@@ -2,35 +2,41 @@
 	<h1>*HTML Toolbar for Text Selection*</h1>
 	<div class="vedor-toolbar">
 		<ul class="vedor-buttons">
-			<li><button data-vedor-section="vedor-text-style" class="vedor-expands"><i class="fa fa-magic"></i>{vd.editor:style}</button></li>
-			<li><button data-vedor-section="vedor-text-align" class="vedor-expands"><i class="fa fa-align-left"></i>{vd.editor:align}</button></li>
-			<li><button data-vedor-section="vedor-clipboard" class="vedor-expands"><i class="fa fa-clipboard"></i>{vd.editor:clipboard}</button></li>
-			<li><button data-vedor-action="vedor-hyperlink-insert" data-vedor-section="vedor-hyperlink"><i class="fa fa-link"></i>{vd.editor:link}</button></li>
-			<li><button data-vedor-section="vedor-code" data-vedor-action="vedor-edit-source"><i class="fa fa-code"></i>{vd.editor:code}</button></li>
+			<li><button data-vedor-section="vedor-text-style" class="vedor-expands"><i class="fa fa-magic"></i>Style</button></li>
+			<li><button data-vedor-section="vedor-text-align" class="vedor-expands"><i class="fa fa-align-left"></i>Align</button></li>
+			<li><button data-vedor-section="vedor-clipboard" class="vedor-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
+			<li><button data-vedor-action="vedor-hyperlink-insert" data-vedor-section="vedor-hyperlink"><i class="fa fa-link"></i>Link</button></li>
+			<li><button data-vedor-section="vedor-code" data-vedor-action="vedor-edit-source"><i class="fa fa-code"></i>Code</button></li>
 		</ul>
 		<div class="vedor-toolbar-section vedor-text-style">
 			<ul>
-				<li class="vedor-text-format"><select name="textStyle" id="vdTextStyle">
+				<li class="vedor-text-format"><select name="textStyle">
+					<option value="h1">Heading 1</option>
+					<option value="h2">Heading 2</option>
+					<option value="h3">Heading 3</option>
+					<option value="p">Paragraph</option>
+					<option value="ul">Unnumbered list</option>
+					<option value="ol">Numbered list</option>
 				</select></li>
-				<li class="vedor-text-bold"><button data-vedor-action="vedor-text-bold"><i class="fa fa-bold"></i>{vd.editor:bold}</button></li>
-				<li class="vedor-text-italic"><button data-vedor-action="vedor-text-italic"><i class="fa fa-italic"></i>{vd.editor:italic}</button></li>
-				<li class="vedor-text-underline"><button data-vedor-action="vedor-text-underline"><i class="fa fa-underline"></i>{vd.editor:underline}</button></li>
+				<li class="vedor-text-bold"><button data-vedor-action="vedor-text-bold"><i class="fa fa-bold"></i>Bold</button></li>
+				<li class="vedor-text-italic"><button data-vedor-action="vedor-text-italic"><i class="fa fa-italic"></i>Italic</button></li>
+				<li class="vedor-text-underline"><button data-vedor-action="vedor-text-underline"><i class="fa fa-underline"></i>Underline</button></li>
 			</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-text-align" data-type="vedor-buttongroup-radio">
 			<ul>
-			<li><button data-vedor-action="vedor-text-align-left" data-value="left" class="vedor-align-left"><i class="fa fa-align-left"></i>{vd.editor:left}</button></li>
-			<li><button data-vedor-action="vedor-text-align-center" data-value="center" class="vedor-align-center"><i class="fa fa-align-center"></i>{vd.editor:center}</button></li>
-			<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>{vd.editor:right}</button></li>
-			<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>{vd.editor:justify}</button></li>
+			<li><button data-vedor-action="vedor-text-align-left" data-value="left" class="vedor-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+			<li><button data-vedor-action="vedor-text-align-center" data-value="center" class="vedor-align-center"><i class="fa fa-align-center"></i>Center</button></li>
+			<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+			<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
 			</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-clipboard">
 			<ul>
-				<li><button class="vedor-clipboard-cut"><i class="fa fa-scissors"></i>{vd.editor:cut}</button></li>
-				<li><button class="vedor-clipboard-copy"><i class="fa fa-files-o"></i>{vd.editor:copy}</button></li>
-				<li><button class="vedor-clipboard-paste"><i class="fa fa-clipboard"></i>{vd.editor:paste}</button></li>
-				<li><button class="vedor-clipboard-select-all" data-vedor-action="vedor-clipboard-select-all"><i class="fa fa-arrows-alt"></i>{vd.editor:selectall}</button></li>
+				<li><button class="vedor-clipboard-cut"><i class="fa fa-scissors"></i>Cut</button></li>
+				<li><button class="vedor-clipboard-copy"><i class="fa fa-files-o"></i>Copy</button></li>
+				<li><button class="vedor-clipboard-paste"><i class="fa fa-clipboard"></i>Paste</button></li>
+				<li><button class="vedor-clipboard-select-all" data-vedor-action="vedor-clipboard-select-all"><i class="fa fa-arrows-alt"></i>Select all</button></li>
 			</ul>
 		</div>
 	</div>
@@ -39,4 +45,35 @@
 	editor.addContextFilter("vedor-text-selection", {
 		"sel-collapsed" : false
 	});
+
+ 	editor.actions['vedor-text-bold'] = function() {
+		replaceNodeTags("STRONG", "B");
+		setFormat("Bold");
+		replaceNodeTags("B", "STRONG");
+	};
+	editor.actions['vedor-text-italic'] = function() {
+		replaceNodeTags("EM", "I");
+		setFormat("Italic");
+		replaceNodeTags("I", "EM");		
+	};
+	editor.actions['vedor-text-underline'] = function() {
+		setFormat("Underline");
+	};
+	editor.actions['vedor-text-align-left'] = function() {
+		setFormat("JustifyLeft");
+	};
+	editor.actions['vedor-text-align-right'] = function() {
+		setFormat("JustifyRight");
+	};
+	editor.actions['vedor-text-align-center'] = function() {
+		setFormat("JustifyCenter");
+	};
+	editor.actions['vedor-text-align-justify'] = function() {
+		setFormat("JustifyFull");
+	};
+	editor.actions['vedor-text-align-left'] = function() {
+		setFormat("JustifyLeft");
+	};
+
+	muze.event.attach(document.querySelector("#vedor-text-selection [name=textStyle]"), "change", function() { setFormatStyle(this.value); } );
 </script>

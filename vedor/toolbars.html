@@ -31,6 +31,7 @@
 		}
 
 		document.body.onclick = function(evt) {
+//			evt.preventDefault();
 			var el = evt.target;
 			if ( el.tagName=='I' ) {
 				el = el.parentNode;
@@ -38,6 +39,7 @@
 			if ( el.tagName == 'BUTTON' ) {
 				var action = editor.actions[el.getAttribute("data-vedor-action")];
 				if (action) {
+					evt.preventDefault();
 					var result = action(el);
 					if (!result) {
 						return;
@@ -489,13 +491,238 @@
 		return styleNode;
 	}
 
+	if( window.getSelection ) {
+		var selection = document.defaultView.getSelection();
+		if( selection && selection.setBaseAndExtent ) { // broken webkit
+			document.addEventListener("click", function(event) {
+				var target = muze.event.target(event);
+				if( target.tagName == 'IMG' ) {
+					var selection = document.defaultView.getSelection();
+					selection.setBaseAndExtent(target, 0, target, 1);
+					vdEditPane_DisplayChanged();
+				}
+			});
+		}
+	}
+
+
+	function updateHtmlContext() {
+		// Check if the current selection is part of an uneditable thing, if so, move the selection to that parent;
+		var sel = vdSelectionState.get();
+		var parent = vdSelection.getNode(sel);
+		// console.log(parent);
+		var selParent = getUneditableParent(parent);
+		if (selParent) {
+			// console.log(selParent);
+			// Selection if part of something uneditable
+			sel.selectNode(selParent);
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+			vdSelectionState.save(sel);
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges()
+		}
+
+		showVedorEditorContext();
+
+		var parent			= false;
+		var sel				= vdSelectionState.get();
+		var imgOptions		= false;
+		var htmlblockOptions= false;
+		var newContextStack	= new Array();
+
+
+		if (sel) {
+			parent = vdSelection.getNode(sel);
+
+			var contextString=new String();
+			while (parent && hasEditableParent(parent) && parent.parentNode) {
+				if (!imgOptions && parent.tagName=='IMG') {
+					imgOptions=true;
+					currentImage=parent;
+					imgStackIndex=newContextStack.length;
+				}
+				try {
+					if (!htmlblockOptions && parent.getAttribute('ar:type')=='htmlblock') {
+						var htmlblock_id = parent.getAttribute('ar:id');
+						if (tbContentEditOptions['htmlblocks'][htmlblock_id]['context']) {
+							// var context_tmpl = tbContentEditOptions['htmlblocks'][htmlblock_id]['context'];
+							htmlblockStackIndex = newContextStack.length;
+							currentHTMLBlock = parent;
+							htmlblockOptions = true;
+							if( window.getSelection ) { // FF and Co
+								if( sel.collapsed ) {
+									var selection = document.defaultView.getSelection();
+									if( selection.setBaseAndExtent ) { // broken webkit
+										selection.setBaseAndExtent(currentHTMLBlock, 0, currentHTMLBlock, 1);
+									} else {
+										sel.selectNode( currentHTMLBlock );
+										sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+										sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+									}
+								}
+							} else {
+								if (!sel.text) {
+									var r = document.body.createControlRange();
+									r.add( currentHTMLBlock );
+									r.select();
+								}
+							}
+							//alert('htmlblock with context template found');
+						}
+					} else if ( parent.getAttribute('contentEditable') == 'false' ) {
+						// uneditable content block
+						currentHTMLBlock = parent;
+						if( window.getSelection ) { // FF and Co
+							if( sel.collapsed ) {
+								var selection = document.defaultView.getSelection();
+								if( selection.setBaseAndExtent ) { // broken webkit
+									selection.setBaseAndExtent(currentHTMLBlock, 0, currentHTMLBlock, 1);
+								} else {
+									sel.selectNode( currentHTMLBlock );
+									sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+									sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+								}
+							}
+						} else {
+							if (!sel.text) {
+								var r = document.body.createControlRange();
+								r.add( currentHTMLBlock );
+								r.select();
+							}
+						}
+					}
+				} catch(e) {
+				}
+
+				newContextStack.push(parent);
+				contextString='<li unselectable="on"><a class="tag" href="#" title="{vd.editor:selecttag}" unselectable="on" onClick="showContextInfo('+(newContextStack.length-1)+',this);">'+parent.tagName +
+				//	'<span unselectable="on" class="deltag" title="{vd.editor:removetag}" onClick="return vdDelTag('+(newContextStack.length-1)+')">X</span>' +
+					'</a></li>'+contextString;
+				parent=parent.parentNode;
+			}
+		}
+
+//		setHtmlTagsContext('<ul class="tagStack" unselectable="on"><li class="vedor-label">{vd.editor:htmlcontext}</li>'+contextString+'</ul>');
+		vdHtmlContextStack=newContextStack;
+
+		if (htmlblockOptions) {
+			var context_tmpl = tbContentEditOptions['htmlblocks'][htmlblock_id]['context'];
+			var vdHTMLBlockProperties = document.getElementById('vdHTMLBlockProperties');
+			vdHTMLBlockProperties.src = objectURL + context_tmpl;
+		}
+
+		if (imgOptions) {
+//			initImageProperties(currentImage);
+		}
+	}
+
+	function getUneditableParent(checkParent) {
+		var parent = checkParent;
+		while (parent) {
+			if (parent.className && parent.className.match(/\buneditable\b/)) {
+				return parent;
+			} else if (parent.className && parent.className.match(/\beditable\b/)) {
+				return false;
+			}
+			parent = parent.parentNode;
+		}
+		return false;
+	}
+
+	function replaceNodeTags(source, target) {
+		var field = getEditableField();
+		if (!field) {
+			return;
+		}
+		var sel = vdSelectionState.get();
+		vedor.editor.bookmarks.set(sel);
+
+		var elms = field.querySelectorAll(source);
+		for (var i=0; i<elms.length; i++) {
+			var newNode = document.createElement(target);
+			newNode.innerHTML = elms[i].innerHTML;
+
+			elms[i].parentNode.replaceChild(newNode, elms[i]);
+		}
+
+		vedor.editor.bookmarks.select();
+		vedor.editor.bookmarks.remove();
+	}
+
+
+	function setFormat(command, value) {
+		var blockRe=new RegExp('(H[1-7])|P');
+		var skipExecCommand=false;
+		var field=getEditableField();
+		if (!field) {
+			return;
+		}
+		registerChange(field.id);
+
+		var sel = vdSelectionState.get();
+
+		var target = document;
+		if( !window.getSelection && target.selection.type != "None" ) { // make sure we execCommand on the selection for IE.
+			target = sel;
+		}
+
+		target.execCommand(command, false, value);
+
+		vdSelectionState.restore();
+
+		vdStoreUndo();
+		vdEditPane_DisplayChanged();
+		return true;
+	}
+
+	function registerChange(field) {
+	}
+	function vdEditPane_DisplayChanged() {
+	}
+	function vdStoreUndo() {
+	}
+
+	function getEditableField() {
+		var vdParent=false;
+		var sel = vdSelectionState.get();
+		if (sel) {
+			vdParent = vdSelection.getNode(sel);
+			while(vdParent) {
+				if (vdParent.className && vdParent.className.match(/\beditable\b/)) {
+					return vdParent;
+				} else if (vdParent.getAttribute("data-vedor-field")) {
+					return vdParent;
+				} else {
+					vdParent = vdParent.parentNode;
+				}
+			}
+			return false;
+		}
+		return false;
+	}
+
+	function setFormatStyle(styleInfo) {
+		var field=getEditableField();
+		if (!field) {
+			return false;
+		}
+
+		vedor.editor.styles.init(window);
+		vedor.editor.styles.format(styleInfo, field);
+
+		vdStoreUndo();
+
+		vdEditPane_DisplayChanged();
+		return true;
+	}
+
 	window.setTimeout(function() {
 		vdSelectionState = vedor.editor.selection;
 		vdSelection = vedor.dom.selection;
 		vdSelectionState.init(window);
 		selectionchange.start(document); // onselectionchange event for Firefox
 
-		muze.event.attach( document, 'selectionchange', showVedorEditorContext );
-		muze.event.attach( document, 'keyup', showVedorEditorContext );
+		muze.event.attach( document, 'selectionchange', updateHtmlContext );
+		muze.event.attach( document, 'keyup', updateHtmlContext );
 	}, 1000);
 </script>
