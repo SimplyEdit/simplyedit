@@ -70,7 +70,7 @@
 				}
 
 				editor.data.initLists(data);
-				localStorage['data'] = JSON.stringify(data);
+				localStorage['data'] = JSON.stringify(data, null, "\t");
 			},
 			stash : function() {
 				var data = {};
@@ -143,7 +143,7 @@
 					delete stashedFields[i].dataset['vedorStashed'];
 				}
 
-				localStorage.data = JSON.stringify(data);
+				localStorage.data = JSON.stringify(data, null, "\t");
 			},
 			save : function() {
 				if (editor.storage.connect()) {
