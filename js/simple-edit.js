@@ -1,3 +1,4 @@
+
 (function() {
 	var editor = {
 		storage : {
@@ -188,6 +189,14 @@
 						for (var t=0; t<templates.length; t++) {
 							var templateName = templates[t].dataset["vedorTemplate"] ? templates[t].dataset["vedorTemplate"] : t;
 							dataLists[i].templates[templateName] = templates[t].cloneNode(true);
+							if (!("content" in dataLists[i].templates[templateName])) {
+								var fragment = document.createDocumentFragment();
+								content  = dataLists[i].templates[templateName].children;
+								for (j = 0; node = content[j]; j++) {
+									fragment.appendChild(node);
+								}
+								dataLists[i].templates[templateName].content = fragment;
+							}
 						}
 						dataLists[i].innerHTML = '';
 
@@ -207,6 +216,11 @@
 									editor.field.set(dataFields[k], listData[j][dataName]);
 								}
 							}
+
+							if (!("firstElementChild" in clone)) {
+								clone.firstElementChild = clone.firstChild;
+							}
+
 							if (templates.length > 1) {
 								clone.firstElementChild.dataset["vedorTemplate"] = requestedTemplate;
 							}
@@ -309,6 +323,14 @@
 								if(http.readyState == 4 && http.status == 200) {
 									var toolbars = document.createElement("TEMPLATE");
 									toolbars.innerHTML = http.responseText;
+									if (!("content" in toolbars)) {
+										var fragment = document.createDocumentFragment();
+										content  = toolbars.children;
+										for (j = 0; node = content[j]; j++) {
+											fragment.appendChild(node);
+										}
+										toolbars.content = fragment;
+									}
 									var toolbarNode = document.importNode(toolbars.content, true);
 									var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
 									for (var i=0; i<newToolbars.length; i++) {
@@ -331,6 +353,14 @@
 					if(http.readyState == 4 && http.status == 200) {
 						var toolbars = document.createElement("TEMPLATE");
 						toolbars.innerHTML = http.responseText;
+						if (!("content" in toolbars)) {
+							var fragment = document.createDocumentFragment();
+							content  = toolbars.children;
+							for (j = 0; node = content[j]; j++) {
+								fragment.appendChild(node);
+							}
+							toolbars.content = fragment;
+						}
 						var toolbarNode = document.importNode(toolbars.content, true);
 						var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
 						for (var i=0; i<newToolbars.length; i++) {
@@ -525,3 +555,4 @@
 	window.editor = editor;
 	editor.init();
 }());
+
