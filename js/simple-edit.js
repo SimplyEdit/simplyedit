@@ -307,7 +307,8 @@
 					var toolbars = [
 						"/simple-edit/vedor/toolbar.vedor-main-toolbar.html",
 						"/simple-edit/vedor/toolbar.vedor-text-cursor.html",
-						"/simple-edit/vedor/toolbar.vedor-text-selection.html"
+						"/simple-edit/vedor/toolbar.vedor-text-selection.html",
+						"/simple-edit/vedor/toolbar.vedor-image.html"
 					];
 
 
@@ -501,7 +502,7 @@
 				editor.storage.disconnect();
 				document.location.href = document.location.href.split("#")[0];
 			},
-			toolbarMonitor() {
+			toolbarMonitor : function() {
 				var target = document.querySelector('#vedor-main-toolbar');
 				if (!target) {
 					window.setTimeout(editor.editmode.toolbarMonitor, 100);
