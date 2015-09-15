@@ -2,6 +2,63 @@
 	var editor = {
 		storage : {
 			url : 'http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simple-edit-data/',
+			save : function(data, callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "save";
+				var params = "data=" + escape(data);
+				params += "&key=" + editor.storage.key;
+
+				http.open("POST", url, true);
+				//Send the proper header information along with the request
+				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+				       		callback();
+					}
+				}
+				http.send(params);
+			},
+			load : function(callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "get";
+				url += "?t=" + (new Date().getTime());
+
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback(http.responseText);
+					}
+				}
+				http.send();
+			},
+			validateKey : function(key) {
+				if (key == "demo") {
+					return true;
+				}
+				if (key == "df5207267b592b6cf158898fed1527cccc03349a") {
+					return true;
+				}
+			},
+			connect : function() {
+				if (!editor.storage.key) {
+					editor.storage.key = localStorage['storageKey'];
+				}
+				if (!editor.storage.key) {
+					editor.storage.key = prompt("Please enter your authentication key");
+				}
+
+				if (editor.storage.validateKey(editor.storage.key)) {
+					localStorage["storageKey"] = editor.storage.key;
+					return true;
+				} else {
+					return editor.storage.connect();
+				}
+			},
+			disconnect : function() {
+				delete editor.storage.key;
+				delete localStorage['storageKey'];
+			}
 		},
 		data : {
 			apply : function(data) {
@@ -92,59 +149,29 @@
 				localStorage.data = JSON.stringify(data);
 			},
 			save : function() {
-				if (!localStorage["ariadneStorageKey"]) {
-					editor.editmode.requestKey();
-				}
-
-				if (editor.editmode.validateKey(localStorage["ariadneStorageKey"])) {
+				if (editor.storage.connect()) {
 					editor.data.stash();
-
-					var http = new XMLHttpRequest();
-					var url = editor.storage.url + "save";
-					var params = "data=" + escape(localStorage.data);
-					params += "&key=" + localStorage["ariadneStorageKey"];
-
-					http.open("POST", url, true);
-
-					//Send the proper header information along with the request
-					http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4 && http.status == 200) {
-					       		alert("Saved!");
-						}
-					}
-					http.send(params);
+					editor.storage.save(localStorage.data, function() {
+						alert("Saved!");
+					});
 				} 
 			},
 			load : function() {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "get";
-				url += "?t=" + (new Date().getTime());
+				editor.storage.load(function(data) {
+					editor.data.apply(JSON.parse(data));
 
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						editor.data.apply(JSON.parse(http.responseText));
-
-						var checkEdit = function() {
-							if (document.location.hash == "#vedor-edit") {
-								var key = localStorage['ariadneStorageKey'];
-								if (!key) {
-									editor.editmode.requestKey();
-								}
-								if (editor.editmode.validateKey(localStorage['ariadneStorageKey'])) {
-									editor.editmode.init();
-									editor.editmode.editable(document);
-								}
+					var checkEdit = function() {
+						if (document.location.hash == "#vedor-edit") {
+							if (editor.storage.connect()) {
+								editor.editmode.init();
+								editor.editmode.editable(document);
 							}
-						};
+						}
+					};
 
-						window.addEventListener("hashchange", checkEdit);
-						checkEdit();
-					}
-				}
-				http.send();
+					window.addEventListener("hashchange", checkEdit);
+					checkEdit();
+				});
 			},
 			initLists : function(data) {
 				var dataLists = document.querySelectorAll("[data-vedor-list]");
@@ -376,25 +403,6 @@
 
 				editor.editmode.sortable(target);
 			},
-			validateKey : function(key) {
-				if (key == "demo") {
-					return true;
-				}
-				if (key == "df5207267b592b6cf158898fed1527cccc03349a") {
-					return true;
-				}
-			},
-			requestKey : function() {
-				var key = prompt("Please enter your authentication key");
-				if (key) {
-					if (editor.editmode.validateKey(key)) {
-						editor.storagekey = key;
-						localStorage["ariadneStorageKey"] = key;
-					} else {
-						editor.editmode.requestKey(key);
-					}		
-				}
-			},
 			sortable : function(target) {
 				if (!window.Slip) {
 					window.setTimeout(function() {
@@ -434,7 +442,7 @@
 				}
 			},
 			stop : function() {
-				delete localStorage["ariadneStorageKey"];
+				editor.storage.disconnect();
 				document.location.href = document.location.href.split("#")[0];
 			},
 			toolbarMonitor() {
