@@ -380,6 +380,33 @@
 		initSortable(target);
 	}
 
+	var startToolbarMonitor = function() {
+/*		window.setInterval(function() {
+			if (document.getElementById("vedor-main-toolbar")) {
+				document.body.style.position = "relative";
+				document.body.style.top = document.getElementById("vedor-main-toolbar").offsetHeight + "px";
+			}
+		}, 500);
+*/
+
+		var target = document.querySelector('#vedor-main-toolbar');
+
+		// create an observer instance
+		var observer = new MutationObserver(function(mutations) {
+			document.body.style.position = "relative";
+			document.body.style.top = document.getElementById("vedor-main-toolbar").offsetHeight + "px";
+		});
+ 
+		// configuration of the observer:
+		var config = { childList: true, subtree: true, attributes: true, characterData: true };
+
+		document.body.style.position = "relative";
+		document.body.style.top = document.getElementById("vedor-main-toolbar").offsetHeight + "px";
+ 
+		// pass in the target node, as well as the observer options
+		observer.observe(target, config);
+
+	}
 
 	var logout = function() {
 		delete localStorage["ariadneStorageKey"];
@@ -397,6 +424,7 @@
 				var toolbars = document.createElement("DIV");
 				toolbars.innerHTML = http.responseText;
 				document.body.appendChild(toolbars);
+				startToolbarMonitor();
 			}
 		}
 		http.send();
