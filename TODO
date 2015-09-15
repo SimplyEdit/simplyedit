@@ -1,4 +1,3 @@
-- Support toevoegen voor huidige (floating) toolbars
 - Images
 - Hyperlinks
 - Meta title
@@ -6,3 +5,4 @@
 - Lijsten in lijsten ?
 
 [v] Meerdere templates per lijst
+[v] Support toevoegen voor huidige (floating) toolbars

@@ -52,6 +52,7 @@
 					localStorage["storageKey"] = editor.storage.key;
 					return true;
 				} else {
+					delete localStorage["storageKey"];
 					return editor.storage.connect();
 				}
 			},
@@ -281,44 +282,58 @@
 		},
 		editmode : {
 			init : function() {
-				var http = new XMLHttpRequest();
-				var url = "/simple-edit/vedor/toolbars.html";
-				url += "?t=" + (new Date().getTime());
+				var toolbars = [
+					"/simple-edit/vedor/toolbars.html",
+				];
 
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						var toolbars = document.createElement("DIV");
-						toolbars.innerHTML = http.responseText;
-						document.body.appendChild(toolbars);
-						editor.editmode.toolbarMonitor();
+				var toolbarsContainer = document.createElement("DIV");
+				document.body.appendChild(toolbarsContainer);
 
-						toolbars.addEventListener("click", function(event) {
-							var el = event.target;
-							if ( el.tagName=='I' ) {
-								el = el.parentNode;
+				for (i in toolbars) {
+					(function() {
+						var http = new XMLHttpRequest();
+						var url = toolbars[i];
+						url += "?t=" + (new Date().getTime());
+						console.log(url);
+
+						http.open("GET", url, true);
+						http.onreadystatechange = function() {//Call a function when the state changes.
+							if(http.readyState == 4 && http.status == 200) {
+								var toolbars = document.createElement("TEMPLATE");
+								toolbars.innerHTML = http.responseText;
+								toolbarsContainer.appendChild(document.importNode(toolbars.content, true));
 							}
-
-							switch(el.dataset["vedorAction"]) {
-								case null:
-								case undefined:
-								break;
-								default:
-									var action = editor.actions[el.dataset["vedorAction"]];
-									if (action) {
-										var result = action(el);
-										if (!result) {
-											return;
-										}
-									} else {
-										console.log(el.getAttribute("data-vedor-action") + " not yet implemented");
-									}
-								break;
-							}
-						});
-					}
+						}
+						http.send();
+					}());
 				}
-				http.send();
+
+				
+				editor.editmode.toolbarMonitor();
+
+				toolbarsContainer.addEventListener("click", function(event) {
+					var el = event.target;
+					if ( el.tagName=='I' ) {
+						el = el.parentNode;
+					}
+
+					switch(el.dataset["vedorAction"]) {
+						case null:
+						case undefined:
+						break;
+						default:
+							var action = editor.actions[el.dataset["vedorAction"]];
+							if (action) {
+								var result = action(el);
+								if (!result) {
+									return;
+								}
+							} else {
+								console.log(el.getAttribute("data-vedor-action") + " not yet implemented");
+							}
+						break;
+					}
+				});
 
 				// Add slip.js for sortable items;
 				var scriptTag = document.createElement("SCRIPT");
@@ -447,6 +462,10 @@
 			},
 			toolbarMonitor() {
 				var target = document.querySelector('#vedor-main-toolbar');
+				if (!target) {
+					window.setTimeout(editor.editmode.toolbarMonitor, 100);
+					return false;
+				}
 
 				var setBodyTop = function() {
 					document.body.style.position = "relative";
@@ -470,6 +489,26 @@
 	editor.actions = {
 		"vedor-save" : editor.data.save,
 		"vedor-logout" : editor.editmode.stop
+	}
+
+	editor.toolbars = {};
+	editor.contextFilters = {};
+
+	editor.addToolbar = function(toolbar) {
+		if (toolbar.filter) {
+			editor.addContextFilter(toolbar.name, toolbar.filter);
+		}
+		for (i in toolbar.actions) {
+			editor.actions[i] = toolbar.actions[i];
+		}
+		editor.toolbars[toolbar.name] = toolbar;
+	}
+
+	editor.addContextFilter = function(name, filter) {
+		if (!filter['context']) {
+			filter['context'] = name;
+		}
+		editor.contextFilters[name] = filter;
 	}
 
 	window.editor = editor;
