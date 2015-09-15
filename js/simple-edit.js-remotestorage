@@ -1,0 +1,232 @@
+(function() {
+	var ariadneStorage = {
+		url : 'http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simple-edit-data/',
+	};
+
+	var validateKey = function(key) {
+		if (key == "df5207267b592b6cf158898fed1527cccc03349a") {
+			return true;
+		}
+	}
+
+	var applyData = function(data) {
+		var dataFields = document.querySelectorAll("[data-vedor-field]");
+		for (var i=0; i<dataFields.length; i++) {
+			var dataName = dataFields[i].dataset["vedorField"];
+			var dataPath = dataFields[i].dataset["vedorPath"] ? dataFields[i].dataset["vedorPath"] : location.pathname;
+
+			if (data[dataPath] && data[dataPath][dataName]) {
+				if (dataFields[i].tagName == "IMG") {
+					dataFields[i].setAttribute("src", data[dataPath][dataName]);
+				} else {
+					dataFields[i].innerHTML = data[dataPath][dataName];
+				}
+			}
+		}
+	}
+
+	var stashData = function() {
+		var data = {};
+		if (localStorage.data) {
+			data = JSON.parse(localStorage.data);
+		}
+		var dataFields = document.querySelectorAll("[data-vedor-field]");
+		for (var i=0; i<dataFields.length; i++) {
+			var dataName = dataFields[i].dataset["vedorField"];
+			var dataPath = dataFields[i].dataset["vedorPath"] ? dataFields[i].dataset["vedorPath"] : location.pathname;
+
+			if (!data[dataPath]) {
+				data[dataPath] = {};
+			}
+
+			if (dataFields[i].tagName == "IMG") {
+				data[dataPath][dataName] = dataFields[i].getAttribute("src");
+			} else {
+				data[dataPath][dataName] = dataFields[i].innerHTML;
+			}
+		}
+		localStorage.data = JSON.stringify(data);
+//		remoteStorage.notes.setNote(JSON.stringify(data));
+	}
+
+	var requestKey = function() {
+		var key = prompt("Please enter your authentication key");
+		if (key) {
+			if (validateKey(key)) {
+				ariadneStorage.key = key;
+			} else {
+				requestKey(key);
+			}		
+		}
+	}
+
+	var saveData = function() {
+		if (!ariadneStorage.key) {
+			requestKey();
+		}
+
+		if (ariadneStorage.key) {
+			stashData();
+	//		remoteStorage.notes.setNote(localStorage.data);		
+
+			var http = new XMLHttpRequest();
+			var url = ariadneStorage.url + "save";
+			var params = "data=" + escape(localStorage.data);
+			params += "&key=" + ariadneStorage.key;
+
+			http.open("POST", url, true);
+
+			//Send the proper header information along with the request
+			http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+			http.onreadystatechange = function() {//Call a function when the state changes.
+				if(http.readyState == 4 && http.status == 200) {
+			       		alert("Saved!");
+				}
+			}
+			http.send(params);
+		}
+	}
+
+	var loadData = function() {
+		var http = new XMLHttpRequest();
+		var url = ariadneStorage.url + "get";
+		url += "?t=" + (new Date().getTime());
+
+		http.open("GET", url, true);
+		http.onreadystatechange = function() {//Call a function when the state changes.
+			if(http.readyState == 4 && http.status == 200) {
+				console.log(http.responseText);
+				applyData(JSON.parse(http.responseText));
+			}
+		}
+		http.send();
+	}
+
+	var initEditable = function() {
+		var dataFields = document.querySelectorAll("[data-vedor-field]");
+		for (var i=0; i<dataFields.length; i++) {
+			dataFields[i].contentEditable = true;
+			dataFields[i].addEventListener("keyup", function() {
+				var clones = document.querySelectorAll("[data-vedor-field='" + this.dataset["vedorField"] + "']");
+				var dataPath = this.dataset["vedorPath"] ? this.dataset["vedorPath"] : location.pathname;
+
+				for (var j=0; j<clones.length; j++) {
+					cloneDataPath = clones[j].dataset["vedorPath"] ? clones[j].dataset["vedorPath"] : location.pathname;
+					if (cloneDataPath == dataPath) {
+						if (clones[j].innerHTML != this.innerHTML) {
+							clones[j].innerHTML = this.innerHTML;
+						}
+					}
+				}
+			});
+		}
+
+		var hyperlinks = document.querySelectorAll("a[data-vedor-field]");
+		for (var i=0; i<hyperlinks.length; i++) {
+			hyperlinks[i].addEventListener("dblclick", function(event) {
+				console.log("doubleclick");
+				document.location.href = this.href;
+			});
+		}
+
+		var images = document.querySelectorAll("img[data-vedor-field]");
+		for (var i=0; i<images.length; i++) {
+			images[i].addEventListener("drop", function(event) {
+				var imageData = event.dataTransfer.getData("text/html");
+
+				var container = document.createElement("DIV");
+				container.innerHTML = imageData;
+				
+				var image = container.querySelector("img");
+
+				if (image && image.getAttribute("src")) {
+					this.src = image.getAttribute("src");
+				}
+				if (event.stopPropagation) {
+					event.stopPropagation(); // stops the browser from redirecting.
+				}				
+			});
+		}
+	}
+
+	var vedor = {};
+	vedor.editor = {};
+	vedor.editor.actions = {
+		"vedor-save" : saveData
+	};
+
+	var initToolbars = function() {
+		var http = new XMLHttpRequest();
+		var url = "/simple-edit/vedor/toolbars.html";
+		url += "?t=" + (new Date().getTime());
+
+		http.open("GET", url, true);
+		http.onreadystatechange = function() {//Call a function when the state changes.
+			if(http.readyState == 4 && http.status == 200) {
+				console.log(http.responseText);
+				var toolbars = document.createElement("DIV");
+				toolbars.innerHTML = http.responseText;
+				document.body.appendChild(toolbars);
+			}
+		}
+		http.send();
+
+		document.body.addEventListener("click", function(event) {
+			var el = event.target;
+			if ( el.tagName=='I' ) {
+				el = el.parentNode;
+			}
+			switch(el.dataset["vedorAction"]) {
+				case null:
+				break;
+				default:
+					var action = vedor.editor.actions[el.dataset["vedorAction"]];
+					if (action) {
+						var result = action(el);
+						if (!result) {
+							return;
+						}
+					} else {
+						console.log(el.getAttribute("data-vedor-action") + " not yet implemented");
+					}
+				break;
+			}
+		});
+
+	}
+
+//	if (localStorage.data) {
+//		applyData(JSON.parse(localStorage.data));
+//	}
+
+	loadData();
+
+	initToolbars();
+	initEditable();
+
+	window.addEventListener("beforeunload", function() {
+		stashData();
+	});
+
+//	RemoteStorage.config.logging = true;
+//	RemoteStorage.config.changeEvents = {
+//		local: true,
+//		window: true,
+//		remote: true,
+//		conflict: true
+//	};
+
+	function displayNote() {
+		var text = remoteStorage.notes.getNote();
+		applyData(JSON.parse(text));
+		console.log(text);
+	}
+
+//	remoteStorage.access.claim('notes', 'rw');
+//	remoteStorage.displayWidget();
+//	remoteStorage.notes.onChange(displayNote);
+
+	window.saveData = saveData;
+	window.loadData = loadData;
+}());

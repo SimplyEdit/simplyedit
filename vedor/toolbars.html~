@@ -1,0 +1,15 @@
+<link rel="stylesheet" href="/simple-edit/vedor/css/editor.v9.css" type="text/css">
+<!-- script type="text/javascript" src="/ariadne/js/vedor.js"></script -->
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<section id="vedor-main-toolbar" class="vedor-section">
+	<div class="vedor-toolbar" data-vedor-section="vedor-page-management">
+		<ul class="vedor-buttons">
+			<li>
+				<button data-vedor-action="vedor-save"><i class="fa fa-save"></i>Opslaan</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-logout"><i class="fa fa-save"></i>Uitloggen</button>
+			</li>
+		</ul>
+	</div>
+</section>

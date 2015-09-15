@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+	<h1 data-vedor-field="title">Thing goes here</h1>
+	<div data-vedor-field="page content">Other things go here</div>
+	<img src="/simple-edit/imgs/muze.png" data-vedor-field="image">
+	<nav>
+		Menu goes here!
+		<ul data-vedor-list="menu" data-vedor-path="/simple-edit/" data-vedor-sortable>
+			<template>
+				<li>
+					<a href="/simple-edit/" data-vedor-field="item">Menu item</a>
+				</li>
+			</template>
+		</ul>
+	</nav>
+	<link rel="import" href="/simple-edit.html">
+</body>
+</html>
