@@ -11,7 +11,7 @@
 		}
 
 		i.vedor-logo {
-			background-image: url('../../images/vedor/vedor.png');
+			background-image: url('../vedor.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			height: 25px;

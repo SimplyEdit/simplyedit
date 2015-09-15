@@ -1,0 +1,122 @@
+<section id="vedor-main-toolbar" class="vedor-section">
+	<div class="vedor-toolbar" data-vedor-section="vedor-page-management">
+		<ul class="vedor-buttons">
+			<li>
+				<button data-vedor-action="vedor">
+					<i class="vedor-logo"></i>Vedor
+				</button>
+			</li>
+			<li class="vedor-seperator"></li>
+			<li>
+				<button data-vedor-action="vedor-save">
+					<i class="fa fa-save"></i>{vd.editor:save}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-section="vedor-manage" class="vedor-expands">
+					<i class="fa fa-folder"></i>{vd.editor:manage_page}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-section="vedor-view" class="vedor-expands">
+					<i class="fa fa-ellipsis-v"></i>{vd.editor:show_more}
+				</button>
+			</li>
+			<li class="vedor-seperator"></li>
+			<li>
+				<button data-vedor-action="vedor-undo" id="VD_UNDO">
+					<i class="fa fa-undo"></i>{vd.editor:undo}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-redo" id="VD_REDO">
+					<i class="fa fa-repeat"></i>{vd.editor:redo}
+				</button>
+			</li>
+			<li class="vedor-seperator"></li>
+			<li>
+				<button data-vedor-action="vedor-help">
+					<i class="fa fa-question-circle"></i>{vd.editor:help}
+				</button>
+			</li>
+			<li class="vedor-seperator"></li>
+			<li id="vedorLanguage" style="display: none !important;">
+				<div class="vedor-list">
+					<button class="vedor-expands" data-vedor-action="vedor-language">
+						<i class="fa fa-flag"></i>{vd.editor:language}
+					</button>
+					<ul id="VD_NLS_SELECT" class="vedor-list-items">
+					</ul>
+				</div>
+			</li>
+		</ul>
+		<div class="vedor-toolbar-section vedor-manage">
+			<ul>
+			<li>
+				<button data-vedor-action="vedor-new" id="NEW">
+					<i class="fa fa-plus-square-o"></i>{vd.editor:new}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-sitemap">
+					<i class="fa fa-sitemap"></i>{vd.editor:sitemap}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-copy">
+					<i class="fa fa-copy"></i>{vd.editor:copy}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-rename">
+					<i class="fa fa-pencil"></i>{vd.editor:rename}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-move">
+					<i class="fa fa-sign-in"></i>{vd.editor:move}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-delete" id="DELETE">
+					<i class="fa fa-trash-o"></i>{vd.editor:delete}
+				</button>
+			</li>
+			</ul>
+		</div>
+		<div class="vedor-toolbar-section vedor-view">
+			<ul>
+			<li>
+				<button data-vedor-action="vedor-borders" id="VD_DETAILS">
+					<i class="fa fa-ellipsis-h"></i>{vd.editor:show_borders}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-show-tags" id="vdShowTagBoundaries">
+					<i class="fa fa-paragraph"></i>{vd.editor:show_boundaries}
+				</button>
+			</li>
+			<li>
+				<button data-vedor-action="vedor-show-tags-stack" id="vdShowTagStack">
+					<i class="fa fa-tags"></i>{vd.editor:show_tags_stack}
+				</button>				
+			</li>
+			<li class="vedor-seperator"></li>
+			<li style="display: none !important;">
+				<button data-vedor-action="vedor-properties" id="VD_META">
+					<i class="fa fa-info-circle"></i>{vd.editor:properties}
+				</button>
+			</li>
+			<li style="display: none !important;">
+				<button data-vedor-action="vedor-context">
+					<i class="fa fa-gears"></i>{vd.editor:context_menu}
+				</button>
+			</li>
+			</ul>
+		</div>
+		<div class="vedor-toolbar-section vedor-toolbar-status vedor-selected">
+			<div class="vedor-context-html">
+			</div>
+		</div>
+	</div>
+</section>

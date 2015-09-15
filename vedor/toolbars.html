@@ -1,108 +1,7 @@
 <link rel="stylesheet" href="/simple-edit/vedor/css/editor.v9.css" type="text/css">
 <!-- script type="text/javascript" src="/ariadne/js/vedor.js"></script -->
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-<script type="text/javascript" src="/ariadne/loader.php/system/users/yvo/simple-edit-data/ariadne.load.js?muze+muze.event+muze.form+muze.html+muze.dialog+muze.ariadne.cookie+muze.util.pngfix+muze.util.splitpane+muze.ariadne.registry+muze.ariadne.explore.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor.js"></script>
-
-<script type="text/javascript" src="/ariadne/js/vedor/dom.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/dom/selection.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/dom/nesting.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/dom/cleaner.js"></script>
-
-<script type="text/javascript" src="/ariadne/js/vedor/util.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/util/base64.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/util/undohandler.js"></script>
-
-<script type="text/javascript" src="/ariadne/js/vedor/widgets.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/widgets/fieldsets.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/widgets/handles.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/widgets/properties.js"></script>
-
-<script type="text/javascript" src="/ariadne/js/vedor/editor.js"></script>
-<!-- script type="text/javascript" src="/ariadne/js/vedor/editor/compose.js"></script -->
-<script type="text/javascript" src="/ariadne/js/vedor/editor/polyfill/qsa-scope.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/polyfill/selectionchange.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/selection.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/bookmarks.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/styles.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/paste.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/keepalive.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/contextbar.js"></script>
-<script type="text/javascript" src="/ariadne/js/vedor/editor/toolbar.js"></script>
-
-<section id="vedor-main-toolbar" class="vedor-section">
-	<div class="vedor-toolbar" data-vedor-section="vedor-page-management">
-		<ul class="vedor-buttons">
-			<li>
-				<button data-vedor-action="vedor-save"><i class="fa fa-save"></i>Opslaan</button>
-			</li>
-			<li>
-				<button data-vedor-action="vedor-logout"><i class="fa fa-power-off"></i>Uitloggen</button>
-			</li>
-		</ul>
-	</div>
-</section>
-
-<section id="vedor-text-cursor" class="vedor-section">
-	<h1>*HTML Toolbar for Text Cursor*</h1>
-	<div class="vedor-toolbar">
-		<ul class="vedor-buttons">
-			<li><button data-vedor-section="vedor-text-style" class="vedor-expands"><i class="fa fa-magic"></i>{vd.editor:style}</button></li>
-			<li><button data-vedor-section="vedor-text-align" class="vedor-expands"><i class="fa fa-align-left"></i>{vd.editor:align}</button></li>
-			<li><button data-vedor-section="vedor-clipboard" class="vedor-expands"><i class="fa fa-clipboard"></i>{vd.editor:clipboard}</button></li>
-			<li><button data-vedor-section="vedor-insert" class="vedor-expands"><i class="fa fa-plus"></i>{vd.editor:insert}</button></li>
-		</ul>
-		<div class="vedor-toolbar-section vedor-text-style">
-			<ul>
-				<li class="vedor-text-format"><select name="textStyle">
-					<option value="h1">{vd.editor:h1}</option>
-					<option value="h2">{vd.editor:h2}</option>
-					<option value="h3">{vd.editor:h3}</option>
-					<option value="p">{vd.editor:default}</option>
-					<option value="ul">{vd.editor:ul}</option>
-					<option value="ol">{vd.editor:ol}</option>
-				</select></li>
-				<!-- li class="vedor-text-bold"><button data-vedor-action="vedor-text-bold"><i class="fa fa-bold"></i>{vd.editor:bold}</button></li>
-				<li class="vedor-text-italic"><button data-vedor-action="vedor-text-italic"><i class="fa fa-italic"></i>{vd.editor:italic}</button></li>
-				<li class="vedor-text-underline"><button data-vedor-action="vedor-text-underline"><i class="fa fa-underline"></i>{vd.editor:underline}</button></li -->
-			</ul>
-		</div>
-		<div class="vedor-toolbar-section vedor-text-align" data-type="vedor-buttongroup-radio">
-			<ul>
-			<li><button data-vedor-action="vedor-text-align-left" data-value="left" class="vedor-align-left"><i class="fa fa-align-left"></i>{vd.editor:left}</button></li>
-			<li><button data-vedor-action="vedor-text-align-center" data-value="center" class="vedor-align-center"><i class="fa fa-align-center"></i>{vd.editor:center}</button></li>
-			<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>{vd.editor:right}</button></li>
-			<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>{vd.editor:justify}</button></li>
-			</ul>
-		</div>
-		<div class="vedor-toolbar-section vedor-insert">
-			<ul>
-				<li><button data-vedor-action="vedor-insert-image" data-vedor-section="vedor-insert-image"><i class="fa fa-picture-o"></i>{vd.editor:image}</button></li>
-				<!-- li><button data-vedor-action="vedor-insert-table" data-vedor-section="vedor-insert-table"><i class="fa fa-table"></i>{vd.editor:table}					<div id="vdTablePopup" style="display: none;" unselectable="on">
-						<div id="vdTablePreview" unselectable="on">
-						</div>
-						<div id="vdTableText" unselectable="on">
-						</div>
-					</div>
-				</button></li -->
-				<!-- li><button data-vedor-action="vedor-insert-symbol" data-vedor-section="vedor-insert-symbol"><i class="fa fa-eur"></i>{vd.editor:symbol}</button></li -->
-				<li><button data-vedor-action="vedor-insert-gadget" data-vedor-section="vedor-insert-gadget"><i class="fa fa-puzzle-piece"></i>{vd.editor:gadget}</button></li>
-				<li><button data-vedor-action="vedor-insert-source" data-vedor-section="vedor-insert-source"><i class="fa fa-code"></i>{vd.editor:code}</button></li>
-			</ul>
-		</div>
-		<div class="vedor-toolbar-section vedor-clipboard">
-			<ul>
-				<li><button class="vedor-clipboard-paste"><i class="fa fa-clipboard"></i>{vd.editor:paste}</button></li>
-				<li><button class="vedor-clipboard-select-all" data-vedor-action="vedor-clipboard-select-all"><i class="fa fa-arrows-alt"></i>{vd.editor:selectall}</button></li>
-			</ul>
-		</div>
-	</div>
-</section>
-<script type="text/javascript">
-	editor.addContextFilter("vedor-text-cursor", {
-		"sel-collapsed" : true
-	});
-</script>
+<script type="text/javascript" src="/ariadne/loader.php/system/users/yvo/simple-edit-data/ariadne.load.js?muze+muze.event+muze.form+muze.html+muze.dialog+muze.ariadne.cookie+muze.util.pngfix+muze.util.splitpane+muze.ariadne.registry+muze.ariadne.explore.js+vedor+vedor.dom+vedor.dom.selection+vedor.dom.nesting+vedor.dom.cleaner+vedor.util+vedor.util.base64+vedor.widgets+vedor.widgets.fieldsets+vedor.widgets.handles+vedor.widgets.properties+vedor.editor+vedor.editor.polyfill.qsa-scope+vedor.editor.polyfill.selectionchange+vedor.editor.selection+vedor.editor.bookmarks+vedor.editor.styles+vedor.editor.paste+vedor.editor.keepalive+vedor.editor.contextbar+vedor.editor.toolbar"></script>
 <script type="text/javascript">
 	(function() {
 		function getToolbar(el) {
@@ -124,7 +23,6 @@
 		var vedorSections = document.querySelectorAll(".vedor-section");
 
 		var toolbars = document.querySelectorAll(".vedor-toolbar");
-		console.log(toolbars);
 
 		for (var i=0; i<toolbars.length; i++) {
 			var marker = document.createElement("div");
@@ -319,7 +217,7 @@
 	function hasEditableParent(checkParent) {
 		var parent = checkParent;
 		while (parent && parent.parentNode) {
-			if (parent.parentNode && parent.parentNode.getAttribute("data-vedor-field")) {
+			if (parent.parentNode.getAttribute && parent.parentNode.getAttribute("data-vedor-field")) {
 				return true;
 			}
 			if (parent.parentNode.className && parent.parentNode.className.match(/\beditable\b/)) {
@@ -495,6 +393,100 @@
 		}
 	}
 
+	function initTextProperties() {
+		var sel = vdSelectionState.get();
+		if (sel) {
+			var parent = vdSelection.getNode(sel);
+			if (parent || parent.getAttribute || parent.getAttribute("contenteditable")) {
+				var parentStyles = getAllStyles(parent);
+
+				var textAlign = document.querySelectorAll(".vedor-text-align[data-type=vedor-buttongroup-radio]");
+				for (var i=0; i<textAlign.length;i++) {
+					var parentStyles = getAllStyles(parent);
+
+					switch (parentStyles["text-align"]) {
+						case "right" :
+							vdSetProperty(textAlign[i], "right");
+						break;
+						case "center" :
+							vdSetProperty(textAlign[i], "center");
+						break;
+						case "justify" :
+							vdSetProperty(textAlign[i], "justify");
+						break;
+						case "left" :
+						default :
+							vdSetProperty(textAlign[i], "left");
+						break;
+					}
+				}
+
+				// Set the parent icon for alignment as well;
+				var currentIcon = document.querySelectorAll("div.vedor-text-align button.vedor-selected i")[0];
+				var icons = document.querySelectorAll("button[data-vedor-section=vedor-text-align] i");
+				for (var i=0; i<icons.length; i++) {
+					icons[i].className = currentIcon.className;
+				}
+
+				// Check "Bold"
+				var textBold = document.querySelectorAll(".vedor-text-bold button");
+				for (var i=0; i<textBold.length; i++) {
+					if (parentStyles["font-weight"] == "bold") {
+						textBold[i].classList.add("vedor-selected");
+					} else {
+						textBold[i].classList.remove("vedor-selected");
+					}
+				}
+
+				// Check "Italic"
+				var textItalic = document.querySelectorAll(".vedor-text-italic button");
+				for (var i=0; i<textItalic.length; i++) {
+					if (parentStyles["font-style"] == "italic") {
+						textItalic[i].classList.add("vedor-selected");
+					} else {
+						textItalic[i].classList.remove("vedor-selected");
+					}
+				}
+
+				// Check "Underline"
+				var textUnderline = document.querySelectorAll(".vedor-text-underline button");
+				for (var i=0; i<textUnderline.length; i++) {
+					if (parentStyles["text-decoration"].match(/underline/)) {
+						textUnderline[i].classList.add("vedor-selected");
+					} else {
+						textUnderline[i].classList.remove("vedor-selected");
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	function getAllStyles(elem) {
+		var styleNode = {};
+		if (!elem) return []; // Element does not exist, empty list.
+		if (elem == document) { return []; } // Document is not what we are looking for;
+
+		var win = document.defaultView || window, style, styleNode = [];
+		if (win.getComputedStyle) { /* Modern browsers */
+			style = win.getComputedStyle(elem, '');
+			for (var i=0; i<style.length; i++) {
+				styleNode[style[i]] = style.getPropertyValue(style[i]);
+				//			   ^name ^		   ^ value ^
+			}
+		} else if (elem.currentStyle) { /* IE */
+			style = elem.currentStyle;
+			for (var name in currentStyle) {
+				styleNode[name] = currentStyle[name];
+			}
+		} else { /* Ancient browser..*/
+			style = elem.style;
+			for (var i=0; i<style.length; i++) {
+				styleNode[style[i]] = style[style[i]];
+			}
+		}
+		return styleNode;
+	}
 
 	window.setTimeout(function() {
 		vdSelectionState = vedor.editor.selection;

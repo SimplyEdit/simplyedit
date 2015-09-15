@@ -282,58 +282,69 @@
 		},
 		editmode : {
 			init : function() {
-				var toolbars = [
-					"/simple-edit/vedor/toolbars.html",
-				];
-
 				var toolbarsContainer = document.createElement("DIV");
 				document.body.appendChild(toolbarsContainer);
 
-				for (i in toolbars) {
-					(function() {
-						var http = new XMLHttpRequest();
-						var url = toolbars[i];
-						url += "?t=" + (new Date().getTime());
-						console.log(url);
+				var http = new XMLHttpRequest();
+				var url = "/simple-edit/vedor/toolbars.html";
+				url += "?t=" + (new Date().getTime());
 
-						http.open("GET", url, true);
-						http.onreadystatechange = function() {//Call a function when the state changes.
-							if(http.readyState == 4 && http.status == 200) {
-								var toolbars = document.createElement("TEMPLATE");
-								toolbars.innerHTML = http.responseText;
-								toolbarsContainer.appendChild(document.importNode(toolbars.content, true));
-							}
-						}
-						http.send();
-					}());
-				}
+				var loadToolbars = function() {
+					var toolbars = [
+						"/simple-edit/vedor/toolbar.vedor-main-toolbar.html",
+						"/simple-edit/vedor/toolbar.vedor-text-cursor.html",
+						"/simple-edit/vedor/toolbar.vedor-text-selection.html"
+					];
 
-				
-				editor.editmode.toolbarMonitor();
 
-				toolbarsContainer.addEventListener("click", function(event) {
-					var el = event.target;
-					if ( el.tagName=='I' ) {
-						el = el.parentNode;
-					}
+					for (i in toolbars) {
+						(function() {
+							var http = new XMLHttpRequest();
+							var url = toolbars[i];
+							url += "?t=" + (new Date().getTime());
+							console.log(url);
 
-					switch(el.dataset["vedorAction"]) {
-						case null:
-						case undefined:
-						break;
-						default:
-							var action = editor.actions[el.dataset["vedorAction"]];
-							if (action) {
-								var result = action(el);
-								if (!result) {
-									return;
+							http.open("GET", url, true);
+							http.onreadystatechange = function() {//Call a function when the state changes.
+								if(http.readyState == 4 && http.status == 200) {
+									var toolbars = document.createElement("TEMPLATE");
+									toolbars.innerHTML = http.responseText;
+									var toolbarNode = document.importNode(toolbars.content, true);
+									var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
+									for (var i=0; i<newToolbars.length; i++) {
+										var marker = document.createElement("div");
+										marker.className = "marker";
+										newToolbars[i].insertBefore(marker, newToolbars[i].firstChild);
+									}
+
+									toolbarsContainer.appendChild(toolbarNode);
 								}
-							} else {
-								console.log(el.getAttribute("data-vedor-action") + " not yet implemented");
 							}
-						break;
+							http.send();
+						}());
 					}
-				});
+					editor.editmode.toolbarMonitor();
+				};
+
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						var toolbars = document.createElement("TEMPLATE");
+						toolbars.innerHTML = http.responseText;
+						var toolbarNode = document.importNode(toolbars.content, true);
+						var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
+						for (var i=0; i<newToolbars.length; i++) {
+							var marker = document.createElement("div");
+							marker.className = "marker";
+							newToolbars[i].insertBefore(marker, newToolbars[i].firstChild);
+						}
+
+						toolbarsContainer.appendChild(toolbarNode);
+						loadToolbars();
+					}
+				}
+				http.send();
+
 
 				// Add slip.js for sortable items;
 				var scriptTag = document.createElement("SCRIPT");
