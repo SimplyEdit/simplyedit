@@ -330,14 +330,15 @@
 
 				if (newleft < 0) {
 					markerLeft = activeToolbar.offsetWidth/2 + newleft;
-					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft;
+
+					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft + "px";
 					newleft = 0;
 				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth) {
 					var delta = newleft + activeToolbar.offsetWidth - document.body.offsetWidth;
 					markerLeft = activeToolbar.offsetWidth/2 + delta;
-					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft;
+					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft + "px";
 
-					newleft = vdEditPane.offsetWidth - activeToolbar.offsetWidth;
+					newleft = document.body.offsetWidth - activeToolbar.offsetWidth;
 				} else {
 					activeToolbar.getElementsByClassName("marker")[0].style.left = "50%";
 				}
