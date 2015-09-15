@@ -1,9 +1,18 @@
-- Images
+- Text selection toolbar toevoegen en werkend maken:
 - Hyperlinks
-- Meta title
+- Images
+- Iets van een server die de merge van html en data serverside doet
+- NLS strings voor toolbars (of hardcoded)
+- Meta title/megatags
 - Sitemap / site management
 - Lijsten in lijsten ?
-- Text selection toolbar toevoegen en werkend maken
 
+---------
+Bugs:
+- IE toont de toolbars niet, omdat hij weigert de scripts van de toolbars
+uit te voeren.
+- Android laad de data niet in
+
+Done:
 [v] Meerdere templates per lijst
 [v] Support toevoegen voor huidige (floating) toolbars
