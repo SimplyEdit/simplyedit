@@ -324,13 +324,16 @@
 								if(http.readyState == 4 && http.status == 200) {
 									var toolbars = document.createElement("TEMPLATE");
 									toolbars.innerHTML = http.responseText;
+									console.log(toolbars);
+
 									if (!("content" in toolbars)) {
 										var fragment = document.createDocumentFragment();
-										content  = toolbars.children;
-										for (j = 0; node = content[j]; j++) {
-											fragment.appendChild(node);
+										while (toolbars.children.length) {
+											fragment.appendChild(toolbars.children[0]);
 										}
 										toolbars.content = fragment;
+
+										toolbars.brokenImport = true;
 									}
 									var toolbarNode = document.importNode(toolbars.content, true);
 									var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
@@ -341,6 +344,19 @@
 									}
 
 									toolbarsContainer.appendChild(toolbarNode);
+									if (toolbars.brokenImport) {
+										var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
+										for (var i=0; i<scriptTags.length; i++) {
+											var newNode = document.createElement("SCRIPT");
+											if (scriptTags[i].src) {
+												newNode.src = scriptTags[i].src;
+											}
+											if (scriptTags[i].innerHTML) {
+												newNode.innerHTML = scriptTags[i].innerHTML;
+											}
+											document.head.appendChild(newNode);
+										}
+									}
 								}
 							}
 							http.send();
@@ -356,12 +372,13 @@
 						toolbars.innerHTML = http.responseText;
 						if (!("content" in toolbars)) {
 							var fragment = document.createDocumentFragment();
-							content  = toolbars.children;
-							for (j = 0; node = content[j]; j++) {
-								fragment.appendChild(node);
+							while (toolbars.children.length) {
+								fragment.appendChild(toolbars.children[0]);
 							}
 							toolbars.content = fragment;
+							toolbars.brokenImport = true;
 						}
+
 						var toolbarNode = document.importNode(toolbars.content, true);
 						var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
 						for (var i=0; i<newToolbars.length; i++) {
@@ -371,6 +388,19 @@
 						}
 
 						toolbarsContainer.appendChild(toolbarNode);
+						if (toolbars.brokenImport) {
+							var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
+							for (var i=0; i<scriptTags.length; i++) {
+								var newNode = document.createElement("SCRIPT");
+								if (scriptTags[i].src) {
+									newNode.src = scriptTags[i].src;
+								}
+								if (scriptTags[i].innerHTML) {
+									newNode.innerHTML = scriptTags[i].innerHTML;
+								}
+								document.head.appendChild(newNode);
+							}
+						}
 						loadToolbars();
 					}
 				}
