@@ -1,3 +1,4 @@
+
 (function() {
 	var editor = {
 		storage : (function() {
@@ -70,7 +71,7 @@
 				}
 
 				editor.data.initLists(data);
-				localStorage['data'] = JSON.stringify(data, null, "\t");
+				localStorage['data'] = JSON.stringify(data);
 			},
 			stash : function() {
 				var data = {};
@@ -143,7 +144,7 @@
 					delete stashedFields[i].dataset['vedorStashed'];
 				}
 
-				localStorage.data = JSON.stringify(data, null, "\t");
+				localStorage.data = JSON.stringify(data);
 			},
 			save : function() {
 				if (editor.storage.connect()) {
@@ -184,6 +185,14 @@
 						for (var t=0; t<templates.length; t++) {
 							var templateName = templates[t].dataset["vedorTemplate"] ? templates[t].dataset["vedorTemplate"] : t;
 							dataLists[i].templates[templateName] = templates[t].cloneNode(true);
+							if (!("content" in dataLists[i].templates[templateName])) {
+								var fragment = document.createDocumentFragment();
+								content  = dataLists[i].templates[templateName].children;
+								for (j = 0; node = content[j]; j++) {
+									fragment.appendChild(node);
+								}
+								dataLists[i].templates[templateName].content = fragment;
+							}
 						}
 						dataLists[i].innerHTML = '';
 
@@ -203,6 +212,11 @@
 									editor.field.set(dataFields[k], listData[j][dataName]);
 								}
 							}
+
+							if (!("firstElementChild" in clone)) {
+								clone.firstElementChild = clone.firstChild;
+							}
+
 							if (templates.length > 1) {
 								clone.firstElementChild.dataset["vedorTemplate"] = requestedTemplate;
 							}
@@ -278,44 +292,86 @@
 		},
 		editmode : {
 			init : function() {
+				var toolbarsContainer = document.createElement("DIV");
+				document.body.appendChild(toolbarsContainer);
+
 				var http = new XMLHttpRequest();
 				var url = "/simple-edit/vedor/toolbars.html";
 				url += "?t=" + (new Date().getTime());
 
+				var loadToolbars = function() {
+					var toolbars = [
+						"/simple-edit/vedor/toolbar.vedor-main-toolbar.html",
+						"/simple-edit/vedor/toolbar.vedor-text-cursor.html",
+						"/simple-edit/vedor/toolbar.vedor-text-selection.html",
+						"/simple-edit/vedor/toolbar.vedor-image.html"
+					];
+
+
+					for (i in toolbars) {
+						(function() {
+							var http = new XMLHttpRequest();
+							var url = toolbars[i];
+							url += "?t=" + (new Date().getTime());
+							console.log(url);
+
+							http.open("GET", url, true);
+							http.onreadystatechange = function() {//Call a function when the state changes.
+								if(http.readyState == 4 && http.status == 200) {
+									var toolbars = document.createElement("TEMPLATE");
+									toolbars.innerHTML = http.responseText;
+									if (!("content" in toolbars)) {
+										var fragment = document.createDocumentFragment();
+										content  = toolbars.children;
+										for (j = 0; node = content[j]; j++) {
+											fragment.appendChild(node);
+										}
+										toolbars.content = fragment;
+									}
+									var toolbarNode = document.importNode(toolbars.content, true);
+									var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
+									for (var i=0; i<newToolbars.length; i++) {
+										var marker = document.createElement("div");
+										marker.className = "marker";
+										newToolbars[i].insertBefore(marker, newToolbars[i].firstChild);
+									}
+
+									toolbarsContainer.appendChild(toolbarNode);
+								}
+							}
+							http.send();
+						}());
+					}
+					editor.editmode.toolbarMonitor();
+				};
+
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
-						var toolbars = document.createElement("DIV");
+						var toolbars = document.createElement("TEMPLATE");
 						toolbars.innerHTML = http.responseText;
-						document.body.appendChild(toolbars);
-						editor.editmode.toolbarMonitor();
-
-						toolbars.addEventListener("click", function(event) {
-							var el = event.target;
-							if ( el.tagName=='I' ) {
-								el = el.parentNode;
+						if (!("content" in toolbars)) {
+							var fragment = document.createDocumentFragment();
+							content  = toolbars.children;
+							for (j = 0; node = content[j]; j++) {
+								fragment.appendChild(node);
 							}
+							toolbars.content = fragment;
+						}
+						var toolbarNode = document.importNode(toolbars.content, true);
+						var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
+						for (var i=0; i<newToolbars.length; i++) {
+							var marker = document.createElement("div");
+							marker.className = "marker";
+							newToolbars[i].insertBefore(marker, newToolbars[i].firstChild);
+						}
 
-							switch(el.dataset["vedorAction"]) {
-								case null:
-								case undefined:
-								break;
-								default:
-									var action = editor.actions[el.dataset["vedorAction"]];
-									if (action) {
-										var result = action(el);
-										if (!result) {
-											return;
-										}
-									} else {
-										console.log(el.getAttribute("data-vedor-action") + " not yet implemented");
-									}
-								break;
-							}
-						});
+						toolbarsContainer.appendChild(toolbarNode);
+						loadToolbars();
 					}
 				}
 				http.send();
+
 
 				// Add slip.js for sortable items;
 				var scriptTag = document.createElement("SCRIPT");
@@ -442,8 +498,12 @@
 				editor.storage.disconnect();
 				document.location.href = document.location.href.split("#")[0];
 			},
-			toolbarMonitor() {
+			toolbarMonitor : function() {
 				var target = document.querySelector('#vedor-main-toolbar');
+				if (!target) {
+					window.setTimeout(editor.editmode.toolbarMonitor, 100);
+					return false;
+				}
 
 				var setBodyTop = function() {
 					document.body.style.position = "relative";
@@ -469,6 +529,27 @@
 		"vedor-logout" : editor.editmode.stop
 	}
 
+	editor.toolbars = {};
+	editor.contextFilters = {};
+
+	editor.addToolbar = function(toolbar) {
+		if (toolbar.filter) {
+			editor.addContextFilter(toolbar.name, toolbar.filter);
+		}
+		for (i in toolbar.actions) {
+			editor.actions[i] = toolbar.actions[i];
+		}
+		editor.toolbars[toolbar.name] = toolbar;
+	}
+
+	editor.addContextFilter = function(name, filter) {
+		if (!filter['context']) {
+			filter['context'] = name;
+		}
+		editor.contextFilters[name] = filter;
+	}
+
 	window.editor = editor;
 	editor.init();
 }());
+
