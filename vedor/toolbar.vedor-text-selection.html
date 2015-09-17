@@ -75,5 +75,5 @@
 		setFormat("JustifyLeft");
 	};
 
-	muze.event.attach(document.querySelector("#vedor-text-selection [name=textStyle]"), "change", function() { setFormatStyle(this.value); } );
+	document.querySelector("#vedor-text-selection [name=textStyle]").addEventListener("change", function() { setFormatStyle(this.value); } );
 </script>
