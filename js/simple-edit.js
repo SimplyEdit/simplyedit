@@ -65,8 +65,8 @@
 			apply : function(data) {
 				var dataFields = document.querySelectorAll("[data-vedor-field]");
 				for (var i=0; i<dataFields.length; i++) {
-					var dataName = dataFields[i].dataset["vedorField"];
-					var dataPath = dataFields[i].dataset["vedorPath"] ? dataFields[i].dataset["vedorPath"] : location.pathname;
+					var dataName = dataFields[i].getAttribute("data-vedor-field");
+					var dataPath = dataFields[i].getAttribute("data-vedor-path") ? dataFields[i].getAttribute("data-vedor-path") : location.pathname;
 
 					if (data[dataPath] && data[dataPath][dataName]) {
 						editor.field.set(dataFields[i], data[dataPath][dataName]);
@@ -177,8 +177,8 @@
 			initLists : function(data) {
 				var dataLists = document.querySelectorAll("[data-vedor-list]");
 				for (var i=0; i<dataLists.length; i++) {
-					var dataName = dataLists[i].dataset["vedorList"];
-					var dataPath = dataLists[i].dataset["vedorPath"] ? dataLists[i].dataset["vedorPath"] : location.pathname;
+					var dataName = dataLists[i].getAttribute("data-vedor-list");
+					var dataPath = dataLists[i].getAttribute("data-vedor-path") ? dataLists[i].getAttribute("data-vedor-path") : location.pathname;
 
 					if (data[dataPath] && data[dataPath][dataName]) {
 						var listData = data[dataPath][dataName];
@@ -186,7 +186,7 @@
 						dataLists[i].templates = {};
 
 						for (var t=0; t<templates.length; t++) {
-							var templateName = templates[t].dataset["vedorTemplate"] ? templates[t].dataset["vedorTemplate"] : t;
+							var templateName = templates[t].getAttribute("data-vedor-template") ? templates[t].getAttribute("data-vedor-template") : t;
 							dataLists[i].templates[templateName] = templates[t].cloneNode(true);
 							if (!("content" in dataLists[i].templates[templateName])) {
 								var fragment = document.createDocumentFragment();
@@ -202,14 +202,18 @@
 						for (var j=0; j<listData.length; j++) {
 							var requestedTemplate = listData[j]["data-vedor-template"];
 							if (!dataLists[i].templates[requestedTemplate]) {
-								requestedTemplate = Object.keys(dataLists[i].templates)[0];
+								for (t in dataLists[i].templates) {
+									requestedTemplate = t;
+									break;
+								}
+								// requestedTemplate = Object.keys(dataLists[i].templates)[0];
 							}
 
 							var clone = document.importNode(dataLists[i].templates[requestedTemplate].content, true);
 							// FIXME: Duplicate code
 							var dataFields = clone.querySelectorAll("[data-vedor-field]");
 							for (var k=0; k<dataFields.length; k++) {
-								var dataName = dataFields[k].dataset["vedorField"];
+								var dataName = dataFields[k].getAttribute("data-vedor-field");
 								if (listData[j][dataName]) {
 									editor.field.set(dataFields[k], listData[j][dataName]);
 								}
@@ -224,9 +228,9 @@
 							}
 
 							if (templates.length > 1) {
-								clone.firstElementChild.dataset["vedorTemplate"] = requestedTemplate;
+								clone.firstElementChild.getAttribute("data-vedor-template") = requestedTemplate;
 							}
-							clone.firstElementChild.dataset["vedorListItem"] = true;
+							clone.firstElementChild.setAttribute("data-vedor-list-item", true);
 							dataLists[i].appendChild(clone);
 						}
 					}
@@ -587,4 +591,3 @@
 	window.editor = editor;
 	editor.init();
 }());
-
