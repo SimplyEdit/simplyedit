@@ -8,7 +8,6 @@
 
 ---------
 Bugs:
-- IE toont de toolbars niet, omdat hij weigert de scripts van de toolbars uit te voeren.
 - textStyle selectbox init niet correct;
 - font in image properties alt/title staat verkeerd
 - in image properties kun je niet op alt/title klikken, dan verdwijt de toolbar
@@ -19,3 +18,4 @@ Done:
 [v] Support toevoegen voor huidige (floating) toolbars
 [v] NLS strings voor toolbars (of hardcoded)
 [v] Text selection toolbar toevoegen en werkend maken:
+[v] IE toont de toolbars niet, omdat hij weigert de scripts van de toolbars uit te voeren.
