@@ -1,4 +1,3 @@
-
 (function() {
 	var editor = {
 		storage : {
@@ -207,7 +206,6 @@
 							}
 
 							var clone = document.importNode(dataLists[i].templates[requestedTemplate].content, true);
-
 							// FIXME: Duplicate code
 							var dataFields = clone.querySelectorAll("[data-vedor-field]");
 							for (var k=0; k<dataFields.length; k++) {
@@ -218,14 +216,17 @@
 							}
 
 							if (!("firstElementChild" in clone)) {
-								clone.firstElementChild = clone.firstChild;
+								for (var l=0; l<clone.childNodes.length; l++) {
+									if (clone.childNodes[l].nodeType == 1) {
+										clone.firstElementChild = clone.childNodes[l];
+									}
+								}
 							}
 
 							if (templates.length > 1) {
 								clone.firstElementChild.dataset["vedorTemplate"] = requestedTemplate;
 							}
 							clone.firstElementChild.dataset["vedorListItem"] = true;
-
 							dataLists[i].appendChild(clone);
 						}
 					}
@@ -256,7 +257,7 @@
 					default:
 						field.innerHTML = data;
 					break;
-				}				
+				}
 			},
 			get : function(field) {
 				switch (field.tagName) {
