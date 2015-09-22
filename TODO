@@ -1,12 +1,12 @@
-- Hyperlinks
 - Images
+- Hyperlinks
 - Code source
 - Iets van een server die de merge van html en data serverside doet
 - Meta title/megatags
 - Sitemap / site management
 - Lijsten in lijsten ?
-- Save
-- Keuze voor template insert
+- Weergave "Saving" dialoogje
+- Keuze voor template insert dialoogje
 - code voor de init van text, image, hyperlink toolbars verplaatsen naar de toolbars ipv main toolbar file
 
 ---------
