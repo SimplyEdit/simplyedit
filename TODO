@@ -7,13 +7,14 @@
 - Lijsten in lijsten ?
 - Save
 - Keuze voor template insert
+- code voor de init van text, image, hyperlink toolbars verplaatsen naar de toolbars ipv main toolbar file
 
 ---------
 Bugs:
 - textStyle selectbox init niet correct;
 - font in image properties alt/title staat verkeerd
-- in image properties kun je niet op alt/title klikken, dan verdwijt de toolbar
 - als een slip reorder start, moeten de toolbars weg
+- er is een timing issue met muze.js; de toolbar init moet pas worden gedaan nadat muze javascript is ingeladen.
 
 Done:
 [v] Meerdere templates per lijst
@@ -22,3 +23,4 @@ Done:
 [v] Text selection toolbar toevoegen en werkend maken:
 [v] IE toont de toolbars niet, omdat hij weigert de scripts van de toolbars uit te voeren.
 [v] Weergave support voor IE vanaf versie 8
+[v] in image properties kun je niet op alt/title klikken, dan verdwijt de toolbar

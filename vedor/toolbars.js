@@ -26,11 +26,17 @@
 		}
 
 		document.body.onclick = function(evt) {
-//			evt.preventDefault();
+			evt.preventDefault();
 			var el = evt.target;
 			if ( el.tagName=='I' ) {
 				el = el.parentNode;
 			}
+
+			if (getToolbar(el) && /\bvedor-toolbar\b/.test(getToolbar(el).className)) {
+				evt.preventDefault();
+			//	return false;
+			}
+
 			if ( el.tagName == 'BUTTON' ) {
 				switch(el.getAttribute("data-vedor-action")) {
 					case null:
@@ -64,11 +70,13 @@
 						el.className += ' vedor-selected';
 						var rel = el.dataset.vedorSection;
 						if ( rel ) {
-							var target = toolbar.querySelectorAll('.vedor-toolbar-section.' + rel );
-							if ( target && target[0] ) {
-								target[0].className += ' vedor-selected';
-								lastSection = target[0];
-								lastSection.querySelectorAll("LI > *")[0].focus();
+							var target = toolbar.querySelector('.vedor-toolbar-section.' + rel );
+							if ( target ) {
+								target.className += ' vedor-selected';
+								var focusTarget = target.querySelector("LI > *");
+								if (focusTarget) {
+									focusTarget.focus();
+								}
 							}
 						}
 					} else {
@@ -141,6 +149,9 @@
 
 		if (sel) {
 			var parent = vdSelection.getNode(sel);
+			if (parent && hasToolbarParent(parent)) {
+				return "vedor-toolbar";
+			}
 
 			if ((parent && parent.getAttribute && (parent.getAttribute("contenteditable") || parent.getAttribute("data-vedor-selectable"))) || hasEditableParent(parent)) {
 				if (parent || parent.getAttribute || parent.getAttribute("contenteditable")) {
@@ -217,10 +228,25 @@
 		return false;
 	}
 
+	function hasToolbarParent(checkParent) {
+		var parent = checkParent;
+		while (parent && parent.parentNode) {
+			if (parent.parentNode.className && parent.parentNode.className.match(/\bvedor-toolbar\b/)) {
+				console.log("found toolbar parent");
+				return true;
+			}
+			parent = parent.parentNode;
+		}
+		return false;
+	}
+
 	vdHideToolbars = false;
 
 	function showVedorEditorContext() {
 		var currentContext = getVedorEditorContext();
+		if (currentContext == "vedor-toolbar") {
+			return;
+		}
 
 		var sections = document.querySelectorAll("section.vedor-section");
 		for (var i=0; i<sections.length; i++) {
