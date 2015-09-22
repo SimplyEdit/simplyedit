@@ -353,7 +353,8 @@
 						"/simple-edit/vedor/toolbar.vedor-main-toolbar.html",
 						"/simple-edit/vedor/toolbar.vedor-text-cursor.html",
 						"/simple-edit/vedor/toolbar.vedor-text-selection.html",
-						"/simple-edit/vedor/toolbar.vedor-image.html"
+						"/simple-edit/vedor/toolbar.vedor-image.html",
+						"/simple-edit/vedor/toolbar.vedor-selectable.html"
 					];
 
 

@@ -1,0 +1,53 @@
+<script>
+	(function() {
+		var removeMouseSelectionEvent;
+		var removeTouchSelectionEvent;
+	
+		var handleItemSelect = function(event) {
+			var target = muze.event.target(event);
+
+			while(!target.getAttribute("data-vedor-selectable") && target.parentNode) {
+				if (target.getAttribute("contenteditable")) {
+					return;
+				}
+			
+				target = target.parentNode;
+			}
+
+			var sel = vdSelectionState.get();
+			sel.selectNode(target);
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+			vdSelectionState.save(sel);
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges()
+			vdEditPane_DisplayChanged();
+		
+			window.setTimeout(function() {
+				removeMouseSelectionEvent = muze.event.attach(document, "mousedown", function() {
+					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
+					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
+					vdSelectionState.remove(sel);
+				});
+				removeTouchSelectionEvent = muze.event.attach(document, "touchstart", function() {
+					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
+					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
+					vdSelectionState.remove(sel);
+				});
+			}, 50);
+		}
+	
+		var bindSelectables = function() {
+			var listItems = document.querySelectorAll("[data-vedor-selectable]");
+			for (var i=0; i<listItems.length; i++) {
+				muze.event.attach(listItems[i], 'click', handleItemSelect);
+			}
+		}
+		
+		muze.event.attach(document, "vedor-selectable-inserted", bindSelectables);
+
+		editor.addToolbar({
+			name: 'vedor-selectable',
+			init : bindSelectables
+		});
+	})();
+</script>
