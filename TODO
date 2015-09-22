@@ -5,6 +5,8 @@
 - Meta title/megatags
 - Sitemap / site management
 - Lijsten in lijsten ?
+- Save
+- Keuze voor template insert
 
 ---------
 Bugs:
@@ -19,3 +21,4 @@ Done:
 [v] NLS strings voor toolbars (of hardcoded)
 [v] Text selection toolbar toevoegen en werkend maken:
 [v] IE toont de toolbars niet, omdat hij weigert de scripts van de toolbars uit te voeren.
+[v] Weergave support voor IE vanaf versie 8
