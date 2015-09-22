@@ -149,9 +149,6 @@
 
 		if (sel) {
 			var parent = vdSelection.getNode(sel);
-			if (parent && hasToolbarParent(parent)) {
-				return "vedor-toolbar";
-			}
 
 			if ((parent && parent.getAttribute && (parent.getAttribute("contenteditable") || parent.getAttribute("data-vedor-selectable"))) || hasEditableParent(parent)) {
 				if (parent || parent.getAttribute || parent.getAttribute("contenteditable")) {
@@ -232,7 +229,6 @@
 		var parent = checkParent;
 		while (parent && parent.parentNode) {
 			if (parent.parentNode.className && parent.parentNode.className.match(/\bvedor-toolbar\b/)) {
-				console.log("found toolbar parent");
 				return true;
 			}
 			parent = parent.parentNode;
@@ -525,6 +521,14 @@
 		// Check if the current selection is part of an uneditable thing, if so, move the selection to that parent;
 		var sel = vdSelectionState.get();
 		var parent = vdSelection.getNode(sel);
+
+		if (hasToolbarParent(parent)) {
+			return;
+		}
+		if (document.querySelector(":focus") && hasToolbarParent(document.querySelector(":focus"))) {
+			return;
+		}
+
 		// console.log(parent);
 		var selParent = getUneditableParent(parent);
 		if (selParent) {
