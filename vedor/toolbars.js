@@ -32,15 +32,6 @@
 				el = el.parentNode;
 			}
 			if ( el.tagName == 'BUTTON' ) {
-				var action = editor.actions[el.getAttribute("data-vedor-action")];
-				if (action) {
-					evt.preventDefault();
-					var result = action(el);
-					if (!result) {
-						return;
-					}
-				}
-
 				switch(el.getAttribute("data-vedor-action")) {
 					case null:
 					break;
@@ -96,7 +87,7 @@
 					}
 				}
 			}
-		}
+		};
 	})();
 
 	function parents(target) {
@@ -194,6 +185,7 @@
 			case "vedor-table-cell-selection":
 				vdHideToolbars = false;
 				initTextProperties();
+			break;
 			case "vedor-image" :
 				vdHideToolbars = false;
 			// 	FIXME: Deze wordt nu nog in updateHtmlContext gedaan;
@@ -244,7 +236,7 @@
 					sections[j].style.left = "-10000px";
 				}
 			}
-		}
+		};
 		//window.setTimeout(hideIt, 200);
 
 		var activeSection = document.getElementById(currentContext);
@@ -265,7 +257,7 @@
 					return;
 				}
 				if (sel.collapsed) {
-					var parent = vdSelection.getNode(sel);
+					parent = vdSelection.getNode(sel);
 					vdSelection.setHTMLText(sel, "<span id='vdBookmarkLeft'></span><span id='vdBookmarkRight'></span>");
 				} else {
 					vedor.editor.bookmarks.set(sel);
@@ -297,7 +289,7 @@
 				bmRight.parentNode.removeChild(bmRight);
 				bmLeft.parentNode.removeChild(bmLeft);
 
-				if ( lleft == 0 && rleft == 0 && ltop == 0 && rtop == 0 ) {
+				if ( lleft === 0 && rleft === 0 && ltop === 0 && rtop === 0 ) {
 					pos = vdSelection.parentNode(sel).getBoundingClientRect();
 					lleft = pos.left;
 					ltop = pos.top;
@@ -413,6 +405,8 @@
 							vdSetProperty(textAlign[i], "justify");
 						break;
 						case "left" :
+							vdSetProperty(textAlign[i], "left");
+						break;
 						default :
 							vdSetProperty(textAlign[i], "left");
 						break;
@@ -514,22 +508,22 @@
 			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
 			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
 			vdSelectionState.save(sel);
-			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges()
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
 		}
 
 		showVedorEditorContext();
 
-		var parent			= false;
-		var sel				= vdSelectionState.get();
+		parent			= false;
+		sel			= vdSelectionState.get();
 		var imgOptions		= false;
-		var htmlblockOptions= false;
-		var newContextStack	= new Array();
+		var htmlblockOptions	= false;
+		var newContextStack	= [];
 
 
 		if (sel) {
 			parent = vdSelection.getNode(sel);
 
-			var contextString=new String();
+			var contextString='';
 			while (parent && hasEditableParent(parent) && parent.parentNode) {
 				if (!imgOptions && parent.tagName=='IMG') {
 					imgOptions=true;
