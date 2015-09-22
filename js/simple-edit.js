@@ -170,35 +170,49 @@
 						}
 					};
 
-					window.addEventListener("hashchange", checkEdit);
+					if ("addEventListener" in window) {
+						window.addEventListener("hashchange", checkEdit);
+					}
 					checkEdit();
 				});
 			},
 			initLists : function(data) {
+				document.createElement("template");
+				document.body.innerHTML = document.body.innerHTML;
+
 				var dataLists = document.querySelectorAll("[data-vedor-list]");
 				for (var i=0; i<dataLists.length; i++) {
 					var dataName = dataLists[i].getAttribute("data-vedor-list");
 					var dataPath = dataLists[i].getAttribute("data-vedor-path") ? dataLists[i].getAttribute("data-vedor-path") : location.pathname;
 
+//					var templates = dataLists[i].querySelectorAll("template");
+					var templates = dataLists[i].getElementsByTagName("template");
+
+					dataLists[i].templates = {};
+
+					for (var t=0; t<templates.length; t++) {
+						var templateName = templates[t].getAttribute("data-vedor-template") ? templates[t].getAttribute("data-vedor-template") : t;
+						dataLists[i].templates[templateName] = templates[t].cloneNode(true);
+						if (!("content" in dataLists[i].templates[templateName])) {
+							var fragment = document.createDocumentFragment();
+							var fragmentNode = document.createElement("FRAGMENT");
+
+							content  = dataLists[i].templates[templateName].children;
+							for (j = 0; node = content[j]; j++) {
+								fragment.appendChild(node);
+								fragmentNode.appendChild(node);
+							}
+							dataLists[i].templates[templateName].content = fragment;
+							dataLists[i].templates[templateName].contentNode = fragmentNode;
+						}
+						templates[t].parentNode.removeChild(templates[t]);
+
+					}
+
+					console.log(dataLists[i].templates);
+
 					if (data[dataPath] && data[dataPath][dataName]) {
 						var listData = data[dataPath][dataName];
-						var templates = dataLists[i].querySelectorAll("template");
-						dataLists[i].templates = {};
-
-						for (var t=0; t<templates.length; t++) {
-							var templateName = templates[t].getAttribute("data-vedor-template") ? templates[t].getAttribute("data-vedor-template") : t;
-							dataLists[i].templates[templateName] = templates[t].cloneNode(true);
-							if (!("content" in dataLists[i].templates[templateName])) {
-								var fragment = document.createDocumentFragment();
-								content  = dataLists[i].templates[templateName].children;
-								for (j = 0; node = content[j]; j++) {
-									fragment.appendChild(node);
-								}
-								dataLists[i].templates[templateName].content = fragment;
-							}
-						}
-						dataLists[i].innerHTML = '';
-
 						for (var j=0; j<listData.length; j++) {
 							var requestedTemplate = listData[j]["data-vedor-template"];
 							if (!dataLists[i].templates[requestedTemplate]) {
@@ -209,34 +223,60 @@
 								// requestedTemplate = Object.keys(dataLists[i].templates)[0];
 							}
 
-							var clone = document.importNode(dataLists[i].templates[requestedTemplate].content, true);
-							// FIXME: Duplicate code
-							var dataFields = clone.querySelectorAll("[data-vedor-field]");
-							for (var k=0; k<dataFields.length; k++) {
-								var dataName = dataFields[k].getAttribute("data-vedor-field");
-								if (listData[j][dataName]) {
-									editor.field.set(dataFields[k], listData[j][dataName]);
-								}
-							}
-
-							if (!("firstElementChild" in clone)) {
-								for (var l=0; l<clone.childNodes.length; l++) {
-									if (clone.childNodes[l].nodeType == 1) {
-										clone.firstElementChild = clone.childNodes[l];
+							if ("importNode" in document) {
+								var clone = document.importNode(dataLists[i].templates[requestedTemplate].content, true);
+								// FIXME: Duplicate code
+								var dataFields = clone.querySelectorAll("[data-vedor-field]");
+								for (var k=0; k<dataFields.length; k++) {
+									var dataName = dataFields[k].getAttribute("data-vedor-field");
+									if (listData[j][dataName]) {
+										editor.field.set(dataFields[k], listData[j][dataName]);
 									}
 								}
-							}
 
-							if (templates.length > 1) {
-								clone.firstElementChild.getAttribute("data-vedor-template") = requestedTemplate;
+								if (!("firstElementChild" in clone)) {
+									for (var l=0; l<clone.childNodes.length; l++) {
+										if (clone.childNodes[l].nodeType == 1) {
+											clone.firstElementChild = clone.childNodes[l];
+										}
+									}
+								}
+
+								if (templates.length > 1) {
+									clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
+								}
+								clone.firstElementChild.setAttribute("data-vedor-list-item", true);
+								dataLists[i].appendChild(clone);
+							} else {
+								for (var e=0; e<dataLists[i].templates[requestedTemplate].contentNode.childNodes.length; e++) {
+									var clone = dataLists[i].templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
+									var dataFields = clone.querySelectorAll("[data-vedor-field]");
+									for (var k=0; k<dataFields.length; k++) {
+										var dataName = dataFields[k].getAttribute("data-vedor-field");
+										if (listData[j][dataName]) {
+											editor.field.set(dataFields[k], listData[j][dataName]);
+										}
+									}
+
+									if (!("firstElementChild" in clone)) {
+										for (var l=0; l<clone.childNodes.length; l++) {
+											if (clone.childNodes[l].nodeType == 1) {
+												clone.firstElementChild = clone.childNodes[l];
+											}
+										}
+									}
+
+									if (templates.length > 1) {
+										clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
+									}
+									clone.firstElementChild.setAttribute("data-vedor-list-item", true);
+									dataLists[i].appendChild(clone);
+								}
 							}
-							clone.firstElementChild.setAttribute("data-vedor-list-item", true);
-							dataLists[i].appendChild(clone);
 						}
 					}
 				}
-			},
-
+			}
 		},
 		field : {
 			set : function(field, data) {
@@ -560,7 +600,7 @@
 
 				window.setTimeout(setBodyTop, 500);
 			}
-		},
+		}
 	}
 
 	editor.actions = {
