@@ -621,7 +621,6 @@ window['Slip'] = (function(){
         },
 
         onMouseLeave: function(e) {
-        	console.log('onMouseLeave');
             if (this.usingTouch) return;
 
             if (e.target === document.documentElement || e.relatedTarget === document.documentElement) {
