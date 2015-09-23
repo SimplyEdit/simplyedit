@@ -42,38 +42,112 @@
 	</div>
 </section>
 <script type="text/javascript">
-	editor.addContextFilter("vedor-text-selection", {
-		"sel-collapsed" : false
+	editor.addToolbar({
+		name : "vedor-text-selection",
+		update : function(el) {
+			var i;
+			var sel = vdSelectionState.get();
+			if (sel) {
+				var parent = vdSelection.getNode(sel);
+				if (parent || parent.getAttribute || parent.getAttribute("contenteditable")) {
+					var parentStyles = editor.node.getAllStyles(parent);
+
+					var textAlign = document.querySelectorAll(".vedor-text-align[data-type=vedor-buttongroup-radio]");
+					for (i=0; i<textAlign.length;i++) {
+						switch (parentStyles["text-align"]) {
+							case "right" :
+								vdSetProperty(textAlign[i], "right");
+							break;
+							case "center" :
+								vdSetProperty(textAlign[i], "center");
+							break;
+							case "justify" :
+								vdSetProperty(textAlign[i], "justify");
+							break;
+							case "left" :
+								vdSetProperty(textAlign[i], "left");
+							break;
+							default :
+								vdSetProperty(textAlign[i], "left");
+							break;
+						}
+					}
+
+					// Set the parent icon for alignment as well;
+					var currentIcon = document.querySelectorAll("div.vedor-text-align button.vedor-selected i")[0];
+					var icons = document.querySelectorAll("button[data-vedor-section=vedor-text-align] i");
+					for (i=0; i<icons.length; i++) {
+						icons[i].className = currentIcon.className;
+					}
+
+					// Check "Bold"
+					var textBold = document.querySelectorAll(".vedor-text-bold button");
+					for (i=0; i<textBold.length; i++) {
+						if (parentStyles["font-weight"] == "bold") {
+							textBold[i].classList.add("vedor-selected");
+						} else {
+							textBold[i].classList.remove("vedor-selected");
+						}
+					}
+
+					// Check "Italic"
+					var textItalic = document.querySelectorAll(".vedor-text-italic button");
+					for (i=0; i<textItalic.length; i++) {
+						if (parentStyles["font-style"] == "italic") {
+							textItalic[i].classList.add("vedor-selected");
+						} else {
+							textItalic[i].classList.remove("vedor-selected");
+						}
+					}
+
+					// Check "Underline"
+					var textUnderline = document.querySelectorAll(".vedor-text-underline button");
+					for (i=0; i<textUnderline.length; i++) {
+						if (parentStyles["text-decoration"].match(/underline/)) {
+							textUnderline[i].classList.add("vedor-selected");
+						} else {
+							textUnderline[i].classList.remove("vedor-selected");
+						}
+					}
+				}
+			}
+			return true;
+		},
+		filter : {
+			"sel-collapsed" : false
+		},
+		actions : {
+			'vedor-text-bold' : function() {
+				replaceNodeTags("STRONG", "B");
+				setFormat("Bold");
+				replaceNodeTags("B", "STRONG");
+			},
+			'vedor-text-italic' : function() {
+				replaceNodeTags("EM", "I");
+				setFormat("Italic");
+				replaceNodeTags("I", "EM");		
+			},
+			'vedor-text-underline' : function() {
+				setFormat("Underline");
+			},
+			'vedor-text-align-left' : function() {
+				setFormat("JustifyLeft");
+			},
+			'vedor-text-align-right' : function() {
+				setFormat("JustifyRight");
+			},
+			'vedor-text-align-center' : function() {
+				setFormat("JustifyCenter");
+			},
+			'vedor-text-align-justify' : function() {
+				setFormat("JustifyFull");
+			},
+			'vedor-text-align-left' : function() {
+				setFormat("JustifyLeft");
+			}
+		},
+		init : function() {
+			document.querySelector("#vedor-text-selection [name=textStyle]").addEventListener("change", function() { setFormatStyle(this.value); } );
+		}
 	});
-
- 	editor.actions['vedor-text-bold'] = function() {
-		replaceNodeTags("STRONG", "B");
-		setFormat("Bold");
-		replaceNodeTags("B", "STRONG");
-	};
-	editor.actions['vedor-text-italic'] = function() {
-		replaceNodeTags("EM", "I");
-		setFormat("Italic");
-		replaceNodeTags("I", "EM");		
-	};
-	editor.actions['vedor-text-underline'] = function() {
-		setFormat("Underline");
-	};
-	editor.actions['vedor-text-align-left'] = function() {
-		setFormat("JustifyLeft");
-	};
-	editor.actions['vedor-text-align-right'] = function() {
-		setFormat("JustifyRight");
-	};
-	editor.actions['vedor-text-align-center'] = function() {
-		setFormat("JustifyCenter");
-	};
-	editor.actions['vedor-text-align-justify'] = function() {
-		setFormat("JustifyFull");
-	};
-	editor.actions['vedor-text-align-left'] = function() {
-		setFormat("JustifyLeft");
-	};
-
-	document.querySelector("#vedor-text-selection [name=textStyle]").addEventListener("change", function() { setFormatStyle(this.value); } );
 </script>
