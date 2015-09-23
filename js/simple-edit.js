@@ -202,7 +202,7 @@
 							content  = dataLists[i].templates[templateName].children;
 							for (j = 0; node = content[j]; j++) {
 								fragment.appendChild(node);
-								fragmentNode.appendChild(node);
+								fragmentNode.appendChild(node.cloneNode(true));
 							}
 							dataLists[i].templates[templateName].content = fragment;
 							dataLists[i].templates[templateName].contentNode = fragmentNode;
