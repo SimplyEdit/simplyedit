@@ -62,9 +62,11 @@
 				var toolbars = document.querySelectorAll(".vedor-toolbar");
 
 				for (var i=0; i<toolbars.length; i++) {
-					var marker = document.createElement("div");
-					marker.className = "marker";
-					toolbars[i].insertBefore(marker, toolbars[i].firstChild);
+					if (!toolbars[i].querySelector("div.marker")) {
+						var marker = document.createElement("div");
+						marker.className = "marker";
+						toolbars[i].insertBefore(marker, toolbars[i].firstChild);
+					}
 				}
 			}
 		};
@@ -340,6 +342,9 @@
 						ltop = pos.top;
 						rleft = pos.right;
 						rtop = pos.bottom;
+
+						ltop -= 20+parseInt(document.body.style.top); // FIXME: Why 20?
+						rtop -= 20+parseInt(document.body.style.top);
 					}
 
 					var top = Math.max(ltop, rtop);

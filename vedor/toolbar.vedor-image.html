@@ -92,10 +92,16 @@
 			vdSetImage = function() {
 				if (currentImage) {
 					var type=vdGetProperty('vdImageType');
-					currentImage.setAttribute('data-vedor-image-type',type);
+					if (type) {
+						currentImage.setAttribute('data-vedor-image-type',type);
+					} else {
+						currentImage.removeAttribute('data-vedor-image-type');
+					}
 
 					var align=vdGetProperty('vdImageAlign');
-					if (align=='none') {
+					console.log(align);
+
+					if (align=='none' || align=='') {
 						currentImage.removeAttribute('align');
 					} else {
 						currentImage.setAttribute('align',align);
@@ -120,6 +126,33 @@
 			document.querySelector("#vdImageAlt").addEventListener("change", vdSetImage);
 			document.querySelector("#vdImageTitle").addEventListener("change", vdSetImage);
 			document.querySelector("#vdImageType").addEventListener("change", vdSetImage);
+		},
+		"actions" : {
+			"vedor-image-align-left" : function(el) {
+				vdSetProperty("vdImageAlign", "left");
+				vdSetImage();
+				return false;
+			},
+			"vedor-image-align-center" : function(el) {
+				vdSetProperty("vdImageAlign", "center");
+				vdSetImage();
+				return false;
+			},
+			"vedor-image-align-right" : function(el) {
+				vdSetProperty("vdImageAlign", "right");
+				vdSetImage();
+				return false;
+			},
+			"vedor-image-align-none" : function(el) {
+				vdSetProperty("vdImageAlign", "none");
+				vdSetImage();
+				return false;
+			},
+			"vedor-image-delete" : function(el) {
+				var sel = vdSelectionState.get();
+				var image = vdSelection.getNode(sel);
+				image.parentNode.removeChild(image);
+			}
 		}
 	});
 </script>
