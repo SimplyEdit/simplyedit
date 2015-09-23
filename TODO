@@ -1,4 +1,9 @@
 - Images
+  - alignment classes?
+  - styles? of die weghalen? is dat 1 lijst, of is dat per plaatje wisselbaar?
+  - upload/browse opties?
+  - link?
+
 - Hyperlinks
 - Code source
 - Iets van een server die de merge van html en data serverside doet
@@ -7,13 +12,14 @@
 - Lijsten in lijsten ?
 - Weergave "Saving" dialoogje
 - Keuze voor template insert dialoogje
-- code voor de init van text, image, hyperlink toolbars verplaatsen naar de toolbars ipv main toolbar file
+- code voor de init van hyperlink toolbar verplaatsen naar de toolbars ipv main toolbar file
 
 ---------
 Bugs:
 - textStyle selectbox init niet correct;
 - als een slip reorder start, moeten de toolbars weg
 - er is een timing issue met muze.js; de toolbar init moet pas worden gedaan nadat muze javascript is ingeladen.
+- image align wordt nog met attribuut 'align' gedaan;
 
 Done:
 [v] Meerdere templates per lijst
@@ -24,3 +30,4 @@ Done:
 [v] Weergave support voor IE vanaf versie 8
 [v] in image properties kun je niet op alt/title klikken, dan verdwijt de toolbar
 [v] font in image properties alt/title staat verkeerd
+[v] init code van de image toolbaar naar de toolbar zelf
