@@ -16,7 +16,7 @@
 					if(http.readyState == 4 && http.status == 200) {
 				       		callback();
 					}
-				}
+				};
 				http.send(params);
 			},
 			load : function(callback) {
@@ -29,7 +29,7 @@
 					if(http.readyState == 4 && http.status == 200) {
 						callback(http.responseText);
 					}
-				}
+				};
 				http.send();
 			},
 			validateKey : function(key) {
@@ -42,23 +42,23 @@
 			},
 			connect : function() {
 				if (!editor.storage.key) {
-					editor.storage.key = localStorage['storageKey'];
+					editor.storage.key = localStorage.storageKey;
 				}
 				if (!editor.storage.key) {
 					editor.storage.key = prompt("Please enter your authentication key");
 				}
 
 				if (editor.storage.validateKey(editor.storage.key)) {
-					localStorage["storageKey"] = editor.storage.key;
+					localStorage.storageKey = editor.storage.key;
 					return true;
 				} else {
-					delete localStorage["storageKey"];
+					delete localStorage.storageKey;
 					return editor.storage.connect();
 				}
 			},
 			disconnect : function() {
 				delete editor.storage.key;
-				delete localStorage['storageKey'];
+				delete localStorage.storageKey;
 			}
 		},
 		data : {
@@ -74,24 +74,26 @@
 				}
 
 				editor.data.initLists(data);
-				localStorage['data'] = JSON.stringify(data);
+				localStorage.data = JSON.stringify(data);
 			},
 			stash : function() {
 				var data = {};
+				var dataFields;
+
 				if (localStorage.data) {
 					data = JSON.parse(localStorage.data);
 				}
 
 				var dataLists = document.querySelectorAll("[data-vedor-list]");
 				for (var i=0; i<dataLists.length; i++) {
-					var dataName = dataLists[i].dataset["vedorList"];
-					var dataPath = dataLists[i].dataset["vedorPath"] ? dataLists[i].dataset["vedorPath"] : location.pathname;
+					var dataName = dataLists[i].dataset.vedorList;
+					var dataPath = dataLists[i].dataset.vedorPath ? dataLists[i].dataset.vedorPath : location.pathname;
 
 					var listItems = dataLists[i].querySelectorAll("[data-vedor-list-item]");
 					for (var j=0; j<listItems.length; j++) {
-						var dataFields = listItems[j].querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
+						dataFields = listItems[j].querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
 						for (var k=0; k<dataFields.length; k++) {
-							var subKey = dataFields[k].dataset["vedorField"];
+							var subKey = dataFields[k].dataset.vedorField;
 							if (!data[dataPath][dataName]) {
 								data[dataPath][dataName] = [];
 							}
@@ -102,14 +104,14 @@
 
 							data[dataPath][dataName][j][subKey] = editor.field.get(dataFields[k]);
 							// Mark it so it doesn't get processed twice;
-							dataFields[k].dataset['vedorStashed'] = 1;
+							dataFields[k].dataset.vedorStashed = 1;
 						}
 
 					}
 
-					var dataFields = dataLists[i].querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
+					dataFields = dataLists[i].querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
 					for (var k=0; k<dataFields.length; k++) {
-						var subKey = dataFields[k].dataset["vedorField"];
+						var subKey = dataFields[k].dataset.vedorField;
 						if (!data[dataPath][dataName]) {
 							data[dataPath][dataName] = [];
 						}
@@ -119,21 +121,21 @@
 
 						data[dataPath][dataName][k][subKey] = editor.field.get(dataFields[k]);
 						// Mark it so it doesn't get processed twice;
-						dataFields[k].dataset['vedorStashed'] = 1;
+						dataFields[k].dataset.vedorStashed = 1;
 					}
 
 					var listItems = dataLists[i].querySelectorAll("[data-vedor-list-item]");
 					for (var j=0; j<listItems.length; j++) {
-						if (listItems[j].dataset['vedorTemplate']) {
-							data[dataPath][dataName][j]['data-vedor-template'] = listItems[j].dataset['vedorTemplate'];
+						if (listItems[j].dataset.vedorTemplate) {
+							data[dataPath][dataName][j]['data-vedor-template'] = listItems[j].dataset.vedorTemplate;
 						}
 					}
 				}
 
-				var dataFields = document.querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
+				dataFields = document.querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
 				for (var i=0; i<dataFields.length; i++) {
-					var dataName = dataFields[i].dataset["vedorField"];
-					var dataPath = dataFields[i].dataset["vedorPath"] ? dataFields[i].dataset["vedorPath"] : location.pathname;
+					var dataName = dataFields[i].dataset.vedorField;
+					var dataPath = dataFields[i].dataset.vedorPath ? dataFields[i].dataset.vedorPath : location.pathname;
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -144,7 +146,7 @@
 
 				var stashedFields = document.querySelectorAll("[data-vedor-stashed]");
 				for (var i=0; i<stashedFields.length; i++) {
-					delete stashedFields[i].dataset['vedorStashed'];
+					delete stashedFields[i].dataset.vedorStashed;
 				}
 
 				localStorage.data = JSON.stringify(data);
@@ -208,8 +210,6 @@
 						templates[t].parentNode.removeChild(templates[t]);
 
 					}
-
-					console.log(dataLists[i].templates);
 
 					if (data[dataPath] && data[dataPath][dataName]) {
 						var listData = data[dataPath][dataName];
@@ -280,6 +280,7 @@
 		},
 		field : {
 			set : function(field, data) {
+				var attr;
 				switch (field.tagName) {
 					case "IMG":
 						if (typeof data == "string") {
@@ -304,10 +305,13 @@
 				}
 			},
 			get : function(field) {
+				var attr;
+				var attributes = {};
+				var allowedAttributes = {};
+
 				switch (field.tagName) {
 					case "IMG": 
-						var attributes = {};
-						var allowedAttributes = ["src", "class", "alt", "title"];
+						allowedAttributes = ["src", "class", "alt", "title"];
 						for (attr in allowedAttributes) {
 							attr = allowedAttributes[attr];
 							if (field.getAttribute(attr)) {
@@ -318,15 +322,14 @@
 						return attributes;
 					break;
 					case "A":
-						var attributes = {};
-						var allowedAttributes = ["href", "class", "alt", "title"];
+						allowedAttributes = ["href", "class", "alt", "title"];
 						for (attr in allowedAttributes) {
 							attr = allowedAttributes[attr];
 							if (field.getAttribute(attr)) {
 								attributes[attr] = field.getAttribute(attr);
 							}
 						}
-						attributes['innerHTML'] = field.innerHTML;
+						attributes.innerHTML = field.innerHTML;
 
 						return attributes;
 					break;
@@ -358,19 +361,17 @@
 					];
 
 
-					for (i in toolbars) {
+					for (var i in toolbars) {
 						(function() {
 							var http = new XMLHttpRequest();
 							var url = toolbars[i];
 							url += "?t=" + (new Date().getTime());
-							console.log(url);
 
 							http.open("GET", url, true);
 							http.onreadystatechange = function() {//Call a function when the state changes.
 								if(http.readyState == 4 && http.status == 200) {
 									var toolbars = document.createElement("TEMPLATE");
 									toolbars.innerHTML = http.responseText;
-									console.log(toolbars);
 
 									if (!("content" in toolbars)) {
 										var fragment = document.createDocumentFragment();
@@ -404,7 +405,7 @@
 										}
 									}
 								}
-							}
+							};
 							http.send();
 						}());
 					}
@@ -449,7 +450,7 @@
 						}
 						loadToolbars();
 					}
-				}
+				};
 				http.send();
 
 
@@ -525,8 +526,8 @@
 							if (selectedTemplate) {
 								var newNode = document.importNode(selectedTemplate.content, true);
 								editor.editmode.editable(newNode);
-								newNode.firstElementChild.dataset["vedorTemplate"] = templateName;
-								newNode.firstElementChild.dataset["vedorListItem"] = true;
+								newNode.firstElementChild.dataset.vedorTemplate = templateName;
+								newNode.firstElementChild.dataset.vedorListItem = true;
 								this.appendChild(newNode);
 							}
 							evt.preventDefault();
@@ -549,7 +550,7 @@
 				
 				var preventDefault = function(evt) {
 					evt.preventDefault();
-				}
+				};
 				
 				for (var i=0; i<list.length; i++) {
 					list[i].addEventListener('slip:reorder', function(e) {	
@@ -588,7 +589,7 @@
 				var setBodyTop = function() {
 					document.body.style.position = "relative";
 					document.body.style.top = document.getElementById("vedor-main-toolbar").offsetHeight + "px";
-				}
+				};
 
 				// create an observer instance
 				var observer = new MutationObserver(setBodyTop);
@@ -602,12 +603,12 @@
 				window.setTimeout(setBodyTop, 500);
 			}
 		}
-	}
+	};
 
 	editor.actions = {
 		"vedor-save" : editor.data.save,
 		"vedor-logout" : editor.editmode.stop
-	}
+	};
 
 	editor.toolbars = {};
 	editor.contextFilters = {};
@@ -616,18 +617,18 @@
 		if (toolbar.filter) {
 			editor.addContextFilter(toolbar.name, toolbar.filter);
 		}
-		for (i in toolbar.actions) {
+		for (var i in toolbar.actions) {
 			editor.actions[i] = toolbar.actions[i];
 		}
 		editor.toolbars[toolbar.name] = toolbar;
-	}
+	};
 
 	editor.addContextFilter = function(name, filter) {
-		if (!filter['context']) {
-			filter['context'] = name;
+		if (!filter.context) {
+			filter.context = name;
 		}
 		editor.contextFilters[name] = filter;
-	}
+	};
 
 	window.editor = editor;
 	editor.init();
