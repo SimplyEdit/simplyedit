@@ -188,22 +188,22 @@
 				tempNode.appendChild(target.cloneNode(false));
 				var result = 0;
 				if (
-					( (typeof filter["selector"] !== 'undefined') ? tempNode.querySelectorAll(":scope > " + filter["selector"]).length : true) && 
+					( (typeof filter.selector !== 'undefined') ? tempNode.querySelectorAll(":scope > " + filter.selector).length : true) && 
 					( (typeof filter["sel-collapsed"] !== 'undefined') ? (sel.collapsed == filter["sel-collapsed"]) : true)
 				) {
 					result += 50 * (targets.length+1); // tagName weight
-					if (typeof filter["selector"] !== 'undefined') {
-						result += 2*(filter["selector"].split(".").length-1); // Add the number of class selectors;
-						result += 2*(filter["selector"].split("[").length-1); // Add the number of attribute selectors
+					if (typeof filter.selector !== 'undefined') {
+						result += 2*(filter.selector.split(".").length-1); // Add the number of class selectors;
+						result += 2*(filter.selector.split("[").length-1); // Add the number of attribute selectors
 					}
 
 					if (typeof filter["sel-collapsed"] !== 'undefined') {
 						result += 1;
 					}
-					if (typeof filter["parent"] == 'undefined') {
+					if (typeof filter.parent == 'undefined') {
 						return result;
 					} else {
-						var parentResult = editor.context.check(filter["parent"], targets);
+						var parentResult = editor.context.check(filter.parent, targets);
 						if (parentResult) {
 							return result + parentResult;
 						} else {
@@ -427,16 +427,9 @@
 			switch (context) {
 				case "vedor-text-selection" :
 				case "vedor-table-cell-selection":
-					vdHideToolbars = false;
-				break;
 				case "vedor-image" :
-					vdHideToolbars = false;
-				break;
-				case "vedor-no-context" :
-				break;
 				case "vedor-hyperlink" :
 					vdHideToolbars = false;
-					initHyperlinkProperties();
 				break;
 				default:
 				break;
