@@ -643,6 +643,9 @@
 			editor.actions[i] = toolbar.actions[i];
 		}
 		editor.toolbars[toolbar.name] = toolbar;
+		if (toolbar.init) {
+			toolbar.init();
+		}
 	};
 
 	editor.addContextFilter = function(name, filter) {

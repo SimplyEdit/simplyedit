@@ -39,11 +39,11 @@
 		var bindSelectables = function() {
 			var listItems = document.querySelectorAll("[data-vedor-selectable]");
 			for (var i=0; i<listItems.length; i++) {
-				muze.event.attach(listItems[i], 'click', handleItemSelect);
+				listItems[i].addEventListener('click', handleItemSelect);
 			}
 		}
 		
-		muze.event.attach(document, "vedor-selectable-inserted", bindSelectables);
+		document.addEventListener("vedor-selectable-inserted", bindSelectables);
 
 		editor.addToolbar({
 			name: 'vedor-selectable',

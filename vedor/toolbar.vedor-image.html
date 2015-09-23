@@ -10,7 +10,9 @@
 		</ul>
 		<div class="vedor-toolbar-section vedor-image-style">
 			<ul>
-				<li><label>Format</label><select id="vdImageType"></select></li>
+				<li><label>Format</label><select id="vdImageType">
+					<option value="">Original</option>
+				</select></li>
 			</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-image-align" data-type="vedor-buttongroup-radio" id="vdImageAlign">
@@ -45,10 +47,79 @@
 	</div>
 </section>
 <script type="text/javascript">
-	editor.addContextFilter("vedor-image", {
-		"selector" : "IMG",
-		"parent" : {
-			"selector" : "*"
+	editor.addToolbar({
+		"name" : "vedor-image",
+		"filter" : {
+			"selector" : "IMG",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function() {
+			var sel = vdSelectionState.get();
+			var image = vdSelection.getNode(sel);
+
+			currentImage = image;
+
+			var type=image.getAttribute('data-vedor-image-type');
+			if (!type || type=='undefined') {
+				// type='Origineel'; // FIXME: gewoon de eerste in de lijst selecteren?
+				type = document.querySelectorAll("#vdImageType option")[0].value;
+			}
+			vdSetProperty('vdImageType',type);
+
+			var alt=image.getAttribute('alt');
+			vdSetProperty('vdImageAlt',alt);
+
+			var align = image.getAttribute("align");
+			vdSetProperty('vdImageAlign', align);
+
+			var title=image.getAttribute('title');
+			vdSetProperty('vdImageTitle', title);
+
+			// Set the parent icon for alignment as well;
+			var currentIcon = document.querySelectorAll("div.vedor-image-align button.vedor-selected i")[0];
+			if (currentIcon) {
+				var icons = document.querySelectorAll("button[data-vedor-section=vedor-image-align] i");
+				for (var i=0; i<icons.length; i++) {
+					icons[i].className = currentIcon.className;
+				}
+			}
+		},
+		"init" : function() {
+			console.log("init image toolbar");
+
+			vdSetImage = function() {
+				if (currentImage) {
+					var type=vdGetProperty('vdImageType');
+					currentImage.setAttribute('data-vedor-image-type',type);
+
+					var align=vdGetProperty('vdImageAlign');
+					if (align=='none') {
+						currentImage.removeAttribute('align');
+					} else {
+						currentImage.setAttribute('align',align);
+					}
+					var alt=vdGetProperty('vdImageAlt');
+					if (alt) {
+						currentImage.setAttribute('alt',alt);
+					} else {
+						currentImage.removeAttribute('alt');
+					}
+					var title=vdGetProperty('vdImageTitle');
+					if (title) {
+						currentImage.setAttribute('title',title);
+					} else {
+						currentImage.removeAttribute('title');
+					}
+					vdStoreUndo();
+				}
+			};
+
+
+			document.querySelector("#vdImageAlt").addEventListener("change", vdSetImage);
+			document.querySelector("#vdImageTitle").addEventListener("change", vdSetImage);
+			document.querySelector("#vdImageType").addEventListener("change", vdSetImage);
 		}
 	});
 </script>
