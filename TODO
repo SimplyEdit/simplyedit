@@ -4,7 +4,6 @@
   - upload/browse opties?
   - link?
 
-- Hyperlinks (update code ook in de toolbar)
 - Code source
 - Iets van een server die de merge van html en data serverside doet
 - Meta title/megatags
@@ -18,7 +17,8 @@ Bugs:
 - als een slip reorder start, moeten de toolbars weg
 - image align wordt nog met attribuut 'align' gedaan;
 - text align wordt met attribuut style="text-align: iets" gedaan
-
+- na aanmaken van een nieuwe hyperlink (editor.plugins.hyperlink.create) wordt de selectie aangepast en raak je de selectie kwijt
+- klik in de text van een hyperlink (zonder selectie) en klik op bold - had verwacht dat dan de hyperlink bold zou worden?
 Done:
 [v] Meerdere templates per lijst
 [v] Support toevoegen voor huidige (floating) toolbars
@@ -32,3 +32,5 @@ Done:
 [v] textStyle selectbox init niet correct;
 [v] er is een timing issue met muze.js; de toolbar init moet pas worden gedaan nadat muze javascript is ingeladen.
 [v] prevent ready event fire tot de content binnen is
+[v] Hyperlinks voor text (update code ook in de toolbar)
+[v] Hyperlinks voor images

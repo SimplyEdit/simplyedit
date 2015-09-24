@@ -199,7 +199,7 @@
 			var sel = vdSelectionState.get();
 			var parent = vdSelection.getNode(sel);
 			if (sel) {
-				while(parent) {
+				while(parent && parent != document) {
 					if (parent.className && parent.className.match(/\beditable\b/)) {
 						return parent;
 					} else if (parent.getAttribute("data-vedor-field")) {
@@ -307,10 +307,8 @@
 			}
 		},
 		show : function() {
+			vdSelectionState.remove();
 			var currentContext = editor.context.get();
-			if (currentContext == "vedor-toolbar") {
-				return;
-			}
 
 			var sections = document.querySelectorAll("section.vedor-section");
 			for (var i=0; i<sections.length; i++) {

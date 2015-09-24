@@ -61,7 +61,7 @@
 			<li><button data-vedor-section="vedor-text-style" class="vedor-expands"><i class="fa fa-magic"></i>Style</button></li>
 			<li><button data-vedor-section="vedor-text-align" class="vedor-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-vedor-section="vedor-clipboard" class="vedor-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
-			<li><button data-vedor-action="vedor-hyperlink-insert" data-vedor-section="vedor-hyperlink"><i class="fa fa-link"></i>Link</button></li>
+			<li><button data-vedor-section="vedor-hyperlink" class="vedor-expands"><i class="fa fa-link"></i>Link</button></li>
 			<li><button data-vedor-section="vedor-code" data-vedor-action="vedor-edit-source"><i class="fa fa-code"></i>Code</button></li>
 		</ul>
 		<div class="vedor-toolbar-section vedor-text-style">
@@ -86,6 +86,12 @@
 			<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>Right</button></li>
 			<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
 			</ul>
+		</div>
+		<div class="vedor-toolbar-section vedor-hyperlink">
+			<div><label>URL</label><input type="text" id="vdHyperlinkHref" data-vedor-action="vedor-hyperlink-href"></div>
+			<div><label>Title</label><input type="text" id="vdHyperlinkTitle" data-vedor-action="vedor-hyperlink-title"></div>
+			<div><label>Name</label><input type="text" id="vdHyperlinkName" data-vedor-action="vedor-hyperlink-name"></div>
+			<div><button class="vedor-hyperlink-nofollow" data-vedor-action="vedor-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button></div>
 		</div>
 		<div class="vedor-toolbar-section vedor-clipboard">
 			<ul>
@@ -141,18 +147,133 @@
 		}
 	};
 
+	editor.plugins.hyperlink = {
+		create : function() {
+			var tagList = []; // This holds the list of related hyperlink tags that the attributes will be set on;
+
+			// first let the dhtmledit component set the link, since it is better in it.
+			// but to find it back, we need a unique identifier
+
+			var linkIdentifier=Math.floor(Math.random()*10000);
+			editor.plugins.text.formatInline("CreateLink", '#'+linkIdentifier);
+			var tags = document.querySelectorAll("A[href='#" + linkIdentifier + "']");
+
+			for (var i=0; i<tags.length; i++) {
+				tagList.push(tags[i]);
+			}
+			return tagList;
+		},
+		get : function() {
+			var tagList = [];
+			var element;
+			var sel = vdSelectionState.get();
+			var control = vdSelectionState.getControlNode(sel);
+			if (control) {
+				element = control;
+				parent = element.parentNode;
+			} else {
+				if (sel.select) { // IE only
+					var htmlText = vdSelection.getHTMLText(oSel);
+					if (htmlText.substr(htmlText.length-4, 4)=='<BR>') {
+						// BR included in selection as last element, remove it, it has
+						// dangerous effects on the hyperlink command in IE
+						sel.moveEnd('character',-1);
+						sel.select();
+					}
+					if (htmlText.substr(0,4)=='<BR>') {
+						// idem when its the first character
+						sel.moveStart('character',1);
+						sel.select();
+					}
+
+				}
+				parent = vdSelection.parentNode(sel);
+			}
+
+			if (parent.tagName.toLowerCase() == 'a') {
+				tagList.push(parent);
+			}
+			return tagList;
+		},
+		set : function(tagList, attributes) {
+			var newTagList = [];
+
+			var newLink="<a";
+			for (var i in attributes) {
+				if (attributes[i]) {
+					newLink=newLink+" "+i+"=\""+attributes[i]+"\"";
+				}
+			}
+			newLink=newLink+">";
+
+			// Now set the link properties for all the elements in the list.
+			for (var j=0; j<tagList.length; j++) {
+				tag = tagList[j];
+
+				if (tag && (attributes['href'] || attributes['name'])) {
+					var div = document.createElement('div');
+					div.innerHTML = newLink+tag.innerHTML+'</a>';
+					var frag = document.createDocumentFragment();
+					for (var i=0; i < div.childNodes.length; i++) {
+						var node = div.childNodes[i].cloneNode(true);
+						frag.appendChild(node);
+						if (node.tagName.toLowerCase() == "a") {
+							newTagList.push(node);
+						}
+					}
+					div = null;
+					tag.parentNode.replaceChild(frag, tag);
+				}
+			}
+			currentLink = newTagList;
+		}
+	};
+
 	var updateTextToolbar = function(toolbar) {
 		var i;
 
 		var sel = vdSelectionState.get();
 		var parent = vdSelection.getNode(sel);
+		vdSelectionState.save();
+		currentLink = [];
+
 		if (parent) {
 			var foundTag = toolbar.querySelector("[name='textStyle'] option[value='" + parent.tagName.toLowerCase() + "']");
 			if (foundTag) {
 				foundTag.selected = true;
 			}
+			if (parent.tagName.toLowerCase() == "a") {
+				currentLink.push(parent);
+			}
 		}
 
+		if (currentLink.length) {
+			var hyperlinkHref = currentLink[0].getAttribute('href');
+			vdSetProperty('vdHyperlinkHref', hyperlinkHref);
+
+			var hyperlinkTitle = currentLink[0].getAttribute('title');
+			vdSetProperty('vdHyperlinkTitle', hyperlinkTitle);
+
+			var hyperlinkName = currentLink[0].getAttribute('name');
+			vdSetProperty('vdHyperlinkName', hyperlinkName);
+			
+			var hyperlinkNofollow = toolbar.querySelectorAll("button.vedor-hyperlink-nofollow");
+			for (var i=0; i<hyperlinkNofollow.length; i++) {
+				if (parent.getAttribute("rel") && parent.getAttribute("rel").match(/nofollow/)) {
+					hyperlinkNofollow[i].classList.add("vedor-selected");
+				} else {
+					hyperlinkNofollow[i].classList.remove("vedor-selected");
+				}
+			}
+		} else {
+			vdSetProperty('vdHyperlinkHref', '');
+			vdSetProperty('vdHyperlinkTitle', '');
+			vdSetProperty('vdHyperlinkName', '');
+			var hyperlinkNofollow = toolbar.querySelector("button.vedor-hyperlink-nofollow");
+			if (hyperlinkNofollow) {
+				hyperlinkNofollow.classList.remove("vedor-selected");
+			}
+		}
 
 		if (parent || parent.getAttribute || parent.getAttribute("contenteditable")) {
 			var parentStyles = editor.node.getAllStyles(parent);
@@ -261,5 +382,12 @@
 				editor.plugins.text.formatBlock(value);
 			}
 		}
+	});
+	editor.addContextFilter("vedor-hyperlink", {
+		"selector" : "A",
+		"parent" : {
+			"selector" : "*"
+		},
+		"context" : "vedor-text-selection"
 	});
 </script>

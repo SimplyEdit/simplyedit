@@ -5,8 +5,9 @@
 			<li><button data-vedor-section="vedor-image-style" class="vedor-expands"><i class="fa fa-magic"></i>Style</button></li>
 			<li><button data-vedor-section="vedor-image-align" class="vedor-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-vedor-section="vedor-clipboard" class="vedor-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
-			<li><button data-vedor-section="vedor-image-edit" class="vedor-expands"><i class="fa fa-pencil"></i>Edit</button></li>
 			<li><button data-vedor-section="vedor-image-properties" class="vedor-expands"><i class="fa fa-tags"></i>Properties</button></li>
+			<li><button data-vedor-section="vedor-hyperlink" class="vedor-expands"><i class="fa fa-link"></i>Link</button></li>
+			<li><button data-vedor-section="vedor-code" data-vedor-action="vedor-edit-source"><i class="fa fa-code"></i>Code</button></li>
 		</ul>
 		<div class="vedor-toolbar-section vedor-image-style">
 			<ul>
@@ -24,18 +25,15 @@
 		</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-image-properties">
+			<div><label>URL</label><input type="text" id="vdImageSrc" data-vedor-action="vedor-image-src"></div>
 			<div><label>Alt</label><input type="text" id="vdImageAlt" data-vedor-action="vedor-image-alt"></div>
 			<div><label>Title</label><input type="text" id="vdImageTitle" data-vedor-action="vedor-image-title"></div>
 		</div>
-		<div class="vedor-toolbar-section vedor-image-edit">
-			<ul>
-				<li><button class="vedor-image-upload" data-vedor-action="vedor-image-upload"><i class="fa fa-cloud-upload"></i>Upload</button></li>
-				<li><button class="vedor-image-browse" data-vedor-action="vedor-image-browse"><i class="fa fa-folder-open"></i>Browse</button></li>
-				<!-- li><button class="vedor-image-editor" data-vedor-action="vedor-image-editor"><i class="fa fa-pencil-square-o"></i>Edit image</button></li -->
-				<li><button class="vedor-image-delete" data-vedor-action="vedor-image-delete"><i class="fa fa-trash-o"></i>Delete</button></li>
-				<li><button class="vedor-image-link" data-vedor-action="vedor-hyperlink-insert"><i class="fa fa-link"></i>Link</button></li>
-				<li><button data-vedor-section="vedor-code" data-vedor-action="vedor-edit-source"><i class="fa fa-code"></i>Code</button></li>
-			</ul>
+		<div class="vedor-toolbar-section vedor-hyperlink">
+			<div><label>URL</label><input type="text" id="vdHyperlinkHref" data-vedor-action="vedor-hyperlink-href"></div>
+			<div><label>Title</label><input type="text" id="vdHyperlinkTitle" data-vedor-action="vedor-hyperlink-title"></div>
+			<div><label>Name</label><input type="text" id="vdHyperlinkName" data-vedor-action="vedor-hyperlink-name"></div>
+			<div><button class="vedor-hyperlink-nofollow" data-vedor-action="vedor-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button></div>
 		</div>
 		<div class="vedor-toolbar-section vedor-clipboard">
 			<ul>
@@ -47,6 +45,9 @@
 	</div>
 </section>
 <script type="text/javascript">
+	var currentImage;
+	var currentLink;
+
 	editor.addToolbar({
 		"name" : "vedor-image",
 		"filter" : {
@@ -55,9 +56,11 @@
 				"selector" : "*"
 			}
 		},
-		"update" : function() {
+		"update" : function(toolbar) {
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
+
+			vdSelectionState.save();
 
 			currentImage = image;
 
@@ -77,6 +80,39 @@
 			var title=image.getAttribute('title');
 			vdSetProperty('vdImageTitle', title);
 
+			var src=image.getAttribute('src');
+			vdSetProperty('vdImageSrc', src);
+
+			currentLink = editor.plugins.hyperlink.get();
+
+			if (currentLink.length) {
+				var hyperlinkHref = currentLink[0].getAttribute('href');
+				vdSetProperty('vdHyperlinkHref', hyperlinkHref);
+
+				var hyperlinkTitle = currentLink[0].getAttribute('title');
+				vdSetProperty('vdHyperlinkTitle', hyperlinkTitle);
+
+				var hyperlinkName = currentLink[0].getAttribute('name');
+				vdSetProperty('vdHyperlinkName', hyperlinkName);
+				
+				var hyperlinkNofollow = toolbar.querySelectorAll("button.vedor-hyperlink-nofollow");
+				for (var i=0; i<hyperlinkNofollow.length; i++) {
+					if (parent.getAttribute("rel") && parent.getAttribute("rel").match(/nofollow/)) {
+						hyperlinkNofollow[i].classList.add("vedor-selected");
+					} else {
+						hyperlinkNofollow[i].classList.remove("vedor-selected");
+					}
+				}
+			} else {
+				vdSetProperty('vdHyperlinkHref', '');
+				vdSetProperty('vdHyperlinkTitle', '');
+				vdSetProperty('vdHyperlinkName', '');
+				var hyperlinkNofollow = toolbar.querySelector("button.vedor-hyperlink-nofollow");
+				if (hyperlinkNofollow) {
+					hyperlinkNofollow.classList.remove("vedor-selected");
+				}
+			}
+
 			// Set the parent icon for alignment as well;
 			var currentIcon = document.querySelectorAll("div.vedor-image-align button.vedor-selected i")[0];
 			if (currentIcon) {
@@ -87,8 +123,6 @@
 			}
 		},
 		"init" : function() {
-			console.log("init image toolbar");
-
 			vdSetImage = function() {
 				if (currentImage) {
 					var type=vdGetProperty('vdImageType');
@@ -99,7 +133,6 @@
 					}
 
 					var align=vdGetProperty('vdImageAlign');
-					console.log(align);
 
 					if (align=='none' || align=='') {
 						currentImage.removeAttribute('align');
@@ -116,22 +149,18 @@
 			"vedor-image-align-left" : function() {
 				vdSetProperty("vdImageAlign", "left");
 				vdSetImage();
-				return false;
 			},
 			"vedor-image-align-center" : function() {
 				vdSetProperty("vdImageAlign", "center");
 				vdSetImage();
-				return false;
 			},
 			"vedor-image-align-right" : function() {
 				vdSetProperty("vdImageAlign", "right");
 				vdSetImage();
-				return false;
 			},
 			"vedor-image-align-none" : function() {
 				vdSetProperty("vdImageAlign", "none");
 				vdSetImage();
-				return false;
 			},
 			"vedor-image-delete" : function() {
 				var sel = vdSelectionState.get();
@@ -154,6 +183,74 @@
 					} else {
 						currentImage.removeAttribute("title");
 					}
+				}
+			},
+			"vedor-image-src" : function(value) {
+				if (currentImage) {
+					if (value) {
+						currentImage.setAttribute("src", value);
+					} else {
+						currentImage.removeAttribute("src");
+					}
+				}
+			},
+			"vedor-hyperlink-href" : function(value) {
+				if (!currentLink.length) {
+					currentLink = editor.plugins.hyperlink.create();
+				}
+				editor.plugins.hyperlink.set(currentLink, {
+					"href" : value,
+					"title" : currentLink[0].getAttribute("title"),
+					"name" : currentLink[0].getAttribute("name"),
+					"rel" : currentLink[0].getAttribute("rel"),
+					"class" : currentLink[0].getAttribute("class")
+				});
+			},
+			"vedor-hyperlink-title" : function(value) {
+				if (!currentLink.length) {
+					currentLink = editor.plugins.hyperlink.create();
+				}
+				editor.plugins.hyperlink.set(currentLink, {
+					"href" : currentLink[0].getAttribute("href"),
+					"title" : value,
+					"name" : currentLink[0].getAttribute("name"),
+					"rel" : currentLink[0].getAttribute("rel"),
+					"class" : currentLink[0].getAttribute("class")
+				});
+			},
+			"vedor-hyperlink-name" : function(value) {
+				if (!currentLink.length) {
+					currentLink = editor.plugins.hyperlink.create();
+				}
+				editor.plugins.hyperlink.set(currentLink, {
+					"href" : currentLink[0].getAttribute("href"),
+					"title" : currentLink[0].getAttribute("title"),
+					"name" : value,
+					"rel" : currentLink[0].getAttribute("rel"),
+					"class" : currentLink[0].getAttribute("class")
+				});
+			},
+			"vedor-hyperlink-nofollow" : function(button) {
+				if (!currentLink.length) {
+					currentLink = editor.plugins.hyperlink.create();
+				}
+				if (currentLink[0].getAttribute("rel") == "nofollow") {
+					editor.plugins.hyperlink.set(currentLink, {
+						"href" : currentLink[0].getAttribute("href"),
+						"title" : currentLink[0].getAttribute("title"),
+						"name" : currentLink[0].getAttribute("name"),
+						"class" : currentLink[0].getAttribute("class")
+					});
+					button.classList.remove("vedor-selected");
+				} else {
+					editor.plugins.hyperlink.set(currentLink, {
+						"href" : currentLink[0].getAttribute("href"),
+						"title" : currentLink[0].getAttribute("title"),
+						"name" : currentLink[0].getAttribute("name"),
+						"class" : currentLink[0].getAttribute("class"),
+						"rel" : "nofollow"
+					});
+					button.classList.add("vedor-selected");
 				}
 			}
 		}
