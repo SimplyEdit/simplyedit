@@ -358,10 +358,15 @@
 				url += "?t=" + (new Date().getTime());
 
 				var loadToolbars = function() {
+					if (!editor.toolbar) {
+						// Main toolbar code isn't loaded yet, delay a bit;
+						window.setTimeout(loadToolbars, 100);
+						return;
+					}
+
 					var toolbars = [
 						"/simple-edit/vedor/toolbar.vedor-main-toolbar.html",
-						"/simple-edit/vedor/toolbar.vedor-text-cursor.html",
-						"/simple-edit/vedor/toolbar.vedor-text-selection.html",
+						"/simple-edit/vedor/toolbar.vedor-text.html",
 						"/simple-edit/vedor/toolbar.vedor-image.html",
 						"/simple-edit/vedor/toolbar.vedor-selectable.html"
 					];
@@ -383,18 +388,10 @@
 										fragment.appendChild(toolbars.children[0]);
 									}
 									toolbars.content = fragment;
-
 									toolbars.brokenImport = true;
 								}
-								var toolbarNode = document.importNode(toolbars.content, true);
-								var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
-								for (i=0; i<newToolbars.length; i++) {
-									var marker = document.createElement("div");
-									marker.className = "marker";
-									newToolbars[i].insertBefore(marker, newToolbars[i].firstChild);
-								}
 
-								toolbarsContainer.appendChild(toolbarNode);
+								var toolbarNode = document.importNode(toolbars.content, true);
 								if (toolbars.brokenImport) {
 									var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
 									for (i=0; i<scriptTags.length; i++) {
@@ -408,6 +405,12 @@
 										document.head.appendChild(newNode);
 									}
 								}
+
+								var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
+								for (i=0; i<newToolbars.length; i++) {
+									editor.toolbar.init(newToolbars[i]);
+								}
+								toolbarsContainer.appendChild(toolbarNode);
 							}
 						};
 						http.send();
@@ -437,13 +440,6 @@
 						}
 
 						var toolbarNode = document.importNode(toolbars.content, true);
-						var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
-						for (i=0; i<newToolbars.length; i++) {
-							var marker = document.createElement("div");
-							marker.className = "marker";
-							newToolbars[i].insertBefore(marker, newToolbars[i].firstChild);
-						}
-
 						toolbarsContainer.appendChild(toolbarNode);
 						if (toolbars.brokenImport) {
 							var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
@@ -622,7 +618,7 @@
 				// pass in the target node, as well as the observer options
 				observer.observe(target, config);
 
-				window.setTimeout(setBodyTop, 500);
+				window.setTimeout(setBodyTop, 100);
 			}
 		}
 	};
@@ -634,6 +630,7 @@
 
 	editor.toolbars = {};
 	editor.contextFilters = {};
+	editor.plugins = {};
 
 	editor.addToolbar = function(toolbar) {
 		if (toolbar.filter) {

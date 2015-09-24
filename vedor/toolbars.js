@@ -1,110 +1,127 @@
-	(function() {
-		editor.toolbar = {
-			getToolbarEl : function(el) {
-				while ( el && el.tagName!='div' && !/\bvedor-toolbar\b/.test(el.className) ) {
-					el = el.parentNode;
-				}
-				return el;
-			},
-			getSectionEl : function(el) {
-				while ( el && el.tagName!='div' && !/\bvedor-toolbar-section\b/.test(el.className) ) {
-					el = el.parentNode;
-				}
-				return el;
-			},
-			handleButton : function(el) {
-				var toolbar = editor.toolbar.getToolbarEl(el);
-				var section = editor.toolbar.getSectionEl(el);
-				var i;
-				var l;
-				var selectedSectionButtons;
+	editor.toolbar = {
+		getToolbarEl : function(el) {
+			while ( el && el.tagName!='div' && !/\bvedor-toolbar\b/.test(el.className) ) {
+				el = el.parentNode;
+			}
+			return el;
+		},
+		getSectionEl : function(el) {
+			while ( el && el.tagName!='div' && !/\bvedor-toolbar-section\b/.test(el.className) ) {
+				el = el.parentNode;
+			}
+			return el;
+		},
+		handleButton : function(el) {
+			var toolbar = editor.toolbar.getToolbarEl(el);
+			var section = editor.toolbar.getSectionEl(el);
+			var i;
+			var l;
+			var selectedSectionButtons;
 
 
-				if ( !section ) {
-					var sections = toolbar.querySelectorAll('.vedor-toolbar-section.vedor-selected, .vedor-toolbar-status');
-					for ( i=0, l=sections.length; i<l; i++ ) {
-						sections[i].className = sections[i].className.replace(/\bvedor-selected\b/,'');
-					}
-					selectedSectionButtons = toolbar.querySelectorAll('ul.vedor-buttons button.vedor-selected');
-					for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
-						selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bvedor-selected\b/,'');
-					}
-					if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
-						el.className += ' vedor-selected';
-						var rel = el.dataset.vedorSection;
-						if ( rel ) {
-							var target = toolbar.querySelector('.vedor-toolbar-section.' + rel );
-							if ( target ) {
-								target.className += ' vedor-selected';
-								var focusTarget = target.querySelector("LI > *");
-								if (focusTarget) {
-									focusTarget.focus();
-								}
+			if ( !section ) {
+				var sections = toolbar.querySelectorAll('.vedor-toolbar-section.vedor-selected, .vedor-toolbar-status');
+				for ( i=0, l=sections.length; i<l; i++ ) {
+					sections[i].className = sections[i].className.replace(/\bvedor-selected\b/,'');
+				}
+				selectedSectionButtons = toolbar.querySelectorAll('ul.vedor-buttons button.vedor-selected');
+				for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
+					selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bvedor-selected\b/,'');
+				}
+				if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
+					el.className += ' vedor-selected';
+					var rel = el.dataset.vedorSection;
+					if ( rel ) {
+						var target = toolbar.querySelector('.vedor-toolbar-section.' + rel );
+						if ( target ) {
+							target.className += ' vedor-selected';
+							var focusTarget = target.querySelector("LI > *");
+							if (focusTarget) {
+								focusTarget.focus();
 							}
-						}
-					} else {
-						var status = toolbar.querySelectorAll('.vedor-toolbar-status')[0];
-						if ( status ) {
-							status.className += ' vedor-selected';
 						}
 					}
 				} else {
-					selectedSectionButtons = section.querySelectorAll('.vedor-selected');
-					for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
-						selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bvedor-selected\b/,'');
-					}
-					if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
-						el.className += ' vedor-selected';
+					var status = toolbar.querySelectorAll('.vedor-toolbar-status')[0];
+					if ( status ) {
+						status.className += ' vedor-selected';
 					}
 				}
-			},
-			addMarkers : function() {
-				var toolbars = document.querySelectorAll(".vedor-toolbar");
-
-				for (var i=0; i<toolbars.length; i++) {
-					if (!toolbars[i].querySelector("div.marker")) {
-						var marker = document.createElement("div");
-						marker.className = "marker";
-						toolbars[i].insertBefore(marker, toolbars[i].firstChild);
-					}
+			} else {
+				selectedSectionButtons = section.querySelectorAll('.vedor-selected');
+				for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
+					selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bvedor-selected\b/,'');
+				}
+				if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
+					el.className += ' vedor-selected';
 				}
 			}
-		};
+		},
+		addMarkers : function() {
+			var toolbars = document.querySelectorAll(".vedor-toolbar");
 
-		var lastEl = null;
-		var lastSection = document.querySelector('.vedor-toolbar-status');
-		var vedorSections = document.querySelectorAll(".vedor-section");
-		editor.toolbar.addMarkers();
-
-		document.body.onclick = function(evt) {
-			evt.preventDefault();
-			var el = evt.target;
-			if ( el.tagName=='I' ) {
-				el = el.parentNode;
+			for (var i=0; i<toolbars.length; i++) {
+				editor.toolbar.addMarker(toolbars[i]);
 			}
+		},
+		addMarker : function(toolbar) {
+			if (!toolbar.querySelector("div.marker")) {
+				var marker = document.createElement("div");
+				marker.className = "marker";
+				toolbar.insertBefore(marker, toolbar.firstChild);
+			}
+		},
+		init : function(toolbar) {
+			toolbar.addEventListener("click", function(evt) {
+				evt.preventDefault();
+				var el = evt.target;
+				if ( el.tagName=='I' ) {
+					el = el.parentNode;
+				}
 
-			if ( el.tagName == 'BUTTON' ) {
-				switch(el.getAttribute("data-vedor-action")) {
-					case null:
-					break;
-					default:
-						var action = editor.actions[el.getAttribute("data-vedor-action")];
-						if (action) {
-							var result = action(el);
-							if (!result) {
-								return;
+				if ( el.tagName == 'BUTTON' ) {
+					switch(el.getAttribute("data-vedor-action")) {
+						case null:
+						break;
+						default:
+							var action = editor.actions[el.getAttribute("data-vedor-action")];
+							if (action) {
+								var result = action(el);
+								if (!result) {
+									return;
+								}
+							} else {
+								console.log(el.getAttribute("data-vedor-action") + " not yet implemented");
 							}
-						} else {
-							console.log(el.getAttribute("data-vedor-action") + " not yet implemented");
-						}
-					break;
-				}
+						break;
+					}
 
-				evt.target.blur();
-				editor.toolbar.handleButton(el);
+					evt.target.blur();
+					editor.toolbar.handleButton(el);
+				}
+			});
+
+			var inputs = toolbar.querySelectorAll("select[data-vedor-action], input[data-vedor-action], textarea[data-vedor-action]");
+			var handleChange = function(evt) {
+				var action = editor.actions[this.getAttribute("data-vedor-action")];
+				if (action) {
+					var result = action(this.value);
+				} else {
+					console.log(this.getAttribute("data-vedor-action") + " not yet implemented");
+				}
+			};
+
+			for (var i=0; i<inputs.length; i++) {
+				inputs[i].addEventListener("change", handleChange);
 			}
-		};
-	})();
+
+			editor.toolbar.addMarker(toolbar);
+		}
+	};
+
+	var lastEl = null;
+	var lastSection = document.querySelector('.vedor-toolbar-status');
+	var vedorSections = document.querySelectorAll(".vedor-section");
 
 	editor.node = {
 		parents : function(target) {
@@ -177,11 +194,47 @@
 				}
 			}
 			return styleNode;
+		},
+		getEditableField : function() {
+			var sel = vdSelectionState.get();
+			var parent = vdSelection.getNode(sel);
+			if (sel) {
+				while(parent) {
+					if (parent.className && parent.className.match(/\beditable\b/)) {
+						return parent;
+					} else if (parent.getAttribute("data-vedor-field")) {
+						return parent;
+					} else {
+						parent = parent.parentNode;
+					}
+				}
+				return false;
+			}
+			return false;
+		},
+		replaceTags : function(source, target) {
+			var field = editor.node.getEditableField();
+			if (!field) {
+				return;
+			}
+			var sel = vdSelectionState.get();
+			vedor.editor.bookmarks.set(sel);
+
+			var elms = field.querySelectorAll(source);
+			for (var i=0; i<elms.length; i++) {
+				var newNode = document.createElement(target);
+				newNode.innerHTML = elms[i].innerHTML;
+
+				elms[i].parentNode.replaceChild(newNode, elms[i]);
+			}
+
+			vedor.editor.bookmarks.select();
+			vedor.editor.bookmarks.remove();
 		}
 	};
 
 	editor.context = {
-		check : function(filter, targets) {
+		weigh : function(filter, targets) {
 			var sel = vdSelectionState.get();
 
 			var target = targets.shift();
@@ -205,7 +258,7 @@
 					if (typeof filter.parent == 'undefined') {
 						return result;
 					} else {
-						var parentResult = editor.context.check(filter.parent, targets);
+						var parentResult = editor.context.weigh(filter.parent, targets);
 						if (parentResult) {
 							return result + parentResult;
 						} else {
@@ -230,7 +283,7 @@
 						var bestFilterWeight = 0;
 						for (var i in editor.contextFilters) {
 							var filter = editor.contextFilters[i];
-							var filterWeight = editor.context.check(filter, editor.node.parents(parent));
+							var filterWeight = editor.context.weigh(filter, editor.node.parents(parent));
 
 							if (filterWeight) {
 								validFilters[i] = filterWeight;
@@ -439,9 +492,57 @@
 				default:
 				break;
 			}
+		},
+		fixSelection : function() {
+			// check the current selection and update it if necessary
+			var sel = vdSelectionState.get();
+			var parent = vdSelection.getNode(sel);
+
+			// console.log(parent);
+			var selParent = editor.node.getUneditableParent(parent);
+			if (selParent) {
+				// console.log(selParent);
+				// Selection if part of something uneditable
+				sel.selectNode(selParent);
+				sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+				sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+				vdSelectionState.save(sel);
+				sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+			}
+
+		},
+		getTagStack : function() {
+			var sel	= vdSelectionState.get();
+			var parent = vdSelection.getNode(sel);
+			var newContextStack	= [];
+
+			if (sel) {
+				while (parent && editor.node.hasEditableParent(parent) && parent.parentNode) {
+					newContextStack.push(parent);
+					parent=parent.parentNode;
+				}
+			}
+
+			return newContextStack;
+		},
+		update : function() {
+			// Check if the current selection is part of an uneditable thing, if so, move the selection to that parent;
+			var sel = vdSelectionState.get();
+			var parent = vdSelection.getNode(sel);
+
+			// Skip the update when the selection is within a toolbar;
+			if (editor.node.hasToolbarParent(parent)) {
+				return;
+			}
+			if (document.querySelector(":focus") && editor.node.hasToolbarParent(document.querySelector(":focus"))) {
+				return;
+			}
+
+			editor.context.fixSelection();
+			editor.context.show();
+			vdHtmlContextStack = editor.context.getTagStack();
 		}
 	};
-
 
 	vdHideToolbars = false;
 
@@ -460,85 +561,10 @@
 	}
 
 
-	function updateHtmlContext() {
-		// Check if the current selection is part of an uneditable thing, if so, move the selection to that parent;
-		var sel = vdSelectionState.get();
-		var parent = vdSelection.getNode(sel);
-
-		if (editor.node.hasToolbarParent(parent)) {
-			return;
-		}
-		if (document.querySelector(":focus") && editor.node.hasToolbarParent(document.querySelector(":focus"))) {
-			return;
-		}
-
-		// console.log(parent);
-		var selParent = editor.node.getUneditableParent(parent);
-		if (selParent) {
-			// console.log(selParent);
-			// Selection if part of something uneditable
-			sel.selectNode(selParent);
-			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
-			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
-			vdSelectionState.save(sel);
-			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
-		}
-
-		editor.context.show();
-
-		parent			= false;
-		sel			= vdSelectionState.get();
-		var imgOptions		= false;
-		var newContextStack	= [];
-
-		if (sel) {
-			parent = vdSelection.getNode(sel);
-
-			var contextString='';
-			while (parent && editor.node.hasEditableParent(parent) && parent.parentNode) {
-				if (!imgOptions && parent.tagName=='IMG') {
-					imgOptions=true;
-					currentImage=parent;
-					imgStackIndex=newContextStack.length;
-				}
-
-				newContextStack.push(parent);
-				contextString='<li unselectable="on"><a class="tag" href="#" title="{vd.editor:selecttag}" unselectable="on" onClick="showContextInfo('+(newContextStack.length-1)+',this);">'+parent.tagName +
-				//	'<span unselectable="on" class="deltag" title="{vd.editor:removetag}" onClick="return vdDelTag('+(newContextStack.length-1)+')">X</span>' +
-					'</a></li>'+contextString;
-				parent=parent.parentNode;
-			}
-		}
-
-//		setHtmlTagsContext('<ul class="tagStack" unselectable="on"><li class="vedor-label">{vd.editor:htmlcontext}</li>'+contextString+'</ul>');
-		vdHtmlContextStack=newContextStack;
-	}
-
-	function replaceNodeTags(source, target) {
-		var field = getEditableField();
-		if (!field) {
-			return;
-		}
-		var sel = vdSelectionState.get();
-		vedor.editor.bookmarks.set(sel);
-
-		var elms = field.querySelectorAll(source);
-		for (var i=0; i<elms.length; i++) {
-			var newNode = document.createElement(target);
-			newNode.innerHTML = elms[i].innerHTML;
-
-			elms[i].parentNode.replaceChild(newNode, elms[i]);
-		}
-
-		vedor.editor.bookmarks.select();
-		vedor.editor.bookmarks.remove();
-	}
 
 
 	function setFormat(command, value) {
-		var blockRe=new RegExp('(H[1-7])|P');
-		var skipExecCommand=false;
-		var field=getEditableField();
+		var field=editor.node.getEditableField();
 		if (!field) {
 			return;
 		}
@@ -551,9 +577,13 @@
 			target = sel;
 		}
 
+		editor.node.replaceTags("STRONG", "B");
+		editor.node.replaceTags("EM", "I");
 		target.execCommand(command, false, value);
-
 		vdSelectionState.restore();
+
+		editor.node.replaceTags("I", "EM");
+		editor.node.replaceTags("B", "STRONG");
 
 		vdStoreUndo();
 		vdEditPane_DisplayChanged();
@@ -567,27 +597,8 @@
 	function vdStoreUndo() {
 	}
 
-	function getEditableField() {
-		var vdParent=false;
-		var sel = vdSelectionState.get();
-		if (sel) {
-			vdParent = vdSelection.getNode(sel);
-			while(vdParent) {
-				if (vdParent.className && vdParent.className.match(/\beditable\b/)) {
-					return vdParent;
-				} else if (vdParent.getAttribute("data-vedor-field")) {
-					return vdParent;
-				} else {
-					vdParent = vdParent.parentNode;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-
 	function setFormatStyle(styleInfo) {
-		var field=getEditableField();
+		var field=editor.node.getEditableField();
 		if (!field) {
 			return false;
 		}
@@ -607,6 +618,6 @@
 		vdSelectionState.init(window);
 		selectionchange.start(document); // onselectionchange event for Firefox
 
-		muze.event.attach( document, 'selectionchange', updateHtmlContext );
-		muze.event.attach( document, 'keyup', updateHtmlContext );
+		muze.event.attach( document, 'selectionchange', editor.context.update );
+		muze.event.attach( document, 'keyup', editor.context.update );
 	}, 1000);

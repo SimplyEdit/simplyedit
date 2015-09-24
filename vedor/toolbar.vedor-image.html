@@ -24,8 +24,8 @@
 		</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-image-properties">
-			<div><label>Alt</label><input type="text" id="vdImageAlt"></div>
-			<div><label>Title</label><input type="text" id="vdImageTitle"></div>
+			<div><label>Alt</label><input type="text" id="vdImageAlt" data-vedor-action="vedor-image-alt"></div>
+			<div><label>Title</label><input type="text" id="vdImageTitle" data-vedor-action="vedor-image-title"></div>
 		</div>
 		<div class="vedor-toolbar-section vedor-image-edit">
 			<ul>
@@ -106,52 +106,55 @@
 					} else {
 						currentImage.setAttribute('align',align);
 					}
-					var alt=vdGetProperty('vdImageAlt');
-					if (alt) {
-						currentImage.setAttribute('alt',alt);
-					} else {
-						currentImage.removeAttribute('alt');
-					}
-					var title=vdGetProperty('vdImageTitle');
-					if (title) {
-						currentImage.setAttribute('title',title);
-					} else {
-						currentImage.removeAttribute('title');
-					}
 					vdStoreUndo();
 				}
 			};
 
-
-			document.querySelector("#vdImageAlt").addEventListener("change", vdSetImage);
-			document.querySelector("#vdImageTitle").addEventListener("change", vdSetImage);
 			document.querySelector("#vdImageType").addEventListener("change", vdSetImage);
 		},
 		"actions" : {
-			"vedor-image-align-left" : function(el) {
+			"vedor-image-align-left" : function() {
 				vdSetProperty("vdImageAlign", "left");
 				vdSetImage();
 				return false;
 			},
-			"vedor-image-align-center" : function(el) {
+			"vedor-image-align-center" : function() {
 				vdSetProperty("vdImageAlign", "center");
 				vdSetImage();
 				return false;
 			},
-			"vedor-image-align-right" : function(el) {
+			"vedor-image-align-right" : function() {
 				vdSetProperty("vdImageAlign", "right");
 				vdSetImage();
 				return false;
 			},
-			"vedor-image-align-none" : function(el) {
+			"vedor-image-align-none" : function() {
 				vdSetProperty("vdImageAlign", "none");
 				vdSetImage();
 				return false;
 			},
-			"vedor-image-delete" : function(el) {
+			"vedor-image-delete" : function() {
 				var sel = vdSelectionState.get();
 				var image = vdSelection.getNode(sel);
 				image.parentNode.removeChild(image);
+			},
+			"vedor-image-alt" : function(value) {
+				if (currentImage) {
+					if (value) {
+						currentImage.setAttribute("alt", value);
+					} else {
+						currentImage.removeAttribute("alt");
+					}
+				}
+			},
+			"vedor-image-title" : function(value) {
+				if (currentImage) {
+					if (value) {
+						currentImage.setAttribute("title", value);
+					} else {
+						currentImage.removeAttribute("title");
+					}
+				}
 			}
 		}
 	});
