@@ -237,8 +237,8 @@
 
 							content  = list.templates[templateName].children;
 							for (j = 0; j < content.length; j++) {
-								fragment.appendChild(content[j]);
 								fragmentNode.appendChild(content[j].cloneNode(true));
+								fragment.appendChild(content[j]);
 							}
 							list.templates[templateName].content = fragment;
 							list.templates[templateName].contentNode = fragmentNode;
