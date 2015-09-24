@@ -479,7 +479,7 @@
 		},
 		initProperties : function(context) {
 			if (editor.toolbars[context] && editor.toolbars[context].update) {
-				return editor.toolbars[context].update();
+				return editor.toolbars[context].update(document.getElementById(context));
 			}
 
 			switch (context) {
@@ -560,56 +560,11 @@
 		}
 	}
 
-
-
-
-	function setFormat(command, value) {
-		var field=editor.node.getEditableField();
-		if (!field) {
-			return;
-		}
-		registerChange(field.id);
-
-		var sel = vdSelectionState.get();
-
-		var target = document;
-		if( !window.getSelection && target.selection.type != "None" ) { // make sure we execCommand on the selection for IE.
-			target = sel;
-		}
-
-		editor.node.replaceTags("STRONG", "B");
-		editor.node.replaceTags("EM", "I");
-		target.execCommand(command, false, value);
-		vdSelectionState.restore();
-
-		editor.node.replaceTags("I", "EM");
-		editor.node.replaceTags("B", "STRONG");
-
-		vdStoreUndo();
-		vdEditPane_DisplayChanged();
-		return true;
-	}
-
 	function registerChange(field) {
 	}
 	function vdEditPane_DisplayChanged() {
 	}
 	function vdStoreUndo() {
-	}
-
-	function setFormatStyle(styleInfo) {
-		var field=editor.node.getEditableField();
-		if (!field) {
-			return false;
-		}
-
-		vedor.editor.styles.init(window);
-		vedor.editor.styles.format(styleInfo, field);
-
-		vdStoreUndo();
-
-		vdEditPane_DisplayChanged();
-		return true;
 	}
 
 	window.setTimeout(function() {
