@@ -411,11 +411,13 @@
 										fragment.appendChild(toolbars.children[0]);
 									}
 									toolbars.content = fragment;
-									toolbars.brokenImport = true;
 								}
-
+								editor.brokenImport = true;
 								var toolbarNode = document.importNode(toolbars.content, true);
-								if (toolbars.brokenImport) {
+								if (editor.brokenImport) {
+									editor.importScripts = true;
+								}
+								if (editor.importScripts) {
 									var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
 									for (i=0; i<scriptTags.length; i++) {
 										var newNode = document.createElement("SCRIPT");
@@ -459,12 +461,16 @@
 								fragment.appendChild(toolbars.children[0]);
 							}
 							toolbars.content = fragment;
-							toolbars.brokenImport = true;
 						}
 
+						editor.brokenImport = true;
 						var toolbarNode = document.importNode(toolbars.content, true);
 						toolbarsContainer.appendChild(toolbarNode);
-						if (toolbars.brokenImport) {
+						
+						if (editor.brokenImport) {
+							editor.importScripts = true;
+						}
+						if (editor.brokenImport) {
 							var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
 							for (i=0; i<scriptTags.length; i++) {
 								var newNode = document.createElement("SCRIPT");
