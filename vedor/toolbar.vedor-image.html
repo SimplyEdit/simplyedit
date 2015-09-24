@@ -193,65 +193,6 @@
 						currentImage.removeAttribute("src");
 					}
 				}
-			},
-			"vedor-hyperlink-href" : function(value) {
-				if (!currentLink.length) {
-					currentLink = editor.plugins.hyperlink.create();
-				}
-				editor.plugins.hyperlink.set(currentLink, {
-					"href" : value,
-					"title" : currentLink[0].getAttribute("title"),
-					"name" : currentLink[0].getAttribute("name"),
-					"rel" : currentLink[0].getAttribute("rel"),
-					"class" : currentLink[0].getAttribute("class")
-				});
-			},
-			"vedor-hyperlink-title" : function(value) {
-				if (!currentLink.length) {
-					currentLink = editor.plugins.hyperlink.create();
-				}
-				editor.plugins.hyperlink.set(currentLink, {
-					"href" : currentLink[0].getAttribute("href"),
-					"title" : value,
-					"name" : currentLink[0].getAttribute("name"),
-					"rel" : currentLink[0].getAttribute("rel"),
-					"class" : currentLink[0].getAttribute("class")
-				});
-			},
-			"vedor-hyperlink-name" : function(value) {
-				if (!currentLink.length) {
-					currentLink = editor.plugins.hyperlink.create();
-				}
-				editor.plugins.hyperlink.set(currentLink, {
-					"href" : currentLink[0].getAttribute("href"),
-					"title" : currentLink[0].getAttribute("title"),
-					"name" : value,
-					"rel" : currentLink[0].getAttribute("rel"),
-					"class" : currentLink[0].getAttribute("class")
-				});
-			},
-			"vedor-hyperlink-nofollow" : function(button) {
-				if (!currentLink.length) {
-					currentLink = editor.plugins.hyperlink.create();
-				}
-				if (currentLink[0].getAttribute("rel") == "nofollow") {
-					editor.plugins.hyperlink.set(currentLink, {
-						"href" : currentLink[0].getAttribute("href"),
-						"title" : currentLink[0].getAttribute("title"),
-						"name" : currentLink[0].getAttribute("name"),
-						"class" : currentLink[0].getAttribute("class")
-					});
-					button.classList.remove("vedor-selected");
-				} else {
-					editor.plugins.hyperlink.set(currentLink, {
-						"href" : currentLink[0].getAttribute("href"),
-						"title" : currentLink[0].getAttribute("title"),
-						"name" : currentLink[0].getAttribute("name"),
-						"class" : currentLink[0].getAttribute("class"),
-						"rel" : "nofollow"
-					});
-					button.classList.add("vedor-selected");
-				}
 			}
 		}
 	});
