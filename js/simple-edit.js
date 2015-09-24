@@ -75,6 +75,27 @@
 
 				editor.data.list.init(data);
 				localStorage.data = JSON.stringify(data);
+
+				document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
+				var event; // The custom event that will be created
+				if (document.createEvent) {
+					event = document.createEvent("HTMLEvents");
+					event.initEvent("DOMContentLoaded", true, true);
+				} else {
+					event = document.createEventObject();
+					event.eventType = "DOMContentLoaded";
+				}
+
+				event.eventName = "DOMContentLoaded";
+
+				if (document.createEvent) {
+					document.dispatchEvent(event);
+				} else {
+					document.fireEvent("on" + event.eventType, event);
+				}
+				if (jQuery) {
+					jQuery.holdReady(false);
+				}
 			},
 			stash : function() {
 				var data = {};
@@ -358,7 +379,7 @@
 				url += "?t=" + (new Date().getTime());
 
 				var loadToolbars = function() {
-					if (!editor.toolbar) {
+					if (!editor.toolbar || (typeof muze === "undefined")) {
 						// Main toolbar code isn't loaded yet, delay a bit;
 						window.setTimeout(loadToolbars, 100);
 						return;
@@ -651,6 +672,15 @@
 		}
 		editor.contextFilters[name] = filter;
 	};
+
+	var preventDOMContentLoaded = function(event) {
+		event.preventDefault();
+		return false;
+	};
+	document.addEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
+	if (jQuery) {
+		jQuery.holdReady(true);
+	}
 
 	window.editor = editor;
 	editor.init();
