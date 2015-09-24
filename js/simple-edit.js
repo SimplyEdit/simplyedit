@@ -93,7 +93,7 @@
 				} else {
 					document.fireEvent("on" + event.eventType, event);
 				}
-				if (jQuery) {
+				if (typeof jQuery !== "undefined") {
 					jQuery.holdReady(false);
 				}
 			},
@@ -678,7 +678,7 @@
 		return false;
 	};
 	document.addEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-	if (jQuery) {
+	if (typeof jQuery !== "undefined") {
 		jQuery.holdReady(true);
 	}
 
