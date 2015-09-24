@@ -1,9 +1,3 @@
-- Images
-  - alignment classes?
-  - styles? of die weghalen? is dat 1 lijst, of is dat per plaatje wisselbaar?
-  - upload/browse opties?
-  - link?
-
 - Code source
 - Iets van een server die de merge van html en data serverside doet
 - Meta title/megatags
@@ -19,6 +13,7 @@ Bugs:
 - text align wordt met attribuut style="text-align: iets" gedaan
 - na aanmaken van een nieuwe hyperlink (editor.plugins.hyperlink.create) wordt de selectie aangepast en raak je de selectie kwijt
 - klik in de text van een hyperlink (zonder selectie) en klik op bold - had verwacht dat dan de hyperlink bold zou worden?
+- positionering van toolbars in IE Edge is 'bijzonder'
 
 Done:
 [v] Meerdere templates per lijst
