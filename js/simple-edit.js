@@ -243,7 +243,9 @@
 							list.templates[templateName].content = fragment;
 							list.templates[templateName].contentNode = fragmentNode;
 						}
-						templates[t].parentNode.removeChild(templates[t]);
+					}
+					while (templates.length) {
+						templates[0].parentNode.removeChild(templates[0]);
 					}
 				},
 				applyTemplates : function(list, listData) {

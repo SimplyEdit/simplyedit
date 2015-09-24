@@ -98,8 +98,24 @@
 			</div>
 
 			<ul class="clearfix" data-vedor-list="blogposts" data-vedor-sortable>
-				<template>
+				<template data-vedor-template="delay0">
 					<li class="animated wow fadeInDown">
+						<div class="media">
+							<div class="date">
+								<span data-vedor-field="blog dag" class="day">25</span>
+								<span data-vedor-field="blog maand" class="month">Jun</span>
+							</div>
+							<a href="#">
+								<img data-vedor-field="blog foto" src="img/blog_post1.jpg" alt=""/>
+							</a>
+						</div>
+						<a href="#">
+							<h1 data-vedor-field="blog titel">Sed do eiusmod tempor incididunt.</h1>
+						</a>
+					</li>
+				</template>
+				<template data-vedor-template="delay4">
+					<li class="animated wow fadeInDown" data-wow-delay=".4s">
 						<div class="media">
 							<div class="date">
 								<span data-vedor-field="blog dag" class="day">25</span>

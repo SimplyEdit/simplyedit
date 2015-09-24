@@ -4,7 +4,7 @@
   - upload/browse opties?
   - link?
 
-- Hyperlinks
+- Hyperlinks (update code ook in de toolbar)
 - Code source
 - Iets van een server die de merge van html en data serverside doet
 - Meta title/megatags
@@ -12,14 +12,12 @@
 - Lijsten in lijsten ?
 - Weergave "Saving" dialoogje
 - Keuze voor template insert dialoogje
-- code voor de init van hyperlink toolbar verplaatsen naar de toolbars ipv main toolbar file
 
 ---------
 Bugs:
-- textStyle selectbox init niet correct;
 - als een slip reorder start, moeten de toolbars weg
-- er is een timing issue met muze.js; de toolbar init moet pas worden gedaan nadat muze javascript is ingeladen.
 - image align wordt nog met attribuut 'align' gedaan;
+- text align wordt met attribuut style="text-align: iets" gedaan
 
 Done:
 [v] Meerdere templates per lijst
@@ -31,3 +29,6 @@ Done:
 [v] in image properties kun je niet op alt/title klikken, dan verdwijt de toolbar
 [v] font in image properties alt/title staat verkeerd
 [v] init code van de image toolbaar naar de toolbar zelf
+[v] textStyle selectbox init niet correct;
+[v] er is een timing issue met muze.js; de toolbar init moet pas worden gedaan nadat muze javascript is ingeladen.
+[v] prevent ready event fire tot de content binnen is
