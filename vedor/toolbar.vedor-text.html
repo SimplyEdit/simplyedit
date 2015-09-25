@@ -120,7 +120,7 @@
 				target = sel;
 			}
 
-			var r = window.getSelection().getRangeAt(0);
+			var r = sel.cloneRange();
 
 			editor.node.replaceTags("STRONG", "B");
 			editor.node.replaceTags("EM", "I");
