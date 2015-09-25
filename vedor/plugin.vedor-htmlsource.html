@@ -14,7 +14,7 @@
 	<div class="vedor-toolbar">
 		<ul class="vedor-buttons">
 			<li><button data-vedor-action="vedor-htmlsource-close"><i class="fa fa-times"></i>Cancel</button></li>
-			<li class='vedor-right'><button data-vedor-action="vedor-htmlsource-insert"><i class="fa fa-plus"></i>Insert</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-htmlsource-insert"><i class="fa fa-check"></i>Insert</button></li>
 		</ul>
 	</div>
 </section>
@@ -50,7 +50,7 @@
 		font-family: arial, helvetica, sans-serif;
 		color: black;
 		padding: 0px;
-		position: absolute;
+		position: fixed;
 		z-index: 100000;
 		box-shadow: 0px 0px 8px #444;
 		top: 50%;
@@ -110,11 +110,15 @@
 	};
 
 	editor.plugins.htmlsource = {
+		currentField : null,
+		currentSel : null,
 		selectAll : function() {
-			var element = editor.node.getEditableField();
+			var element = editor.plugins.hyperlink.currentField;
 			var sel = vdSelectionState.get();
 			vdSelection.selectNode(sel, element);
-			editor.plugins.htmlsource.dialog.open();
+			vdSelectionState.save(sel);
+			vdSelectionState.selectAll = true;
+			editor.plugins.htmlsource.dialog.setSource();
 		},
 		getSourceSpan() {
 			var parent=false;
@@ -140,29 +144,25 @@
 			}
 		},
 		dialog : {
+			setSource : function() {
+				var source = editor.plugins.htmlsource.get();
+				document.getElementById('vdInsertHTMLSource').value = source;
+
+				var span = editor.plugins.htmlsource.getSourceSpan();
+				var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
+				if (span) {
+					button.classList.add("vedor-selected");
+				} else {
+					button.classList.remove("vedor-selected");
+				}
+				document.getElementById('vdInsertHTMLSource').select();
+			},
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('vedor-htmlsource'),
-					function() {
-						var field=editor.node.getEditableField();
-						var field = true;
-						if (field) {
-							var sel = vdSelectionState.get();
-							vdSelectionState.save(sel);
+				editor.plugins.hyperlink.currentSel = vdSelectionState.get();
+				editor.plugins.hyperlink.currentField = editor.node.getEditableField();
+				vdSelectionState.save(editor.plugins.hyperlink.currentSel);
 
-							var source = editor.plugins.htmlsource.get();
-							document.getElementById('vdInsertHTMLSource').value = source;
-
-							var span = editor.plugins.htmlsource.getSourceSpan();
-							var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
-							if (span) {
-								button.classList.add("vedor-selected");
-							} else {
-								button.classList.remove("vedor-selected");
-							}
-							document.getElementById('vdInsertHTMLSource').select();
-						}
-					}
-				);
+				editor.plugins.dialog.open(document.getElementById('vedor-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
 				editor.plugins.htmlsource.dialog.resize();
 			},
 			close : function() {
@@ -193,12 +193,13 @@
 				document.getElementById('vdInsertHTMLSource').style.height= textareaHeight + 'px';
 			}
 		},
-		tidy : function(source) {
+		tidy : function(html) {
 			var d = document.createElement('div');
 			d.innerHTML = html;
 			return d.innerHTML;
 		},
-		insert : function(source) {
+		insert : function() {
+			var source = document.getElementById('vdInsertHTMLSource').value;
 			var tidySource = editor.plugins.htmlsource.tidy(source);
 			if (tidySource != source) {
 				if (confirm("The HTML content does not seem valid and cannot be inserted. Correct it automatically?")) {
@@ -207,40 +208,29 @@
 				return;
 			}
 
-			var field=editor.node.getEditableField();
-			if (!field && vdSelectionState.selectAll && vdSelectionState.selectedElement) {
-				field = vdSelectionState.selectedElement;
-			}
+			var field=editor.plugins.hyperlink.currentField;
 			if (field) {
-				var editable = (document.getElementById('vdInsertHTMLEditable').checked==true);
-				if (!editable) {
+				var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
+				if (button && button.classList.contains("vedor-selected")) {
 					var encodedsource = vedor.util.base64.encode(source); // this makes sure IE doesn't touch the sourcecode.
 					source = '<div data-vedor-htmlsource="'+encodedsource+'" contenteditable="false">'+source+'</div>';
 				}
 				if (vdSelectionState.selectAll) {
 					field.innerHTML = source;
 				} else {
-					var sel = vdSelectionState.get();
-					if (sel) {
-						if( window.getSelection ) {
-							var selection = vdEditPane.contentWindow.document.defaultView.getSelection();
-							if( selection.setBaseAndExtent ) { // broken webkit
-								var node = sel.commonAncestorContainer.parentNode;
-								if( node && node.contentEditable == "false" ) {
-									sel.selectNode(node);
-								}
-							}
-						}
-						editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
-						vdSelection.setHTMLText(sel, source);
-					}
+					editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+					vdSelection.setHTMLText(editor.plugins.hyperlink.currentSel, source);
 				}
 			}
 			vdSelectionState.selectAll = false;
-			vdSelectionState.selectedElement = false;
+			editor.plugins.hyperlink.currentField = false;
 			editor.plugins.htmlsource.dialog.close();
 		}
 	};
 
 	editor.addAction("vedor-insert-source", editor.plugins.htmlsource.dialog.open);
+	editor.addAction("vedor-edit-source", editor.plugins.htmlsource.dialog.open);
+	editor.addAction("vedor-htmlsource-close", editor.plugins.htmlsource.dialog.close);
+	editor.addAction("vedor-htmlsource-selectall", editor.plugins.htmlsource.selectAll);
+	editor.addAction("vedor-htmlsource-insert", editor.plugins.htmlsource.insert);
 </script>
