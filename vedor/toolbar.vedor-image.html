@@ -11,7 +11,7 @@
 		</ul>
 		<div class="vedor-toolbar-section vedor-image-style">
 			<ul>
-				<li><label>Format</label><select id="vdImageType">
+				<li><label>Format</label><select id="vdImageType" data-vedor-action=vedor-image-type">
 					<option value="">Original</option>
 				</select></li>
 			</ul>
@@ -142,8 +142,6 @@
 					vdStoreUndo();
 				}
 			};
-
-			document.querySelector("#vdImageType").addEventListener("change", vdSetImage);
 		},
 		"actions" : {
 			"vedor-image-align-left" : function() {
@@ -160,6 +158,9 @@
 			},
 			"vedor-image-align-none" : function() {
 				vdSetProperty("vdImageAlign", "none");
+				vdSetImage();
+			},
+			"vedor-image-type" : function() {
 				vdSetImage();
 			},
 			"vedor-image-delete" : function() {

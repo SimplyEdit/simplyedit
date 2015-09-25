@@ -159,6 +159,7 @@
 			var tags = document.querySelectorAll("A[href='#" + linkIdentifier + "']");
 
 			for (var i=0; i<tags.length; i++) {
+				tags[i].removeAttribute("href");
 				tagList.push(tags[i]);
 			}
 			return tagList;
@@ -173,7 +174,7 @@
 				parent = element.parentNode;
 			} else {
 				if (sel.select) { // IE only
-					var htmlText = vdSelection.getHTMLText(oSel);
+					var htmlText = vdSelection.getHTMLText(sel);
 					if (htmlText.substr(htmlText.length-4, 4)=='<BR>') {
 						// BR included in selection as last element, remove it, it has
 						// dangerous effects on the hyperlink command in IE
@@ -196,36 +197,14 @@
 			return tagList;
 		},
 		set : function(tagList, attributes) {
-			var newTagList = [];
-
-			var newLink="<a";
-			for (var i in attributes) {
-				if (attributes[i]) {
-					newLink=newLink+" "+i+"=\""+attributes[i]+"\"";
-				}
-			}
-			newLink=newLink+">";
-
 			// Now set the link properties for all the elements in the list.
-			for (var j=0; j<tagList.length; j++) {
-				tag = tagList[j];
-
-				if (tag && (attributes['href'] || attributes['name'])) {
-					var div = document.createElement('div');
-					div.innerHTML = newLink+tag.innerHTML+'</a>';
-					var frag = document.createDocumentFragment();
-					for (var i=0; i < div.childNodes.length; i++) {
-						var node = div.childNodes[i].cloneNode(true);
-						frag.appendChild(node);
-						if (node.tagName.toLowerCase() == "a") {
-							newTagList.push(node);
-						}
+			for (var i=0; i<tagList.length; i++) {
+				for (var j in attributes) {
+					if (attributes[j] !== null) {
+						tagList[i].setAttribute(j, attributes[j]);
 					}
-					div = null;
-					tag.parentNode.replaceChild(frag, tag);
 				}
 			}
-			currentLink = newTagList;
 		}
 	};
 
@@ -249,13 +228,13 @@
 
 		if (currentLink.length) {
 			var hyperlinkHref = currentLink[0].getAttribute('href');
-			vdSetProperty('vdHyperlinkHref', hyperlinkHref);
+			vedor.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), hyperlinkHref);
 
 			var hyperlinkTitle = currentLink[0].getAttribute('title');
-			vdSetProperty('vdHyperlinkTitle', hyperlinkTitle);
+			vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), hyperlinkTitle);
 
 			var hyperlinkName = currentLink[0].getAttribute('name');
-			vdSetProperty('vdHyperlinkName', hyperlinkName);
+			vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), hyperlinkName);
 			
 			var hyperlinkNofollow = toolbar.querySelectorAll("button.vedor-hyperlink-nofollow");
 			for (var i=0; i<hyperlinkNofollow.length; i++) {
@@ -266,9 +245,10 @@
 				}
 			}
 		} else {
-			vdSetProperty('vdHyperlinkHref', '');
-			vdSetProperty('vdHyperlinkTitle', '');
-			vdSetProperty('vdHyperlinkName', '');
+			vedor.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), '');
+			vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), '');
+			vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), '');
+			
 			var hyperlinkNofollow = toolbar.querySelector("button.vedor-hyperlink-nofollow");
 			if (hyperlinkNofollow) {
 				hyperlinkNofollow.classList.remove("vedor-selected");
@@ -282,19 +262,19 @@
 			for (i=0; i<textAlign.length;i++) {
 				switch (parentStyles["text-align"]) {
 					case "right" :
-						vdSetProperty(textAlign[i], "right");
+						vedor.widgets.properties.set(textAlign[i], "right");
 					break;
 					case "center" :
-						vdSetProperty(textAlign[i], "center");
+						vedor.widgets.properties.set(textAlign[i], "center");
 					break;
 					case "justify" :
-						vdSetProperty(textAlign[i], "justify");
+						vedor.widgets.properties.set(textAlign[i], "justify");
 					break;
 					case "left" :
-						vdSetProperty(textAlign[i], "left");
+						vedor.widgets.properties.set(textAlign[i], "left");
 					break;
 					default :
-						vdSetProperty(textAlign[i], "left");
+						vedor.widgets.properties.set(textAlign[i], "left");
 					break;
 				}
 			}
