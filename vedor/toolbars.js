@@ -230,6 +230,29 @@
 
 			vedor.editor.bookmarks.select();
 			vedor.editor.bookmarks.remove();
+		},
+		replaceStyleToClass : function(source, target) {
+			var field = editor.node.getEditableField();
+			if (!field) {
+				return;
+			}
+
+			var elms = field.querySelectorAll("[style='" + source + "']");
+			for (var i=0; i<elms.length; i++) {
+				elms[i].classList.add(target);
+				elms[i].removeAttribute("style");
+			}
+		},
+		replaceClassToStyle : function(source, target) {
+			var field = editor.node.getEditableField();
+			if (!field) {
+				return;
+			}
+			var elms = field.querySelectorAll("[class*='" + source + "']");
+			for (var i=0; i<elms.length; i++) {
+				elms[i].classList.remove(source);
+				elms[i].setAttribute("style", target);
+			}
 		}
 	};
 

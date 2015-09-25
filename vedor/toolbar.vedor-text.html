@@ -24,10 +24,11 @@
 		</div>
 		<div class="vedor-toolbar-section vedor-text-align" data-type="vedor-buttongroup-radio">
 			<ul>
-			<li><button data-vedor-action="vedor-text-align-left" data-value="left" class="vedor-align-left"><i class="fa fa-align-left"></i>Left</button></li>
-			<li><button data-vedor-action="vedor-text-align-center" data-value="center" class="vedor-align-center"><i class="fa fa-align-center"></i>Center</button></li>
-			<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>Right</button></li>
-			<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-vedor-action="vedor-text-align-left" data-value="left" class="vedor-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-vedor-action="vedor-text-align-center" data-value="center" class="vedor-align-center"><i class="fa fa-align-center"></i>Center</button></li>
+				<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-vedor-action="vedor-text-align-none" data-value="none" class="vedor-align-none"><i class="fa fa-minus-circle"></i>None</button></li>
 			</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-insert">
@@ -119,13 +120,29 @@
 				target = sel;
 			}
 
+			var r = window.getSelection().getRangeAt(0);
+
 			editor.node.replaceTags("STRONG", "B");
 			editor.node.replaceTags("EM", "I");
+
+			editor.node.replaceClassToStyle("vedor-text-align-left", "text-align: left;");
+			editor.node.replaceClassToStyle("vedor-text-align-right", "text-align: right;");
+			editor.node.replaceClassToStyle("vedor-text-align-center", "text-align: center;");
+			editor.node.replaceClassToStyle("vedor-text-align-justify", "text-align: justify;");
+
 			target.execCommand(command, false, value);
-			vdSelectionState.restore();
 
 			editor.node.replaceTags("I", "EM");
 			editor.node.replaceTags("B", "STRONG");
+			editor.node.replaceStyleToClass("text-align: left;", "vedor-text-align-left");
+			editor.node.replaceStyleToClass("text-align: right;", "vedor-text-align-right");
+			editor.node.replaceStyleToClass("text-align: justify;", "vedor-text-align-justify");
+			editor.node.replaceStyleToClass("text-align: center;", "vedor-text-align-center");
+
+			vdSelectionState.restore();
+
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(r);
 
 			vdStoreUndo();
 			vdEditPane_DisplayChanged();
