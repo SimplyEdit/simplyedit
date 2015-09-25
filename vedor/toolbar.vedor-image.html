@@ -69,31 +69,31 @@
 				// type='Origineel'; // FIXME: gewoon de eerste in de lijst selecteren?
 				type = document.querySelectorAll("#vdImageType option")[0].value;
 			}
-			vdSetProperty('vdImageType',type);
+			vedor.widgets.properties.set('vdImageType',type);
 
 			var alt=image.getAttribute('alt');
-			vdSetProperty('vdImageAlt',alt);
+			vedor.widgets.properties.set('vdImageAlt',alt);
 
 			var align = image.getAttribute("align");
-			vdSetProperty('vdImageAlign', align);
+			vedor.widgets.properties.set('vdImageAlign', align);
 
 			var title=image.getAttribute('title');
-			vdSetProperty('vdImageTitle', title);
+			vedor.widgets.properties.set('vdImageTitle', title);
 
 			var src=image.getAttribute('src');
-			vdSetProperty('vdImageSrc', src);
+			vedor.widgets.properties.set('vdImageSrc', src);
 
 			currentLink = editor.plugins.hyperlink.get();
 
 			if (currentLink.length) {
 				var hyperlinkHref = currentLink[0].getAttribute('href');
-				vdSetProperty('vdHyperlinkHref', hyperlinkHref);
+				vedor.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), hyperlinkHref);
 
 				var hyperlinkTitle = currentLink[0].getAttribute('title');
-				vdSetProperty('vdHyperlinkTitle', hyperlinkTitle);
+				vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), hyperlinkTitle);
 
 				var hyperlinkName = currentLink[0].getAttribute('name');
-				vdSetProperty('vdHyperlinkName', hyperlinkName);
+				vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), hyperlinkName);
 				
 				var hyperlinkNofollow = toolbar.querySelectorAll("button.vedor-hyperlink-nofollow");
 				for (var i=0; i<hyperlinkNofollow.length; i++) {
@@ -104,9 +104,10 @@
 					}
 				}
 			} else {
-				vdSetProperty('vdHyperlinkHref', '');
-				vdSetProperty('vdHyperlinkTitle', '');
-				vdSetProperty('vdHyperlinkName', '');
+				vedor.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), '');
+				vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), '');
+				vedor.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), '');
+				
 				var hyperlinkNofollow = toolbar.querySelector("button.vedor-hyperlink-nofollow");
 				if (hyperlinkNofollow) {
 					hyperlinkNofollow.classList.remove("vedor-selected");
@@ -145,19 +146,19 @@
 		},
 		"actions" : {
 			"vedor-image-align-left" : function() {
-				vdSetProperty("vdImageAlign", "left");
+				vedor.widgets.properties.set("vdImageAlign", "left");
 				vdSetImage();
 			},
 			"vedor-image-align-center" : function() {
-				vdSetProperty("vdImageAlign", "center");
+				vedor.widgets.properties.set("vdImageAlign", "center");
 				vdSetImage();
 			},
 			"vedor-image-align-right" : function() {
-				vdSetProperty("vdImageAlign", "right");
+				vedor.widgets.properties.set("vdImageAlign", "right");
 				vdSetImage();
 			},
 			"vedor-image-align-none" : function() {
-				vdSetProperty("vdImageAlign", "none");
+				vedor.widgets.properties.set("vdImageAlign", "none");
 				vdSetImage();
 			},
 			"vedor-image-type" : function() {
