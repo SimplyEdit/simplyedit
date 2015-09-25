@@ -1,21 +1,97 @@
+<section id="vedor-htmlsource" class="vedor-dialog">
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button data-vedor-action="vedor-htmlsource-selectall"><i class="fa fa-expand"></i>Select field</button></li>
+			<li><button data-vedor-action="vedor-htmlsource-editable"><i class="fa fa-lock"></i>Source is static</button></li>
+		</ul>
+	</div>
+	<div class="vedor-dialog-body">
+		<div class="vdYellowAlert" id="vdInsertHTMLWarning" style="display: none;">
+			Warning: editable source and javascript do not mix.
+		</div>
+		<textarea id="vdInsertHTMLSource"></textarea>
+	</div>
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button data-vedor-action="vedor-htmlsource-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-htmlsource-insert"><i class="fa fa-plus"></i>Insert</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	.vedor-dialog {
+		display: none;
+	}
+	.vedor-dialog.active {
+		display: block;
+	}
+
+	.vedor-toolbar .vedor-right {
+		float: right;
+	}
+	.vedor-dialog .marker {
+		display: none;
+	}
+	.vedor-dialog .vedor-toolbar {
+		border: 0;
+		border-top: 1px solid #eee;
+		box-shadow: none;
+	}
+	.vedor-dialog-body {
+		padding: 5px;
+		position: relative;
+	}
+	#vedor-htmlsource {
+		max-width: 500px;
+		width: 90%;
+		border: 1px solid #aaa;
+		border-top: 5px solid #ea5922;
+		background-color: #eee;
+		font-family: arial, helvetica, sans-serif;
+		color: black;
+		padding: 0px;
+		position: absolute;
+		z-index: 100000;
+		box-shadow: 0px 0px 8px #444;
+		top: 50%;
+		margin-top: -200px;
+		left: 50%;
+		margin-left: -250px;
+	}
+	#vedor-htmlsource textarea {
+		width: 100%;
+		height: 236px;
+		border: 1px solid #9F9F9F;
+		background-color: white;
+		box-sizing: border-box;
+	}
+	#vdInsertHTMLWarning {
+		background-color: #FFFFCC;
+		border: 1px solid black;
+		padding: 2px;
+		clear: both;
+		height: 32px;
+		overflow: hidden;
+	}
+</style>
 <script>
 	editor.plugins.dialog = {
 		backdrop : null,
 		open : function(target, callback) {
-			if (!backdrop) {
+			if (!editor.plugins.dialog.backdrop) {
 				editor.plugins.dialog.createBackdrop();
 			}
-			backdrop.style.display = "block";
+			editor.plugins.dialog.backdrop.style.display = "block";
+			target.classList.add("active");
 			callback();
-			target.style.display = "block";
 		},
 		close : function(target, callback) {
-			target.style.display = "none";
-			backdrop.style.display = "none";
+			editor.plugins.dialog.backdrop.style.display = "none";
+			target.classList.remove("active");
 			callback();
 		},
 		createBackdrop : function() {
-			if (!backdrop) {
+			if (!editor.plugins.dialog.backdrop) {
 				backdrop = document.createElement("IFRAME");
 				backdrop.className = "vedor-dialog-backdrop";
 				backdrop.style.display = "none";
@@ -23,18 +99,19 @@
 				backdrop.style.height = "100%";
 				backdrop.style.top = 0;
 				backdrop.style.left = 0;
-				backdrop.style.position = absoluete;
+				backdrop.style.position = "absolute";
 				backdrop.style.zIndex = 100;
 				backdrop.style.border = 0;
 				backdrop.style.backgroundColor = "rgba(255,255,255,0.7)";
 				document.body.appendChild(backdrop);
+				editor.plugins.dialog.backdrop = backdrop;
 			}
 		}
 	};
 
 	editor.plugins.htmlsource = {
 		selectAll : function() {
-			var element = getEditableField();
+			var element = editor.node.getEditableField();
 			var sel = vdSelectionState.get();
 			vdSelection.selectNode(sel, element);
 			editor.plugins.htmlsource.dialog.open();
@@ -66,7 +143,7 @@
 			open : function() {
 				editor.plugins.dialog.open(document.getElementById('vedor-htmlsource'),
 					function() {
-						var field=getEditableField();
+						var field=editor.node.getEditableField();
 						var field = true;
 						if (field) {
 							var sel = vdSelectionState.get();
@@ -76,12 +153,17 @@
 							document.getElementById('vdInsertHTMLSource').value = source;
 
 							var span = editor.plugins.htmlsource.getSourceSpan();
-							document.getElementById('vdInsertHTMLEditable').checked = (span ? false : true);
+							var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
+							if (span) {
+								button.classList.add("vedor-selected");
+							} else {
+								button.classList.remove("vedor-selected");
+							}
 							document.getElementById('vdInsertHTMLSource').select();
 						}
 					}
 				);
-				editor.plugins.htmlsource.resize();
+				editor.plugins.htmlsource.dialog.resize();
 			},
 			close : function() {
 				editor.plugins.dialog.close(
@@ -99,8 +181,8 @@
 				var maxheight = 236;
 				var textareaHeight = maxheight;
 
-				var editable = document.getElementById('vdInsertHTMLEditable').checked;
-				if (editable) {
+				var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
+				if (button && button.classList.contains("vedor-selected")) {
 					document.getElementById('vdInsertHTMLWarning').style.display='block';
 				} else {
 					document.getElementById('vdInsertHTMLWarning').style.display='none';
@@ -125,7 +207,7 @@
 				return;
 			}
 
-			var field=getEditableField();
+			var field=editor.node.getEditableField();
 			if (!field && vdSelectionState.selectAll && vdSelectionState.selectedElement) {
 				field = vdSelectionState.selectedElement;
 			}
@@ -159,76 +241,6 @@
 			editor.plugins.htmlsource.dialog.close();
 		}
 	};
-</script>
-<section id="vedor-htmlsource" class="vedor-dialog vedor-section">
-	<div class="vedor-toolbar">
-		<ul class="vedor-buttons">
-			<li><button data-vedor-action="vedor-htmlsource-selectall"><i class="fa fa-expand"></i>Select field</button></li>
-			<li><button data-vedor-action="vedor-htmlsource-editable"><i class="fa fa-lock"></i>Source is static</button></li>
-		</ul>
-	</div>
-	<div class="vedor-dialog-body">
-		<div class="vdYellowAlert" id="vdInsertHTMLWarning" style="display: none;">
-			Warning: editable source and javascript do not mix.
-		</div>
-		<textarea id="vdInsertHTMLSource"></textarea>
-	</div>
-	<div class="vedor-toolbar">
-		<ul class="vedor-buttons">
-			<li><button data-vedor-action="vedor-htmlsource-close"><i class="fa fa-times"></i>Cancel</button></li>
-			<li class='vedor-right'><button data-vedor-action="vedor-htmlsource-insert"><i class="fa fa-plus"></i>Insert</button></li>
-		</ul>
-	</div>
-</section>
-<style type="text/css">
-	.vedor-toolbar .vedor-right {
-		float: right;
-	}
-	.vedor-dialog .marker {
-		display: none;
-	}
-	.vedor-dialog .vedor-toolbar {
-		border: 0;
-		border-top: 1px solid #eee;
-		box-shadow: none;
-	}
-	.vedor-dialog-body {
-		padding: 5px;
-		position: relative;
-	}
-	#vedor-htmlsource {
-		opacity: 1;
-		left: 50% !important;
 
-		max-width: 500px;
-		width: 90%;
-		border: 1px solid #aaa;
-		border-top: 5px solid #ea5922;
-		background-color: #eee;
-		font-family: arial, helvetica, sans-serif;
-		color: black;
-		padding: 0px;
-		position: absolute;
-		z-index: 100000;
-		box-shadow: 0px 0px 8px #444;
-		top: 50%;
-		margin-top: -200px;
-		left: 50%;
-		margin-left: -250px;
-	}
-	#vedor-htmlsource textarea {
-		width: 100%;
-		height: 236px;
-		border: 1px solid #9F9F9F;
-		background-color: white;
-		box-sizing: border-box;
-	}
-	#vdInsertHTMLWarning {
-		background-color: #FFFFCC;
-		border: 1px solid black;
-		padding: 2px;
-		clear: both;
-		height: 32px;
-		overflow: hidden;
-	}
-</style>
+	editor.addAction("vedor-insert-source", editor.plugins.htmlsource.dialog.open);
+</script>
