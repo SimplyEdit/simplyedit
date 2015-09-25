@@ -2,7 +2,6 @@
 - Iets van een server die de merge van html en data serverside doet
 - Meta title/megatags
 - Sitemap / site management
-- Weergave "Saving" dialoogje
 - Keuze voor template insert dialoogje
 - Link insert plugin?
 - Toolbar voor lijsten (add, delete)
@@ -39,3 +38,4 @@ Done:
 [v] image align wordt nog met attribuut 'align' gedaan;
 [v] text align wordt met attribuut style="text-align: iets" gedaan
 [v] text only velden (door iets van een content type mee te geven)
+[v] Weergave "Saving" dialoogje
