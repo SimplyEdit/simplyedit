@@ -1,8 +1,9 @@
 <section id="vedor-htmlsource" class="vedor-dialog">
 	<div class="vedor-toolbar">
 		<ul class="vedor-buttons">
-			<li><button data-vedor-action="vedor-htmlsource-selectall"><i class="fa fa-expand"></i>Select field</button></li>
+			<li><button data-vedor-action="vedor-htmlsource-selectall"><i class="fa fa-quote-right"></i>Select field</button></li>
 			<li><button data-vedor-action="vedor-htmlsource-editable"><i class="fa fa-lock"></i>Source is static</button></li>
+			<li><button data-vedor-action="vedor-htmlsource-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
 		</ul>
 	</div>
 	<div class="vedor-dialog-body">
@@ -36,14 +37,24 @@
 		border: 0;
 		border-top: 1px solid #eee;
 		box-shadow: none;
+		width: 100%;
 	}
 	.vedor-dialog-body {
-		padding: 5px;
-		position: relative;
+		padding: 66px 5px;
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
 	}
+	.vedor-dialog .vedor-toolbar:first-child {
+		position: absolute;
+		top: 0px;
+	}
+	.vedor-dialog .vedor-toolbar:last-child {
+		position: absolute;
+		bottom: 0px;
+	}
+
 	#vedor-htmlsource {
-		max-width: 500px;
-		width: 90%;
 		border: 1px solid #aaa;
 		border-top: 5px solid #ea5922;
 		background-color: #eee;
@@ -53,14 +64,33 @@
 		position: fixed;
 		z-index: 100000;
 		box-shadow: 0px 0px 8px #444;
+
 		top: 50%;
+		height: 400px;
+		max-height: 80%;
 		margin-top: -200px;
+
 		left: 50%;
+		width: 500px;
+		max-width: 80%;
 		margin-left: -250px;
 	}
+	#vedor-htmlsource.fullscreen {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+
 	#vedor-htmlsource textarea {
 		width: 100%;
-		height: 236px;
+		height: 100%;
 		border: 1px solid #9F9F9F;
 		background-color: white;
 		box-sizing: border-box;
@@ -106,7 +136,7 @@
 				document.body.appendChild(backdrop);
 				editor.plugins.dialog.backdrop = backdrop;
 			}
-		}
+		},
 	};
 
 	editor.plugins.htmlsource = {
@@ -156,6 +186,13 @@
 					button.classList.remove("vedor-selected");
 				}
 				document.getElementById('vdInsertHTMLSource').select();
+
+				var fullscreen = document.querySelector("[data-vedor-action=vedor-htmlsource-fullscreen]");
+				if (document.getElementById('vedor-htmlsource').classList.contains("fullscreen")) {
+					fullscreen.classList.add("vedor-selected");
+				} else {
+					fullscreen.classList.remove("vedor-selected");
+				}
 			},
 			open : function() {
 				editor.plugins.hyperlink.currentSel = vdSelectionState.get();
@@ -178,19 +215,22 @@
 				);
 			},
 			resize : function() {
-				var maxheight = 236;
-				var textareaHeight = maxheight;
-
 				var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
 				if (button && button.classList.contains("vedor-selected")) {
 					document.getElementById('vdInsertHTMLWarning').style.display='block';
 				} else {
 					document.getElementById('vdInsertHTMLWarning').style.display='none';
 				}
-
-				textareaHeight = textareaHeight - parseInt(document.getElementById('vdInsertHTMLWarning').offsetHeight);
-
-				document.getElementById('vdInsertHTMLSource').style.height= textareaHeight + 'px';
+			},
+			fullscreen : function() {
+				var fullscreen = document.querySelector("[data-vedor-action=vedor-htmlsource-fullscreen]");
+				if (document.getElementById('vedor-htmlsource').classList.contains("fullscreen")) {
+					fullscreen.classList.remove("vedor-selected");
+					document.getElementById('vedor-htmlsource').classList.remove("fullscreen");
+				} else {
+					fullscreen.classList.add("vedor-selected");
+					document.getElementById('vedor-htmlsource').classList.add("fullscreen");
+				}
 			}
 		},
 		tidy : function(html) {
@@ -233,4 +273,5 @@
 	editor.addAction("vedor-htmlsource-close", editor.plugins.htmlsource.dialog.close);
 	editor.addAction("vedor-htmlsource-selectall", editor.plugins.htmlsource.selectAll);
 	editor.addAction("vedor-htmlsource-insert", editor.plugins.htmlsource.insert);
+	editor.addAction("vedor-htmlsource-fullscreen", editor.plugins.htmlsource.dialog.fullscreen);
 </script>
