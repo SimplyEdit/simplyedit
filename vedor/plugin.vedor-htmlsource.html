@@ -1,0 +1,234 @@
+<script>
+	editor.plugins.dialog = {
+		backdrop : null,
+		open : function(target, callback) {
+			if (!backdrop) {
+				editor.plugins.dialog.createBackdrop();
+			}
+			backdrop.style.display = "block";
+			callback();
+			target.style.display = "block";
+		},
+		close : function(target, callback) {
+			target.style.display = "none";
+			backdrop.style.display = "none";
+			callback();
+		},
+		createBackdrop : function() {
+			if (!backdrop) {
+				backdrop = document.createElement("IFRAME");
+				backdrop.className = "vedor-dialog-backdrop";
+				backdrop.style.display = "none";
+				backdrop.style.width = "100%";
+				backdrop.style.height = "100%";
+				backdrop.style.top = 0;
+				backdrop.style.left = 0;
+				backdrop.style.position = absoluete;
+				backdrop.style.zIndex = 100;
+				backdrop.style.border = 0;
+				backdrop.style.backgroundColor = "rgba(255,255,255,0.7)";
+				document.body.appendChild(backdrop);
+			}
+		}
+	};
+
+	editor.plugins.htmlsource = {
+		selectAll : function() {
+			var element = getEditableField();
+			var sel = vdSelectionState.get();
+			vdSelection.selectNode(sel, element);
+			editor.plugins.htmlsource.dialog.open();
+		},
+		getSourceSpan() {
+			var parent=false;
+			var sel = vdSelectionState.get();
+			if (sel) {
+				parent = vdSelection.getNode(sel);
+				while (parent && (parent.tagName=='DIV' || parent.tagName=='SPAN') && parent.parentNode && !parent.getAttribute('data-vedor-htmlsource')) {
+					parent=parent.parentNode;
+				}
+				if (!parent || (parent.tagName!='DIV' && parent.tagName!='SPAN') || !parent.getAttribute('data-vedor-htmlsource')) {
+					parent=false;
+				}
+			}
+			return parent;
+		},
+		get : function() {
+			var span = editor.plugins.htmlsource.getSourceSpan();
+			if (span) {
+				return vedor.util.base64.decode(span.getAttribute('data-vedor-htmlsource'));
+			} else {
+				var sel = vdSelectionState.get();
+				return vdSelection.getHTMLText(sel);
+			}
+		},
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('vedor-htmlsource'),
+					function() {
+						var field=getEditableField();
+						var field = true;
+						if (field) {
+							var sel = vdSelectionState.get();
+							vdSelectionState.save(sel);
+
+							var source = editor.plugins.htmlsource.get();
+							document.getElementById('vdInsertHTMLSource').value = source;
+
+							var span = editor.plugins.htmlsource.getSourceSpan();
+							document.getElementById('vdInsertHTMLEditable').checked = (span ? false : true);
+							document.getElementById('vdInsertHTMLSource').select();
+						}
+					}
+				);
+				editor.plugins.htmlsource.resize();
+			},
+			close : function() {
+				editor.plugins.dialog.close(
+					document.getElementById('vedor-htmlsource'),
+					function() {
+						vdSelectionState.restore();
+						vdSelectionState.remove();
+						vdSelectionState.selectAll = false;
+						vdSelectionState.selectedElement = false;
+						vdEditPane_DisplayChanged();
+					}
+				);
+			},
+			resize : function() {
+				var maxheight = 236;
+				var textareaHeight = maxheight;
+
+				var editable = document.getElementById('vdInsertHTMLEditable').checked;
+				if (editable) {
+					document.getElementById('vdInsertHTMLWarning').style.display='block';
+				} else {
+					document.getElementById('vdInsertHTMLWarning').style.display='none';
+				}
+
+				textareaHeight = textareaHeight - parseInt(document.getElementById('vdInsertHTMLWarning').offsetHeight);
+
+				document.getElementById('vdInsertHTMLSource').style.height= textareaHeight + 'px';
+			}
+		},
+		tidy : function(source) {
+			var d = document.createElement('div');
+			d.innerHTML = html;
+			return d.innerHTML;
+		},
+		insert : function(source) {
+			var tidySource = editor.plugins.htmlsource.tidy(source);
+			if (tidySource != source) {
+				if (confirm("The HTML content does not seem valid and cannot be inserted. Correct it automatically?")) {
+					document.getElementById('vdInsertHTMLSource').value = tidySource;
+				}
+				return;
+			}
+
+			var field=getEditableField();
+			if (!field && vdSelectionState.selectAll && vdSelectionState.selectedElement) {
+				field = vdSelectionState.selectedElement;
+			}
+			if (field) {
+				var editable = (document.getElementById('vdInsertHTMLEditable').checked==true);
+				if (!editable) {
+					var encodedsource = vedor.util.base64.encode(source); // this makes sure IE doesn't touch the sourcecode.
+					source = '<div data-vedor-htmlsource="'+encodedsource+'" contenteditable="false">'+source+'</div>';
+				}
+				if (vdSelectionState.selectAll) {
+					field.innerHTML = source;
+				} else {
+					var sel = vdSelectionState.get();
+					if (sel) {
+						if( window.getSelection ) {
+							var selection = vdEditPane.contentWindow.document.defaultView.getSelection();
+							if( selection.setBaseAndExtent ) { // broken webkit
+								var node = sel.commonAncestorContainer.parentNode;
+								if( node && node.contentEditable == "false" ) {
+									sel.selectNode(node);
+								}
+							}
+						}
+						editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+						vdSelection.setHTMLText(sel, source);
+					}
+				}
+			}
+			vdSelectionState.selectAll = false;
+			vdSelectionState.selectedElement = false;
+			editor.plugins.htmlsource.dialog.close();
+		}
+	};
+</script>
+<section id="vedor-htmlsource" class="vedor-dialog vedor-section">
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button data-vedor-action="vedor-htmlsource-selectall"><i class="fa fa-expand"></i>Select field</button></li>
+			<li><button data-vedor-action="vedor-htmlsource-editable"><i class="fa fa-lock"></i>Source is static</button></li>
+		</ul>
+	</div>
+	<div class="vedor-dialog-body">
+		<div class="vdYellowAlert" id="vdInsertHTMLWarning" style="display: none;">
+			Warning: editable source and javascript do not mix.
+		</div>
+		<textarea id="vdInsertHTMLSource"></textarea>
+	</div>
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button data-vedor-action="vedor-htmlsource-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-htmlsource-insert"><i class="fa fa-plus"></i>Insert</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	.vedor-toolbar .vedor-right {
+		float: right;
+	}
+	.vedor-dialog .marker {
+		display: none;
+	}
+	.vedor-dialog .vedor-toolbar {
+		border: 0;
+		border-top: 1px solid #eee;
+		box-shadow: none;
+	}
+	.vedor-dialog-body {
+		padding: 5px;
+		position: relative;
+	}
+	#vedor-htmlsource {
+		opacity: 1;
+		left: 50% !important;
+
+		max-width: 500px;
+		width: 90%;
+		border: 1px solid #aaa;
+		border-top: 5px solid #ea5922;
+		background-color: #eee;
+		font-family: arial, helvetica, sans-serif;
+		color: black;
+		padding: 0px;
+		position: absolute;
+		z-index: 100000;
+		box-shadow: 0px 0px 8px #444;
+		top: 50%;
+		margin-top: -200px;
+		left: 50%;
+		margin-left: -250px;
+	}
+	#vedor-htmlsource textarea {
+		width: 100%;
+		height: 236px;
+		border: 1px solid #9F9F9F;
+		background-color: white;
+		box-sizing: border-box;
+	}
+	#vdInsertHTMLWarning {
+		background-color: #FFFFCC;
+		border: 1px solid black;
+		padding: 2px;
+		clear: both;
+		height: 32px;
+		overflow: hidden;
+	}
+</style>
