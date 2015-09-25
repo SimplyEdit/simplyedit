@@ -391,7 +391,8 @@
 						"/simple-edit/vedor/toolbar.vedor-main-toolbar.html",
 						"/simple-edit/vedor/toolbar.vedor-text.html",
 						"/simple-edit/vedor/toolbar.vedor-image.html",
-						"/simple-edit/vedor/toolbar.vedor-selectable.html"
+						"/simple-edit/vedor/toolbar.vedor-selectable.html",
+						"/simple-edit/vedor/plugin.vedor-htmlsource.html"
 					];
 
 					var loadToolbar = function(url) {
@@ -679,6 +680,9 @@
 			filter.context = name;
 		}
 		editor.contextFilters[name] = filter;
+	};
+	editor.addAction = function(name, action) {
+		editor.actions[name] = action;
 	};
 
 	var preventDOMContentLoaded = function(event) {
