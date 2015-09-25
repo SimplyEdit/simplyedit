@@ -19,8 +19,10 @@
 		<div class="vedor-toolbar-section vedor-image-align" data-type="vedor-buttongroup-radio" id="vdImageAlign">
 		<ul>
 			<li><button class="vedor-align-left" data-value="left" data-vedor-action="vedor-image-align-left"><i class="fa fa-align-left"></i>Left</button></li>
-			<li><button class="vedor-align-center" data-value="center" data-vedor-action="vedor-image-align-center"><i class="fa fa-align-center"></i>Center</button></li>
 			<li><button class="vedor-align-right" data-value="right" data-vedor-action="vedor-image-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+			<li><button class="vedor-align-top" data-value="top" data-vedor-action="vedor-image-align-top"><i class="fa fa-chevron-up"></i>Top</button></li>
+			<li><button class="vedor-align-bottom" data-value="bottom" data-vedor-action="vedor-image-align-bottom"><i class="fa fa-chevron-down"></i>Bottom</button></li>
+			<li><button class="vedor-align-middle" data-value="middle" data-vedor-action="vedor-image-align-middle"><i class="fa fa-chevron-right"></i>Middle</button></li>
 			<li><button class="vedor-align-none" data-value="none" data-vedor-action="vedor-image-align-none"><i class="fa fa-minus-circle"></i>None</button></li>
 		</ul>
 		</div>
@@ -74,8 +76,12 @@
 			var alt=image.getAttribute('alt');
 			vedor.widgets.properties.set('vdImageAlt',alt);
 
-			var align = image.getAttribute("align");
-			vedor.widgets.properties.set('vdImageAlign', align);
+			var alignOptions = ["left", "right", "top", "middle", "bottom"];
+			for (i in alignOptions) {
+				if (image.classList.contains("vedor-image-align-" + alignOptions[i])) {
+					vedor.widgets.properties.set('vdImageAlign', alignOptions[i]);
+				}
+			}
 
 			var title=image.getAttribute('title');
 			vedor.widgets.properties.set('vdImageTitle', title);
@@ -135,10 +141,20 @@
 
 					var align=vdGetProperty('vdImageAlign');
 
-					if (align=='none' || align=='') {
-						currentImage.removeAttribute('align');
-					} else {
-						currentImage.setAttribute('align',align);
+					currentImage.classList.remove("vedor-image-align-left");
+					currentImage.classList.remove("vedor-image-align-right");
+					currentImage.classList.remove("vedor-image-align-top");
+					currentImage.classList.remove("vedor-image-align-bottom");
+					currentImage.classList.remove("vedor-image-align-middle");
+
+					switch (align) {
+						case 'left':
+						case 'right':
+						case 'top':
+						case 'bottom':
+						case 'middle':
+							currentImage.classList.add("vedor-image-align-" + align);
+						break;
 					}
 					vdStoreUndo();
 				}
@@ -149,12 +165,20 @@
 				vedor.widgets.properties.set("vdImageAlign", "left");
 				vdSetImage();
 			},
-			"vedor-image-align-center" : function() {
-				vedor.widgets.properties.set("vdImageAlign", "center");
-				vdSetImage();
-			},
 			"vedor-image-align-right" : function() {
 				vedor.widgets.properties.set("vdImageAlign", "right");
+				vdSetImage();
+			},
+			"vedor-image-align-top" : function() {
+				vedor.widgets.properties.set("vdImageAlign", "top");
+				vdSetImage();
+			},
+			"vedor-image-align-middle" : function() {
+				vedor.widgets.properties.set("vdImageAlign", "middle");
+				vdSetImage();
+			},
+			"vedor-image-align-bottom" : function() {
+				vedor.widgets.properties.set("vdImageAlign", "bottom");
 				vdSetImage();
 			},
 			"vedor-image-align-none" : function() {

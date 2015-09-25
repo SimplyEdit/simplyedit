@@ -368,7 +368,15 @@
 				}
 			}
 		},
+		loadBaseStyles : function() {
+			var baseStyles = document.createElement("link");
+			baseStyles.setAttribute("href", "/simple-edit/vedor/vedor-base.css");
+			baseStyles.setAttribute("rel", "stylesheet");
+			baseStyles.setAttribute("type", "text/css");
+			document.head.appendChild(baseStyles);
+		},
 		init : function() {
+			editor.loadBaseStyles();
 			editor.data.load();
 		},
 		editmode : {
