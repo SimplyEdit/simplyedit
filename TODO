@@ -2,22 +2,19 @@
 - Iets van een server die de merge van html en data serverside doet
 - Meta title/megatags
 - Sitemap / site management
-- Lijsten in lijsten ?
 - Weergave "Saving" dialoogje
 - Keuze voor template insert dialoogje
-- text only velden (door iets van een content type mee te geven)
 - Link insert plugin?
 - Toolbar voor lijsten (add, delete)
 - Weergave van een lege lijst fixen dat je er dingen in kunt zetten
+- Lijsten in lijsten ?
 - Gadget insert knop weghalen
 - configuratie maken (welke toolbars/plugins, welke storage, config van de storage, extra image stylen/classes, text stijlen)
-- mogelijkheid voor github login ipv huidige key?
+- mogelijkheid voor github login ipv huidige key? (is voor oauth meer voor nodig, zie https://github.com/prose/gatekeeper)
 
 ---------
 Bugs:
 - als een slip reorder start, moeten de toolbars weg
-- image align wordt nog met attribuut 'align' gedaan;
-- text align wordt met attribuut style="text-align: iets" gedaan
 - na aanmaken van een nieuwe hyperlink (editor.plugins.hyperlink.create) wordt de selectie aangepast en raak je de selectie kwijt
 - klik in de text van een hyperlink (zonder selectie) en klik op bold - had verwacht dat dan de hyperlink bold zou worden?
 - positionering van toolbars in IE Edge is 'bijzonder'
@@ -39,3 +36,6 @@ Done:
 [v] Hyperlinks voor text (update code ook in de toolbar)
 [v] Hyperlinks voor images
 [v] Code source
+[v] image align wordt nog met attribuut 'align' gedaan;
+[v] text align wordt met attribuut style="text-align: iets" gedaan
+[v] text only velden (door iets van een content type mee te geven)

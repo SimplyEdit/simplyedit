@@ -502,7 +502,6 @@
 				var scriptTag = document.createElement("SCRIPT");
 				scriptTag.setAttribute("src", "/simple-edit/vedor/slip.js");
 				document.head.appendChild(scriptTag);
-
 			},
 			editable : function(target) {
 				var i;
@@ -589,6 +588,7 @@
 				}
 
 				editor.editmode.sortable(target);
+				editor.editmode.textonly(target);
 			},
 			sortable : function(target) {
 				if (!window.Slip) {
@@ -629,6 +629,27 @@
 					}
 					
 					new Slip(list[i]);
+				}
+			},
+			textonly : function(target) {
+				var textonly = target.querySelectorAll("[data-vedor-content='text']");
+				var unwrap = function(el, target) {
+					if ( !target ) {
+						target = el.parentNode;
+					}
+					while (el.firstChild) {
+						target.insertBefore(el.firstChild, el);
+					}
+					el.parentNode.removeChild(el);
+				};
+				var preventNodeInsert = function(evt) {
+					if (evt.target.tagName) {
+						unwrap(evt.target);
+					}
+				};
+
+				for (var i=0; i<textonly.length; i++) {
+					textonly[i].addEventListener("DOMNodeInserted", preventNodeInsert);
 				}
 			},
 			stop : function() {
