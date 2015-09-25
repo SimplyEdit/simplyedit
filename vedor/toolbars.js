@@ -565,6 +565,44 @@
 		}
 	};
 
+	editor.plugins.dialog = {
+		backdrop : null,
+		open : function(target, callback) {
+			if (!editor.plugins.dialog.backdrop) {
+				editor.plugins.dialog.createBackdrop();
+			}
+			editor.plugins.dialog.backdrop.style.display = "block";
+			target.classList.add("active");
+			if (typeof callback == "function") {
+				callback();
+			}
+		},
+		close : function(target, callback) {
+			editor.plugins.dialog.backdrop.style.display = "none";
+			target.classList.remove("active");
+			if (typeof callback == "function") {
+				callback();
+			}
+		},
+		createBackdrop : function() {
+			if (!editor.plugins.dialog.backdrop) {
+				backdrop = document.createElement("IFRAME");
+				backdrop.className = "vedor-dialog-backdrop";
+				backdrop.style.display = "none";
+				backdrop.style.width = "100%";
+				backdrop.style.height = "100%";
+				backdrop.style.top = 0;
+				backdrop.style.left = 0;
+				backdrop.style.position = "absolute";
+				backdrop.style.zIndex = 100;
+				backdrop.style.border = 0;
+				backdrop.style.backgroundColor = "rgba(255,255,255,0.7)";
+				document.body.appendChild(backdrop);
+				editor.plugins.dialog.backdrop = backdrop;
+			}
+		},
+	};
+
 	vdHideToolbars = false;
 
 	if( window.getSelection ) {

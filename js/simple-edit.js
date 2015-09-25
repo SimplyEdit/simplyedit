@@ -176,8 +176,15 @@
 			save : function() {
 				if (editor.storage.connect()) {
 					editor.data.stash();
+					if (editor.actions['vedor-beforesave']) {
+						editor.actions['vedor-beforesave']();
+					}
 					editor.storage.save(localStorage.data, function() {
-						alert("Saved!");
+						if (editor.actions['vedor-aftersave']) {
+							editor.actions['vedor-aftersave']();
+						} else {
+							alert("Saved!");
+						}
 					});
 				} 
 			},
@@ -400,7 +407,8 @@
 						"/simple-edit/vedor/toolbar.vedor-text.html",
 						"/simple-edit/vedor/toolbar.vedor-image.html",
 						"/simple-edit/vedor/toolbar.vedor-selectable.html",
-						"/simple-edit/vedor/plugin.vedor-htmlsource.html"
+						"/simple-edit/vedor/plugin.vedor-htmlsource.html",
+						"/simple-edit/vedor/plugin.vedor-save.html"
 					];
 
 					var loadToolbar = function(url) {

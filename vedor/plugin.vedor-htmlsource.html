@@ -20,51 +20,7 @@
 	</div>
 </section>
 <style type="text/css">
-	.vedor-dialog {
-		display: none;
-	}
-	.vedor-dialog.active {
-		display: block;
-	}
-
-	.vedor-toolbar .vedor-right {
-		float: right;
-	}
-	.vedor-dialog .marker {
-		display: none;
-	}
-	.vedor-dialog .vedor-toolbar {
-		border: 0;
-		border-top: 1px solid #eee;
-		box-shadow: none;
-		width: 100%;
-	}
-	.vedor-dialog-body {
-		padding: 66px 5px;
-		width: 100%;
-		height: 100%;
-		box-sizing: border-box;
-	}
-	.vedor-dialog .vedor-toolbar:first-child {
-		position: absolute;
-		top: 0px;
-	}
-	.vedor-dialog .vedor-toolbar:last-child {
-		position: absolute;
-		bottom: 0px;
-	}
-
 	#vedor-htmlsource {
-		border: 1px solid #aaa;
-		border-top: 5px solid #ea5922;
-		background-color: #eee;
-		font-family: arial, helvetica, sans-serif;
-		color: black;
-		padding: 0px;
-		position: fixed;
-		z-index: 100000;
-		box-shadow: 0px 0px 8px #444;
-
 		top: 50%;
 		height: 400px;
 		max-height: 80%;
@@ -74,6 +30,9 @@
 		width: 500px;
 		max-width: 80%;
 		margin-left: -250px;
+	}
+	#vedor-htmlsource .vedor-dialog-body {
+		background-color: #eee;
 	}
 	#vedor-htmlsource.fullscreen {
 		top: 0px;
@@ -105,40 +64,6 @@
 	}
 </style>
 <script>
-	editor.plugins.dialog = {
-		backdrop : null,
-		open : function(target, callback) {
-			if (!editor.plugins.dialog.backdrop) {
-				editor.plugins.dialog.createBackdrop();
-			}
-			editor.plugins.dialog.backdrop.style.display = "block";
-			target.classList.add("active");
-			callback();
-		},
-		close : function(target, callback) {
-			editor.plugins.dialog.backdrop.style.display = "none";
-			target.classList.remove("active");
-			callback();
-		},
-		createBackdrop : function() {
-			if (!editor.plugins.dialog.backdrop) {
-				backdrop = document.createElement("IFRAME");
-				backdrop.className = "vedor-dialog-backdrop";
-				backdrop.style.display = "none";
-				backdrop.style.width = "100%";
-				backdrop.style.height = "100%";
-				backdrop.style.top = 0;
-				backdrop.style.left = 0;
-				backdrop.style.position = "absolute";
-				backdrop.style.zIndex = 100;
-				backdrop.style.border = 0;
-				backdrop.style.backgroundColor = "rgba(255,255,255,0.7)";
-				document.body.appendChild(backdrop);
-				editor.plugins.dialog.backdrop = backdrop;
-			}
-		},
-	};
-
 	editor.plugins.htmlsource = {
 		currentField : null,
 		currentSel : null,
