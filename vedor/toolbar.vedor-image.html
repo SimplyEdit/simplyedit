@@ -218,6 +218,32 @@
 						vdSelectionState.currentNode.removeAttribute("src");
 					}
 				}
+			},
+			"vedor-insert-image" : function() {
+				// Create a nice placeholder image and insert that;
+				var canvas = document.createElement("canvas");
+				canvas.setAttribute("height", 60);
+				canvas.setAttribute("width", 80);
+
+				var ctx = canvas.getContext("2d");
+				ctx.fillStyle = "#ccc";
+				ctx.fillRect(0,0,canvas.getAttribute("width"), canvas.getAttribute("height"));
+				ctx.fillStyle = "#eee";
+				ctx.fillRect(2,2,canvas.getAttribute("width")-4, canvas.getAttribute("height")-4);
+
+				ctx.font = "48px FontAwesome";
+				ctx.fillStyle = "#999";
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+
+				// Use FontAwesome 'photo' icon;
+				ctx.fillText("\uf03e", canvas.getAttribute("width")/2, canvas.getAttribute("height")/2);
+				
+				var imageSrc = canvas.toDataURL("image/png");
+
+				var sel = vdSelectionState.get();
+				var source = "<img src='" + imageSrc + "'>";
+				vdSelection.setHTMLText(sel, source);
 			}
 		}
 	});
