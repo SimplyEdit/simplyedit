@@ -333,7 +333,6 @@
 		show : function() {
 			// vdSelectionState.remove(); // FIXME: deze is nodig voor text toolbar update, maar maakt selectie bij lists stuk.
 			var currentContext = editor.context.get();
-			console.log(currentContext);
 
 			var sections = document.querySelectorAll("section.vedor-section");
 			for (var i=0; i<sections.length; i++) {
