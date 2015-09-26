@@ -422,9 +422,6 @@
 						lleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
 						rtop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
 						rleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
-
-						ltop -= parseInt(document.body.style.top);
-						rtop -= parseInt(document.body.style.top);
 					}
 
 					var top = Math.max(ltop, rtop);

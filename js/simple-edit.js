@@ -564,12 +564,13 @@
 					}
 					if (event.stopPropagation) {
 						event.stopPropagation(); // stops the browser from redirecting.
-					}				
+					}
+					event.preventDefault();
 				};
 
 				for (i=0; i<images.length; i++) {
 					images[i].addEventListener("drop", imageDrop);
-					images[i].contentEditable = false;
+					images[i].contentEditable = true; // needs to be true for drop event?
 					images[i].dataset.vedorSelectable = true;
 				}
 
