@@ -19,6 +19,7 @@ Bugs:
 - als in de data nog geen entry is voor een pad, kun je niet opslaan
 - na toevoegen van een list item is de selectable init niet gedaan, dus je kunt hem niet selecteren
 - na verwijderen van een list item wordt de selectie/toolbar context niet goed ge-update; de toolbar blijft naar het oude item wijzen.
+- bij sublime geeft een klik binnen een selectable item nu eerst de toolbar voor tekst en dan direct de list toolbar (komt omdat de selectie wordt aangepast)
 
 Done:
 [v] Meerdere templates per lijst

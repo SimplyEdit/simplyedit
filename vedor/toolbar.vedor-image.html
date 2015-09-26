@@ -62,9 +62,8 @@
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
 
-			vdSelectionState.save();
-
-			currentImage = image;
+			vdSelectionState.currentSelection = sel;
+			vdSelectionState.currentNode = image;
 
 			var type=image.getAttribute('data-vedor-image-type');
 			if (!type || type=='undefined') {
@@ -131,21 +130,21 @@
 		},
 		"init" : function() {
 			vdSetImage = function() {
-				if (currentImage) {
+				if (vdSelectionState.currentNode) {
 					var type=vdGetProperty('vdImageType');
 					if (type) {
-						currentImage.setAttribute('data-vedor-image-type',type);
+						vdSelectionState.currentNode.setAttribute('data-vedor-image-type',type);
 					} else {
-						currentImage.removeAttribute('data-vedor-image-type');
+						vdSelectionState.currentNode.removeAttribute('data-vedor-image-type');
 					}
 
 					var align=vdGetProperty('vdImageAlign');
 
-					currentImage.classList.remove("vedor-image-align-left");
-					currentImage.classList.remove("vedor-image-align-right");
-					currentImage.classList.remove("vedor-image-align-top");
-					currentImage.classList.remove("vedor-image-align-bottom");
-					currentImage.classList.remove("vedor-image-align-middle");
+					vdSelectionState.currentNode.classList.remove("vedor-image-align-left");
+					vdSelectionState.currentNode.classList.remove("vedor-image-align-right");
+					vdSelectionState.currentNode.classList.remove("vedor-image-align-top");
+					vdSelectionState.currentNode.classList.remove("vedor-image-align-bottom");
+					vdSelectionState.currentNode.classList.remove("vedor-image-align-middle");
 
 					switch (align) {
 						case 'left':
@@ -153,7 +152,7 @@
 						case 'top':
 						case 'bottom':
 						case 'middle':
-							currentImage.classList.add("vedor-image-align-" + align);
+							vdSelectionState.currentNode.classList.add("vedor-image-align-" + align);
 						break;
 					}
 					vdStoreUndo();
@@ -194,29 +193,29 @@
 				image.parentNode.removeChild(image);
 			},
 			"vedor-image-alt" : function(value) {
-				if (currentImage) {
+				if (vdSelectionState.currentNode) {
 					if (value) {
-						currentImage.setAttribute("alt", value);
+						vdSelectionState.currentNode.setAttribute("alt", value);
 					} else {
-						currentImage.removeAttribute("alt");
+						vdSelectionState.currentNode.removeAttribute("alt");
 					}
 				}
 			},
 			"vedor-image-title" : function(value) {
-				if (currentImage) {
+				if (vdSelectionState.currentNode) {
 					if (value) {
-						currentImage.setAttribute("title", value);
+						vdSelectionState.currentNode.setAttribute("title", value);
 					} else {
-						currentImage.removeAttribute("title");
+						vdSelectionState.currentNode.removeAttribute("title");
 					}
 				}
 			},
 			"vedor-image-src" : function(value) {
-				if (currentImage) {
+				if (vdSelectionState.currentNode) {
 					if (value) {
-						currentImage.setAttribute("src", value);
+						vdSelectionState.currentNode.setAttribute("src", value);
 					} else {
-						currentImage.removeAttribute("src");
+						vdSelectionState.currentNode.removeAttribute("src");
 					}
 				}
 			}

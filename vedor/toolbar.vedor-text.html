@@ -230,7 +230,8 @@
 
 		var sel = vdSelectionState.get();
 		var parent = vdSelection.getNode(sel);
-		vdSelectionState.save();
+		vdSelectionState.currentSelection = sel;
+
 		currentLink = [];
 
 		if (parent) {
@@ -379,6 +380,8 @@
 				editor.plugins.text.formatBlock(value);
 			},
 			"vedor-hyperlink-href" : function(value) {
+				vdSelectionState.restore(vdSelectionState.currentSelection);
+
 				if (!currentLink.length) {
 					currentLink = editor.plugins.hyperlink.create();
 				}
