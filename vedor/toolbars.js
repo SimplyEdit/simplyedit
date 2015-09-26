@@ -640,7 +640,12 @@
 	function vdStoreUndo() {
 	}
 
-	window.setTimeout(function() {
+	var vdSelection, vdSelectionState;
+	var initSelections = function() {
+		if (typeof vedor === "undefined") {
+			window.setTimeout(initSelections, 100);
+			return;
+		}
 		vdSelectionState = vedor.editor.selection;
 		vdSelection = vedor.dom.selection;
 		vdSelectionState.init(window);
@@ -648,4 +653,6 @@
 
 		muze.event.attach( document, 'selectionchange', editor.context.update );
 		muze.event.attach( document, 'keyup', editor.context.update );
-	}, 1000);
+	};
+
+	initSelections();
