@@ -569,6 +569,8 @@
 
 				for (i=0; i<images.length; i++) {
 					images[i].addEventListener("drop", imageDrop);
+					images[i].contentEditable = false;
+					images[i].dataset.vedorSelectable = true;
 				}
 
 				// FIXME: Have a way to now init plugins as well;

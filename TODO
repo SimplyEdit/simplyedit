@@ -4,7 +4,6 @@
 - Sitemap / site management
 - Keuze voor template insert dialoogje
 - Link insert plugin?
-- Weergave van een lege lijst fixen dat je er dingen in kunt zetten
 - Lijsten in lijsten ?
 - Gadget insert knop weghalen
 - configuratie maken (welke toolbars/plugins, welke storage, config van de storage, extra image stylen/classes, text stijlen)
@@ -15,11 +14,9 @@ Bugs:
 - als een slip reorder start, moeten de toolbars weg
 - na aanmaken van een nieuwe hyperlink (editor.plugins.hyperlink.create) wordt de selectie aangepast en raak je de selectie kwijt
 - klik in de text van een hyperlink (zonder selectie) en klik op bold - had verwacht dat dan de hyperlink bold zou worden?
-- positionering van toolbars in IE Edge is 'bijzonder'
 - als in de data nog geen entry is voor een pad, kun je niet opslaan
-- na toevoegen van een list item is de selectable init niet gedaan, dus je kunt hem niet selecteren
-- na verwijderen van een list item wordt de selectie/toolbar context niet goed ge-update; de toolbar blijft naar het oude item wijzen.
 - bij sublime geeft een klik binnen een selectable item nu eerst de toolbar voor tekst en dan direct de list toolbar (komt omdat de selectie wordt aangepast)
+- kan in sublime nu niet de tekst van een menuitem aanpassen, omdat ze ook een list item zijn.
 
 Done:
 [v] Meerdere templates per lijst
@@ -42,3 +39,4 @@ Done:
 [v] text only velden (door iets van een content type mee te geven)
 [v] Weergave "Saving" dialoogje
 [v] Toolbar voor lijsten (add, delete)
+[v] Weergave van een lege lijst fixen dat je er dingen in kunt zetten
