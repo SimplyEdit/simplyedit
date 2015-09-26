@@ -4,7 +4,6 @@
 - Sitemap / site management
 - Keuze voor template insert dialoogje
 - Link insert plugin?
-- Toolbar voor lijsten (add, delete)
 - Weergave van een lege lijst fixen dat je er dingen in kunt zetten
 - Lijsten in lijsten ?
 - Gadget insert knop weghalen
@@ -41,3 +40,4 @@ Done:
 [v] text align wordt met attribuut style="text-align: iets" gedaan
 [v] text only velden (door iets van een content type mee te geven)
 [v] Weergave "Saving" dialoogje
+[v] Toolbar voor lijsten (add, delete)
