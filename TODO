@@ -1,6 +1,5 @@
-- Image insert
-- Iets van een server die de merge van html en data serverside doet
 - Meta title/megatags
+- Iets van een server die de merge van html en data serverside doet
 - Sitemap / site management
 - Keuze voor template insert dialoogje
 - Link insert plugin?
@@ -8,6 +7,9 @@
 - Gadget insert knop weghalen
 - configuratie maken (welke toolbars/plugins, welke storage, config van de storage, extra image stylen/classes, text stijlen)
 - mogelijkheid voor github login ipv huidige key? (is voor oauth meer voor nodig, zie https://github.com/prose/gatekeeper)
+
+Integratie met CMS (voor later dus):
+- browse knop voor image url, hyperlink url
 
 ---------
 Bugs:
@@ -17,6 +19,7 @@ Bugs:
 - als in de data nog geen entry is voor een pad, kun je niet opslaan
 - bij sublime geeft een klik binnen een selectable item nu eerst de toolbar voor tekst en dan direct de list toolbar (komt omdat de selectie wordt aangepast)
 - kan in sublime nu niet de tekst van een menuitem aanpassen, omdat ze ook een list item zijn.
+- drop even voor images lijkt niet meer te werken
 
 Done:
 [v] Meerdere templates per lijst
@@ -40,3 +43,4 @@ Done:
 [v] Weergave "Saving" dialoogje
 [v] Toolbar voor lijsten (add, delete)
 [v] Weergave van een lege lijst fixen dat je er dingen in kunt zetten
+[v] Image insert
