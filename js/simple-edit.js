@@ -651,8 +651,18 @@
 				}
 
 				var setBodyTop = function() {
-					document.body.style.position = "relative";
-					document.body.style.top = document.getElementById("vedor-main-toolbar").offsetHeight + "px";
+					var style = document.head.querySelector("#vedor-body-top");
+					if (!style) {
+						style = document.createElement("style");
+						style.setAttribute("type", "text/css");
+
+						style.id = "vedor-body-top";
+						document.head.appendChild(style);
+					}
+
+					var toolbarHeight = document.getElementById("vedor-main-toolbar").offsetHeight;
+
+					style.innerHTML = "html:before { display: block; background-color: green; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
 				};
 
 				// create an observer instance
