@@ -68,7 +68,7 @@
 		currentField : null,
 		currentSel : null,
 		selectAll : function() {
-			var element = editor.plugins.hyperlink.currentField;
+			var element = editor.plugins.htmlsource.currentField;
 			var sel = vdSelectionState.get();
 			vdSelection.selectNode(sel, element);
 			vdSelectionState.save(sel);
@@ -120,9 +120,9 @@
 				}
 			},
 			open : function() {
-				editor.plugins.hyperlink.currentSel = vdSelectionState.get();
-				editor.plugins.hyperlink.currentField = editor.node.getEditableField();
-				vdSelectionState.save(editor.plugins.hyperlink.currentSel);
+				editor.plugins.htmlsource.currentSel = vdSelectionState.get();
+				editor.plugins.htmlsource.currentField = editor.node.getEditableField();
+				vdSelectionState.save(editor.plugins.htmlsource.currentSel);
 
 				editor.plugins.dialog.open(document.getElementById('vedor-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
 				editor.plugins.htmlsource.dialog.resize();
@@ -173,7 +173,7 @@
 				return;
 			}
 
-			var field=editor.plugins.hyperlink.currentField;
+			var field=editor.plugins.htmlsource.currentField;
 			if (field) {
 				var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
 				if (button && button.classList.contains("vedor-selected")) {
@@ -184,11 +184,11 @@
 					field.innerHTML = source;
 				} else {
 					editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
-					vdSelection.setHTMLText(editor.plugins.hyperlink.currentSel, source);
+					vdSelection.setHTMLText(editor.plugins.htmlsource.currentSel, source);
 				}
 			}
 			vdSelectionState.selectAll = false;
-			editor.plugins.hyperlink.currentField = false;
+			editor.plugins.htmlsource.currentField = false;
 			editor.plugins.htmlsource.dialog.close();
 		}
 	};
