@@ -299,6 +299,7 @@
 								clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
 							}
 							clone.firstElementChild.setAttribute("data-vedor-list-item", true);
+							clone.firstElementChild.setAttribute("data-vedor-selectable", true);
 							list.appendChild(clone);
 						} else {
 							for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
@@ -310,6 +311,7 @@
 									clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
 								}
 								clone.firstElementChild.setAttribute("data-vedor-list-item", true);
+								clone.firstElementChild.setAttribute("data-vedor-selectable", true);
 								list.appendChild(clone);
 							}
 						}
@@ -408,7 +410,8 @@
 						"/simple-edit/vedor/toolbar.vedor-image.html",
 						"/simple-edit/vedor/toolbar.vedor-selectable.html",
 						"/simple-edit/vedor/plugin.vedor-htmlsource.html",
-						"/simple-edit/vedor/plugin.vedor-save.html"
+						"/simple-edit/vedor/plugin.vedor-save.html",
+						"/simple-edit/vedor/toolbar.vedor-list.html"
 					];
 
 					var loadToolbar = function(url) {
@@ -567,34 +570,7 @@
 					images[i].addEventListener("drop", imageDrop);
 				}
 
-				/* Add keyboard listener to lists */
-				var dataLists = target.querySelectorAll("[data-vedor-list]");
-				var keyDownHandler = function(evt) {
-					if(evt.ctrlKey && evt.altKey && evt.keyCode == 65) { // ctrl-alt-A
-						var templateName = Object.keys(this.templates)[0];
-
-						if (Object.keys(this.templates).length > 1) {
-							alert('multiple templates possible');
-							templateName = Object.keys(this.templates)[prompt("Template number?")];
-						}
-
-						var selectedTemplate = this.templates[templateName];
-
-						if (selectedTemplate) {
-							var newNode = document.importNode(selectedTemplate.content, true);
-							editor.editmode.editable(newNode);
-							newNode.firstElementChild.dataset.vedorTemplate = templateName;
-							newNode.firstElementChild.dataset.vedorListItem = true;
-							this.appendChild(newNode);
-						}
-						evt.preventDefault();
-					}
-				};
-
-				for (i=0; i<dataLists.length; i++) {
-					dataLists[i].addEventListener("keydown", keyDownHandler);
-				}
-
+				// FIXME: Have a way to now init plugins as well;
 				editor.editmode.sortable(target);
 				editor.editmode.textonly(target);
 			},

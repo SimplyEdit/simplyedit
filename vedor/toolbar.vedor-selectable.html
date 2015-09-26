@@ -5,7 +5,6 @@
 	
 		var handleItemSelect = function(event) {
 			var target = muze.event.target(event);
-
 			while(!target.getAttribute("data-vedor-selectable") && target.parentNode) {
 				if (target.getAttribute("contenteditable")) {
 					return;
@@ -20,7 +19,7 @@
 			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
 			vdSelectionState.save(sel);
 			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges()
-			vdEditPane_DisplayChanged();
+			editor.context.update();
 		
 			window.setTimeout(function() {
 				removeMouseSelectionEvent = muze.event.attach(document, "mousedown", function() {

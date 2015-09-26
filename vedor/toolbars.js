@@ -257,6 +257,7 @@
 	};
 
 	editor.context = {
+		skipUpdate : false,
 		weigh : function(filter, targets) {
 			var sel = vdSelectionState.get();
 
@@ -330,7 +331,7 @@
 			}
 		},
 		show : function() {
-			vdSelectionState.remove();
+			// vdSelectionState.remove();
 			var currentContext = editor.context.get();
 
 			var sections = document.querySelectorAll("section.vedor-section");
@@ -417,19 +418,19 @@
 						rleft = pos.right;
 						rtop = pos.bottom;
 
-						ltop -= 20+parseInt(document.body.style.top); // FIXME: Why 20?
-						rtop -= 20+parseInt(document.body.style.top);
+						ltop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
+						lleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
+						rtop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
+						rleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
+
+						ltop -= parseInt(document.body.style.top);
+						rtop -= parseInt(document.body.style.top);
 					}
 
 					var top = Math.max(ltop, rtop);
 					var left = lleft + ((rleft - lleft) / 2);
 
 					var activeToolbar = activeSection.querySelectorAll("div.vedor-toolbar")[0];
-
-					if (!parent.getAttribute("data-vedor-selectable")) {
-						// top -= document.body.scrollTop ? document.body.scrollTop : pageYOffset;
-						// left -= document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
-					}
 
 					newleft = left - (activeToolbar.offsetWidth/2);
 
@@ -465,11 +466,11 @@
 
 	// FIXME: Android fix here
 	//				// restore selection triggers contextupdate, which triggers restore selection - this hopefully prevents that loop.
-					skipContextUpdate = true;
+					editor.context.skipUpdate = true;
 					if (!sel.collapsed) {
 					//	vdSelectionState.restore(sel); // // FIXME: This reverses the current selection, which causes problems selecting from right to left; Is it used at all?
 					}
-					window.setTimeout(function() { skipContextUpdate = false;}, 20);
+					window.setTimeout(function() { editor.context.skipUpdate = false;}, 20);
 			} else {
 				hideIt();
 			}
@@ -558,7 +559,9 @@
 			if (document.querySelector(":focus") && editor.node.hasToolbarParent(document.querySelector(":focus"))) {
 				return;
 			}
-
+			if (editor.context.skipUpdate) {
+				return;
+			}
 			editor.context.fixSelection();
 			editor.context.show();
 			vdHtmlContextStack = editor.context.getTagStack();
@@ -621,8 +624,19 @@
 
 	function registerChange(field) {
 	}
+
+	var updateHtmlTimer;
 	function vdEditPane_DisplayChanged() {
+		if (updateHtmlTimer) {
+			window.clearTimeout(updateHtmlTimer);
+		}
+		updateHtmlTimer = window.setTimeout(function() {
+			editor.context.update();
+		}, 100);
+
+		return true;
 	}
+
 	function vdStoreUndo() {
 	}
 
