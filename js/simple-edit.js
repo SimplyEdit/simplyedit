@@ -316,6 +316,7 @@
 							}
 						}
 					}
+					list.setAttribute("data-vedor-selectable", true);
 				}
 			}
 		},

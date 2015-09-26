@@ -528,3 +528,32 @@
 
 @media (max-width: 481px) {
 }
+
+.vedor-empty[data-vedor-list] {
+	min-height: 24px;
+	background-color: rgba(128,128,128,0.1);
+	outline: 2px dashed rgba(128,128,128,0.3);
+	text-align: center;
+}
+.vedor-empty[data-vedor-list]:before {
+	content: "\f1b3"; /* cubes */
+	text-align: center;
+	font-family: FontAwesome;
+	font-size: 20px;
+	color: #888;
+	width: 100%;
+	line-height: 24px;
+	vertical-align: middle;
+	padding-top: 5px;
+}
+.vedor-empty[data-vedor-list]:after {
+	content: "(Empty list)";
+	text-align: center;
+	font-family: arial;
+	font-size: 12px;
+	color: #888;
+	width: 100%;
+	line-height: 24px;
+	vertical-align: middle;
+	padding-bottom: 5px;
+}

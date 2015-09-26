@@ -37,11 +37,9 @@
 				if (!objectList.querySelector("[data-vedor-list-item]")) {
 					objectList.classList.add("vedor-empty");
 				}
-				
-				// FIXME: De selectie blijft toch staan, wat niet goed is;
-				vdSelectionState.remove();
-				editor.context.update();
-				
+
+				editor.context.show(); // force toolbar context update to remove the toolbar pointing to the deleted item;
+
 				// FIXME: register change stond hier;
 			}
 		},
@@ -49,7 +47,7 @@
 			var targetObjectList = currentList;
 
 			if (targetObjectList.getAttribute("data-vedor-list")) {
-				var tempate = editor.plugins.list.getHtmlTemplate(targetObjectList);
+				var template = editor.plugins.list.getHtmlTemplate(targetObjectList);
 				editor.plugins.list.insertTemplate(targetObjectList, template);
 			}
 		},
@@ -60,6 +58,7 @@
 				editor.editmode.editable(newNode);
 				newNode.firstElementChild.dataset.vedorTemplate = templateName;
 				newNode.firstElementChild.dataset.vedorListItem = true;
+				newNode.firstElementChild.dataset.vedorSelectable = true;
 
 				var listItems = list.querySelectorAll("[data-vedor-list-item]");
 				if (listItems.length) {
@@ -130,7 +129,7 @@
 			"vedor-list-add" : editor.plugins.list.add
 		},
 		update : function(el) {
-			currentListItem = vdSelection.getNode(vdSelectionState.get());
+			currentList = vdSelection.getNode(vdSelectionState.get());
 			// console.log("update vedor-list toolbar");
 		}
 	});	
