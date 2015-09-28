@@ -25,7 +25,7 @@
 			position: absolute;
 			margin-top: -24px;
 			margin-left: 5px;
-			opacity: 0;
+			opacity: 0.2;
 			transition: 0.3s opacity ease;
 			box-shadow: 0px 0px 2px #ccc;
 			-webkit-box-shadow: 0px 0px 2px #ccc;
@@ -37,9 +37,11 @@
 		}
 		*[data-vedor-list-item]:before {
 			content: "\f1b2"; /* cube */
+			margin-left: 24px;
 		}
-		*[data-vedor-list]:before {
+		*[data-vedor-list]:not(.vedor-empty):before {
 			content: "\f1b3"; /* cubes */
+			margin-left: -24px;
 		}
 
 		i.vedor-logo {
