@@ -243,24 +243,30 @@
 		button.vedor-selected.vedor-expands::after {
 			display: none;
 		}
+		.vedor-toolbar-section > div {
+			padding-left: 80px;
+		}
+
 		.vedor-toolbar-section label {
-			min-width: 60px;
+			width: 60px;
 			font-size: 12px;
 			display: inline-block;
 			font-weight: normal;
 			padding-left: 10px;
+			margin-left: -80px;
 		}
 		.vedor-toolbar-section input,
 		.vedor-toolbar-section select {
 			background-color: white;
-			margin-bottom: 6px;
+			margin-top: 3px;
+			margin-bottom: 3px;
 			border: 1px solid #888;
 			border-bottom-color: #EEE;
 			border-right-color: #EEE;
 			border-radius: 2px;
 			line-height: 22px;
 			min-height: 22px;
-			width: 150px;
+			width: 100%;
 		}
 		.vedor-toolbar-section select {
 			padding: 4px 0px;
