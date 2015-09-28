@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	<nav>
+		Menu goes here!
+		<ul data-vedor-list="menu" data-vedor-path="/simple-edit/" data-vedor-sortable>
+			<template>
+				<li>
+					<a href="/simple-edit/" data-vedor-field="item">Menu item</a>
+				</li>
+			</template>
+		</ul>
+	</nav>
+	<div class="body" data-vedor-list="body" data-vedor-sortable>
+		<template data-vedor-template="Header">
+			<div class="header">
+				<h1 data-vedor-field="title" data-vedor-content="text">Thing goes here</h1>
+			</div>
+		</template>
+		<template data-vedor-template="Menu">
+			<nav>
+				Menu goes here!
+				<ul data-vedor-list="menu" data-vedor-path="/simple-edit/" data-vedor-sortable>
+					<template>
+						<li>
+							<a href="/simple-edit/" data-vedor-field="item">Menu item</a>
+						</li>
+					</template>
+				</ul>
+			</nav>
+		</template>
+	</div>
+	<img src="/simple-edit/imgs/muze.png" data-vedor-selectable="true">
+	<script src="/simple-edit/js/simple-edit.js"></script>
+</body>
+</html>
