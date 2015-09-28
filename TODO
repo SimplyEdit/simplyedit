@@ -1,4 +1,3 @@
-
 - configuratie maken (welke toolbars/plugins, welke storage, config van de storage, extra image stylen/classes, text stijlen)
 - mogelijkheid voor github login ipv huidige key? (is voor oauth meer voor nodig, zie https://github.com/prose/gatekeeper)
 
@@ -48,4 +47,5 @@ Done:
 [v] select handle voor lijsten
 [v] Keuze voor template insert dialoogje -> vedor expand op de 'add' met namen van de templates in de toolbar;
 [v] Meta title/megatags
-
+[v] symbol plugin
+[v] dropbox image plugin proof of concept
