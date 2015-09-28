@@ -55,12 +55,14 @@
 			var template = list.templates[templateName];
 			if (template) {
 				var newNode = document.importNode(template.content, true);
+				editor.data.list.init({}, newNode);
+
 				editor.editmode.editable(newNode);
 				newNode.firstElementChild.dataset.vedorTemplate = templateName;
 				newNode.firstElementChild.dataset.vedorListItem = true;
 				newNode.firstElementChild.dataset.vedorSelectable = true;
 
-				var listItems = list.querySelectorAll("[data-vedor-list-item]");
+				var listItems = list.querySelectorAll(":scope > [data-vedor-list-item]");
 				if (listItems.length) {
 					list.insertBefore(newNode.children[0], listItems[listItems.length-1].nextSibling);
 				} else {
@@ -109,21 +111,6 @@
 			}*/
 		},
 		init: function() {
-			var objectLists = document.querySelectorAll("[data-vedor-list]");
-			var keyDownHandler = function(evt) {
-				if(evt.ctrlKey && evt.altKey && evt.keyCode == 65) { // ctrl-alt-A
-					editor.plugins.list.add(this);
-					evt.preventDefault();
-				}
-			};
-
-			for (var i=0; i<objectLists.length; i++) {
-				if (!objectLists[i].querySelector("[data-vedor-list-item]")) {
-					objectLists[i].classList.add("vedor-empty");
-				}
-				objectLists[i].addEventListener("keydown", keyDownHandler);
-			}
-
 		},
 		actions: {
 			"vedor-list-add" : editor.plugins.list.add

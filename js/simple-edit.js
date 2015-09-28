@@ -62,8 +62,8 @@
 			}
 		},
 		data : {
-			apply : function(data) {
-				var dataFields = document.querySelectorAll("[data-vedor-field]");
+			apply : function(data, target) {
+				var dataFields = target.querySelectorAll("[data-vedor-field]");
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-vedor-field");
 					var dataPath = dataFields[i].getAttribute("data-vedor-path") ? dataFields[i].getAttribute("data-vedor-path") : location.pathname;
@@ -73,8 +73,7 @@
 					}
 				}
 
-				editor.data.list.init(data);
-				localStorage.data = JSON.stringify(data);
+				editor.data.list.init(data, target);
 
 				document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
 				var event; // The custom event that will be created
@@ -97,6 +96,105 @@
 					jQuery.holdReady(false);
 				}
 			},
+			get : function(target) {
+				var i, j;
+				var data = {};
+				var dataName, dataPath, dataFields, dataLists, listItems;
+
+				dataLists = target.querySelectorAll("[data-vedor-list]");
+				for (i=0; i<dataLists.length; i++) {
+					if (dataLists[i].dataset.vedorStashed) {
+						continue;
+					}
+					dataName = dataLists[i].dataset.vedorList;
+					dataPath = dataLists[i].dataset.vedorPath ? dataLists[i].dataset.vedorPath : location.pathname;
+
+					if (!data[dataPath]) {
+						data[dataPath] = {};
+					}
+
+					if (!data[dataPath][dataName]) {
+						data[dataPath][dataName] = [];
+					}
+
+					listItems = dataLists[i].querySelectorAll(":scope > [data-vedor-list-item]");
+					for (j=0; j<listItems.length; j++) {
+						if (!data[dataPath][dataName][j]) {
+							data[dataPath][dataName][j] = {};
+						}
+						subData = editor.data.get(listItems[j]);
+						for (var subPath in subData) {
+							if (subPath != dataPath) {
+								console.log("translated " + subPath + " to " + dataPath);
+							}
+							data[dataPath][dataName][j] = subData[subPath];
+						}
+						// data[dataPath][dataName][j] = editor.data.get(listItems[j]);
+						if (listItems[j].dataset.vedorTemplate) {
+							data[dataPath][dataName][j]['data-vedor-template'] = listItems[j].dataset.vedorTemplate;
+						}
+					}
+					dataLists[i].dataset.vedorStashed = 1;
+				}
+
+				dataFields = target.querySelectorAll("[data-vedor-field]");
+				for (i=0; i<dataFields.length; i++) {
+					if (dataFields[i].dataset.vedorStashed) {
+						continue;
+					}
+
+					dataName = dataFields[i].dataset.vedorField;
+					dataPath = dataFields[i].dataset.vedorPath ? dataFields[i].dataset.vedorPath : location.pathname;
+
+					if (!data[dataPath]) {
+						data[dataPath] = {};
+					}
+
+					data[dataPath][dataName] = editor.field.get(dataFields[i]);
+					dataFields[i].dataset.vedorStashed = 1;
+				}
+				return data;
+			},
+			merge : function(target, src) {
+				var array = Array.isArray(src);
+				var dst = array && [] || {};
+
+				if (array) {
+					target = target || [];
+					dst = dst.concat(target);
+					src.forEach(function(e, i) {
+						if (typeof dst[i] === 'undefined') {
+							dst[i] = e;
+						} else if (typeof e === 'object') {
+							dst[i] = editor.data.merge(target[i], e);
+						} else {
+							if (target.indexOf(e) === -1) {
+								dst.push(e);
+							}
+						}
+					});
+				} else {
+					if (target && typeof target === 'object') {
+						Object.keys(target).forEach(function (key) {
+							dst[key] = target[key];
+						});
+					}
+					Object.keys(src).forEach(function (key) {
+						if (typeof src[key] !== 'object' || !src[key]) {
+							dst[key] = src[key];
+						}
+						else {
+							if (!target[key]) {
+								dst[key] = src[key];
+							} else {
+								dst[key] = editor.data.merge(target[key], src[key]);
+							}
+						}
+					});
+				}
+
+				return dst;
+			},
 			stash : function() {
 				var data = {};
 				var dataName, dataPath, dataFields;
@@ -106,71 +204,13 @@
 					data = JSON.parse(localStorage.data);
 				}
 
-				var dataLists = document.querySelectorAll("[data-vedor-list]");
-				for (i=0; i<dataLists.length; i++) {
-					dataName = dataLists[i].dataset.vedorList;
-					dataPath = dataLists[i].dataset.vedorPath ? dataLists[i].dataset.vedorPath : location.pathname;
-
-					var listItems = dataLists[i].querySelectorAll("[data-vedor-list-item]");
-					for (j=0; j<listItems.length; j++) {
-						dataFields = listItems[j].querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
-						for (k=0; k<dataFields.length; k++) {
-							subKey = dataFields[k].dataset.vedorField;
-							if (!data[dataPath][dataName]) {
-								data[dataPath][dataName] = [];
-							}
-
-							if (!data[dataPath][dataName][j]) {
-								data[dataPath][dataName][j] = {};
-							}
-
-							data[dataPath][dataName][j][subKey] = editor.field.get(dataFields[k]);
-							// Mark it so it doesn't get processed twice;
-							dataFields[k].dataset.vedorStashed = 1;
-						}
-
-					}
-
-					dataFields = dataLists[i].querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
-					for (k=0; k<dataFields.length; k++) {
-						subKey = dataFields[k].dataset.vedorField;
-						if (!data[dataPath][dataName]) {
-							data[dataPath][dataName] = [];
-						}
-						if (!data[dataPath][dataName][k]) {
-							data[dataPath][dataName][k] = {};
-						}
-
-						data[dataPath][dataName][k][subKey] = editor.field.get(dataFields[k]);
-						// Mark it so it doesn't get processed twice;
-						dataFields[k].dataset.vedorStashed = 1;
-					}
-
-					listItems = dataLists[i].querySelectorAll("[data-vedor-list-item]");
-					for (j=0; j<listItems.length; j++) {
-						if (listItems[j].dataset.vedorTemplate) {
-							data[dataPath][dataName][j]['data-vedor-template'] = listItems[j].dataset.vedorTemplate;
-						}
-					}
-				}
-
-				dataFields = document.querySelectorAll("[data-vedor-field]:not([data-vedor-stashed])");
-				for (i=0; i<dataFields.length; i++) {
-					dataName = dataFields[i].dataset.vedorField;
-					dataPath = dataFields[i].dataset.vedorPath ? dataFields[i].dataset.vedorPath : location.pathname;
-
-					if (!data[dataPath]) {
-						data[dataPath] = {};
-					}
-
-					data[dataPath][dataName] = editor.field.get(dataFields[i]);
-				}
-
 				var stashedFields = document.querySelectorAll("[data-vedor-stashed]");
 				for (i=0; i<stashedFields.length; i++) {
 					delete stashedFields[i].dataset.vedorStashed;
 				}
 
+				var newData = editor.data.get(document);
+				data = editor.data.merge(data, newData);
 				localStorage.data = JSON.stringify(data);
 			},
 			save : function() {
@@ -190,7 +230,8 @@
 			},
 			load : function() {
 				editor.storage.load(function(data) {
-					editor.data.apply(JSON.parse(data));
+					localStorage.data = data;
+					editor.data.apply(JSON.parse(data), document);
 
 					var checkEdit = function() {
 						if (document.location.hash == "#vedor-edit") {
@@ -208,13 +249,17 @@
 				});
 			},
 			list : {
-				init : function(data) {
+				keyDownHandler : function(evt) {
+					if(evt.ctrlKey && evt.altKey && evt.keyCode == 65) { // ctrl-alt-A
+						if (typeof editor.plugins.list.add !== "undefined") {
+							editor.plugins.list.add(this);
+							evt.preventDefault();
+						}
+					}
+				},
+				init : function(data, target) {
 					var dataName, dataPath;
-
-					document.createElement("template");
-					document.body.innerHTML = document.body.innerHTML;
-
-					var dataLists = document.querySelectorAll("[data-vedor-list]");
+					var dataLists = target.querySelectorAll("[data-vedor-list]");
 
 					for (var i=0; i<dataLists.length; i++) {
 						editor.data.list.parseTemplates(dataLists[i]);
@@ -224,9 +269,17 @@
 						if (data[dataPath] && data[dataPath][dataName]) {
 							editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
 						}
+
+						if (!dataLists[i].querySelector(":scope > [data-vedor-list-item]")) {
+							dataLists[i].classList.add("vedor-empty");
+						}
+						dataLists[i].addEventListener("keydown", editor.data.list.keyDownHandler);
 					}
 				},
 				parseTemplates : function(list) {
+					console.log("parseTemplates");
+					console.log(list);
+
 					var dataName = list.getAttribute("data-vedor-list");
 					var dataPath = list.getAttribute("data-vedor-path") ? list.getAttribute("data-vedor-path") : location.pathname;
 
@@ -268,6 +321,19 @@
 								editor.field.set(dataFields[k], listData[j][dataName]);
 							}
 						}
+
+						var dataLists = clone.querySelectorAll("[data-vedor-list]");
+						for (k=0; k<dataLists.length; k++) {
+							editor.data.list.parseTemplates(dataLists[k]);
+							dataName = dataLists[k].getAttribute("data-vedor-list");
+							if (listData[j][dataName]) {
+								editor.data.list.applyTemplates(dataLists[k], listData[j][dataName]);
+							}
+
+							if (!dataLists[k].querySelector(":scope > [data-vedor-list-item]")) {
+								dataLists[k].classList.add("vedor-empty");
+							}
+						}
 					};
 
 					var fixFirstElementChild = function(clone) {
@@ -301,6 +367,7 @@
 							clone.firstElementChild.setAttribute("data-vedor-list-item", true);
 							clone.firstElementChild.setAttribute("data-vedor-selectable", true);
 							list.appendChild(clone);
+							editor.data.list.init(listData[j], clone);
 						} else {
 							for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
 								clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
@@ -386,6 +453,9 @@
 			document.head.appendChild(baseStyles);
 		},
 		init : function() {
+			document.createElement("template");
+			document.body.innerHTML = document.body.innerHTML;
+
 			editor.loadBaseStyles();
 			editor.data.load();
 		},
@@ -535,6 +605,11 @@
 						}
 					});
 				*/
+				}
+
+				var dataLists = target.querySelectorAll("[data-vedor-list]");
+				for (i=0; i<dataLists.length; i++) {
+					dataLists[i].dataset.vedorSelectable = true;
 				}
 
 				var hyperlinks = target.querySelectorAll("a");
