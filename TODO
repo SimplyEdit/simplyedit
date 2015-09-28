@@ -1,8 +1,7 @@
 - Meta title/megatags
-- Keuze voor template insert dialoogje -> vedor expand op de 'add' met namen van de templates in de toolbar;
 
 - Iets van een server die de merge van html en data serverside doet
-- Sitemap / site management
+- Sitemap / site management / pagina aanmaken etc;
 
 - configuratie maken (welke toolbars/plugins, welke storage, config van de storage, extra image stylen/classes, text stijlen)
 - mogelijkheid voor github login ipv huidige key? (is voor oauth meer voor nodig, zie https://github.com/prose/gatekeeper)
@@ -11,6 +10,8 @@ Integratie met CMS (voor later dus):
 - browse knop voor image url, hyperlink url
 - Link insert plugin?
 
+Voor later:
+- template wisselen voor een listitem;
 ---------
 Bugs:
 - als een slip reorder start, moeten de toolbars weg
@@ -44,3 +45,4 @@ Done:
 [v] Image insert
 [v] Lijsten in lijsten ?
 [v] select handle voor lijsten
+[v] Keuze voor template insert dialoogje -> vedor expand op de 'add' met namen van de templates in de toolbar;
