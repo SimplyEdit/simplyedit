@@ -1,0 +1,199 @@
+<section id="vedor-meta" class="vedor-dialog">
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button class="vedor-expands vedor-selected" data-vedor-action="vedor-metadata" data-vedor-section="vedor-metadata"><i class="fa fa-clone fa-flip-horizontal"></i>Meta tags</li>
+			<li class='vedor-right'><button data-vedor-action="vedor-meta-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div class="vedor-toolbar-section vedor-metadata vedor-selected">
+			<div class="field">
+				<label for="vedor-meta-title">Page title</label>
+				<input type="text" id="vedor-meta-title">
+			</div>
+			<div class="field">
+				<label for="vedor-meta-description">Page description</label>
+				<input type="text" id="vedor-meta-description">
+			</div>
+			<div class="field">
+				<label for="vedor-meta-author">Author</label>
+				<input type="text" id="vedor-meta-author">
+			</div>
+			<div class="field">
+				<label>Robots</label>
+				<ul class="vedor-buttons">
+					<li><button data-vedor-action="vedor-meta-robots" data-value="nofollow"><i class="fa fa-chain-broken"></i>No follow</button></li>
+					<li><button data-vedor-action="vedor-meta-robots" data-value="noindex"><i class="fa fa-eye-slash"></i>No index</button></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button data-vedor-action="vedor-meta-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-meta-apply"><i class="fa fa-check"></i>Apply</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#vedor-meta {
+		top: 50%;
+		height: 400px;
+		max-height: 80%;
+		margin-top: -200px;
+
+		left: 50%;
+		width: 500px;
+		max-width: 80%;
+		margin-left: -250px;
+		background-color: #EEE;
+	}
+	#vedor-meta.fullscreen {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	#vedor-meta .vedor-toolbar-section ul {
+		background: transparent;
+	}
+	#vedor-meta .vedor-metadata button:not(.vedor-selected) {
+		background: white;
+	}
+
+	#vedor-meta .vedor-toolbar-section {
+		background: #eee;
+		padding: 10px 5px;
+	}
+	#vedor-meta .vedor-metadata .vedor-buttons {
+		margin-top: 0px;
+		margin-left: -3px;
+		display: inline-block;
+	}
+	#vedor-meta .vedor-metadata .vedor-buttons li {
+		margin-right: 5px;
+		list-style: none;
+	}
+	#vedor-meta .vedor-metadata .field {
+		margin-bottom: 10px;
+		padding-left: 120px;
+		margin-right: 20px;
+	}
+	#vedor-meta .vedor-metadata .field label {
+		margin-left: -120px;
+		display: inline-block;
+		width: 120px;
+		vertical-align: top;
+		margin-top: 12px;
+	}
+	#vedor-meta .vedor-metadata input {
+		width: 100%;
+	}
+
+</style>
+<script>
+	editor.plugins.meta = {
+		dialog : {
+			open : function() {
+				vdSelectionState.save();
+				editor.plugins.dialog.open(document.getElementById('vedor-meta'), editor.plugins.meta.dialog.update);
+			},
+			close : function() {
+				editor.plugins.dialog.close(
+					document.getElementById('vedor-meta'),
+					function() {
+						vdSelectionState.restore();
+						vdSelectionState.remove();
+					}
+				);
+			},
+			fullscreen : function() {
+				var fullscreen = document.querySelector("[data-vedor-action=vedor-meta-fullscreen]");
+				if (document.getElementById('vedor-meta').classList.contains("fullscreen")) {
+					fullscreen.classList.remove("vedor-selected");
+					document.getElementById('vedor-meta').classList.remove("fullscreen");
+				} else {
+					fullscreen.classList.add("vedor-selected");
+					document.getElementById('vedor-meta').classList.add("fullscreen");
+				}
+			},
+			update : function() {
+				vedor.widgets.properties.set("vedor-meta-title", document.head.querySelector("title").innerText);
+				vedor.widgets.properties.set("vedor-meta-description", document.head.querySelector("meta[name=description]").getAttribute("content"));
+				vedor.widgets.properties.set("vedor-meta-author", document.head.querySelector("meta[name=author]").getAttribute("content"));
+				var metaRobots = document.head.querySelector('meta[name=robots]');
+				if (metaRobots) {
+					var allButtons = document.querySelectorAll("[data-vedor-action=vedor-meta-robots]");
+					for (var j=0; j<allButtons.length; j++) {
+						allButtons[j].classList.remove("vedor-selected");
+					}
+					var instructions = metaRobots.getAttribute("content").split(",");
+					for (var i=0; i<instructions.length; i++) {
+						var query = "[data-vedor-action=vedor-meta-robots][data-value=" + instructions[i] + "]";
+
+						var targetButton = document.querySelector("[data-vedor-action=vedor-meta-robots][data-value=" + instructions[i] + "]");
+						if (targetButton) {
+							targetButton.classList.add("vedor-selected");
+						}
+					}
+				}
+			}
+		},
+		apply : function() {
+			editor.plugins.meta.setTitle(vedor.widgets.properties.get("vedor-meta-title"));
+			editor.plugins.meta.setMeta("description", vedor.widgets.properties.get("vedor-meta-description"));
+			editor.plugins.meta.setMeta("author", vedor.widgets.properties.get("vedor-meta-author"));
+
+			var metaRobots = document.querySelectorAll(".vedor-selected[data-vedor-action=vedor-meta-robots]");
+			var instructions = [];
+			for (var i=0; i<metaRobots.length; i++) {
+				instructions.push(metaRobots[i].getAttribute("data-value"));
+			}
+
+			editor.plugins.meta.setMeta("robots", instructions.join(","));
+			editor.plugins.meta.dialog.close();
+		},
+		setTitle : function(value) {
+			var title = document.head.querySelector("title");
+			if (!title) {
+				title = document.createElement("TITLE");
+				document.head.appendChild(title);
+			}
+			if (value) {
+				title.innerHTML = value;
+			} else {
+				document.head.removeChild(title);
+			}
+		},
+		setMeta : function(name, value) {
+			var metaTag = document.head.querySelector("meta[name=" + name + "]");
+			if (!metaTag) {
+				metaTag = document.createElement("meta");
+				metaTag.setAttribute("name", name);
+				document.head.appendChild(metaTag);
+			}
+			if (value) {
+				metaTag.setAttribute("content", value);
+			} else {
+				document.head.removeChild(metaTag);
+			}
+		}
+	};
+
+	editor.addAction("vedor-metadata", function(el) {
+		el.classList.toggle("vedor-selected");
+		document.querySelector("#vedor-meta .vedor-metadata").classList.toggle("vedor-selected");
+	});
+
+	editor.addAction("vedor-meta-robots", function(el) {
+		el.classList.toggle('vedor-selected');
+	});
+	editor.addAction("vedor-meta", editor.plugins.meta.dialog.open);
+	editor.addAction("vedor-meta-close", editor.plugins.meta.dialog.close);
+	editor.addAction("vedor-meta-apply", editor.plugins.meta.apply);
+	editor.addAction("vedor-meta-fullscreen", editor.plugins.meta.dialog.fullscreen);
+</script>
