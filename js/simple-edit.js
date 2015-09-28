@@ -478,6 +478,7 @@
 						"/simple-edit/vedor/toolbar.vedor-image.html",
 						"/simple-edit/vedor/toolbar.vedor-selectable.html",
 						"/simple-edit/vedor/plugin.vedor-htmlsource.html",
+						"/simple-edit/vedor/plugin.vedor-meta.html",
 						"/simple-edit/vedor/plugin.vedor-save.html",
 						"/simple-edit/vedor/toolbar.vedor-list.html"
 					];
