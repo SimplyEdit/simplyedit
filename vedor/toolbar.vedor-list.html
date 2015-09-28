@@ -5,6 +5,11 @@
 			<li><button data-vedor-action="vedor-list-item-delete"><i class="fa fa-times"></i>Delete</button></li>
 			<li><button data-vedor-action="vedor-list-item-add"><i class="fa fa-plus-circle"></i>Add</button></li>
 		</ul>
+		<div class="vedor-toolbar-section vedor-list-templates">
+			<ul>
+				<li><button data-vedor-action="vedor-list-item-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
 	</div>
 </section>
 <section id="vedor-list" class="vedor-section">
@@ -13,6 +18,11 @@
 		<ul class="vedor-buttons">
 			<li><button data-vedor-action="vedor-list-add"><i class="fa fa-plus-circle"></i>Add</button></li>
 		</ul>
+		<div class="vedor-toolbar-section vedor-list-templates">
+			<ul>
+				<li><button data-vedor-action="vedor-list-item-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
 	</div>
 </section>
 <script>
@@ -20,12 +30,16 @@
 
 	editor.plugins.list = {
 		item : {
-			add : function() {
+			add : function(el) {
 				var targetNode = currentListItem;
 				
 				var targetObjectList = targetNode.parentNode;
 				if (targetObjectList.getAttribute("data-vedor-list")) {
-					var template = editor.plugins.list.getHtmlTemplate(targetObjectList);
+					var template = el.getAttribute("data-vedor-value");
+					if (template === null) {
+						console.log(targetObjectList);
+						template = Object.keys(targetObjectList.templates)[0];
+					}
 					editor.plugins.list.insertTemplate(targetObjectList, template);
 				}
 			},
@@ -43,11 +57,15 @@
 				// FIXME: register change stond hier;
 			}
 		},
-		add : function() {
+		add : function(el) {
 			var targetObjectList = currentList;
 
 			if (targetObjectList.getAttribute("data-vedor-list")) {
-				var template = editor.plugins.list.getHtmlTemplate(targetObjectList);
+				var template = el.getAttribute("data-vedor-value");
+				if (template === null) {
+					console.log(targetObjectList);
+					template = Object.keys(targetObjectList.templates)[0];
+				}
 				editor.plugins.list.insertTemplate(targetObjectList, template);
 			}
 		},
@@ -71,16 +89,6 @@
 				list.classList.remove("vedor-empty");
 				list.appendChild(newNode);
 			}
-		},
-		getHtmlTemplate : function(list) {
-			var templateName = Object.keys(list.templates)[0];
-
-			if (Object.keys(list.templates).length > 1) {
-				alert('multiple templates possible');
-				templateName = Object.keys(list.templates)[prompt("Template number?")];
-			}
-
-			return templateName;
 		}
 	};
 
@@ -96,9 +104,43 @@
 			"vedor-list-item-add" : editor.plugins.list.item.add,
 			"vedor-list-item-delete" : editor.plugins.list.item.delete
 		},
-		update : function(el) {
+		update : function(toolbar) {
 			currentListItem = vdSelection.getNode(vdSelectionState.get());
-			// console.log("update vedor-list toolbar");
+
+			currentList = currentListItem.parentNode;
+			var listTemplates = toolbar.querySelector("div.vedor-list-templates ul");
+			listTemplates.innerHTML = '';
+			for (var i=0; i<Object.keys(currentList.templates).length; i++) {
+				var templateName = Object.keys(currentList.templates)[i];
+				var templateDisplay = templateName;				
+
+				if (templateName == i) {
+					templateDisplay = "Template " + (i+1);
+				}
+				
+				var item = document.createElement("li");
+				item.innerHTML = '<button data-vedor-action="vedor-list-item-add" data-vedor-value="' + templateName + '"><i class="fa fa-cube"></i>' + templateDisplay + '</button>';
+				listTemplates.appendChild(item);
+			}
+		
+			console.log(toolbar);
+			var addButton = toolbar.querySelector("button[data-vedor-action='vedor-list-item-add'], button[data-vedor-section='vedor-list-templates']");
+			console.log(currentList.templates);
+
+			console.log(currentList.templates.length);
+
+			if (Object.keys(currentList.templates).length > 1) {
+				delete addButton.dataset.vedorAction;
+				addButton.dataset.vedorSection = "vedor-list-templates";
+				addButton.classList.add("vedor-expands");
+			} else { 
+				delete addButton.dataset.vedorSection;
+				addButton.dataset.vedorAction = "vedor-list-item-add";
+				addButton.classList.remove("vedor-expands");
+			}
+			addButton.classList.remove("vedor-selected");
+			toolbar.querySelector("div.vedor-list-templates").classList.remove("vedor-selected");
+
 		}
 	});
 	
@@ -115,9 +157,41 @@
 		actions: {
 			"vedor-list-add" : editor.plugins.list.add
 		},
-		update : function(el) {
+		update : function(toolbar) {
 			currentList = vdSelection.getNode(vdSelectionState.get());
-			// console.log("update vedor-list toolbar");
+
+			var listTemplates = toolbar.querySelector("div.vedor-list-templates ul");
+			listTemplates.innerHTML = '';
+			for (var i=0; i<Object.keys(currentList.templates).length; i++) {
+				var templateName = Object.keys(currentList.templates)[i];
+				var templateDisplay = templateName;				
+
+				if (templateName == i) {
+					templateDisplay = "Template " + (i+1);
+				}
+				
+				var item = document.createElement("li");
+				item.innerHTML = '<button data-vedor-action="vedor-list-add" data-vedor-value="' + templateName + '"><i class="fa fa-cube"></i>' + templateDisplay + '</button>';
+				listTemplates.appendChild(item);
+			}
+		
+			console.log(toolbar);
+			var addButton = toolbar.querySelector("button[data-vedor-action='vedor-list-add'], button[data-vedor-section='vedor-list-templates']");
+			console.log(currentList.templates);
+
+			console.log(currentList.templates.length);
+
+			if (Object.keys(currentList.templates).length > 1) {
+				delete addButton.dataset.vedorAction;
+				addButton.dataset.vedorSection = "vedor-list-templates";
+				addButton.classList.add("vedor-expands");
+			} else { 
+				delete addButton.dataset.vedorSection;
+				addButton.dataset.vedorAction = "vedor-list-add";
+				addButton.classList.remove("vedor-expands");
+			}
+			addButton.classList.remove("vedor-selected");
+			toolbar.querySelector("div.vedor-list-templates").classList.remove("vedor-selected");
 		}
 	});	
 </script>
