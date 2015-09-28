@@ -122,7 +122,7 @@
 				}
 			},
 			update : function() {
-				vedor.widgets.properties.set("vedor-meta-title", document.head.querySelector("title").innerText);
+				vedor.widgets.properties.set("vedor-meta-title", document.head.querySelector("title").innerHTML);
 				vedor.widgets.properties.set("vedor-meta-description", document.head.querySelector("meta[name=description]").getAttribute("content"));
 				vedor.widgets.properties.set("vedor-meta-author", document.head.querySelector("meta[name=author]").getAttribute("content"));
 				var metaRobots = document.head.querySelector('meta[name=robots]');
