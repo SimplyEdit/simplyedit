@@ -481,7 +481,8 @@
 						"/simple-edit/vedor/plugin.vedor-meta.html",
 						"/simple-edit/vedor/plugin.vedor-save.html",
 						"/simple-edit/vedor/toolbar.vedor-list.html",
-						"/simple-edit/vedor/plugin.vedor-dropbox.html"
+						"/simple-edit/vedor/plugin.vedor-dropbox.html",
+						"/simple-edit/vedor/plugin.vedor-symbol.html"
 					];
 
 					var loadToolbar = function(url) {
@@ -521,7 +522,7 @@
 									}
 								}
 
-								var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar");
+								var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar,.vedor-dialog-body");
 								for (i=0; i<newToolbars.length; i++) {
 									editor.toolbar.init(newToolbars[i]);
 								}
