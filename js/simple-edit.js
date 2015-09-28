@@ -480,7 +480,8 @@
 						"/simple-edit/vedor/plugin.vedor-htmlsource.html",
 						"/simple-edit/vedor/plugin.vedor-meta.html",
 						"/simple-edit/vedor/plugin.vedor-save.html",
-						"/simple-edit/vedor/toolbar.vedor-list.html"
+						"/simple-edit/vedor/toolbar.vedor-list.html",
+						"/simple-edit/vedor/plugin.vedor-dropbox.html"
 					];
 
 					var loadToolbar = function(url) {
@@ -501,7 +502,7 @@
 									}
 									toolbars.content = fragment;
 								}
-								editor.brokenImport = true;
+								// editor.brokenImport = true;
 								var toolbarNode = document.importNode(toolbars.content, true);
 								if (editor.brokenImport) {
 									editor.importScripts = true;
