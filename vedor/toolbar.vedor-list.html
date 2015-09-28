@@ -37,7 +37,6 @@
 				if (targetObjectList.getAttribute("data-vedor-list")) {
 					var template = el.getAttribute("data-vedor-value");
 					if (template === null) {
-						console.log(targetObjectList);
 						template = Object.keys(targetObjectList.templates)[0];
 					}
 					editor.plugins.list.insertTemplate(targetObjectList, template);
@@ -63,7 +62,6 @@
 			if (targetObjectList.getAttribute("data-vedor-list")) {
 				var template = el.getAttribute("data-vedor-value");
 				if (template === null) {
-					console.log(targetObjectList);
 					template = Object.keys(targetObjectList.templates)[0];
 				}
 				editor.plugins.list.insertTemplate(targetObjectList, template);
@@ -123,11 +121,7 @@
 				listTemplates.appendChild(item);
 			}
 		
-			console.log(toolbar);
 			var addButton = toolbar.querySelector("button[data-vedor-action='vedor-list-item-add'], button[data-vedor-section='vedor-list-templates']");
-			console.log(currentList.templates);
-
-			console.log(currentList.templates.length);
 
 			if (Object.keys(currentList.templates).length > 1) {
 				delete addButton.dataset.vedorAction;
@@ -175,11 +169,7 @@
 				listTemplates.appendChild(item);
 			}
 		
-			console.log(toolbar);
 			var addButton = toolbar.querySelector("button[data-vedor-action='vedor-list-add'], button[data-vedor-section='vedor-list-templates']");
-			console.log(currentList.templates);
-
-			console.log(currentList.templates.length);
 
 			if (Object.keys(currentList.templates).length > 1) {
 				delete addButton.dataset.vedorAction;
