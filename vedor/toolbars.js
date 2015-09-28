@@ -153,6 +153,9 @@
 				if (parent.parentNode.className && parent.parentNode.className.match(/\bvedor-toolbar\b/)) {
 					return true;
 				}
+				if (parent.parentNode.className && parent.parentNode.className.match(/\bvedor-dialog\b/)) {
+					return true;
+				}
 				parent = parent.parentNode;
 			}
 			return false;
