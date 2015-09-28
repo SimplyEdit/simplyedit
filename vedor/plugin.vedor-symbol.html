@@ -34,7 +34,7 @@
 		margin-left: 0px;
 		margin-top: 0px;
 	}
-	.vedor-dialog-body {
+	#vedor-symbol .vedor-dialog-body {
 		overflow-y: scroll;
 		padding: 0px;
 		width: 500px;
@@ -42,7 +42,7 @@
 	#vedor-symbol.fullscreen .vedor-dialog-body {
 		width: 100%;
 	}
-	.vedor-dialog-body button {
+	#vedor-symbol .vedor-dialog-body button {
 		border: 1px solid #eee;
 		background-color: white;
 		height: 48px;
@@ -111,7 +111,9 @@
 	editor.addAction("vedor-symbol-close", editor.plugins.symbol.dialog.close);
 	editor.addAction("vedor-symbol-fullscreen", editor.plugins.symbol.dialog.fullscreen);
 	editor.addAction("vedor-symbol-insert", function(el) {
-		editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+		if (!editor.plugins.symbol.currentSel.collapsed) {
+			editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+		}
 		vdSelection.setHTMLText(editor.plugins.symbol.currentSel, "&#" + el.dataset.value + ";");
 		editor.plugins.symbol.dialog.close();
 	});
