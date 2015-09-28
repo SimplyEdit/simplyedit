@@ -10,6 +10,38 @@
 			background-color: rgba(128,128,128,0.2);
 		}
 
+		*[data-vedor-list]:not(.vedor-empty):before,
+		*[data-vedor-list-item]:before {
+			font-weight: normal;
+			font-style: normal;
+			font-family: FontAwesome;
+			border: 1px solid #ccc;
+			border-top: 2px solid #ea5922;
+			background-color: white;
+			color: #666;
+			border-bottom-left-radius: 3px;
+			border-bottom-right-radius: 3px;
+			padding: 5px;
+			position: absolute;
+			margin-top: -24px;
+			margin-left: 5px;
+			opacity: 0;
+			transition: 0.3s opacity ease;
+			box-shadow: 0px 0px 2px #ccc;
+			-webkit-box-shadow: 0px 0px 2px #ccc;
+			-moz-box-shadow: 0px 0px 2px #ccc;
+		}
+		*[data-vedor-list]:not(.vedor-empty):hover:before,
+		*[data-vedor-list-item]:hover:before {
+			opacity: 1;
+		}
+		*[data-vedor-list-item]:before {
+			content: "\f1b2"; /* cube */
+		}
+		*[data-vedor-list]:before {
+			content: "\f1b3"; /* cubes */
+		}
+
 		i.vedor-logo {
 			background-image: url('../vedor.png');
 			background-size: contain;
