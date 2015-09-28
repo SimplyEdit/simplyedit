@@ -125,7 +125,7 @@
 						subData = editor.data.get(listItems[j]);
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
-								console.log("translated " + subPath + " to " + dataPath);
+								console.log("Notice: use of data-vedor-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
 							}
 							data[dataPath][dataName][j] = subData[subPath];
 						}
@@ -277,9 +277,6 @@
 					}
 				},
 				parseTemplates : function(list) {
-					console.log("parseTemplates");
-					console.log(list);
-
 					var dataName = list.getAttribute("data-vedor-list");
 					var dataPath = list.getAttribute("data-vedor-path") ? list.getAttribute("data-vedor-path") : location.pathname;
 
