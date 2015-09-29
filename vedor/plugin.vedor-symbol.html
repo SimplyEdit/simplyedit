@@ -14,10 +14,8 @@
 		height: 400px;
 		max-height: 80%;
 		margin-top: -200px;
-
 		left: 50%;
-		max-width: 80%;
-		margin-left: -250px;
+		margin-left: -235px;
 		background-color: #EEE;
 		padding-top: 61px;
 		box-sizing: border-box;
@@ -37,7 +35,8 @@
 	#vedor-symbol .vedor-dialog-body {
 		overflow-y: scroll;
 		padding: 0px;
-		width: 500px;
+		width: 470px;
+		padding-left: 2px;
 	}
 	#vedor-symbol.fullscreen .vedor-dialog-body {
 		width: 100%;
@@ -45,10 +44,27 @@
 	#vedor-symbol .vedor-dialog-body button {
 		border: 1px solid #eee;
 		background-color: white;
-		height: 48px;
-		width: 48px;
+		height: 50px;
+		width: 50px;
 		font-family: inherit;
 		font-size: 20px;
+	}
+	@media (max-width: 481px) {
+		#vedor-symbol {
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+			width: auto;
+			margin-left: 0px;
+			margin-top: 0px;
+		}
+		#vedor-symbol [data-vedor-action="vedor-symbol-fullscreen"] {
+			display: none;
+		}
 	}
 </style>
 <script>
