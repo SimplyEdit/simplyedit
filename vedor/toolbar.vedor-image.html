@@ -10,11 +10,11 @@
 			<li><button data-vedor-section="vedor-code" data-vedor-action="vedor-edit-source"><i class="fa fa-code"></i>Code</button></li>
 		</ul>
 		<div class="vedor-toolbar-section vedor-image-style">
-			<ul>
-				<li><label>Format</label><select id="vdImageType" data-vedor-action=vedor-image-type">
+			<div>
+				<label>Format</label><select id="vdImageType" data-vedor-action=vedor-image-type">
 					<option value="">Original</option>
-				</select></li>
-			</ul>
+				</select>
+			</div>
 		</div>
 		<div class="vedor-toolbar-section vedor-image-align" data-type="vedor-buttongroup-radio" id="vdImageAlign">
 		<ul>
@@ -49,6 +49,35 @@
 <script type="text/javascript">
 	var currentImage;
 	var currentLink;
+
+	editor.plugins.image = {
+		placeholderData : null,
+		placeholder : function() {
+			if (!editor.plugins.image.placeholderData) {
+				// Create a nice placeholder image and insert that;
+				var canvas = document.createElement("canvas");
+				canvas.setAttribute("height", 60);
+				canvas.setAttribute("width", 80);
+
+				var ctx = canvas.getContext("2d");
+				ctx.fillStyle = "#ccc";
+				ctx.fillRect(0,0,canvas.getAttribute("width"), canvas.getAttribute("height"));
+				ctx.fillStyle = "#eee";
+				ctx.fillRect(2,2,canvas.getAttribute("width")-4, canvas.getAttribute("height")-4);
+
+				ctx.font = "48px FontAwesome";
+				ctx.fillStyle = "#999";
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+
+				// Use FontAwesome 'photo' icon;
+				ctx.fillText("\uf03e", canvas.getAttribute("width")/2, canvas.getAttribute("height")/2);
+				
+				editor.plugins.image.placeholderData = canvas.toDataURL("image/png");
+			}
+			return editor.plugins.image.placeholderData;
+		}
+	};
 
 	editor.addToolbar({
 		"name" : "vedor-image",
@@ -86,6 +115,9 @@
 			vedor.widgets.properties.set('vdImageTitle', title);
 
 			var src=image.getAttribute('src');
+			if (src == editor.plugins.image.placeholder()) {
+				src = "";
+			}
 			vedor.widgets.properties.set('vdImageSrc', src);
 
 			currentLink = editor.plugins.hyperlink.get();
@@ -215,31 +247,12 @@
 					if (value) {
 						vdSelectionState.currentNode.setAttribute("src", value);
 					} else {
-						vdSelectionState.currentNode.removeAttribute("src");
+						vdSelectionState.currentNode.setAttribute("src", editor.plugins.image.placeholder());
 					}
 				}
 			},
 			"vedor-insert-image" : function() {
-				// Create a nice placeholder image and insert that;
-				var canvas = document.createElement("canvas");
-				canvas.setAttribute("height", 60);
-				canvas.setAttribute("width", 80);
-
-				var ctx = canvas.getContext("2d");
-				ctx.fillStyle = "#ccc";
-				ctx.fillRect(0,0,canvas.getAttribute("width"), canvas.getAttribute("height"));
-				ctx.fillStyle = "#eee";
-				ctx.fillRect(2,2,canvas.getAttribute("width")-4, canvas.getAttribute("height")-4);
-
-				ctx.font = "48px FontAwesome";
-				ctx.fillStyle = "#999";
-				ctx.textAlign = "center";
-				ctx.textBaseline = "middle";
-
-				// Use FontAwesome 'photo' icon;
-				ctx.fillText("\uf03e", canvas.getAttribute("width")/2, canvas.getAttribute("height")/2);
-				
-				var imageSrc = canvas.toDataURL("image/png");
+				var imageSrc = editor.plugins.image.placeholder();
 
 				var sel = vdSelectionState.get();
 				var source = "<img src='" + imageSrc + "'>";
