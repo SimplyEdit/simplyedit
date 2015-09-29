@@ -37,11 +37,11 @@
 		}
 		*[data-vedor-list-item]:before {
 			content: "\f1b2"; /* cube */
-			margin-left: 24px;
+			margin-left: 40px;
 		}
 		*[data-vedor-list]:not(.vedor-empty):before {
 			content: "\f1b3"; /* cubes */
-			margin-left: -24px;
+			margin-left: 0px;
 		}
 
 		i.vedor-logo {
