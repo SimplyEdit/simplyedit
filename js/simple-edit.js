@@ -1,5 +1,6 @@
 (function() {
 	var editor = {
+		baseURL : "http://yvo.muze.nl/simple-edit/",
 		storage : {
 			url : 'http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simple-edit-data/',
 			save : function(data, callback) {
@@ -211,7 +212,7 @@
 
 				var newData = editor.data.get(document);
 				data = editor.data.merge(data, newData);
-				localStorage.data = JSON.stringify(data);
+				localStorage.data = JSON.stringify(data, null, "\t");
 			},
 			save : function() {
 				if (editor.storage.connect()) {
@@ -397,6 +398,7 @@
 						}
 					break;
 					case "A":
+					case "META":
 						for (attr in data) {
 							if (attr == "innerHTML") {
 								field.innerHTML = data[attr];
@@ -435,7 +437,15 @@
 							}
 						}
 						attributes.innerHTML = field.innerHTML;
-
+					return attributes;
+					case "META":
+						allowedAttributes = ["content"];
+						for (attr in allowedAttributes) {
+							attr = allowedAttributes[attr];
+							if (field.getAttribute(attr)) {
+								attributes[attr] = field.getAttribute(attr);
+							}
+						}
 					return attributes;
 					default:
 					return field.innerHTML;
@@ -444,7 +454,7 @@
 		},
 		loadBaseStyles : function() {
 			var baseStyles = document.createElement("link");
-			baseStyles.setAttribute("href", "/simple-edit/vedor/vedor-base.css");
+			baseStyles.setAttribute("href", editor.baseURL + "vedor/vedor-base.css");
 			baseStyles.setAttribute("rel", "stylesheet");
 			baseStyles.setAttribute("type", "text/css");
 			document.head.appendChild(baseStyles);
@@ -462,7 +472,7 @@
 				document.body.appendChild(toolbarsContainer);
 
 				var http = new XMLHttpRequest();
-				var url = "/simple-edit/vedor/toolbars.html";
+				var url = editor.baseURL + "vedor/toolbars.html";
 				url += "?t=" + (new Date().getTime());
 
 				var loadToolbars = function() {
@@ -473,16 +483,16 @@
 					}
 
 					var toolbars = [
-						"/simple-edit/vedor/toolbar.vedor-main-toolbar.html",
-						"/simple-edit/vedor/toolbar.vedor-text.html",
-						"/simple-edit/vedor/toolbar.vedor-image.html",
-						"/simple-edit/vedor/toolbar.vedor-selectable.html",
-						"/simple-edit/vedor/plugin.vedor-htmlsource.html",
-						"/simple-edit/vedor/plugin.vedor-meta.html",
-						"/simple-edit/vedor/plugin.vedor-save.html",
-						"/simple-edit/vedor/toolbar.vedor-list.html",
-						"/simple-edit/vedor/plugin.vedor-dropbox.html",
-						"/simple-edit/vedor/plugin.vedor-symbol.html"
+						editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
+						editor.baseURL + "vedor/toolbar.vedor-text.html",
+						editor.baseURL + "vedor/toolbar.vedor-image.html",
+						editor.baseURL + "vedor/toolbar.vedor-selectable.html",
+						editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
+						editor.baseURL + "vedor/plugin.vedor-meta.html",
+						editor.baseURL + "vedor/plugin.vedor-save.html",
+						editor.baseURL + "vedor/toolbar.vedor-list.html",
+						editor.baseURL + "vedor/plugin.vedor-dropbox.html",
+						editor.baseURL + "vedor/plugin.vedor-symbol.html"
 					];
 
 					var loadToolbar = function(url) {
@@ -582,7 +592,7 @@
 
 				// Add slip.js for sortable items;
 				var scriptTag = document.createElement("SCRIPT");
-				scriptTag.setAttribute("src", "/simple-edit/vedor/slip.js");
+				scriptTag.setAttribute("src", editor.baseURL + "vedor/slip.js");
 				document.head.appendChild(scriptTag);
 			},
 			editable : function(target) {
