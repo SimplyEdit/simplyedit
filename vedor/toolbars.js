@@ -596,7 +596,7 @@
 				backdrop.style.height = "100%";
 				backdrop.style.top = 0;
 				backdrop.style.left = 0;
-				backdrop.style.position = "absolute";
+				backdrop.style.position = "fixed";
 				backdrop.style.zIndex = 100;
 				backdrop.style.border = 0;
 				backdrop.style.backgroundColor = "rgba(255,255,255,0.7)";
