@@ -84,10 +84,11 @@
 		</div>
 		<div class="vedor-toolbar-section vedor-text-align" data-type="vedor-buttongroup-radio">
 			<ul>
-			<li><button data-vedor-action="vedor-text-align-left" data-value="left" class="vedor-align-left"><i class="fa fa-align-left"></i>Left</button></li>
-			<li><button data-vedor-action="vedor-text-align-center" data-value="center" class="vedor-align-center"><i class="fa fa-align-center"></i>Center</button></li>
-			<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>Right</button></li>
-			<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-vedor-action="vedor-text-align-left" data-value="left" class="vedor-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-vedor-action="vedor-text-align-center" data-value="center" class="vedor-align-center"><i class="fa fa-align-center"></i>Center</button></li>
+				<li><button data-vedor-action="vedor-text-align-right" data-value="right" class="vedor-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-vedor-action="vedor-text-align-justify" data-value="justify" class="vedor-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-vedor-action="vedor-text-align-none" data-value="none" class="vedor-align-none"><i class="fa fa-minus-circle"></i>None</button></li>
 			</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-hyperlink">
@@ -375,8 +376,13 @@
 			'vedor-text-align-justify' : function() {
 				editor.plugins.text.formatInline("JustifyFull");
 			},
-			'vedor-text-align-left' : function() {
+			'vedor-text-align-none' : function() {
 				editor.plugins.text.formatInline("JustifyLeft");
+				var parent = vdSelection.getNode(vdSelectionState.currentSelection);
+				parent.classList.remove("vedor-text-align-left");
+				if (parent.classList.length == 0) {
+					parent.removeAttribute("class");
+				}
 			},
 			'vedor-text-blockstyle' : function(value) {
 				editor.plugins.text.formatBlock(value);
