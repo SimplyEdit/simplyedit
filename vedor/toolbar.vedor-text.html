@@ -110,6 +110,7 @@
 <script type="text/javascript">
 	editor.plugins.text = {
 		formatInline : function(command, value) {
+			vdSelectionState.restore(vdSelectionState.currentSelection);
 			var field=editor.node.getEditableField();
 			if (!field) {
 				return;
