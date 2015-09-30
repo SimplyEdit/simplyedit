@@ -242,6 +242,8 @@
 			var foundTag = toolbar.querySelector("[name='textStyle'] option[value='" + parent.tagName.toLowerCase() + "']");
 			if (foundTag) {
 				foundTag.selected = true;
+			} else {
+				toolbar.querySelector("[name='textStyle'] option[value='p']").selected = true;
 			}
 			if (parent.tagName.toLowerCase() == "a") {
 				currentLink.push(parent);

@@ -260,6 +260,7 @@
 	};
 
 	editor.context = {
+		touching : false,
 		skipUpdate : false,
 		weigh : function(filter, targets) {
 			var sel = vdSelectionState.get();
@@ -464,13 +465,21 @@
 					activeSection.style.top = top + 10 + "px"; // 80 is the height of the main vedor toolbar if the toolbars are directly under the document - not used since they moved to editorPane
 					activeSection.style.left = newleft + "px";
 
-	// FIXME: Android fix here
-	//				// restore selection triggers contextupdate, which triggers restore selection - this hopefully prevents that loop.
-					editor.context.skipUpdate = true;
-					if (!sel.collapsed) {
-					//	vdSelectionState.restore(sel); // // FIXME: This reverses the current selection, which causes problems selecting from right to left; Is it used at all?
+					if (editor.context.touching) {
+						// FIXME: Android fix here
+						// restore selection triggers contextupdate, which triggers restore selection - this hopefully prevents that loop.
+						editor.context.skipUpdate = true;
+						if (!sel.collapsed) {
+							// FIXME: This reverses the
+							// current selection, which
+							// causes problems selecting
+							// from right to left; It is
+							// needed to allow text
+							// selection on android.
+							vdSelectionState.restore(sel); 
+						}
+						window.setTimeout(function() { editor.context.skipUpdate = false;}, 20);
 					}
-					window.setTimeout(function() { editor.context.skipUpdate = false;}, 20);
 			} else {
 				hideIt();
 			}
@@ -653,6 +662,13 @@
 
 		muze.event.attach( document, 'selectionchange', editor.context.update );
 		muze.event.attach( document, 'keyup', editor.context.update );
+
+		muze.event.attach( document, 'touchstart', function(evt) {
+			editor.context.touching = true;
+		});
+		muze.event.attach( document, 'touchend', function(evt) {
+			editor.context.touching = false;
+		});
 	};
 
 	initSelections();
