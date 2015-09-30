@@ -436,7 +436,7 @@
 
 					return attributes;
 					case "META":
-						allowedAttributes = ["content", "class", "alt", "title"];
+						allowedAttributes = ["content"];
 						for (attr in allowedAttributes) {
 							attr = allowedAttributes[attr];
 							if (field.getAttribute(attr)) {
