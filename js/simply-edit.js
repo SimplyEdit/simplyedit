@@ -1,3 +1,9 @@
+/*
+	Vedor editor - Simply edit the Web
+
+	Written by Yvo Brevoort
+	Copyright Muze 2015, all rights reserved.
+*/
 (function() {
 	var editor = {
 		baseURL : "http://yvo.muze.nl/simply-edit/",
