@@ -346,7 +346,7 @@
 				var parent = vdSelection.getNode(sel);
 				if ( !rects.length ) {
 					// insert element at range and get its position, other options aren't exact enough
-					var span = vdEditPane.contentDocument.createElement('span');
+					var span = document.createElement('span');
 					if ( span.getClientRects ) {
 						// Ensure span has dimensions and position by
 						// adding a zero-width space character
