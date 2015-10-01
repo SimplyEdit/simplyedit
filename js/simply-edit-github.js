@@ -7,20 +7,22 @@
 
 (function() {
 	var editor = {
-		baseURL : "http://yvo.muze.nl/simply-edit/",
+		baseURL : "http://se-cdn.muze.nl/github/simply-edit/", // api key = github;
 		storage : (function() {
 			var script = document.createElement("SCRIPT");
-			script.src = "http://yvo.muze.nl/github.js/github/github.js";
+			script.src = "http://se-cdn.muze.nl/github.js";
 			document.head.appendChild(script);
 
 			var repoUser = document.location.hostname.split(".")[0];
 			var repoName = document.location.pathname.split("/")[1];
-
-			//var repoUser = "ylebre";
-			//var repoName = "simply-edit";
 			var repoBranch = "gh-pages";
 			var dataFile = "data.json";
 
+			if (!repoName) {
+				repoName = document.location.hostname;
+				repoBranch = "master";
+			}
+			
 			return {
 				connect : function() {
 					if (!editor.storage.key) {
