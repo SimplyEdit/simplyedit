@@ -334,6 +334,129 @@
 				}
 			}
 		},
+		toolbar : {
+			getPosition : function(sel) {
+				var ltop, lleft, rleft, rtop, top, left;
+
+				var range = sel; //.getRangeAt(0);
+				if ( !range ) {
+					return null;
+				}
+				var rects = range.getClientRects();
+				var parent = vdSelection.getNode(sel);
+				if ( !rects.length ) {
+					// insert element at range and get its position, other options aren't exact enough
+					var span = vdEditPane.contentDocument.createElement('span');
+					if ( span.getClientRects ) {
+						// Ensure span has dimensions and position by
+						// adding a zero-width space character
+						try {
+							span.appendChild( document.createTextNode("\u200b") );
+							range.insertNode(span);
+							rects = span.getClientRects();
+							var spanParent = span.parentNode;
+							spanParent.removeChild(span);
+							// Glue any broken text nodes back together
+							spanParent.normalize();
+						} catch(e) {
+						}
+					}
+				}
+				if ( rects.length ) {
+					ltop = rects[0].top;
+					lleft = rects[0].left;
+					rleft = rects[rects.length-1].right;
+					rtop = rects[rects.length-1].bottom; 
+				}
+				if ( !rects.length || parent.getAttribute("data-vedor-selectable") ) {
+					pos = parent && parent.getBoundingClientRect ? parent.getBoundingClientRect() : { left: 0, top: 0, right: 0, bottom: 0};
+					lleft = pos.left;
+					ltop = pos.top;
+					rleft = pos.right;
+					rtop = pos.bottom;
+				}
+				// fallback... if nothing else works
+				if ( lleft === 0 && rleft === 0 && ltop === 0 && rtop === 0 ) {
+					parent = vdSelection.parentNode(sel);
+					if ( !parent || !parent.getBoundingClientRect ) {
+						return false;
+					}
+					pos = parent.getBoundingClientRect();
+					lleft = pos.left;
+					ltop = pos.top;
+					rleft = pos.right;
+					rtop = pos.bottom;
+				}
+				top = Math.max(ltop, rtop);
+				left = lleft + ((rleft - lleft) / 2);
+				return { top: top, left: left, ltop: ltop, lleft: lleft, rtop: rtop, rleft: rleft };
+			},
+			reposition : function() {
+				var markerLeft, scrollHeight, scrollTop;
+
+				var sel = vdSelectionState.get();
+				var currentContext = editor.context.get();
+
+				var activeSection = document.getElementById(currentContext);
+				var pos = editor.context.toolbar.getPosition(sel);
+				if ( !pos || !activeSection ) {
+					hideToolbar(true);
+					return;
+				}
+				var top = pos.top;
+				var left = pos.left;
+					
+				var activeToolbar = activeSection.querySelector("div.vedor-toolbar");
+				top += document.body.offsetTop;
+				var newleft = left - (activeToolbar.offsetWidth/2);
+				if (newleft < 0) {
+					markerLeft = activeToolbar.offsetWidth/2 + newleft;
+					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft+'px';
+					newleft = 0;
+				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth) {
+					var delta = newleft + activeToolbar.offsetWidth - document.body.offsetWidth;
+					markerLeft = activeToolbar.offsetWidth/2 + delta;
+					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft+'px';
+					newleft = document.body.offsetWidth - activeToolbar.offsetWidth;
+				} else {
+					activeToolbar.getElementsByClassName("marker")[0].style.left = "50%";
+				}
+				// Move the toolbar to beneath the top of the selection if the toolbar goes out of view;
+				// check the position 
+				// - if toolbar bottom <= editor pane bottom, no problem
+				// - if toolbar can be repositioned, no problem
+				// - if edit pane content can be scrolled down, no problem
+				// - else: add space on the bottom so that you can scroll down
+				var editPaneRect = document.body.getBoundingClientRect();
+				var toolbarRect = activeSection.getBoundingClientRect();
+				if ( top + toolbarRect.height > editPaneRect.height ) {
+					// toolbar extends beyond bottom edge if not repositioned
+					var mintop = Math.min(pos.ltop, pos.rtop);
+					if ( mintop + toolbarRect.height <= editPaneRect.height ) {
+						// toolbar can be repositioned
+						// FIXME: min top should be position of the cursor, not selection
+						top = editPaneRect.height - toolbarRect.height;
+					} else {
+						top = mintop;
+						scrollHeight = Math.max(document.body.scrollHeight, document.body.clientHeight);
+						scrollTop    = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+						if ( scrollTop >= (scrollHeight - document.body.clientHeight - toolbarRect.height ) ) {
+							// no more scroll space, so add it.
+							document.body.classList.add('vedor-footer-space');
+						}
+					}
+				}
+				if ( document.body.classList.contains('vedor-footer-space') ) {
+					scrollHeight = Math.max(document.body.scrollHeight, document.body.clientHeight);
+					scrollTop    = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+					if ( scrollTop < (scrollHeight - document.body.clientHeight - toolbarRect.height - 132 )) {
+						document.body.classList.remove('vedor-footer-space');
+					}
+				}
+				activeSection.style.top = top + 10 + "px"; // 10 is the height of the marker arrow
+				activeSection.style.left = newleft + "px";
+			}
+		},
 		show : function() {
 			// vdSelectionState.remove(); // FIXME: deze is nodig voor text toolbar update, maar maakt selectie bij lists stuk.
 			var currentContext = editor.context.get();
@@ -359,127 +482,37 @@
 			// console.log(activeSection);
 
 			if (activeSection && !vdHideToolbars) {
-					var htmlContext = activeSection.querySelectorAll("div.vedor-toolbar-status")[0];
-					if ( htmlContext ) {
-						htmlContext.classList.add("vedor-selected");
+				var htmlContext = activeSection.querySelectorAll("div.vedor-toolbar-status")[0];
+				if ( htmlContext ) {
+					htmlContext.classList.add("vedor-selected");
+				}
+				// activeSection.style.display = "block";
+				activeSection.className += " active";
+				hideIt(); // window.setTimeout(hideIt, 200);
+
+				var sel = vdSelectionState.get();
+				var parent = vdSelection.getNode(sel);
+				if (parent == document) {
+					return;
+				}
+
+				editor.context.toolbar.reposition();
+
+				if (editor.context.touching) {
+					// FIXME: Android fix here
+					// restore selection triggers contextupdate, which triggers restore selection - this hopefully prevents that loop.
+					editor.context.skipUpdate = true;
+					if (!sel.collapsed) {
+						// FIXME: This reverses the
+						// current selection, which
+						// causes problems selecting
+						// from right to left; It is
+						// needed to allow text
+						// selection on android.
+						vdSelectionState.restore(sel); 
 					}
-					// activeSection.style.display = "block";
-					activeSection.className += " active";
-					hideIt(); // window.setTimeout(hideIt, 200);
-
-					var sel = vdSelectionState.get();
-					var parent = vdSelection.getNode(sel);
-					if (parent == document) {
-						return;
-					}
-					if (sel.collapsed) {
-						parent = vdSelection.getNode(sel);
-						vdSelection.setHTMLText(sel, "<span id='vdBookmarkLeft'></span><span id='vdBookmarkRight'></span>");
-					} else {
-						vedor.editor.bookmarks.set(sel);
-					}
-
-					var bmLeft = document.getElementById("vdBookmarkLeft");
-					var obj = bmLeft;
-
-					if (!obj) {
-						return;
-					}
-
-					var lleft = 0, ltop = 0;
-					ltop += obj.offsetHeight;
-					do {
-						lleft += obj.offsetLeft;
-						ltop += obj.offsetTop;
-						obj = obj.offsetParent;
-					} while (obj);
-
-					var bmRight = document.getElementById("vdBookmarkRight");
-					obj = bmRight;
-					var rleft = 0, rtop = 0;
-					rtop += obj.offsetHeight;
-					do {
-						rleft += obj.offsetLeft;
-						rtop += obj.offsetTop;
-						obj = obj.offsetParent;
-					} while (obj);
-
-					bmRight.parentNode.removeChild(bmRight);
-					bmLeft.parentNode.removeChild(bmLeft);
-
-					if ( lleft === 0 && rleft === 0 && ltop === 0 && rtop === 0 ) {
-						pos = vdSelection.parentNode(sel).getBoundingClientRect();
-						lleft = pos.left;
-						ltop = pos.top;
-						rleft = pos.right;
-						rtop = pos.bottom;
-					}
-
-					if ( parent.getAttribute("data-vedor-selectable")) {
-						pos = parent.getBoundingClientRect();
-						lleft = pos.left;
-						ltop = pos.top;
-						rleft = pos.right;
-						rtop = pos.bottom;
-
-						ltop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
-						lleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
-						rtop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
-						rleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
-					}
-
-					var top = Math.max(ltop, rtop);
-					var left = lleft + ((rleft - lleft) / 2);
-
-					var activeToolbar = activeSection.querySelectorAll("div.vedor-toolbar")[0];
-
-					newleft = left - (activeToolbar.offsetWidth/2);
-
-					if (newleft < 0) {
-						markerLeft = activeToolbar.offsetWidth/2 + newleft;
-
-						activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft + "px";
-						newleft = 0;
-					} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth) {
-						var delta = newleft + activeToolbar.offsetWidth - document.body.offsetWidth;
-						markerLeft = activeToolbar.offsetWidth/2 + delta;
-						activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft + "px";
-
-						newleft = document.body.offsetWidth - activeToolbar.offsetWidth;
-					} else {
-						activeToolbar.getElementsByClassName("marker")[0].style.left = "50%";
-					}
-
-	/*				// Move the toolbar to beneath the top of the selection if the toolbar goes out of view;
-					var fullHeight = document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight
-					if (top > (fullHeight - (activeSection.scrollHeight * 2))) {
-						mintop = Math.min(ltop, rtop);
-						mintop -= document.body.scrollTop ? document.body.scrollTop : pageYOffset;
-
-						top = fullHeight - (activeSection.scrollHeight * 2);
-						if (top < mintop) {
-							top = mintop;
-						}
-					}
-	*/
-					activeSection.style.top = top + 10 + "px"; // 80 is the height of the main vedor toolbar if the toolbars are directly under the document - not used since they moved to editorPane
-					activeSection.style.left = newleft + "px";
-
-					if (editor.context.touching) {
-						// FIXME: Android fix here
-						// restore selection triggers contextupdate, which triggers restore selection - this hopefully prevents that loop.
-						editor.context.skipUpdate = true;
-						if (!sel.collapsed) {
-							// FIXME: This reverses the
-							// current selection, which
-							// causes problems selecting
-							// from right to left; It is
-							// needed to allow text
-							// selection on android.
-							vdSelectionState.restore(sel); 
-						}
-						window.setTimeout(function() { editor.context.skipUpdate = false;}, 20);
-					}
+					window.setTimeout(function() { editor.context.skipUpdate = false;}, 20);
+				}
 			} else {
 				hideIt();
 			}
