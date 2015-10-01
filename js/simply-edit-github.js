@@ -88,22 +88,32 @@
 				editor.data.list.init(data, target);
 
 				document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-				var event; // The custom event that will be created
-				if (document.createEvent) {
-					event = document.createEvent("HTMLEvents");
-					event.initEvent("DOMContentLoaded", true, true);
-				} else {
-					event = document.createEventObject();
-					event.eventType = "DOMContentLoaded";
-				}
+				window.removeEventListener("load", preventDOMContentLoaded, true);
 
-				event.eventName = "DOMContentLoaded";
+				var fireEvent = function(evtname, target) {
+					var event; // The custom event that will be created
+					if (document.createEvent) {
+						event = document.createEvent("HTMLEvents");
+						event.initEvent(evtname, true, true);
+					} else {
+						event = document.createEventObject();
+						event.eventType = evtname;
+					}
 
-				if (document.createEvent) {
-					document.dispatchEvent(event);
-				} else {
-					document.fireEvent("on" + event.eventType, event);
-				}
+					event.eventName = evtname;
+
+					if (document.createEvent) {
+						target.dispatchEvent(event);
+					} else {
+						target.fireEvent("on" + event.eventType, event);
+					}
+				};
+
+				fireEvent("DOMContentLoaded", document);
+				window.setTimeout(function() {
+					fireEvent("load", window);
+				}, 100);
+
 				if (typeof jQuery !== "undefined") {
 					jQuery.holdReady(false);
 				}
@@ -485,6 +495,7 @@
 			toolbars : null,
 			init : function() {
 				var toolbarsContainer = document.createElement("DIV");
+				toolbarsContainer.id = "vedor-editor";
 				document.body.appendChild(toolbarsContainer);
 
 				var http = new XMLHttpRequest();
@@ -805,6 +816,7 @@
 		return false;
 	};
 	document.addEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
+	window.addEventListener("load", preventDOMContentLoaded, true);
 	if (typeof jQuery !== "undefined") {
 		jQuery.holdReady(true);
 	}
