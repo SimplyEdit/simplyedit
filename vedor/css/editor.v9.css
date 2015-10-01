@@ -44,6 +44,10 @@
 			margin-left: 0px;
 		}
 
+		#vedor-editor {
+			font-family: arial;
+		}
+
 		i.vedor-logo {
 			background-image: url('../vedor.png');
 			background-size: contain;
@@ -65,6 +69,7 @@
 			-webkit-box-shadow: 0px 0px 4px #CCC;
 			-moz-box-shadow: 0px 0px 4px #CCC;
 			box-shadow: 0px 0px 4px #CCC;
+			z-index: 1000;
 		}
 		.vedor-toolbar::after, .vedor-toolbar > ul::after, .vedor-toolbar-section > ul::after {
 			content: "";
@@ -136,11 +141,16 @@
 			position: relative;
 			min-width: 50px;
 			text-align: center;
-			font-size: 13px;
 			height: 60px;
 			font-size: 11px;
 			color: #666;
 			box-sizing: border-box;
+			font-weight: inherit;
+			letter-spacing: 0;
+			line-height: inherit;
+			text-transform: inherit;
+			font-family: inherit;
+			box-shadow: inherit;			
 		}
 		.vedor-toolbar button > i,
 		.vedor-toolbar button > span.fa-stack {
@@ -181,6 +191,7 @@
 		}
 		section.vedor-section.active {
 			opacity: 1;
+			z-index: 100000;
 		}
 		section.vedor-section {
 			position: absolute;
@@ -255,7 +266,9 @@
 			display: inline-block;
 			font-weight: normal;
 			padding-left: 10px;
+			margin: inherit;
 			margin-left: -80px;
+			color: inherit;
 		}
 		.vedor-toolbar-section input,
 		.vedor-toolbar-section select {
@@ -269,6 +282,9 @@
 			line-height: 22px;
 			min-height: 22px;
 			width: 100%;
+			font-family: inherit;
+			font-size: inherit;
+			display: inline-block;
 		}
 		.vedor-toolbar-section select {
 			padding: 4px 0px;
@@ -342,6 +358,7 @@
 		li.vedor-text-format {
 			line-height: 32px;
 			vertical-align: top;
+			width: 100%;
 		}
 
 		input[type="number"] {
