@@ -387,8 +387,15 @@
 					rleft = pos.right;
 					rtop = pos.bottom;
 				}
+
+				ltop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
+				lleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
+				rtop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
+				rleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
+
 				top = Math.max(ltop, rtop);
 				left = lleft + ((rleft - lleft) / 2);
+
 				return { top: top, left: left, ltop: ltop, lleft: lleft, rtop: rtop, rleft: rleft };
 			},
 			reposition : function() {
