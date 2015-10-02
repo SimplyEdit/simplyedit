@@ -1,0 +1,211 @@
+<section id="vedor-image-browse" class="vedor-dialog">
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button data-vedor-action="vedor-image-browse-filter-same-size"><i class="fa fa-filter"></i>Same size only</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+	</div>
+	<div class="vedor-dialog-body">
+	</div>
+</section>
+<style type="text/css">
+	#vedor-image-browse {
+		top: 50%;
+		height: 400px;
+		max-height: 80%;
+		margin-top: -200px;
+		left: 50%;
+		margin-left: -235px;
+		background-color: #EEE;
+		padding-top: 61px;
+		box-sizing: border-box;
+	}
+	#vedor-image-browse.fullscreen {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	#vedor-image-browse .vedor-dialog-body {
+		overflow-y: scroll;
+		padding: 0px;
+		width: 470px;
+		padding-left: 2px;
+	}
+	#vedor-image-browse.fullscreen .vedor-dialog-body {
+		width: 100%;
+	}
+	#vedor-image-browse .vedor-dialog-body button {
+		border: 1px solid #eee;
+		background-color: white;
+		height: 149px;
+		width: 149px;
+		font-family: inherit;
+		font-size: 20px;
+		position: relative;
+		padding: 5px;
+		color: #999;
+		display: inline-block;
+		vertical-align: top;
+	}
+	#vedor-image-browse .vedor-dialog-body button:before {
+		display: block;
+		content: '';
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		height: 100%;
+		width: 100%;
+	}
+        #vedor-image-browse .vedor-dialog-body button i {
+		font-size: 48px;
+		display: block;
+		width: 100%;
+		text-align: center;
+	}
+	#vedor-image-browse .vedor-dialog-body button img {
+		max-width: 100%;
+		max-height: 100%;
+	}
+
+	@media (max-width: 481px) {
+		#vedor-image-browse {
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+			width: auto;
+			margin-left: 0px;
+			margin-top: 0px;
+		}
+		#vedor-image-browse [data-vedor-action="vedor-image-browse-fullscreen"] {
+			display: none;
+		}
+		#vedor-image-browse .vedor-dialog-body {
+			max-width: 100%;
+		}
+		#vedor-image-browse .vedor-dialog-body button {
+			width: 50%;
+		}
+	}
+</style>
+<script>
+	editor.plugins.imageBrowse = {
+		currentSel : null,
+		currentField : null,
+		currentJail : null,
+		dialog : {
+			open : function() {
+				editor.plugins.imageBrowse.currentSel = vdSelectionState.get();
+				editor.plugins.imageBrowse.currentField = editor.node.getEditableField();
+				editor.plugins.imageBrowse.currentJail = null;
+
+				vdSelectionState.save(editor.plugins.imageBrowse.currentSel);
+				editor.plugins.dialog.open(document.getElementById('vedor-image-browse'), editor.plugins.imageBrowse.dialog.update);
+			},
+			fullscreen : function() {
+				var fullscreen = document.querySelector("[data-vedor-action=vedor-image-browse-fullscreen]");
+				if (document.getElementById('vedor-image-browse').classList.contains("fullscreen")) {
+					fullscreen.classList.remove("vedor-selected");
+					document.getElementById('vedor-image-browse').classList.remove("fullscreen");
+					document.body.classList.remove("vedor-overflow-hidden");
+				} else {
+					fullscreen.classList.add("vedor-selected");
+					document.getElementById('vedor-image-browse').classList.add("fullscreen");
+					document.body.classList.add("vedor-overflow-hidden");
+				}
+			},
+			loadImages : function(url) {
+				var targetList = document.querySelector("#vedor-image-browse .vedor-dialog-body");
+				var iframe = document.createElement("IFRAME");
+				iframe.src = url;
+				iframe.style.opacity = 0;
+				iframe.style.position = "absolute";
+				iframe.style.left = "-10000px";
+				iframe.addEventListener("load", function() {
+					if (editor.plugins.imageBrowse.currentJail === null) {
+						editor.plugins.imageBrowse.currentJail = iframe.contentDocument.location.href;
+					}
+
+					newHtml = '';
+					var images = iframe.contentDocument.body.querySelectorAll("a");
+					for (var i=0; i<images.length; i++) {
+						href = images[i].getAttribute("href");
+						if (href.substring(0, 1) === "?") {
+							continue;
+						}
+
+						var targetUrl = images[i].href;
+						if (targetUrl.indexOf(editor.plugins.imageBrowse.currentJail) === 0) {
+							if (href.substring(href.length-1, href.length) === "/") {
+								newHtml += "<button data-vedor-action='vedor-image-browse-directory' data-value='" + targetUrl + "'><i class='fa fa-folder'></i>" + images[i].innerHTML + "</button>";
+							} else {
+								newHtml += "<button data-vedor-action='vedor-image-browse-insert'><img src='" + targetUrl + "'></button>";
+							}
+						}
+					}
+					targetList.innerHTML = newHtml;
+					targetList.scrollTop = 0;
+					document.querySelector("#vedor-image-browse [data-vedor-action=vedor-image-browse-filter-same-size]").classList.remove("vedor-selected");
+				});
+				targetList.appendChild(iframe);
+			},
+			update : function() {
+				// var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
+				editor.plugins.imageBrowse.dialog.loadImages("img/");
+			}
+		},
+		init : function() {
+			var button = document.createElement("LI");
+			button.innerHTML = '<button data-vedor-action="vedor-image-browse"><i class="fa fa-folder"></i>Browse</button>';
+			document.querySelector("#vedor-image .vedor-toolbar .vedor-buttons").appendChild(button);
+		}
+	};
+
+	editor.addAction("vedor-image-browse", editor.plugins.imageBrowse.dialog.open);
+	editor.addAction("vedor-image-browse-directory", function(el) {
+		editor.plugins.imageBrowse.dialog.loadImages(el.dataset.value);
+	});
+	editor.addAction("vedor-image-browse-insert", function(el) {
+		var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
+		parent.setAttribute("src", el.querySelector("img").getAttribute("src"));
+		editor.plugins.dialog.close();
+	});
+	editor.addAction("vedor-image-browse-filter-same-size", function(el) {
+		var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
+		var currentWidth = parent.naturalWidth;
+		var currentHeight = parent.naturalHeight;
+		var targetList = document.querySelector("#vedor-image-browse .vedor-dialog-body");
+		var imageList = targetList.querySelectorAll("button img");
+		if (el.classList.contains("vedor-selected")) {
+			for (var i=0; i<imageList.length; i++) {
+				imageList[i].parentNode.style.display = "inline-block";
+			}
+			el.classList.remove("vedor-selected");
+		} else {
+			for (var i=0; i<imageList.length; i++) {
+				if (
+					imageList[i].naturalWidth == parent.naturalWidth &&
+					imageList[i].naturalHeight == parent.naturalHeight
+				) {
+					imageList[i].parentNode.style.display = "inline-block";
+				} else {
+					imageList[i].parentNode.style.display = "none";
+				}
+			}
+			el.classList.add("vedor-selected");
+		}
+	});
+
+	editor.plugins.imageBrowse.init();
+</script>

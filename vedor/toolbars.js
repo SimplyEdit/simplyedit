@@ -346,7 +346,7 @@
 				var parent = vdSelection.getNode(sel);
 				if ( !rects.length ) {
 					// insert element at range and get its position, other options aren't exact enough
-					var span = vdEditPane.contentDocument.createElement('span');
+					var span = document.createElement('span');
 					if ( span.getClientRects ) {
 						// Ensure span has dimensions and position by
 						// adding a zero-width space character
@@ -620,18 +620,24 @@
 	editor.plugins.dialog = {
 		backdrop : null,
 		open : function(target, callback) {
+			vdSelectionState.save();
 			if (!editor.plugins.dialog.backdrop) {
 				editor.plugins.dialog.createBackdrop();
 			}
+			document.body.classList.add("vedor-overflow-hidden");
 			editor.plugins.dialog.backdrop.style.display = "block";
 			target.classList.add("active");
 			if (typeof callback == "function") {
 				callback();
 			}
 		},
-		close : function(target, callback) {
+		close : function(callback) {
+			target = document.querySelector(".vedor-dialog.active");
 			editor.plugins.dialog.backdrop.style.display = "none";
+			document.body.classList.remove("vedor-overflow-hidden");
 			target.classList.remove("active");
+			vdSelectionState.restore();
+			vdSelectionState.remove();
 			if (typeof callback == "function") {
 				callback();
 			}
@@ -653,7 +659,25 @@
 				editor.plugins.dialog.backdrop = backdrop;
 			}
 		},
+		fullscreen : function(button) {
+			var dialog = editor.plugins.dialog.getDialogEl(button);
+			if (dialog.classList.contains("fullscreen")) {
+				button.classList.remove("vedor-selected");
+				dialog.classList.remove("fullscreen");
+			} else {
+				button.classList.add("vedor-selected");
+				dialog.classList.add("fullscreen");
+			}
+		},
+		getDialogEl : function(el) {
+			while ( el && el.tagName!='div' && !/\bvedor-dialog\b/.test(el.className) ) {
+				el = el.parentNode;
+			}
+			return el;
+		}
 	};
+	editor.addAction("vedor-dialog-fullscreen", editor.plugins.dialog.fullscreen);
+	editor.addAction("vedor-dialog-close", editor.plugins.dialog.close);
 
 	vdHideToolbars = false;
 

@@ -298,6 +298,15 @@
 						dataLists[i].addEventListener("keydown", editor.data.list.keyDownHandler);
 					}
 				},
+				fixFirstElementChild : function(clone) {
+					if (!("firstElementChild" in clone)) {
+						for (var l=0; l<clone.childNodes.length; l++) {
+							if (clone.childNodes[l].nodeType == 1) {
+								clone.firstElementChild = clone.childNodes[l];
+							}
+						}
+					}
+				},
 				parseTemplates : function(list) {
 					var dataName = list.getAttribute("data-vedor-list");
 					var dataPath = list.getAttribute("data-vedor-path") ? list.getAttribute("data-vedor-path") : location.pathname;
@@ -355,16 +364,6 @@
 						}
 					};
 
-					var fixFirstElementChild = function(clone) {
-						if (!("firstElementChild" in clone)) {
-							for (var l=0; l<clone.childNodes.length; l++) {
-								if (clone.childNodes[l].nodeType == 1) {
-									clone.firstElementChild = clone.childNodes[l];
-								}
-							}
-						}
-					};
-
 					for (j=0; j<listData.length; j++) {
 						var requestedTemplate = listData[j]["data-vedor-template"];
 						if (!list.templates[requestedTemplate]) {
@@ -379,7 +378,7 @@
 						if ("importNode" in document) {
 							clone = document.importNode(list.templates[requestedTemplate].content, true);
 							initFields(clone);
-							fixFirstElementChild(clone);
+							editor.data.list.fixFirstElementChild(clone);
 							if (list.templates.length > 1) {
 								clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
 							}
@@ -391,7 +390,7 @@
 							for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
 								clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
 								initFields(clone);
-								fixFirstElementChild(clone);
+								editor.data.list.fixFirstElementChild(clone);
 
 								if (list.templates.length > 1) {
 									clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);

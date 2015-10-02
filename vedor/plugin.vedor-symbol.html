@@ -1,8 +1,8 @@
 <section id="vedor-symbol" class="vedor-dialog">
 	<div class="vedor-toolbar">
 		<ul class="vedor-buttons">
-			<li class='vedor-right'><button data-vedor-action="vedor-symbol-close"><i class="fa fa-times"></i>Cancel</button></li>
-			<li class='vedor-right'><button data-vedor-action="vedor-symbol-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
 		</ul>
 	</div>
 	<div class="vedor-dialog-body">
@@ -75,28 +75,7 @@
 			open : function() {
 				editor.plugins.symbol.currentSel = vdSelectionState.get();
 				editor.plugins.symbol.currentField = editor.node.getEditableField();
-				vdSelectionState.save(editor.plugins.symbol.currentSel);
 				editor.plugins.dialog.open(document.getElementById('vedor-symbol'), editor.plugins.symbol.dialog.update);
-			},
-			close : function() {
-				editor.plugins.dialog.close(
-					document.getElementById('vedor-symbol'),
-					function() {
-						vdSelectionState.restore();
-						vdSelectionState.remove();
-					}
-				);
-			},
-			fullscreen : function() {
-				var fullscreen = document.querySelector("[data-vedor-action=vedor-symbol-fullscreen]");
-				if (document.getElementById('vedor-symbol').classList.contains("fullscreen")) {
-					fullscreen.classList.remove("vedor-selected");
-					document.getElementById('vedor-symbol').classList.remove("fullscreen");
-				} else {
-					fullscreen.classList.add("vedor-selected");
-					document.getElementById('vedor-symbol').classList.add("fullscreen");
-					document.body.style.overflow = "hidden";
-				}
 			},
 			update : function() {
 				var parent = vdSelection.getNode(editor.plugins.symbol.currentSel);
@@ -124,14 +103,12 @@
 	};
 
 	editor.addAction("vedor-symbol", editor.plugins.symbol.dialog.open);
-	editor.addAction("vedor-symbol-close", editor.plugins.symbol.dialog.close);
-	editor.addAction("vedor-symbol-fullscreen", editor.plugins.symbol.dialog.fullscreen);
 	editor.addAction("vedor-symbol-insert", function(el) {
 		if (!editor.plugins.symbol.currentSel.collapsed) {
 			editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
 		}
 		vdSelection.setHTMLText(editor.plugins.symbol.currentSel, "&#" + el.dataset.value + ";");
-		editor.plugins.symbol.dialog.close();
+		editor.plugins.dialog.close();
 	});
 
 	var inserts = document.querySelectorAll(".vedor-toolbar-section.vedor-insert > ul");
