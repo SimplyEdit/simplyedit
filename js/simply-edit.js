@@ -714,18 +714,9 @@
 			},
 			textonly : function(target) {
 				var textonly = target.querySelectorAll("[data-vedor-content='text']");
-				var unwrap = function(el, target) {
-					if ( !target ) {
-						target = el.parentNode;
-					}
-					while (el.firstChild) {
-						target.insertBefore(el.firstChild, el);
-					}
-					el.parentNode.removeChild(el);
-				};
 				var preventNodeInsert = function(evt) {
 					if (evt.target.tagName) {
-						unwrap(evt.target);
+						editor.node.unwrap(evt.target);
 					}
 				};
 

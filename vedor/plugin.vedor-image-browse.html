@@ -104,6 +104,7 @@
 		currentSel : null,
 		currentField : null,
 		currentJail : null,
+		path : 'img/',
 		dialog : {
 			open : function() {
 				editor.plugins.imageBrowse.currentSel = vdSelectionState.get();
@@ -162,7 +163,7 @@
 			},
 			update : function() {
 				// var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
-				editor.plugins.imageBrowse.dialog.loadImages("img/");
+				editor.plugins.imageBrowse.dialog.loadImages(editor.plugins.imageBrowse.path);
 			}
 		},
 		init : function() {

@@ -256,6 +256,15 @@
 				elms[i].classList.remove(source);
 				elms[i].setAttribute("style", target);
 			}
+		},
+		unwrap : function(el, target) {
+			if ( !target ) {
+				target = el.parentNode;
+			}
+			while (el.firstChild) {
+				target.insertBefore(el.firstChild, el);
+			}
+			el.parentNode.removeChild(el);
 		}
 	};
 
