@@ -71,18 +71,23 @@
 			var template = list.templates[templateName];
 			if (template) {
 				var newNode = document.importNode(template.content, true);
+
 				editor.data.list.init({}, newNode);
 
 				editor.editmode.editable(newNode);
+				editor.data.list.fixFirstElementChild(newNode);
+				editor.data.list.fixFirstElementChild(list);
+
 				newNode.firstElementChild.dataset.vedorTemplate = templateName;
 				newNode.firstElementChild.dataset.vedorListItem = true;
 				newNode.firstElementChild.dataset.vedorSelectable = true;
 
 				var listItems = list.querySelectorAll(":scope > [data-vedor-list-item]");
+
 				if (listItems.length) {
-					list.insertBefore(newNode.children[0], listItems[listItems.length-1].nextSibling);
+					list.insertBefore(newNode.firstElementChild, listItems[listItems.length-1].nextSibling);
 				} else {
-					list.insertBefore(newNode.children[0], list.firstElementChild);
+					list.insertBefore(newNode.firstElementChild, list.firstElementChild);
 				}
 				list.classList.remove("vedor-empty");
 				list.appendChild(newNode);
