@@ -256,6 +256,15 @@
 				elms[i].classList.remove(source);
 				elms[i].setAttribute("style", target);
 			}
+		},
+		unwrap : function(el, target) {
+			if ( !target ) {
+				target = el.parentNode;
+			}
+			while (el.firstChild) {
+				target.insertBefore(el.firstChild, el);
+			}
+			el.parentNode.removeChild(el);
 		}
 	};
 
@@ -407,7 +416,7 @@
 				var activeSection = document.getElementById(currentContext);
 				var pos = editor.context.toolbar.getPosition(sel);
 				if ( !pos || !activeSection ) {
-					hideToolbar(true);
+					// editor.context.toolbar.hide = true;
 					return;
 				}
 				var top = pos.top;
@@ -434,8 +443,12 @@
 				// - if toolbar can be repositioned, no problem
 				// - if edit pane content can be scrolled down, no problem
 				// - else: add space on the bottom so that you can scroll down
-				var editPaneRect = document.body.getBoundingClientRect();
+				var editPaneRect = {
+					height : document.body.scrollTop + window.innerHeight
+				};
+
 				var toolbarRect = activeSection.getBoundingClientRect();
+
 				if ( top + toolbarRect.height > editPaneRect.height ) {
 					// toolbar extends beyond bottom edge if not repositioned
 					var mintop = Math.min(pos.ltop, pos.rtop);
@@ -726,7 +739,7 @@
 
 		muze.event.attach( document, 'selectionchange', editor.context.update );
 		muze.event.attach( document, 'keyup', editor.context.update );
-
+		muze.event.attach( document, 'scroll', editor.context.toolbar.reposition );
 		muze.event.attach( document, 'touchstart', function(evt) {
 			editor.context.touching = true;
 		});

@@ -714,18 +714,9 @@
 			},
 			textonly : function(target) {
 				var textonly = target.querySelectorAll("[data-vedor-content='text']");
-				var unwrap = function(el, target) {
-					if ( !target ) {
-						target = el.parentNode;
-					}
-					while (el.firstChild) {
-						target.insertBefore(el.firstChild, el);
-					}
-					el.parentNode.removeChild(el);
-				};
 				var preventNodeInsert = function(evt) {
 					if (evt.target.tagName) {
-						unwrap(evt.target);
+						editor.node.unwrap(evt.target);
 					}
 				};
 
@@ -756,7 +747,7 @@
 
 					var toolbarHeight = document.getElementById("vedor-main-toolbar").offsetHeight;
 
-					style.innerHTML = "html:before { display: block; background-color: green; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
+					style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
 				};
 
 				// create an observer instance

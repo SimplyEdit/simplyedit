@@ -134,7 +134,16 @@
 			editor.node.replaceClassToStyle("vedor-text-align-center", "text-align: center;");
 			editor.node.replaceClassToStyle("vedor-text-align-justify", "text-align: justify;");
 
+			// FIXME: Extend this to only allow specific node types on specific commands;
+			var preventNodeInsert = function(evt) {
+				if (evt.target.tagName && (evt.target.tagName.toLowerCase() == "span")) {
+					editor.node.unwrap(evt.target);
+				}
+			};
+
+			target.addEventListener("DOMNodeInserted", preventNodeInsert);
 			target.execCommand(command, false, value);
+			target.removeEventListener("DOMNodeInserted", preventNodeInsert);
 
 			editor.node.replaceTags("I", "EM");
 			editor.node.replaceTags("B", "STRONG");
