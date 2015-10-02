@@ -3,8 +3,8 @@
 		<ul class="vedor-buttons">
 			<li><button data-vedor-action="vedor-htmlsource-selectall"><i class="fa fa-quote-right"></i>Select field</button></li>
 			<li><button data-vedor-action="vedor-htmlsource-editable"><i class="fa fa-lock"></i>Source is static</button></li>
-			<li class='vedor-right'><button data-vedor-action="vedor-htmlsource-close"><i class="fa fa-times"></i>Cancel</button></li>
-			<li class='vedor-right'><button data-vedor-action="vedor-htmlsource-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
 		</ul>
 	</div>
 	<div class="vedor-dialog-body">
@@ -128,7 +128,7 @@
 				}
 				document.getElementById('vdInsertHTMLSource').select();
 
-				var fullscreen = document.querySelector("[data-vedor-action=vedor-htmlsource-fullscreen]");
+				var fullscreen = document.querySelector("[data-vedor-action=vedor-dialog-fullscreen]");
 				if (document.getElementById('vedor-htmlsource').classList.contains("fullscreen")) {
 					fullscreen.classList.add("vedor-selected");
 				} else {
@@ -141,21 +141,12 @@
 				vdSelectionState.save(editor.plugins.htmlsource.currentSel);
 
 				editor.plugins.dialog.open(document.getElementById('vedor-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
-				editor.plugins.htmlsource.dialog.resize();
+				editor.plugins.htmlsource.dialog.setWarning();
+
+				vdSelectionState.selectAll = false;
+				vdSelectionState.selectedElement = false;
 			},
-			close : function() {
-				editor.plugins.dialog.close(
-					document.getElementById('vedor-htmlsource'),
-					function() {
-						vdSelectionState.restore();
-						vdSelectionState.remove();
-						vdSelectionState.selectAll = false;
-						vdSelectionState.selectedElement = false;
-						vdEditPane_DisplayChanged();
-					}
-				);
-			},
-			resize : function() {
+			setWarning : function() {
 				var button = document.querySelector("[data-vedor-action=vedor-htmlsource-editable]");
 				if (button && button.classList.contains("vedor-selected")) {
 					document.getElementById('vdInsertHTMLWarning').style.display='block';
@@ -207,14 +198,12 @@
 			}
 			vdSelectionState.selectAll = false;
 			editor.plugins.htmlsource.currentField = false;
-			editor.plugins.htmlsource.dialog.close();
+			editor.plugins.dialog.close();
 		}
 	};
 
 	editor.addAction("vedor-insert-source", editor.plugins.htmlsource.dialog.open);
 	editor.addAction("vedor-edit-source", editor.plugins.htmlsource.dialog.open);
-	editor.addAction("vedor-htmlsource-close", editor.plugins.htmlsource.dialog.close);
 	editor.addAction("vedor-htmlsource-selectall", editor.plugins.htmlsource.selectAll);
 	editor.addAction("vedor-htmlsource-insert", editor.plugins.htmlsource.insert);
-	editor.addAction("vedor-htmlsource-fullscreen", editor.plugins.htmlsource.dialog.fullscreen);
 </script>

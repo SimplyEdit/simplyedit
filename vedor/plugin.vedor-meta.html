@@ -2,8 +2,8 @@
 	<div class="vedor-toolbar">
 		<ul class="vedor-buttons">
 			<li><button class="vedor-expands vedor-selected" data-vedor-action="vedor-metadata" data-vedor-section="vedor-metadata"><i class="fa fa-clone fa-flip-horizontal"></i>Meta tags</li>
-			<li class='vedor-right'><button data-vedor-action="vedor-meta-close"><i class="fa fa-times"></i>Cancel</button></li>
-			<li class='vedor-right'><button data-vedor-action="vedor-meta-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
 		</ul>
 		<div class="vedor-toolbar-section vedor-metadata vedor-selected">
 			<div class="field">
@@ -85,7 +85,7 @@
 	#vedor-meta .vedor-metadata .field label {
 		margin-left: -120px;
 		display: inline-block;
-		width: 120px;
+		width: 95px;
 		vertical-align: top;
 		margin-top: 12px;
 	}
@@ -114,27 +114,7 @@
 	editor.plugins.meta = {
 		dialog : {
 			open : function() {
-				vdSelectionState.save();
 				editor.plugins.dialog.open(document.getElementById('vedor-meta'), editor.plugins.meta.dialog.update);
-			},
-			close : function() {
-				editor.plugins.dialog.close(
-					document.getElementById('vedor-meta'),
-					function() {
-						vdSelectionState.restore();
-						vdSelectionState.remove();
-					}
-				);
-			},
-			fullscreen : function() {
-				var fullscreen = document.querySelector("[data-vedor-action=vedor-meta-fullscreen]");
-				if (document.getElementById('vedor-meta').classList.contains("fullscreen")) {
-					fullscreen.classList.remove("vedor-selected");
-					document.getElementById('vedor-meta').classList.remove("fullscreen");
-				} else {
-					fullscreen.classList.add("vedor-selected");
-					document.getElementById('vedor-meta').classList.add("fullscreen");
-				}
 			},
 			update : function() {
 				var title = document.head.querySelector("title") ? document.head.querySelector("title").innerHTML : "";
@@ -174,7 +154,7 @@
 			}
 
 			editor.plugins.meta.setMeta("robots", instructions.join(","));
-			editor.plugins.meta.dialog.close();
+			editor.plugins.dialog.close();
 		},
 		setTitle : function(value) {
 			var title = document.head.querySelector("title");
@@ -212,7 +192,5 @@
 		el.classList.toggle('vedor-selected');
 	});
 	editor.addAction("vedor-meta", editor.plugins.meta.dialog.open);
-	editor.addAction("vedor-meta-close", editor.plugins.meta.dialog.close);
 	editor.addAction("vedor-meta-apply", editor.plugins.meta.apply);
-	editor.addAction("vedor-meta-fullscreen", editor.plugins.meta.dialog.fullscreen);
 </script>
