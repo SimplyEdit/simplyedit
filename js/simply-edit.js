@@ -747,7 +747,7 @@
 
 					var toolbarHeight = document.getElementById("vedor-main-toolbar").offsetHeight;
 
-					style.innerHTML = "html:before { display: block; background-color: green; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
+					style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
 				};
 
 				// create an observer instance
