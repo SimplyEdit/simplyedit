@@ -81,7 +81,7 @@ QUnit.module("editor field get");
 			src : "http://www.muze.nl/logo.gif",
 			title : "Title",
 			alt : "Alt",
-			class : "class test"
+			"class" : "class test"
 		};
 		editor.field.set(field, data);
 		var result = editor.field.get(field);
@@ -90,7 +90,7 @@ QUnit.module("editor field get");
 		assert.equal(result.src, data.src, "result is same as inserted data");
 		assert.equal(result.title, data.title, "result is same as inserted data");
 		assert.equal(result.alt, data.alt, "result is same as inserted data");
-		assert.equal(result.class, data.class, "result is same as inserted data");
+		assert.equal(result["class"], data["class"], "result is same as inserted data");
 	});
 
 	QUnit.test("field get img data", function(assert) {
@@ -113,7 +113,7 @@ QUnit.module("editor field get");
 			href : "http://www.muze.nl/logo.gif",
 			title : "Title",
 			alt : "Alt",
-			class : "class test",
+			"class" : "class test",
 			innerHTML : "Hello"
 		};
 		editor.field.set(field, data);
@@ -123,7 +123,7 @@ QUnit.module("editor field get");
 		assert.equal(result.href, data.href, "result is same as inserted data");
 		assert.equal(result.title, data.title, "result is same as inserted data");
 		assert.equal(result.alt, data.alt, "result is same as inserted data");
-		assert.equal(result.class, data.class, "result is same as inserted data");
+		assert.equal(result['class'], data['class'], "result is same as inserted data");
 		assert.equal(result.innerHTML, data.innerHTML, "result is same as inserted data");
 	});
 
@@ -215,7 +215,7 @@ QUnit.module("editor data apply");
 			}
 		};
 		editor.data.apply(data, target);
-		assert.notOk(document.querySelector("#testContent ul").classList.contains("vedor-empty"), "vedor-empty is set on empty list");
+		assert.notOk(document.querySelector("#testContent ul").className.match(/vedor-empty/), "vedor-empty is set on empty list");
 		assert.equal(document.querySelector("#testContent ul > li").innerHTML, "Home", "Home item was found");
 		assert.equal(document.querySelector("#testContent ul > li + li").innerHTML, "Second item", "Second item was found");
 	});
@@ -231,7 +231,7 @@ QUnit.module("editor data apply");
 		};
 		editor.data.apply(data, target);
 
-		assert.ok(document.querySelector("#testContent ul").classList.contains("vedor-empty"), "vedor-empty is set on empty list");
+		assert.ok(document.querySelector("#testContent ul").className.match(/vedor-empty/), "vedor-empty is set on empty list");
 	});
 
 	QUnit.test("apply 2nd degree list", function(assert) {
