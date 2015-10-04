@@ -138,6 +138,12 @@
 			} else {
 				document.head.removeChild(metaTag);
 			}
+		},
+		init : function() {
+			var button = document.createElement("button");
+			button.dataset.vedorAction = "vedor-template";
+			button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
+			document.querySelector("#vedor-main-toolbar .vedor-buttons").appendChild(button);
 		}
 	};
 
@@ -147,4 +153,5 @@
 
 	editor.addAction("vedor-template", editor.plugins.pageTemplate.dialog.open);
 	editor.addAction("vedor-template-apply", editor.plugins.pageTemplate.apply);
+	editor.plugins.pageTemplate.init();
 </script>
