@@ -122,15 +122,12 @@
 				var data = {};
 				var dataName, dataPath, dataFields, dataLists, listItems;
 
-				target.dataset.vedorGetData = 1;
-
-				dataLists = target.parentNode.querySelectorAll(":scope [data-vedor-get-data][data-vedor-list],:scope [data-vedor-get-data] [data-vedor-list]");
-				for (i=0; i<dataLists.length; i++) {
-					if (dataLists[i].dataset.vedorStashed) {
-						continue;
+				var addListData = function(list) {
+					if (list.dataset.vedorStashed) {
+						return;
 					}
-					dataName = dataLists[i].dataset.vedorList;
-					dataPath = dataLists[i].dataset.vedorPath ? dataLists[i].dataset.vedorPath : location.pathname;
+					dataName = list.dataset.vedorList;
+					dataPath = list.dataset.vedorPath ? list.dataset.vedorPath : location.pathname;
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -140,43 +137,63 @@
 						data[dataPath][dataName] = [];
 					}
 
-					listItems = dataLists[i].querySelectorAll(":scope > [data-vedor-list-item]");
+					listItems = list.querySelectorAll("[data-vedor-list-item]");
+					var counter = 0;
 					for (j=0; j<listItems.length; j++) {
-						if (!data[dataPath][dataName][j]) {
-							data[dataPath][dataName][j] = {};
+						if (listItems[j].parentNode != list) {
+							continue;
+						}
+
+						if (!data[dataPath][dataName][counter]) {
+							data[dataPath][dataName][counter] = {};
 						}
 						var subData = editor.data.get(listItems[j]);
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
 								console.log("Notice: use of data-vedor-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
 							}
-							data[dataPath][dataName][j] = subData[subPath];
+							data[dataPath][dataName][counter] = subData[subPath];
 						}
-						// data[dataPath][dataName][j] = editor.data.get(listItems[j]);
+						// data[dataPath][dataName][counter] = editor.data.get(listItems[j]);
 						if (listItems[j].dataset.vedorTemplate) {
-							data[dataPath][dataName][j]['data-vedor-template'] = listItems[j].dataset.vedorTemplate;
+							data[dataPath][dataName][counter]['data-vedor-template'] = listItems[j].dataset.vedorTemplate;
 						}
+						counter++;
 					}
-					dataLists[i].dataset.vedorStashed = 1;
-				}
+					list.dataset.vedorStashed = 1;
+				};
 
-				dataFields = target.parentNode.querySelectorAll(":scope [data-vedor-get-data][data-vedor-field],:scope [data-vedor-get-data] [data-vedor-field]");
-				for (i=0; i<dataFields.length; i++) {
-					if (dataFields[i].dataset.vedorStashed) {
-						continue;
+				var addData = function(field) {
+					if (field.dataset.vedorStashed) {
+						return;
 					}
 
-					dataName = dataFields[i].dataset.vedorField;
-					dataPath = dataFields[i].dataset.vedorPath ? dataFields[i].dataset.vedorPath : location.pathname;
+					dataName = field.dataset.vedorField;
+					dataPath = field.dataset.vedorPath ? field.dataset.vedorPath : location.pathname;
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
 
-					data[dataPath][dataName] = editor.field.get(dataFields[i]);
-					dataFields[i].dataset.vedorStashed = 1;
+					data[dataPath][dataName] = editor.field.get(field);
+					field.dataset.vedorStashed = 1;
+				};
+
+				dataLists = target.querySelectorAll("[data-vedor-list]");
+				for (i=0; i<dataLists.length; i++) {
+					addListData(dataLists[i]);
 				}
-				delete target.dataset.vedorGetData;
+				if (target.dataset.vedorList) {
+					addListData(target);
+				}
+
+				dataFields = target.querySelectorAll("[data-vedor-field]");
+				for (i=0; i<dataFields.length; i++) {
+					addData(dataFields[i]);
+				}
+				if (target.dataset.vedorField) {
+					addData(target);
+				}
 
 				return data;
 			},
@@ -271,7 +288,13 @@
 							editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
 						}
 
-						if (!dataLists[i].querySelector(":scope > [data-vedor-list-item]")) {
+						var hasChild = false;
+						for (var j=0; j<dataLists[i].childNodes.length; j++) {
+							if (dataLists[i].childNodes[j].getAttribute("data-vedor-list-item")) {
+								hasChild = true;
+							}
+						}
+						if (!hasChild) {
 							dataLists[i].classList.add("vedor-empty");
 						}
 						dataLists[i].addEventListener("keydown", editor.data.list.keyDownHandler);
@@ -340,7 +363,13 @@
 								editor.data.list.applyTemplates(dataLists[k], listData[j][dataName]);
 							}
 
-							if (!dataLists[k].querySelector(":scope > [data-vedor-list-item]")) {
+							var hasChild = false;
+							for (var m=0; m<dataLists[k].childNodes.length; m++) {
+								if (dataLists[k].childNodes[m].getAttribute("data-vedor-list-item")) {
+									hasChild = true;
+								}
+							}
+							if (!hasChild) {
 								dataLists[k].classList.add("vedor-empty");
 							}
 						}
