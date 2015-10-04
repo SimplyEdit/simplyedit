@@ -90,8 +90,10 @@
 
 				editor.data.list.init(data, target);
 
-				document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-				window.removeEventListener("load", preventDOMContentLoaded, true);
+				if ("removeEventListener" in document) {
+					document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
+					window.removeEventListener("load", preventDOMContentLoaded, true);
+				}
 
 				var fireEvent = function(evtname, target) {
 					var event; // The custom event that will be created
@@ -108,10 +110,11 @@
 					if (document.createEvent) {
 						target.dispatchEvent(event);
 					} else {
-						target.fireEvent("on" + event.eventType, event);
+						// target.fireEvent("on" + event.eventType, event);
 					}
 				};
 
+				
 				fireEvent("DOMContentLoaded", document);
 				window.setTimeout(function() {
 					fireEvent("load", window);
@@ -307,7 +310,9 @@
 								dataLists[i].className += " vedor-empty";
 							}
 						}
-						dataLists[i].addEventListener("keydown", editor.data.list.keyDownHandler);
+						if ("addEventListener" in dataLists[i]) {
+							dataLists[i].addEventListener("keydown", editor.data.list.keyDownHandler);
+						}
 					}
 				},
 				fixFirstElementChild : function(clone) {
@@ -354,41 +359,57 @@
 				applyTemplates : function(list, listData) {
 					var e,j,k,l;
 					var dataName;
+					var t, counter;
 
 					var initFields = function(clone) {
-						var dataName;
-						var dataFields = clone.querySelectorAll("[data-vedor-field]");
-						for (k=0; k<dataFields.length; k++) {
-							dataName = dataFields[k].getAttribute("data-vedor-field");
-							if (listData[j][dataName]) {
-								editor.field.set(dataFields[k], listData[j][dataName]);
-							}
-						}
 
-						var dataLists = clone.querySelectorAll("[data-vedor-list]");
-						for (k=0; k<dataLists.length; k++) {
-							editor.data.list.parseTemplates(dataLists[k]);
-							dataName = dataLists[k].getAttribute("data-vedor-list");
+						var handleFields = function(elm) {
+							dataName = elm.getAttribute("data-vedor-field");
 							if (listData[j][dataName]) {
-								editor.data.list.applyTemplates(dataLists[k], listData[j][dataName]);
+								editor.field.set(elm, listData[j][dataName]);
+							}
+						};
+
+						var handleLists = function(elm) {
+							editor.data.list.parseTemplates(elm);
+							dataName = elm.getAttribute("data-vedor-list");
+							if (listData[j][dataName]) {
+								editor.data.list.applyTemplates(elm, listData[j][dataName]);
 							}
 
 							var hasChild = false;
-							for (var m=0; m<dataLists[k].childNodes.length; m++) {
+							for (var m=0; m<elm.childNodes.length; m++) {
 								if (
-									dataLists[k].childNodes[j].nodeType == 1 &&
-									dataLists[k].childNodes[m].getAttribute("data-vedor-list-item")
+									elm.childNodes[m].nodeType == 1 &&
+									elm.childNodes[m].getAttribute("data-vedor-list-item")
 								) {
 									hasChild = true;
 								}
 							}
 							if (!hasChild) {
-								if ("classList" in dataLists[k]) {
-									dataLists[k].classList.add("vedor-empty");
+								if ("classList" in elm) {
+									elm.classList.add("vedor-empty");
 								} else {
-									dataLists[k].className += " vedor-empty";
+									elm.className += " vedor-empty";
 								}
 							}
+						};
+
+						var dataName;
+						var dataFields = clone.querySelectorAll("[data-vedor-field]");
+						for (k=0; k<dataFields.length; k++) {
+							handleFields(dataFields[k]);
+						}
+						if (clone.nodeType == 1 && clone.getAttribute("data-vedor-field")) {
+							handleFields(clone);
+						}
+
+						var dataLists = clone.querySelectorAll("[data-vedor-list]");
+						for (k=0; k<dataLists.length; k++) {
+							handleLists(dataLists[k]);
+						}
+						if (clone.nodeType == 1 && clone.getAttribute("data-vedor-list")) {
+							handleLists(clone);
 						}
 					};
 
@@ -396,7 +417,7 @@
 						var requestedTemplate = listData[j]["data-vedor-template"];
 
 						if (!list.templates[requestedTemplate]) {
-							for (var t in list.templates) {
+							for (t in list.templates) {
 								requestedTemplate = t;
 								break;
 							}
@@ -418,7 +439,13 @@
 							initFields(clone);
 		
 							editor.data.list.fixFirstElementChild(clone);
-							if (Object.keys(list.templates).length > 1) {
+
+							counter = 0;
+							for (t in list.templates) {
+								counter++;
+							}
+							
+							if (counter > 1) {
 								clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
 							}
 
@@ -432,11 +459,16 @@
 								initFields(clone);
 								editor.data.list.fixFirstElementChild(clone);
 
-								if (Object.keys(list.templates).length > 1) {
-									clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
+								counter = 0;
+								for (t in list.templates) {
+									counter++;
 								}
-								clone.firstElementChild.setAttribute("data-vedor-list-item", true);
-								clone.firstElementChild.setAttribute("data-vedor-selectable", true);
+								if (counter > 1) {
+									clone.setAttribute("data-vedor-template", requestedTemplate);
+								}
+								clone.setAttribute("data-vedor-list-item", true);
+								clone.setAttribute("data-vedor-selectable", true);
+
 								list.appendChild(clone);
 								editor.data.list.init(listData[j], clone);
 							}
@@ -514,7 +546,7 @@
 			baseStyles.setAttribute("href", editor.baseURL + "vedor/vedor-base.css");
 			baseStyles.setAttribute("rel", "stylesheet");
 			baseStyles.setAttribute("type", "text/css");
-			document.head.appendChild(baseStyles);
+			document.getElementsByTagName("HEAD")[0].appendChild(baseStyles);
 		},
 		init : function(config) {
 			document.createElement("template");
@@ -852,8 +884,11 @@
 		event.preventDefault();
 		return false;
 	};
-	document.addEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-	window.addEventListener("load", preventDOMContentLoaded, true);
+
+	if ("addEventListener" in document) {
+		document.addEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
+		window.addEventListener("load", preventDOMContentLoaded, true);
+	}
 
 	if (typeof jQuery !== "undefined") {
 		jQuery.holdReady(true);
