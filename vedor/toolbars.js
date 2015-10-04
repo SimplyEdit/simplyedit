@@ -726,6 +726,33 @@
 	function vdStoreUndo() {
 	}
 
+	function monitorIframe() {
+		// monitor for iframes that get focus;
+		var monitor = setInterval(function(){
+			var elem = document.activeElement;
+			if(elem && elem.tagName == 'IFRAME'){
+				if (editor.context.currentIframe != elem) {
+					console.log("iframe got focus");
+					editor.context.currentIframe = elem;
+					var sel = vdSelectionState.get();
+					sel.selectNode(elem);
+					sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+					sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+					vdSelectionState.save(sel);
+					sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+					editor.context.update();
+				}
+			} else {
+				if (editor.context.currentIframe) {
+					vdSelectionState.remove();
+					vdSelectionState.restore();
+					editor.context.update();
+					editor.context.currentIframe = null;
+				}
+			}
+		}, 100);		
+	}
+
 	var vdSelection, vdSelectionState;
 	var initSelections = function() {
 		if (typeof vedor === "undefined") {
@@ -746,6 +773,8 @@
 		muze.event.attach( document, 'touchend', function(evt) {
 			editor.context.touching = false;
 		});
+
+		monitorIframe();
 	};
 
 	initSelections();
