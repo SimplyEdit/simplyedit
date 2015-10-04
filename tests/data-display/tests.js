@@ -205,7 +205,7 @@ QUnit.module("editor data apply");
 
 	QUnit.test("apply list", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = '<ul data-vedor-list="menu" data-vedor-path="/"><template><li data-vedor-field="item">Menu item</li></template></ul>';
+		target.innerHTML = "<ul data-vedor-list='menu' data-vedor-path='/'><template><li data-vedor-field='item'>Menu item</li></template></ul>";
 		var data = {
 			"/" : {
 				"menu" : [
@@ -215,9 +215,23 @@ QUnit.module("editor data apply");
 			}
 		};
 		editor.data.apply(data, target);
-
+		assert.notOk(document.querySelector("#testContent ul").classList.contains("vedor-empty"), "vedor-empty is set on empty list");
 		assert.equal(document.querySelector("#testContent ul > li").innerHTML, "Home", "Home item was found");
 		assert.equal(document.querySelector("#testContent ul > li + li").innerHTML, "Second item", "Second item was found");
+	});
+
+	QUnit.test("apply empty list", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<ul data-vedor-list='menu' data-vedor-path='/'><template><li data-vedor-field='item'>Menu item</li></template></ul>";
+		var data = {
+			"/" : {
+				"menu" : [
+				]
+			}
+		};
+		editor.data.apply(data, target);
+
+		assert.ok(document.querySelector("#testContent ul").classList.contains("vedor-empty"), "vedor-empty is set on empty list");
 	});
 
 	QUnit.test("apply 2nd degree list", function(assert) {
