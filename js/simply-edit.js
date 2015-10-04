@@ -122,7 +122,9 @@
 				var data = {};
 				var dataName, dataPath, dataFields, dataLists, listItems;
 
-				dataLists = target.querySelectorAll("[data-vedor-list]");
+				target.dataset.vedorGetData = 1;
+
+				dataLists = target.parentNode.querySelectorAll(":scope [data-vedor-get-data][data-vedor-list],:scope [data-vedor-get-data] [data-vedor-list]");
 				for (i=0; i<dataLists.length; i++) {
 					if (dataLists[i].dataset.vedorStashed) {
 						continue;
@@ -143,7 +145,7 @@
 						if (!data[dataPath][dataName][j]) {
 							data[dataPath][dataName][j] = {};
 						}
-						subData = editor.data.get(listItems[j]);
+						var subData = editor.data.get(listItems[j]);
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
 								console.log("Notice: use of data-vedor-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
@@ -158,7 +160,7 @@
 					dataLists[i].dataset.vedorStashed = 1;
 				}
 
-				dataFields = target.querySelectorAll("[data-vedor-field]");
+				dataFields = target.parentNode.querySelectorAll(":scope [data-vedor-get-data][data-vedor-field],:scope [data-vedor-get-data] [data-vedor-field]");
 				for (i=0; i<dataFields.length; i++) {
 					if (dataFields[i].dataset.vedorStashed) {
 						continue;
@@ -174,6 +176,8 @@
 					data[dataPath][dataName] = editor.field.get(dataFields[i]);
 					dataFields[i].dataset.vedorStashed = 1;
 				}
+				delete target.dataset.vedorGetData;
+
 				return data;
 			},
 			merge : function(data, newData) {
@@ -409,8 +413,12 @@
 							field.setAttribute(attr, data[attr]);
 						}
 					break;
-					case "A":
 					case "META":
+						for (attr in data) {
+							field.setAttribute(attr, data[attr]);
+						}
+					break;
+					case "A":
 						for (attr in data) {
 							if (attr == "innerHTML") {
 								field.innerHTML = data[attr];
@@ -844,7 +852,7 @@
 			editor.baseURL + "vedor/toolbar.vedor-selectable.html",
 			editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
 			editor.baseURL + "vedor/plugin.vedor-meta.html",
-//			editor.baseURL + "vedor/plugin.vedor-template.html",
+			editor.baseURL + "vedor/plugin.vedor-template.html",
 			editor.baseURL + "vedor/plugin.vedor-save.html",
 			editor.baseURL + "vedor/toolbar.vedor-list.html",
 			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
