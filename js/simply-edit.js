@@ -70,6 +70,10 @@
 		},
 		data : {
 			apply : function(data, target) {
+				if (typeof editor.data.originalBody === "undefined") {
+					editor.data.originalBody = document.body.cloneNode(true);
+				}
+
 				var dataFields = target.querySelectorAll("[data-vedor-field]");
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-vedor-field");
@@ -172,45 +176,18 @@
 				}
 				return data;
 			},
-			merge : function(target, src) {
-				var array = Array.isArray(src);
-				var dst = array && [] || {};
-
-				if (array) {
-					target = target || [];
-					dst = dst.concat(target);
-					src.forEach(function(e, i) {
-						if (typeof dst[i] === 'undefined') {
-							dst[i] = e;
-						} else if (typeof e === 'object') {
-							dst[i] = editor.data.merge(target[i], e);
-						} else {
-							if (target.indexOf(e) === -1) {
-								dst.push(e);
-							}
+			merge : function(data, newData) {
+				// target, src) {
+				for (var path in newData) {
+					if (typeof data[path] === "undefined") {
+						data[path] = newData[path];
+					} else {
+						for (var field in newData[path]) {
+							data[path][field] = newData[path][field];
 						}
-					});
-				} else {
-					if (target && typeof target === 'object') {
-						Object.keys(target).forEach(function (key) {
-							dst[key] = target[key];
-						});
 					}
-					Object.keys(src).forEach(function (key) {
-						if (typeof src[key] !== 'object' || !src[key]) {
-							dst[key] = src[key];
-						}
-						else {
-							if (!target[key]) {
-								dst[key] = src[key];
-							} else {
-								dst[key] = editor.data.merge(target[key], src[key]);
-							}
-						}
-					});
 				}
-
-				return dst;
+				return data;
 			},
 			stash : function() {
 				var data = {};
@@ -228,6 +205,7 @@
 
 				var newData = editor.data.get(document);
 				data = editor.data.merge(data, newData);
+	
 				localStorage.data = JSON.stringify(data, null, "\t");
 			},
 			save : function() {
@@ -246,9 +224,13 @@
 				} 
 			},
 			load : function() {
+				document.body.style.opacity = 0;
+
 				editor.storage.load(function(data) {
+					document.body.style.opacity = 1;
 					localStorage.data = data;
-					editor.data.apply(JSON.parse(data), document);
+					editor.currentData = JSON.parse(data);
+					editor.data.apply(editor.currentData, document);
 
 					var checkEdit = function() {
 						if (document.location.hash == "#vedor-edit") {
@@ -277,10 +259,8 @@
 				init : function(data, target) {
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-vedor-list]");
-
 					for (var i=0; i<dataLists.length; i++) {
 						editor.data.list.parseTemplates(dataLists[i]);
-
 						dataName = dataLists[i].getAttribute("data-vedor-list");
 						dataPath = dataLists[i].getAttribute("data-vedor-path") ? dataLists[i].getAttribute("data-vedor-path") : location.pathname;
 						if (data[dataPath] && data[dataPath][dataName]) {
@@ -309,11 +289,14 @@
 //					var templates = list.querySelectorAll("template");
 					var templates = list.getElementsByTagName("template");
 
-					list.templates = {};
-
+					if (typeof list.templates === "undefined") {
+						list.templates = {};
+					}
 					for (var t=0; t<templates.length; t++) {
 						var templateName = templates[t].getAttribute("data-vedor-template") ? templates[t].getAttribute("data-vedor-template") : t;
-						list.templates[templateName] = templates[t].cloneNode(true);
+
+//						list.templates[templateName] = templates[t].cloneNode(true);
+						list.templates[templateName] = templates[t];
 						if (!("content" in list.templates[templateName])) {
 							var fragment = document.createDocumentFragment();
 							var fragmentNode = document.createElement("FRAGMENT");
@@ -361,6 +344,7 @@
 
 					for (j=0; j<listData.length; j++) {
 						var requestedTemplate = listData[j]["data-vedor-template"];
+
 						if (!list.templates[requestedTemplate]) {
 							for (var t in list.templates) {
 								requestedTemplate = t;
@@ -384,7 +368,7 @@
 							initFields(clone);
 		
 							editor.data.list.fixFirstElementChild(clone);
-							if (list.templates.length > 1) {
+							if (Object.keys(list.templates).length > 1) {
 								clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
 							}
 
@@ -398,7 +382,7 @@
 								initFields(clone);
 								editor.data.list.fixFirstElementChild(clone);
 
-								if (list.templates.length > 1) {
+								if (Object.keys(list.templates).length > 1) {
 									clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
 								}
 								clone.firstElementChild.setAttribute("data-vedor-list-item", true);
@@ -417,6 +401,7 @@
 				var attr;
 				switch (field.tagName) {
 					case "IMG":
+					case "IFRAME":
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
@@ -447,37 +432,27 @@
 				switch (field.tagName) {
 					case "IMG": 
 						allowedAttributes = ["src", "class", "alt", "title"];
-						for (attr in allowedAttributes) {
-							attr = allowedAttributes[attr];
-							if (field.getAttribute(attr)) {
-								attributes[attr] = field.getAttribute(attr);
-							}
-						}
-			
-					return attributes;
+					break;
 					case "A":
 						allowedAttributes = ["href", "class", "alt", "title"];
-						for (attr in allowedAttributes) {
-							attr = allowedAttributes[attr];
-							if (field.getAttribute(attr)) {
-								attributes[attr] = field.getAttribute(attr);
-							}
-						}
 						attributes.innerHTML = field.innerHTML;
-
-					return attributes;
+					break;
 					case "META":
 						allowedAttributes = ["content"];
-						for (attr in allowedAttributes) {
-							attr = allowedAttributes[attr];
-							if (field.getAttribute(attr)) {
-								attributes[attr] = field.getAttribute(attr);
-							}
-						}
-					return attributes;
+					break;
+					case "IFRAME":
+						allowedAttributes = ["src"];
+					break;
 					default:
 					return field.innerHTML;
 				}
+				for (attr in allowedAttributes) {
+					attr = allowedAttributes[attr];
+					if (field.getAttribute(attr)) {
+						attributes[attr] = field.getAttribute(attr);
+					}
+				}
+				return attributes;
 			}
 		},
 		loadBaseStyles : function() {
@@ -490,7 +465,6 @@
 		init : function(config) {
 			document.createElement("template");
 			document.body.innerHTML = document.body.innerHTML;
-
 			if (config.toolbars) {
 				editor.editmode.toolbars = config.toolbars;
 			}
@@ -643,8 +617,33 @@
 				}
 
 				var hyperlinks = target.querySelectorAll("a");
-				var handleDblClick = function(event) {
-					document.location.href = this.href + "#vedor-edit";
+				var handleDblClick = function(evt) {
+					if (
+						this.pathname
+					) {
+						var pathname = this.pathname;
+						var hostname = this.hostname;
+						if (hostname == document.location.hostname && (typeof editor.currentData[this.pathname] == "undefined")) {
+							history.pushState(null, null, this.href + "#vedor-edit");
+							document.body.innerHTML = editor.data.originalBody.innerHTML;
+							editor.data.load();
+							var openTemplateDialog = function() {
+								if (editor.actions['vedor-template']) {
+									if (!document.getElementById("vedor-template")) {
+										window.setTimeout(openTemplateDialog, 200);
+										return;
+									}
+									editor.actions['vedor-template']();
+								} else {
+									alert("This page does not exist yet. Save it to create it!");
+								}
+							};
+							openTemplateDialog();
+							evt.preventDefault();
+						} else {
+							document.location.href = this.href + "#vedor-edit";
+						}
+					}
 				};
 				var handleClick = function(event) {
 					event.preventDefault();
@@ -819,17 +818,36 @@
 		jQuery.holdReady(true);
 	}
 
+/*	document.addEventListener("click", function(evt) {
+		if (
+			evt.target && 
+			evt.target.pathname
+		) {
+			var pathname = evt.target.pathname;
+			var hostname = evt.target.hostname;
+			if (hostname == document.location.hostname && (typeof editor.currentData[evt.target.pathname] !== "undefined")) {
+				history.pushState(null, null, evt.target.href);
+				document.body.innerHTML = editor.data.originalBody.innerHTML;
+				editor.data.load();
+				evt.preventDefault();
+			}
+		}
+	});
+*/
 	window.editor = editor;
 	editor.init({
 		toolbars : [
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-text.html",
 			editor.baseURL + "vedor/toolbar.vedor-image.html",
+			editor.baseURL + "vedor/toolbar.vedor-iframe.html",
 			editor.baseURL + "vedor/toolbar.vedor-selectable.html",
 			editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
 			editor.baseURL + "vedor/plugin.vedor-meta.html",
+//			editor.baseURL + "vedor/plugin.vedor-template.html",
 			editor.baseURL + "vedor/plugin.vedor-save.html",
 			editor.baseURL + "vedor/toolbar.vedor-list.html",
+			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
 			editor.baseURL + "vedor/plugin.vedor-dropbox.html",
 			editor.baseURL + "vedor/plugin.vedor-symbol.html"
 		]
