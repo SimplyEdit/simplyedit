@@ -270,6 +270,14 @@ QUnit.module("editor data get");
 		assert.equal(data["/simply-edit/tests/data-display/"].title, "Test title", "title found in data");
 	});
 
+	QUnit.test("get data on document", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<div data-vedor-field='title'>Test title</div>";
+		var data = editor.data.get(document);
+
+		assert.equal(data["/simply-edit/tests/data-display/"].title, "Test title", "title found in data");
+	});
+
 	QUnit.test("get title with path", function(assert) {
 		var target = document.querySelector("#testContent");
 		target.innerHTML = "<div data-vedor-field='title' data-vedor-path='/'>Test title</div>";
@@ -341,3 +349,133 @@ QUnit.module("editor data get");
 		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
 	});
 
+QUnit.module("data merge");
+	QUnit.test("simply data merge", function(assert) {
+		var data1 = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]},
+					{"items" : [
+						{"item" : "3Home"},
+						{"item" : "3Second item"}
+					]}
+				]
+			}
+		};
+		var data2 = {
+			"/test/" : {
+				"menu-test" : [
+					{"items-test" : [
+						{"item-test" : "Home test"},
+						{"item-test" : "Second item test"}
+					]},
+					{"items-test" : [
+						{"item-test" : "2Home test"},
+						{"item-test" : "2Second item test"}
+					]}
+				]
+			}
+		};
+
+		var result = editor.data.merge(data1, data2);
+		assert.ok(result['/'], "base set found");
+		assert.ok(result['/test/'], "extra set found");
+		assert.equal(result['/test/']['menu-test'].length, 2, "test menu has 2 items");
+		assert.equal(result['/'].menu.length, 3, "base menu has 3 items");
+	});
+
+	QUnit.test("merge siblings", function(assert) {
+		var data1 = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]},
+					{"items" : [
+						{"item" : "3Home"},
+						{"item" : "3Second item"}
+					]}
+				]
+			}
+		};
+		var data2 = {
+			"/" : {
+				"menu-test" : [
+					{"items-test" : [
+						{"item-test" : "Home test"},
+						{"item-test" : "Second item test"}
+					]},
+					{"items-test" : [
+						{"item-test" : "2Home test"},
+						{"item-test" : "2Second item test"}
+					]}
+				]
+			}
+		};
+		var result = editor.data.merge(data1, data2);
+		assert.ok(result['/'], "base set found");
+		assert.equal(result['/']['menu-test'].length, 2, "test menu has 2 items");
+		assert.equal(result['/'].menu.length, 3, "base menu has 3 items");
+	});
+
+
+	QUnit.test("merge with overwrite", function(assert) {
+		var data1 = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]},
+					{"items" : [
+						{"item" : "3Home"},
+						{"item" : "3Second item"}
+					]}
+				]
+			}
+		};
+		var data2 = {
+			"/" : {
+				"menu" : [
+					{"items-test" : [
+						{"item-test" : "Home test"},
+						{"item-test" : "Second item test"}
+					]},
+					{"items-test" : [
+						{"item-test" : "2Home test"},
+						{"item-test" : "2Second item test"}
+					]}
+				]
+			}
+		};
+		var result = editor.data.merge(data1, data2);
+		assert.ok(result['/'], "base set found");
+		assert.equal(result['/'].menu.length, 2, "test menu has 2 items");
+	});
+
+QUnit.module("editor list fixFirstElementChild");
+	QUnit.test("get title", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "Test 123 <div data-vedor-field='title'>Test title</div>";
+		editor.data.list.fixFirstElementChild(target);
+		
+		assert.equal(target.firstElementChild.nodeType, 1, "First child is an element");
+		assert.equal(target.firstElementChild.innerHTML, "Test title", "First child innerHTML found");
+		assert.equal(target.firstElementChild.getAttribute("data-vedor-field"), "title", "First child getAttribute");
+	});
