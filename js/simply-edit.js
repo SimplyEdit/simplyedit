@@ -189,7 +189,7 @@
 				for (i=0; i<dataLists.length; i++) {
 					addListData(dataLists[i]);
 				}
-				if (target.getAttribute("data-vedor-list")) {
+				if (target.nodeType == 1 && target.getAttribute("data-vedor-list")) {
 					addListData(target);
 				}
 
@@ -197,7 +197,7 @@
 				for (i=0; i<dataFields.length; i++) {
 					addData(dataFields[i]);
 				}
-				if (target.getAttribute("data-vedor-field")) {
+				if (target.nodeType == 1 && target.getAttribute("data-vedor-field")) {
 					addData(target);
 				}
 
@@ -893,6 +893,9 @@
 	if (typeof jQuery !== "undefined") {
 		jQuery.holdReady(true);
 	}
+
+	// Add fake window.console for IE8/9
+	if (!window.console) console = {log: function() {}};
 
 /*	document.addEventListener("click", function(evt) {
 		if (
