@@ -184,6 +184,16 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, '<p>He<strong>llo</strong> world</p>', "Bold uses STRONG tag");
 	});
 
+	QUnit.test("text style unset bold", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>He<strong>llo</strong> world</p>";
+
+		setCaretPosition(testContent.querySelector("strong"), 0, 3);
+		editor.actions['vedor-text-bold']();
+
+		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "STRONG tag removed");
+	});
+
 	QUnit.test("text set italic", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello world";
@@ -194,7 +204,7 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, 'He<em>llo</em> world', "Italic uses EM tag");
 	});
 
-	QUnit.test("text set bold in paragraph", function(assert) {
+	QUnit.test("text set italic in paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello world</p>";
 
@@ -204,6 +214,7 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, '<p>He<em>llo</em> world</p>', "Italic uses EM tag");
 	});
 	
+
 	QUnit.test("text style init italic", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>He<em>llo</em> world</p>";
@@ -212,6 +223,16 @@ QUnit.module("editor text selection");
 		var targetButton = document.querySelector("#vedor-text-selection button[data-vedor-action='vedor-text-italic']");
 
 		assert.ok(targetButton.classList.contains("vedor-selected"), "text style is correctly updated");
+	});
+
+	QUnit.test("text style unset italic", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>He<em>llo</em> world</p>";
+
+		setCaretPosition(testContent.querySelector("em"), 0, 3);
+		editor.actions['vedor-text-italic']();
+
+		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "EM tag removed");
 	});
 
 	QUnit.test("text style init italic", function(assert) {
