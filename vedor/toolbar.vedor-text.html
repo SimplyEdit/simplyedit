@@ -110,6 +110,7 @@
 <script type="text/javascript">
 	editor.plugins.text = {
 		formatInline : function(command, value) {
+
 			vdSelectionState.restore(vdSelectionState.currentSelection);
 			var field=editor.node.getEditableField();
 			if (!field) {
@@ -129,10 +130,10 @@
 			editor.node.replaceTags("STRONG", "B");
 			editor.node.replaceTags("EM", "I");
 
-			editor.node.replaceClassToStyle("vedor-text-align-left", "text-align: left;");
-			editor.node.replaceClassToStyle("vedor-text-align-right", "text-align: right;");
-			editor.node.replaceClassToStyle("vedor-text-align-center", "text-align: center;");
-			editor.node.replaceClassToStyle("vedor-text-align-justify", "text-align: justify;");
+			editor.node.replaceClassToAlign("vedor-text-align-left", "left");
+			editor.node.replaceClassToAlign("vedor-text-align-right", "right");
+			editor.node.replaceClassToAlign("vedor-text-align-center", "center");
+			editor.node.replaceClassToAlign("vedor-text-align-justify", "justify");
 
 			// FIXME: Extend this to only allow specific node types on specific commands;
 			var preventNodeInsert = function(evt) {
@@ -142,15 +143,27 @@
 			};
 
 			target.addEventListener("DOMNodeInserted", preventNodeInsert);
+
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(r);
+			vdSelectionState.remove();
+
 			target.execCommand(command, false, value);
 			target.removeEventListener("DOMNodeInserted", preventNodeInsert);
 
+			vdSelectionState.restore();
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(r);
+
 			editor.node.replaceTags("I", "EM");
 			editor.node.replaceTags("B", "STRONG");
-			editor.node.replaceStyleToClass("text-align: left;", "vedor-text-align-left");
-			editor.node.replaceStyleToClass("text-align: right;", "vedor-text-align-right");
-			editor.node.replaceStyleToClass("text-align: justify;", "vedor-text-align-justify");
-			editor.node.replaceStyleToClass("text-align: center;", "vedor-text-align-center");
+			window.getSelection().removeAllRanges();
+			window.getSelection().addRange(r);
+
+			editor.node.replaceAlignToClass("left", "vedor-text-align-left");
+			editor.node.replaceAlignToClass("right", "vedor-text-align-right");
+			editor.node.replaceAlignToClass("justify", "vedor-text-align-justify");
+			editor.node.replaceAlignToClass("center", "vedor-text-align-center");
 
 			vdSelectionState.restore();
 
