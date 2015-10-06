@@ -234,19 +234,25 @@
 			vedor.editor.bookmarks.select();
 			vedor.editor.bookmarks.remove();
 		},
-		replaceStyleToClass : function(source, target) {
+		replaceAlignToClass : function(source, target) {
 			var field = editor.node.getEditableField();
 			if (!field) {
 				return;
 			}
 
-			var elms = field.querySelectorAll("[style='" + source + "']");
+			var elms = field.querySelectorAll("[style='text-align: " + source + ";'], [align='" + source + "']");
 			for (var i=0; i<elms.length; i++) {
+				elms[i].classList.remove("vedor-text-align-left");
+				elms[i].classList.remove("vedor-text-align-right");
+				elms[i].classList.remove("vedor-text-align-justify");
+				elms[i].classList.remove("vedor-text-align-center");
+
 				elms[i].classList.add(target);
 				elms[i].removeAttribute("style");
+				elms[i].removeAttribute("align");
 			}
 		},
-		replaceClassToStyle : function(source, target) {
+		replaceClassToAlign : function(source, target) {
 			var field = editor.node.getEditableField();
 			if (!field) {
 				return;
@@ -254,7 +260,8 @@
 			var elms = field.querySelectorAll("[class*='" + source + "']");
 			for (var i=0; i<elms.length; i++) {
 				elms[i].classList.remove(source);
-				elms[i].setAttribute("style", target);
+				elms[i].setAttribute("style", "text-align: " + target + ";");
+				elms[i].setAttribute("align", target);
 			}
 		},
 		unwrap : function(el, target) {
