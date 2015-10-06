@@ -180,10 +180,9 @@ QUnit.module("editor data apply");
 	QUnit.test("apply title", function(assert) {
 		var target = document.querySelector("#testContent");
 		target.innerHTML = "<div data-vedor-field='title'>Wrong content</div>";
-		var data = {
-			"/simply-edit/tests/data-display/" : {
-				"title" : "Test title"
-			}
+		var data = {};
+		data[location.pathname] = {
+			"title" : "Test title"
 		};
 		editor.data.apply(data, target);
 
@@ -267,7 +266,7 @@ QUnit.module("editor data get");
 		target.innerHTML = "<div data-vedor-field='title'>Test title</div>";
 		var data = editor.data.get(target);
 
-		assert.equal(data["/simply-edit/tests/data-display/"].title, "Test title", "title found in data");
+		assert.equal(data[location.pathname].title, "Test title", "title found in data");
 	});
 
 	QUnit.test("get data on document", function(assert) {
@@ -275,7 +274,7 @@ QUnit.module("editor data get");
 		target.innerHTML = "<div data-vedor-field='title'>Test title</div>";
 		var data = editor.data.get(document);
 
-		assert.equal(data["/simply-edit/tests/data-display/"].title, "Test title", "title found in data");
+		assert.equal(data[location.pathname].title, "Test title", "title found in data");
 	});
 
 	QUnit.test("get title with path", function(assert) {
