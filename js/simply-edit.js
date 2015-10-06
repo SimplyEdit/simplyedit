@@ -829,9 +829,10 @@
 						document.head.appendChild(style);
 					}
 
-					var toolbarHeight = document.getElementById("vedor-main-toolbar").offsetHeight;
-
-					style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
+					if (document.getElementById("vedor-main-toolbar")) {
+						var toolbarHeight = document.getElementById("vedor-main-toolbar").offsetHeight;
+						style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
+					}
 				};
 
 				// create an observer instance
