@@ -234,19 +234,25 @@
 			vedor.editor.bookmarks.select();
 			vedor.editor.bookmarks.remove();
 		},
-		replaceStyleToClass : function(source, target) {
+		replaceAlignToClass : function(source, target) {
 			var field = editor.node.getEditableField();
 			if (!field) {
 				return;
 			}
 
-			var elms = field.querySelectorAll("[style='" + source + "']");
+			var elms = field.querySelectorAll("[style='text-align: " + source + ";'], [align='" + source + "']");
 			for (var i=0; i<elms.length; i++) {
+				elms[i].classList.remove("vedor-text-align-left");
+				elms[i].classList.remove("vedor-text-align-right");
+				elms[i].classList.remove("vedor-text-align-justify");
+				elms[i].classList.remove("vedor-text-align-center");
+
 				elms[i].classList.add(target);
 				elms[i].removeAttribute("style");
+				elms[i].removeAttribute("align");
 			}
 		},
-		replaceClassToStyle : function(source, target) {
+		replaceClassToAlign : function(source, target) {
 			var field = editor.node.getEditableField();
 			if (!field) {
 				return;
@@ -254,7 +260,8 @@
 			var elms = field.querySelectorAll("[class*='" + source + "']");
 			for (var i=0; i<elms.length; i++) {
 				elms[i].classList.remove(source);
-				elms[i].setAttribute("style", target);
+				elms[i].setAttribute("style", "text-align: " + target + ";");
+				elms[i].setAttribute("align", target);
 			}
 		},
 		unwrap : function(el, target) {
@@ -726,6 +733,33 @@
 	function vdStoreUndo() {
 	}
 
+	function monitorIframe() {
+		// monitor for iframes that get focus;
+		var monitor = setInterval(function(){
+			var elem = document.activeElement;
+			if(elem && elem.tagName == 'IFRAME'){
+				if (editor.context.currentIframe != elem) {
+					console.log("iframe got focus");
+					editor.context.currentIframe = elem;
+					var sel = vdSelectionState.get();
+					sel.selectNode(elem);
+					sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+					sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+					vdSelectionState.save(sel);
+					sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+					editor.context.update();
+				}
+			} else {
+				if (editor.context.currentIframe) {
+					vdSelectionState.remove();
+					vdSelectionState.restore();
+					editor.context.update();
+					editor.context.currentIframe = null;
+				}
+			}
+		}, 100);		
+	}
+
 	var vdSelection, vdSelectionState;
 	var initSelections = function() {
 		if (typeof vedor === "undefined") {
@@ -746,6 +780,8 @@
 		muze.event.attach( document, 'touchend', function(evt) {
 			editor.context.touching = false;
 		});
+
+		monitorIframe();
 	};
 
 	initSelections();

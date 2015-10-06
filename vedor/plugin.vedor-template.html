@@ -1,0 +1,157 @@
+<section id="vedor-template" class="vedor-dialog">
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li><button class="vedor-expands vedor-selected" data-vedor-action="vedor-page-template" data-vedor-section="vedor-page-template"><i class="fa fa-paint-brush"></i>Page template</li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='vedor-right'><button data-vedor-action="vedor-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div class="vedor-toolbar-section vedor-page-template vedor-selected">
+			<div class="field">
+				<label for="vedor-page-template-list">Page template</label>
+				<select id="vedor-page-template-list">
+					<option value="index.html">Hoofdpagina</option>
+					<option value="index-1.html">Bio</option>
+					<option value="index-2.html">Music</option>
+					<option value="index-3.html">Discography</option>
+					<option value="index-4.html">Photo & video</option>
+					<option value="index-5.html">Contact</option>
+					<option value="index-6.html">Privacy policy</option>
+				</select>
+			</div>
+			<div class="field">
+				<label><strong>Notice: </strong>when you apply, the page will be saved and reloaded with the new template;</label>
+			</div>
+		</div>
+	</div>
+	<div class="vedor-toolbar">
+		<ul class="vedor-buttons">
+			<li class='vedor-right'><button data-vedor-action="vedor-template-apply"><i class="fa fa-check"></i>Apply</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#vedor-template {
+		top: 50%;
+		height: 400px;
+		max-height: 80%;
+		margin-top: -200px;
+
+		left: 50%;
+		width: 480px;
+		margin-left: -240px;
+		background-color: #EEE;
+	}
+	#vedor-template.fullscreen {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	#vedor-template .vedor-toolbar-section ul {
+		background: transparent;
+	}
+	#vedor-template .vedor-page-template button:not(.vedor-selected) {
+		background: white;
+	}
+
+	#vedor-template .vedor-toolbar-section {
+		background: #eee;
+		padding: 10px 5px;
+	}
+	#vedor-template .vedor-page-template .vedor-buttons {
+		margin-top: 0px;
+		margin-left: -3px;
+		display: inline-block;
+	}
+	#vedor-template .vedor-page-template .vedor-buttons li {
+		margin-right: 5px;
+		list-style: none;
+	}
+	#vedor-template .vedor-page-template .field {
+		margin-bottom: 10px;
+		padding-left: 120px;
+		margin-right: 20px;
+	}
+	#vedor-template .vedor-page-template .field label {
+		margin-left: -120px;
+		display: inline-block;
+		width: 95px;
+		vertical-align: top;
+		margin-top: 12px;
+	}
+	#vedor-template .vedor-page-template input {
+		width: 100%;
+	}
+	@media (max-width: 481px) {
+		#vedor-template {
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+			width: auto;
+			margin-left: 0px;
+			margin-top: 0px;
+		}
+		#vedor-template [data-vedor-action="vedor-page-template-fullscreen"] {
+			display: none;
+		}
+	}
+</style>
+<script>
+	editor.plugins.pageTemplate = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('vedor-template'), editor.plugins.pageTemplate.dialog.update);
+			},
+			update : function() {
+				var pageTemplate = document.head.querySelector("meta[name=page-template]") ? document.head.querySelector("meta[name=page-template]").getAttribute("content") : "index.html";
+				vedor.widgets.properties.set("vedor-page-template-list", pageTemplate);
+			}
+		},
+		apply : function() {
+			editor.plugins.pageTemplate.setMeta("page-template", vedor.widgets.properties.get("vedor-page-template-list"));
+			editor.plugins.dialog.close();
+			var reloadPage = function() {
+				document.location.reload();
+			}
+			editor.actions['vedor-aftersave'] = reloadPage;
+			editor.data.save();
+		},
+		setMeta : function(name, value) {
+			var metaTag = document.head.querySelector("meta[name=" + name + "]");
+			if (!metaTag) {
+				metaTag = document.createElement("meta");
+				metaTag.setAttribute("name", name);
+				document.head.appendChild(metaTag);
+			}
+			if (value) {
+				metaTag.setAttribute("content", value);
+			} else {
+				document.head.removeChild(metaTag);
+			}
+		},
+		init : function() {
+			var button = document.createElement("button");
+			button.dataset.vedorAction = "vedor-template";
+			button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
+			document.querySelector("#vedor-main-toolbar .vedor-buttons").appendChild(button);
+		}
+	};
+
+	editor.addAction("vedor-page-template", function(el) {
+		el.classList.toggle("vedor-selected");
+	});
+
+	editor.addAction("vedor-template", editor.plugins.pageTemplate.dialog.open);
+	editor.addAction("vedor-template-apply", editor.plugins.pageTemplate.apply);
+	editor.plugins.pageTemplate.init();
+</script>
