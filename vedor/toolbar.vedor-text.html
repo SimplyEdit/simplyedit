@@ -127,9 +127,6 @@
 
 			var r = sel.cloneRange();
 
-			editor.node.replaceTags("STRONG", "B");
-			editor.node.replaceTags("EM", "I");
-
 			editor.node.replaceClassToAlign("vedor-text-align-left", "left");
 			editor.node.replaceClassToAlign("vedor-text-align-right", "right");
 			editor.node.replaceClassToAlign("vedor-text-align-center", "center");
@@ -146,17 +143,13 @@
 
 			window.getSelection().removeAllRanges();
 			window.getSelection().addRange(r);
-			vdSelectionState.remove();
 
 			target.execCommand(command, false, value);
 			target.removeEventListener("DOMNodeInserted", preventNodeInsert);
 
-			vdSelectionState.restore();
-			window.getSelection().removeAllRanges();
-			window.getSelection().addRange(r);
-
 			editor.node.replaceTags("I", "EM");
 			editor.node.replaceTags("B", "STRONG");
+
 			window.getSelection().removeAllRanges();
 			window.getSelection().addRange(r);
 
@@ -165,13 +158,9 @@
 			editor.node.replaceAlignToClass("justify", "vedor-text-align-justify");
 			editor.node.replaceAlignToClass("center", "vedor-text-align-center");
 
-			vdSelectionState.restore();
-
-			window.getSelection().removeAllRanges();
-			window.getSelection().addRange(r);
-
 			vdStoreUndo();
 			vdEditPane_DisplayChanged();
+
 			return true;
 		},
 		formatBlock : function(styleInfo) {
@@ -383,7 +372,7 @@
 			'vedor-text-bold' : function() {
 				editor.plugins.text.formatInline("Bold");
 			},
-			'vedor-text-italic' : function() {
+			'vedor-text-italic' : function(el) {
 				editor.plugins.text.formatInline("Italic");
 			},
 			'vedor-text-underline' : function() {
