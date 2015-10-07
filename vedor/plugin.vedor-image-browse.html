@@ -167,9 +167,14 @@
 			}
 		},
 		init : function() {
-			var button = document.createElement("LI");
-			button.innerHTML = '<button data-vedor-action="vedor-image-browse"><i class="fa fa-folder"></i>Browse</button>';
-			document.querySelector("#vedor-image .vedor-toolbar .vedor-buttons").appendChild(button);
+			var target = document.querySelector("#vedor-image .vedor-toolbar .vedor-buttons");
+			if (target) {
+				var button = document.createElement("LI");
+				button.innerHTML = '<button data-vedor-action="vedor-image-browse"><i class="fa fa-folder"></i>Browse</button>';
+				target.appendChild(button);
+			} else {
+				window.setTimeout(editor.plugins.imageBrowse.init, 200);
+			}
 		}
 	};
 
@@ -178,8 +183,10 @@
 		editor.plugins.imageBrowse.dialog.loadImages(el.dataset.value);
 	});
 	editor.addAction("vedor-image-browse-insert", function(el) {
-		var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
-		parent.setAttribute("src", el.querySelector("img").getAttribute("src"));
+		editor.actions["vedor-image-src"](el.querySelector("img").getAttribute("src"));
+
+		//var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
+		//parent.setAttribute("src", el.querySelector("img").getAttribute("src"));
 		editor.plugins.dialog.close();
 	});
 	editor.addAction("vedor-image-browse-filter-same-size", function(el) {
