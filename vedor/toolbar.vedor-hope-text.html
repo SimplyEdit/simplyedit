@@ -264,15 +264,11 @@
 		actions : {
 			'vedor-text-bold' : function() {
 				var range = hopeEditor.selection.getRange();
-				console.log(range);
 				var annotation = hopeEditor.fragment.has(range, "strong");
-				console.log(annotation);
 				if (annotation) {
 					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 				} else {
 					hopeEditor.fragment = hopeEditor.fragment.apply(range, "strong");
-					console.log(hopeEditor.fragment);
-
 				}
 				hopeEditor.update();
 			},
