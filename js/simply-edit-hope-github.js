@@ -73,11 +73,10 @@
 					http.send();
 				},
 				saveTemplate : function(pageTemplate, callback) {
-					var dataPath = location.pathname;
+					var dataPath = location.pathname.split(/\//, 3)[2];
 					if (dataPath.match(/\/$/)) {
 						dataPath += "index.html";
 					}
-					dataPath = dataPath.substring(1, dataPath.length);
 
 					var repo = this.repo;
 					repo.read(repoBranch, pageTemplate, function(err, data) {
@@ -994,7 +993,7 @@
                         editor.baseURL + "vedor/plugin.vedor-save.html",
                         editor.baseURL + "vedor/toolbar.vedor-list.html",
                         editor.baseURL + "vedor/plugin.vedor-dropbox.html",
-                        editor.baseURL + "vedor/plugin.vedor-symbol.html"
+                        editor.baseURL + "vedor/plugin.vedor-symbol.html",
 			editor.baseURL + "vedor/plugin.vedor-template.html"
 		]
 	});
