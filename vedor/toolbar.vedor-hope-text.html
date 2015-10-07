@@ -69,10 +69,7 @@
 					<option value="h1">Heading 1</option>
 					<option value="h2">Heading 2</option>
 					<option value="h3">Heading 3</option>
-					<option value="code">Code</option>
 					<option value="p">Paragraph</option>
-					<option value="ul">Unnumbered list</option>
-					<option value="ol">Numbered list</option>
 				</select></li>
 				<li class="vedor-text-bold"><button data-vedor-action="vedor-text-bold"><i class="fa fa-bold"></i>Bold</button></li>
 				<li class="vedor-text-italic"><button data-vedor-action="vedor-text-italic"><i class="fa fa-italic"></i>Italic</button></li>
@@ -189,6 +186,39 @@
 			var hyperlinkNofollow = toolbar.querySelector("button.vedor-hyperlink-nofollow");
 			if (hyperlinkNofollow) {
 				hyperlinkNofollow.classList.remove("vedor-selected");
+			}
+		}
+
+		// Check aligment
+		blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+		var textAlign = toolbar.querySelector(".vedor-text-align[data-type=vedor-buttongroup-radio]");
+		if (blockAnnotation && textAlign) {
+			var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
+			if (tempNode.classList.contains("vedor-text-align-left")) {
+				vedor.widgets.properties.set(textAlign, "left");
+			} else if (tempNode.classList.contains("vedor-text-align-right")) {
+				vedor.widgets.properties.set(textAlign, "right");
+			} else if (tempNode.classList.contains("vedor-text-align-center")) {
+				vedor.widgets.properties.set(textAlign, "center");
+			} else if (tempNode.classList.contains("vedor-text-align-justify")) {
+				vedor.widgets.properties.set(textAlign, "justify");
+			} else {
+				vedor.widgets.properties.set(textAlign, "none");
+			}
+
+			if (vedor.widgets.properties.get(textAlign) != "none") {
+				// Set the parent icon for alignment as well;
+				var currentIcon = toolbar.querySelector("div.vedor-text-align button.vedor-selected i");
+				var icons = toolbar.querySelectorAll("button[data-vedor-section=vedor-text-align] i");
+				for (i=0; i<icons.length; i++) {
+					icons[i].className = currentIcon.className;
+				}
+			} else {
+				var currentIcon = toolbar.querySelector("div.vedor-text-align button i");
+				var icons = toolbar.querySelectorAll("button[data-vedor-section=vedor-text-align] i");
+				for (i=0; i<icons.length; i++) {
+					icons[i].className = currentIcon.className;
+				}
 			}
 		}
 
