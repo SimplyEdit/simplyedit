@@ -216,6 +216,18 @@
 					vdStoreUndo();
 				}
 			};
+
+
+			// Disable user zoom, because it will zoom extremely weird when you select an image on android devices;
+			var viewportMeta = document.head.querySelector("meta[name=viewport]");
+			if (!viewportMeta) {
+				viewportMeta = document.createElement("meta");
+				viewportMeta.setAttribute("name", "viewport");
+				viewportMeta.setAttribute("content", "user-scalable=no");
+				document.head.appendChild(viewportMeta);
+			} else {
+				viewportMeta.setAttribute("content", viewportMeta.getAttribute("content") + ", user-scalable=no");
+			}
 		},
 		"actions" : {
 			"vedor-image-align-left" : function() {
