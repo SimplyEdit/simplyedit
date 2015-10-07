@@ -584,6 +584,21 @@
 }
 
 @media (max-width: 481px) {
+	.vedor-dialog {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	[data-vedor-action="vedor-dialog-fullscreen"] {
+		display: none;
+	}
 }
 
 .vedor-empty[data-vedor-list] {
@@ -613,4 +628,44 @@
 	line-height: 24px;
 	vertical-align: middle;
 	padding-bottom: 5px;
+}
+
+/* plain view */
+body.vedor-plain [data-vedor-field],
+body.vedor-plain [data-vedor-list],
+body.vedor-plain [data-vedor-list-item] {
+	display: block !important;
+	position: static !important;
+	vertical-align: top;
+	margin-left: 20px;
+}
+body.vedor-plain [data-vedor-field]:before {
+	content: "(Field) " attr(data-vedor-field);
+}
+body.vedor-plain [data-vedor-list]:before {
+	content: "(List) " attr(data-vedor-list);
+	position: static;
+	opacity: 1;
+}
+body.vedor-plain [data-vedor-list-item]:before {
+	content: "(List item) " attr(data-vedor-template);
+	position: static;
+	opacity: 1;
+}
+
+body.vedor-plain [data-vedor-list]:before,
+body.vedor-plain [data-vedor-list-item]:before,
+body.vedor-plain [data-vedor-field]:before {
+	border: 1px solid #999;
+	border-radius: 24px;
+	background-color: #eee;
+	color: #333;
+	display: inline-block;
+	width: auto;
+	margin: 5px;
+	padding: 5px;
+	font-size: 12px;
+	font-family: arial;
+	font-weight: normal;
+	font-style: normal;
 }
