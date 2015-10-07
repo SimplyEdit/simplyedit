@@ -18,6 +18,7 @@
 				<li class="vedor-text-bold"><button data-vedor-action="vedor-text-bold"><i class="fa fa-bold"></i>Bold</button></li>
 				<li class="vedor-text-italic"><button data-vedor-action="vedor-text-italic"><i class="fa fa-italic"></i>Italic</button></li>
 				<li class="vedor-text-underline"><button data-vedor-action="vedor-text-underline"><i class="fa fa-underline"></i>Underline</button></li>
+				<li class="vedor-text-code"><button data-vedor-action="vedor-text-code"><i class="fa fa-code"></i>[Code]</button></li>
 			</ul>
 		</div>
 		<div class="vedor-toolbar-section vedor-text-align" data-type="vedor-buttongroup-radio">
@@ -156,6 +157,14 @@
 			textUnderline.classList.remove("vedor-selected");
 		}
 
+		// Check "Code"
+		var textCode = toolbar.querySelector(".vedor-text-code button");
+		if (hopeEditor.fragment.has(range, "code")) {
+			textCode.classList.add("vedor-selected");
+		} else {
+			textCode.classList.remove("vedor-selected");
+		}
+
 		// Check hyperlink;
 		var hyperlink = hopeEditor.fragment.has(range, "a");
 		if (hyperlink) {
@@ -284,7 +293,22 @@
 			},
 			'vedor-text-underline' : function() {
 				var range = hopeEditor.selection.getRange();
-				hopeEditor.fragment = hopeEditor.fragment.toggle(range, "u");
+				var annotation = hopeEditor.fragment.has(range, "u");
+				if (annotation) {
+					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+				} else {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, "u");
+				}
+				hopeEditor.update();
+			},
+			'vedor-text-code' : function() {
+				var range = hopeEditor.selection.getRange();
+				var annotation = hopeEditor.fragment.has(range, "code");
+				if (annotation) {
+					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+				} else {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, "code");
+				}
 				hopeEditor.update();
 			},
 			'vedor-text-align-left' : function() {
