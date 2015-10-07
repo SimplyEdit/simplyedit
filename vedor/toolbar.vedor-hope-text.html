@@ -416,26 +416,34 @@
 			'vedor-text-blockstyle' : function(value) {
 				var range = hopeEditor.selection.getRange();
 
-				var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
 
-				if (!blockAnnotation) {
-					var sel = window.getSelection();
-					range = window.getSelection().getRangeAt(0);
-					range.setStart(sel.focusNode,0);
-					range.setEnd(sel.focusNode, sel.focusNode.length);
-					window.getSelection().removeAllRanges();
-					sel.addRange(range);
-					hopeEditor.selection.updateRange();
-					range = hopeEditor.selection.getRange();
-					hopeEditor.fragment = hopeEditor.fragment.apply(hopeEditor.selection.getRange(), value);
-				} else { 
-					var nodeInfo = blockAnnotation.tag.split(/ /, 2);
-					var newValue = value;
-					if (nodeInfo[1]) {
-						newValue += " " + nodeInfo[1];
+				if (range.start != range.end) {
+					if (hopeEditor.fragment.has(range, value)) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(range, value);
+					} else {
+						hopeEditor.fragment = hopeEditor.fragment.apply(range, value);
 					}
-					hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
-					hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
+				} else {
+					var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+					if (blockAnnotation) {
+						var nodeInfo = blockAnnotation.tag.split(/ /, 2);
+						var newValue = value;
+						if (nodeInfo[1]) {
+							newValue += " " + nodeInfo[1];
+						}
+						hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
+						hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
+					} else {
+						var sel = window.getSelection();
+						range = window.getSelection().getRangeAt(0);
+						range.setStart(sel.focusNode,0);
+						range.setEnd(sel.focusNode, sel.focusNode.length);
+						window.getSelection().removeAllRanges();
+						sel.addRange(range);
+						hopeEditor.selection.updateRange();
+						range = hopeEditor.selection.getRange();
+						hopeEditor.fragment = hopeEditor.fragment.apply(hopeEditor.selection.getRange(), value);
+					}
 				}
 
 				hopeEditor.update();
