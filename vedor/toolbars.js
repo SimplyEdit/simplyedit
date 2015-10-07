@@ -773,6 +773,8 @@
 
 		muze.event.attach( document, 'selectionchange', editor.context.update );
 		muze.event.attach( document, 'keyup', editor.context.update );
+		muze.event.attach( document, 'mouseup', editor.context.update );
+
 		muze.event.attach( document, 'scroll', editor.context.toolbar.reposition );
 		muze.event.attach( document, 'touchstart', function(evt) {
 			editor.context.touching = true;
