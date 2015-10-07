@@ -104,10 +104,25 @@
 
 	editor.addAction("vedor-symbol", editor.plugins.symbol.dialog.open);
 	editor.addAction("vedor-symbol-insert", function(el) {
-		if (!editor.plugins.symbol.currentSel.collapsed) {
-			editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+		if (editor.plugins.symbol.currentField.hopeEditor) {
+			var hopeEditor = editor.plugins.symbol.currentField.hopeEditor;
+			var range = hopeEditor.selection.getRange();
+			var charTyped = String.fromCharCode(el.dataset.value);
+			if ( charTyped ) { // ignore non printable characters
+				if ( range.length ) {
+					hopeEditor.fragment = hopeEditor.fragment.delete(range);
+				}
+				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, charTyped );
+				setTimeout( function() {
+					hopeEditor.update();
+				}, 0 );
+			}
+		} else {
+			if (!editor.plugins.symbol.currentSel.collapsed) {
+				editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+			}
+			vdSelection.setHTMLText(editor.plugins.symbol.currentSel, "&#" + el.dataset.value + ";");
 		}
-		vdSelection.setHTMLText(editor.plugins.symbol.currentSel, "&#" + el.dataset.value + ";");
 		editor.plugins.dialog.close();
 	});
 

@@ -196,6 +196,11 @@
 					vdSelection.setHTMLText(editor.plugins.htmlsource.currentSel, source);
 				}
 			}
+
+			if (editor.plugins.htmlsource.currentField.hopeEditor) {
+				editor.plugins.htmlsource.currentField.hopeEditor.parseHTML();
+			}
+
 			vdSelectionState.selectAll = false;
 			editor.plugins.htmlsource.currentField = false;
 			editor.plugins.dialog.close();
