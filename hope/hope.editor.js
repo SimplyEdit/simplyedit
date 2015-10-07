@@ -91,7 +91,7 @@ hope.register( 'hope.editor', function() {
 		this.fragment = hope.fragment.create( text, annotations );
 		this.refs.output.contentEditable = true;
 		this.update();
-		initEvents(this);
+//		initEvents(this);
 	}
 
 	function initEvents(editor) {

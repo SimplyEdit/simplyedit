@@ -5,69 +5,47 @@ hope.register( 'hope.editor.selection', function() {
 		this.end = end;
 		this.editor = editor;
 		var self = this;
-		hope.events.listen(this.editor.refs.output, 'keyup', function(evt) {
-			var key = hope.keyboard.getKey( evt );
-			switch ( key ) {
-				case 'Shift+Home':
-				case 'Shift+End':
-				case 'Shift+PageDown':
-				case 'Shift+PageUp' :
-				case 'Shift+ArrowDown' :
-				case 'Shift+ArrowUp':
-				case 'Shift+ArrowLeft':
-				case 'Shift+ArrowRight':
-					var sel = window.getSelection();
-					if (sel.focusNode == self.editor.refs.output) {
-						// cursor is not in any child node, so the offset is in nodes instead of characters;
-						self.end = self.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-					} else {
-						self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-					}
-				break;
-				case 'Home':
-				case 'End':
-				case 'PageDown':
-				case 'PageUp' :
-				case 'ArrowDown' :
-				case 'ArrowUp':
-				case 'ArrowLeft':
-				case 'ArrowRight':
-					var sel = window.getSelection();
 
-					if (sel.focusNode == self.editor.refs.output) {
-						// cursor is not in any child node, so the offset is in nodes instead of characters;
-						self.start = self.end = self.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-					} else {
-						self.start = self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-					}
-				break;
-			}
-		});
-
-		hope.events.listen(this.editor.refs.output, 'mouseup', function() {
+		var updateRange = function() {
 			var sel = window.getSelection();
-			self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-			self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			if (sel.focusNode == self.editor.refs.output) {
+				// cursor is not in any child node, so the offset is in nodes instead of characters;
+
+				self.start = self.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
+				self.end = self.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
+			} else {
+				self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
+				self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			}
+			if (self.end < self.start) {
+				var temp = self.start;
+				self.start = self.end;
+				self.end = temp;
+			}
 			if (self.end == self.start) {
 				self.collapse();
 			}
-		});
+		};
 
-		hope.events.listen(this.editor.refs.output, 'mousedown', function() {
-			var sel = window.getSelection();
-			self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-			self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
-			if (self.end == self.start) {
-				self.collapse();
-			}
-
-		}, true);
+		hope.events.listen(this.editor.refs.output, 'keyup', updateRange);
+		hope.events.listen(this.editor.refs.output, 'mouseup', updateRange);
+		hope.events.listen(this.editor.refs.output, 'mousedown', updateRange, true);
 	}
 
 	hopeEditorSelection.prototype.updateRange = function () {
 		var sel = window.getSelection();
-		this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-		this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+		if (sel.focusNode == this.editor.refs.output) {
+			this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
+			this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
+		} else {
+			this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
+			this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+		}
+		if (this.end < this.start) {
+			var temp = this.start;
+			this.start = this.end;
+			this.end = temp;
+		}
 		if (this.end == this.start) {
 			this.collapse();
 		}
