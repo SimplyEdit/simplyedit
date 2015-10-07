@@ -10,10 +10,10 @@
 	}
 
 	var editor = {
-		baseURL : "http://yvo.muze.nl/simply-edit/",
+		baseURL : "http://se-cdn.muze.nl/github/simply-edit/", // api key = github;
 		storage : (function() {
 			var script = document.createElement("SCRIPT");
-			script.src = "http://yvo.muze.nl/github.js/github/github.js";
+			script.src = "http://se-cdn.muze.nl/github.js";
 			document.head.appendChild(script);
 
 			var repoUser = document.location.hostname.split(".")[0];
@@ -969,7 +969,16 @@
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-image.html",
-			editor.baseURL + "vedor/plugin.vedor-image-browse.html"
+//			editor.baseURL + "vedor/plugin.vedor-image-browse.html"
+
+                        editor.baseURL + "vedor/toolbar.vedor-iframe.html",
+                        editor.baseURL + "vedor/toolbar.vedor-selectable.html",
+                        editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
+                        editor.baseURL + "vedor/plugin.vedor-meta.html",
+                        editor.baseURL + "vedor/plugin.vedor-save.html",
+                        editor.baseURL + "vedor/toolbar.vedor-list.html",
+                        editor.baseURL + "vedor/plugin.vedor-dropbox.html",
+                        editor.baseURL + "vedor/plugin.vedor-symbol.html"
 		]
 	});
 
