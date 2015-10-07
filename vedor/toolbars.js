@@ -485,12 +485,13 @@
 			}
 		},
 		show : function() {
-			// vdSelectionState.remove(); // FIXME: deze is nodig voor text toolbar update, maar maakt selectie bij lists stuk.
 			var currentContext = editor.context.get();
 
 			var sections = document.querySelectorAll("section.vedor-section");
 			for (var i=0; i<sections.length; i++) {
-				sections[i].classList.remove("active");
+				if(sections[i].classList.contains("active")) {
+					sections[i].classList.remove("active");
+				}
 			}
 
 			editor.context.initProperties(currentContext);
@@ -499,7 +500,9 @@
 				var sections = document.querySelectorAll("section.vedor-section");
 				for (var j=0; j<sections.length; j++) {
 					if (!(sections[j].className.match(/active/))) {
-						sections[j].style.left = "-10000px";
+						if (parseInt(sections[j].style.left)) {
+							sections[j].style.left = "-10000px";
+						}
 					}
 				}
 			};
@@ -511,11 +514,14 @@
 			if (activeSection && !vdHideToolbars) {
 				var htmlContext = activeSection.querySelectorAll("div.vedor-toolbar-status")[0];
 				if ( htmlContext ) {
-					htmlContext.classList.add("vedor-selected");
+					if (!htmlContext.classList.contains("vedor-selected")) {
+						htmlContext.classList.add("vedor-selected");
+					}
 				}
 				// activeSection.style.display = "block";
 				activeSection.className += " active";
 				hideIt(); // window.setTimeout(hideIt, 200);
+
 
 				var sel = vdSelectionState.get();
 				var parent = vdSelection.getNode(sel);
@@ -524,6 +530,7 @@
 				}
 
 				editor.context.toolbar.reposition();
+
 
 				if (editor.context.touching) {
 					// FIXME: Android fix here
