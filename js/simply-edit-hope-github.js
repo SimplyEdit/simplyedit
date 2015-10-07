@@ -71,6 +71,22 @@
 						}
 					};
 					http.send();
+				},
+				saveTemplate : function(pageTemplate, callback) {
+					var dataPath = location.pathname;
+					if (dataPath.match(/\/$/)) {
+						dataPath += "index.html";
+					}
+					dataPath = dataPath.substring(1, dataPath.length);
+
+					var repo = this.repo;
+					repo.read(repoBranch, pageTemplate, function(err, data) {
+						if (data) {
+							console.log("copy " + pageTemplate + " to " + dataPath);
+							console.log(data);
+							repo.write(repoBranch, dataPath, data, pageTemplate + " (copy)", callback);
+						}
+					});
 				}
 			};
 		}()),
@@ -979,6 +995,7 @@
                         editor.baseURL + "vedor/toolbar.vedor-list.html",
                         editor.baseURL + "vedor/plugin.vedor-dropbox.html",
                         editor.baseURL + "vedor/plugin.vedor-symbol.html"
+			editor.baseURL + "vedor/plugin.vedor-template.html"
 		]
 	});
 
