@@ -86,6 +86,16 @@
 						default:
 							var action = editor.actions[el.getAttribute("data-vedor-action")];
 							if (action) {
+								var currentField = editor.node.getEditableField();
+								console.log(currentField);
+								if (currentField.hopeEditor) {
+									editor.context.skipUpdate = true;
+									currentField.hopeEditor.parseHTML();
+									window.setTimeout(function() {
+										editor.context.skipUpdate = false;
+									}, 50);
+								}
+
 								var result = action(el);
 								if (!result) {
 									return;
