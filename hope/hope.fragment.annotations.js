@@ -62,6 +62,8 @@ hope.register( 'hope.fragment.annotations', function() {
 	};
 
 	hopeAnnotationList.prototype.grow = function( position, size ) {
+		var i;
+
 		function getBlockIndexes(list, index, position) {
 			var blockIndexes = [];
 			for ( var i=index-1; i>=0; i-- ) {
@@ -77,11 +79,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		var growRange = false;
 		var removeList = [];
 		if ( size < 0 ) {
-			var removeRange = hope.range.create( position + size, position );
+			removeRange = hope.range.create( position + size, position );
 		} else {
-			var growRange = hope.range.create( position, position + size );
+			growRange = hope.range.create( position, position + size );
 		}
-		for ( var i=0, l=list.length; i<l; i++ ) {
+		for ( i=0, l=list.length; i<l; i++ ) {
 			if ( removeRange ) { // && removeRange.overlaps( list[i].range ) ) {
 				if ( removeRange.contains( list[i].range ) ) {
 					removeList.push(i);
@@ -91,7 +93,7 @@ hope.register( 'hope.fragment.annotations', function() {
 						// block annotation must be merged with previous annotation, if available 
 						// get block annotation at start of removeRange
 						var prevBlockIndexes = getBlockIndexes(list, i, removeRange.start);
-						if ( prevBlockIndexes.length == 0 ) {
+						if ( prevBlockIndexes.length === 0 ) {
 							// no block element in removeRange.start, so just move this block element
 							list[i] = hope.annotation.create( list[i].range.delete( removeRange ), list[i].tag );
 						} else {
@@ -100,8 +102,11 @@ hope.register( 'hope.fragment.annotations', function() {
 								var prevBlockIndex = prevBlockIndexes[ii];
 								var prevBlock = list[ prevBlockIndex ];
 								list[ prevBlockIndex ] = hope.annotation.create(
-									hope.range.create( prevBlock.range.start, list[i].range.end ).delete( removeRange )
-									, prevBlock.tag
+									hope.range.create( 
+										prevBlock.range.start,
+										list[i].range.end
+									).delete( removeRange ),
+									prevBlock.tag
 								);
 							}
 							removeList.push(i);
@@ -117,27 +122,29 @@ hope.register( 'hope.fragment.annotations', function() {
 					list[i] = hope.annotation.create( list[i].range.delete( removeRange ), list[i].tag );
 				}
 			} else if (growRange) {
+				var range;
 				if ( list[i].range.start > position ) {
-					var range = list[i].range.move( size, position );
+					range = list[i].range.move( size, position );
 					list[i] = hope.annotation.create( range, list[i].tag );
 				} else if ( list[i].range.end >= position ) {
-					var range = list[i].range.grow( size );
+					range = list[i].range.grow( size );
 					list[i] = hope.annotation.create( range, list[i].tag );
 				}
 			}
 		}
 		// now remove indexes in removeList from list
-		for ( var i=removeList.length-1; i>=0; i--) {
+		for ( i=removeList.length-1; i>=0; i--) {
 			list.splice( removeList[i], 1);
 		}
 		return new hopeAnnotationList(list).clean();
 	};
 
 	hopeAnnotationList.prototype.clear = function( range ) {
+		var i;
 		range = hope.range.create(range);
 		var list = this.list.slice();
 		var remove = [];
-		for ( var i=0, l=list.length; i<l; i++ ) {
+		for ( i=0, l=list.length; i<l; i++ ) {
 			var listRange = list[i].range;
 			if ( listRange.overlaps( range ) && !listRange.contains( range ) ) {
 				if ( range.contains( listRange ) ) {
@@ -150,18 +157,19 @@ hope.register( 'hope.fragment.annotations', function() {
 				}
 			}
 		}
-		for ( var i=remove.length-1; i>=0; i--) {
+		for ( i=remove.length-1; i>=0; i-- ) {
 			list.splice( remove[i], 1);
 		}
 		return new hopeAnnotationList(list).clean();
-	}
+	};
 
 	hopeAnnotationList.prototype.remove = function( range, tag ) {
+		var i;
 		range = hope.range.create(range);
 		var list = this.list.slice();
 		var remove = [];
 		var add = [];
-		for ( var i=0, l=list.length; i<l; i++ ) {
+		for ( i=0, l=list.length; i<l; i++ ) {
 			var listRange = list[i].range;
 			if ( !list[i].has( tag ) ) {
 				continue;
@@ -201,12 +209,12 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 
 		}
-		for ( var i=remove.length-1;i>=0; i--) {
+		for ( i=remove.length-1;i>=0; i-- ) {
 			list.splice( remove[i], 1);
 		}
 		list = list.concat(add);
 		return new hopeAnnotationList(list).clean();
-	}
+	};
 
 	hopeAnnotationList.prototype.delete = function( range ) {
 		range = hope.range.create(range);
@@ -227,7 +235,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 		}
 		return new hopeAnnotationList( copy );
-	}
+	};
 
 	hopeAnnotationList.prototype.getAt = function( position ) {
 		if ( !position ) {
@@ -237,23 +245,24 @@ hope.register( 'hope.fragment.annotations', function() {
 		var matches = [];
 		for ( var i=0, l=this.list.length; i<l; i++ ) {
 			if ( this.list[i].range.overlaps( range ) ) {
-				matches.push( this.list[i] )
+				matches.push( this.list[i] );
 			}
 		}
 		return new hopeAnnotationList( matches );		
-	}
+	};
 
 	hopeAnnotationList.prototype.has = function(range, tag) {
 		range = hope.range.create(range);
 		for ( var i=0,l=this.list.length; i<l; i++ ) {
-			if ( this.list[i].range.overlaps( range ) 
-				&& this.list[i].has( tag )
+			if (
+				this.list[i].range.overlaps( range ) && 
+				this.list[i].has( tag )
 			) {
 				return this.list[i];
 			}
 		}
 		return false;
-	}
+	};
 
 	hopeAnnotationList.prototype.length = function() {
 		return this.list.length;
@@ -265,9 +274,9 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeAnnotationList.prototype.filter = function(f) {
 		var list = this.list.slice();
-		var list = list.filter( f );
+		list = list.filter( f );
 		return new hopeAnnotationList( list );
-	}
+	};
 
 	hopeAnnotationList.prototype.getEventList = function() {
 		function getUnsortedEventList() {
@@ -325,10 +334,10 @@ hope.register( 'hope.fragment.annotations', function() {
 		relativeList = calculateRelativeOffsets.call( this, relativeList );
 		relativeList = groupByOffset.call( this, relativeList );
 		return relativeList;
-	}
+	};
 
 	this.create = function( annotations ) {
 		return new hopeAnnotationList( annotations );	
-	}
+	};
 
 });
