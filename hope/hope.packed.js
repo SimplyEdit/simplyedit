@@ -950,7 +950,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			'dd' : [ 'dl' ]
 		},
 		// which html elements to allow as the top level, default is only block elements
-		'toplevel' : nestingSets.block + [ 'li', 'img', 'span', 'strong', 'em' ]
+		'toplevel' : nestingSets.block + nestingSets.inline // [ 'li', 'img', 'span', 'strong', 'em', 'code' ]
 	};
 
 	this.getTag = function( markup ) {
@@ -986,10 +986,10 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 
 			// daarna komen inline elementen
-			if (nestingSets['block'].indexOf(a.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets['inline'].indexOf(a.tag.split(/ /)[0]) != '-1') {
 				return -1;
 			}
-			if (nestingSets['block'].indexOf(b.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets['inline'].indexOf(b.tag.split(/ /)[0]) != '-1') {
 				return 1;
 			}
 
