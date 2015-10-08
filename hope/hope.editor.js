@@ -207,6 +207,8 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
+		preOffset = offset - node.textContent.length;
+
 		range.setEnd(node, end - preOffset );
 		return range;
 	};

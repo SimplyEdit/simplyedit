@@ -103,6 +103,15 @@ hope.register( 'hope.render.html', function() {
 			} else if ( a.range.end < b.range.end ) {
 				return 1;
 			}
+
+			// block elementen komen voor andere elementen
+			if (nestingSets['block'].indexOf(a.tag.split(/ /)[0]) != '-1') {
+				return -1;
+			}
+			if (nestingSets['block'].indexOf(b.tag.split(/ /)[0]) != '-1') {
+				return 1;
+			}
+
 			// hack om hyperlinks met images er in te laten werken.
 			if (a.tag.split(/ /)[0] == 'a') {
 				return -1;
@@ -114,12 +123,12 @@ hope.register( 'hope.render.html', function() {
 		});
 		var unfilteredStack = [];
 		for ( var i=0, l=annotationSet.length; i<l; i++ ) {
-			unfilteredStack.push( annotationSet[i].tag ); // needs to be filtered
+			unfilteredStack.push( annotationSet[i] ); // needs to be filtered
 		}
 		// assume annotation higher in the stack is what user intended, so should override conflicting annotation lower in the stack
 		// stack will be built up in reverse, most local styles applied first
 		var annotation        = unfilteredStack.pop();
-		var annotationTag     = this.getTag( annotation );
+		var annotationTag     = this.getTag( annotation.tag );
 		var lastAnnotationTag = '';
 		var skippedAnnotation = [];
 
@@ -131,7 +140,7 @@ hope.register( 'hope.render.html', function() {
 		}
 */
 		do {
-			annotationTag = this.getTag( annotation );
+			annotationTag = this.getTag( annotation.tag );
 			if ( 
 				( !lastAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) || 
 				( lastAnnotationTag && ( !this.rules.nesting[ annotationTag ] || 
@@ -142,7 +151,7 @@ hope.register( 'hope.render.html', function() {
 				skippedAnnotation.push( annotation );			
 			} else {
 				annotationStack.push( annotation );
-				lastAnnotationTag = this.getTag( annotation );
+				lastAnnotationTag = this.getTag( annotation.tag );
 			}
 			annotation = unfilteredStack.pop();
 		} while ( annotation );
@@ -154,7 +163,7 @@ hope.register( 'hope.render.html', function() {
 			var topAnnotationTag = annotationStack[0];
 			annotation = skippedAnnotation.pop();
 			while ( annotation ) {
-				annotationTag = this.getTag( annotation );
+				annotationTag = this.getTag( annotation.tag );
 				if (  
 					( !topAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) || 
 					( topAnnotationTag && ( !this.rules.nesting[ topAnnotationTag ] || 
@@ -182,8 +191,6 @@ hope.register( 'hope.render.html', function() {
 
 		var commonStack = [];
 		for ( i=0, l=annotationStackFrom.length; i<l; i++ ) {
-			break; // Do not merge tags; FIXME: maybe merge *some* tags - inline tags only?
-			
 			if ( annotationStackFrom[i] != annotationStackTo[i] ) {
 				break;
 			}
@@ -206,18 +213,18 @@ hope.register( 'hope.render.html', function() {
 		for ( var i=0, l=annotationDiff.length; i<l; i++ ) {
 			var annotationTag;
 			if ( annotationDiff[i].type == 'close' ) {
-				annotationTag = this.getTag( annotationDiff[i].annotation );
+				annotationTag = this.getTag( annotationDiff[i].annotation.tag );
 				if ( this.rules.noChildren.indexOf( annotationTag ) == -1 ) {
 					renderedDiff += '</' + annotationTag + '>';
 				}
 			} else if ( annotationDiff[i].type == 'insert' ) {
 				renderedDiff += '<' + annotationDiff[i].annotation + '>';
-				annotationTag = this.getTag( annotationDiff[i].annotation );
+				annotationTag = this.getTag( annotationDiff[i].annotation.tag );
 				if ( this.rules.noChildren.indexOf( annotationTag ) == -1 ) {
 					renderedDiff += '</' + annotationTag + '>';
 				}
 			} else {
-				renderedDiff += '<' + annotationDiff[i].annotation + '>';
+				renderedDiff += '<' + annotationDiff[i].annotation.tag + '>';
 			}
 		}
 		return renderedDiff;
