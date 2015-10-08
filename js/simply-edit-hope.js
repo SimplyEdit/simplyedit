@@ -969,7 +969,7 @@
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-image.html",
-			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
+//			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
                         editor.baseURL + "vedor/toolbar.vedor-iframe.html",
                         editor.baseURL + "vedor/toolbar.vedor-selectable.html",
                         editor.baseURL + "vedor/toolbar.vedor-list.html",
@@ -978,7 +978,7 @@
                         editor.baseURL + "vedor/plugin.vedor-meta.html",
                         editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
                         editor.baseURL + "vedor/plugin.vedor-symbol.html",
-                        editor.baseURL + "vedor/plugin.vedor-plain.html",
+//                        editor.baseURL + "vedor/plugin.vedor-plain.html",
                         editor.baseURL + "vedor/plugin.vedor-dropbox.html"
 		]
 	});
