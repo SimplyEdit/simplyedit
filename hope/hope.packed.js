@@ -1055,6 +1055,8 @@ hope.register( 'hope.fragment.annotations', function() {
 
 		var commonStack = [];
 		for ( i=0, l=annotationStackFrom.length; i<l; i++ ) {
+			break; // Do not merge tags; FIXME: maybe merge *some* tags - inline tags only?
+			
 			if ( annotationStackFrom[i] != annotationStackTo[i] ) {
 				break;
 			}
