@@ -30,6 +30,6 @@ hope.register('hope.events', function() {
 			evt.cancelBubble = true;
 		}
 		return false;
-	}
+	};
 	
 } );

@@ -111,7 +111,7 @@
 	var updateTextToolbar = function(toolbar) {
 		var sel = vdSelectionState.get();
 		var parent = vdSelection.getNode(sel);
-		var field = editor.node.getEditableField(parent);
+		var field = editor.node.getEditableField();
 
 		hopeEditor = field.hopeEditor;
 
@@ -168,9 +168,13 @@
 
 		// Check hyperlink;
 		var hyperlink = hopeEditor.fragment.has(range, "a");
-		if (hyperlink) {
-			var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
-
+		if (hyperlink || (hopeEditor.field.tagName.toLowerCase() === 'a')) {
+			var tempNode;
+			if (hyperlink) {
+				tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+			} else {
+				tempNode = hopeEditor.field;
+			}
 			var hyperlinkHref = tempNode.getAttribute('href');
 			vedor.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), hyperlinkHref);
 
@@ -416,7 +420,6 @@
 			'vedor-text-blockstyle' : function(value) {
 				var range = hopeEditor.selection.getRange();
 
-
 				if (range.start != range.end) {
 					if (hopeEditor.fragment.has(range, value)) {
 						hopeEditor.fragment = hopeEditor.fragment.remove(range, value);
@@ -449,6 +452,11 @@
 				hopeEditor.update();
 			},
 			"vedor-hyperlink-href" : function(value) {
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					hopeEditor.field.setAttribute("href", value);
+					return;
+				}
+
 				var range = hopeEditor.selection.getRange();
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
@@ -464,6 +472,11 @@
 				hopeEditor.update();
 			},
 			"vedor-hyperlink-title" : function(value) {
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					hopeEditor.field.setAttribute("title", value);
+					return;
+				}
+
 				var range = hopeEditor.selection.getRange();
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
@@ -479,6 +492,11 @@
 				hopeEditor.update();
 			},
 			"vedor-hyperlink-name" : function(value) {
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					hopeEditor.field.setAttribute("name", value);
+					return;
+				}
+
 				var range = hopeEditor.selection.getRange();
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
@@ -494,6 +512,17 @@
 				hopeEditor.update();
 			},
 			"vedor-hyperlink-nofollow" : function(button) {
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					if (hopeEditor.field.getAttribute("rel") == "nofollow") {
+						hopeEditor.field.removeAttribute("rel");
+						button.classList.remove("vedor-selected");
+					} else {
+						hopeEditor.field.setAttribute("rel", "nofollow");
+						button.classList.add("vedor-selected");
+					}
+					return;
+				}
+
 				var range = hopeEditor.selection.getRange();
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				

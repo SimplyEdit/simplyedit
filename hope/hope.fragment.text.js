@@ -9,7 +9,7 @@ hope.register( 'hope.fragment.text', function() {
 		get length () {
 			return this.content.length;
 		}
-	}
+	};
 
 	hopeTextFragment.prototype.delete   = function( range ) {
 		range = hope.range.create(range);
@@ -34,11 +34,11 @@ hope.register( 'hope.fragment.text', function() {
 
 	hopeTextFragment.prototype.toString = function() {
 		return this.content;
-	}
+	};
 
 	hopeTextFragment.prototype.search = function( re, matchIndex ) {
 		function escapeRegExp(s) {
-			return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
+			return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 		}
 		if ( ! ( re instanceof RegExp ) ) {
 			re = new RegExp( escapeRegExp( re ) , 'g' );
@@ -48,17 +48,17 @@ hope.register( 'hope.fragment.text', function() {
 		if ( !matchIndex ) {
 			matchIndex = 0;
 		}
-		while ( ( match = re.exec( this.content ) ) != null ) {
+		while ( ( match = re.exec( this.content ) ) !== null ) {
 			result.push( hope.range.create( match.index, match.index + match[matchIndex].length ) );
 			if ( !re.global ) {
 				break;
 			}
 		}
 		return result;
-	}
+	};
 
 	this.create = function( content ) {
 		return new hopeTextFragment( content );
-	}
+	};
 
 });

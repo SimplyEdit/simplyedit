@@ -52,7 +52,7 @@ hope.register( 'hope.editor', function() {
 		return {
 			text : textValue,
 			tags : tags
-		}
+		};
 	}
 
 	function tagsToText(tags) {
@@ -81,7 +81,7 @@ hope.register( 'hope.editor', function() {
 		this.selection = hope.editor.selection.create(0,0,this);
 		this.commandsKeyUp = {};
 
-		if (this.refs.output.innerHTML != '') {
+		if (this.refs.output.innerHTML !== '') {
 			this.refs.output.innerHTML = this.refs.output.innerHTML.replace(/\/p>/g, "/p>\n");
 			this.parseHTML();
 		}
@@ -190,6 +190,7 @@ hope.register( 'hope.editor', function() {
 			}
 			return false;
 		}
+
 		var preOffset = offset - node.textContent.length;
 		range.setStart(node, start - preOffset );
 		while ( offset < end && node ) {
@@ -205,10 +206,10 @@ hope.register( 'hope.editor', function() {
 			}
 			return false;
 		}
-		var preOffset = offset - node.textContent.length;
+
 		range.setEnd(node, end - preOffset );
 		return range;
-	}
+	};
 
 	hopeEditor.prototype.showCursor = function() {
 		var range = this.selection.getRange();
@@ -218,7 +219,7 @@ hope.register( 'hope.editor', function() {
 			htmlSelection.removeAllRanges();
 			htmlSelection.addRange(selection);
 		}
-	}
+	};
 
 
 	hopeEditor.prototype.getBlockAnnotation = function( position ) {
@@ -230,12 +231,12 @@ hope.register( 'hope.editor', function() {
 			}
 		}
 		return null; // FIXME: define a null block annotation and return it with full range of document
-	}
+	};
 
 	hopeEditor.prototype.isBlockTag = function( tag ) {
 		tag = hope.annotation.stripTag(tag);
 		return ['h1','h2','h3','p','li'].includes(tag);
-	}
+	};
 
 	hopeEditor.prototype.getNextBlockTag = function( tag ) {
 		tag = hope.annotation.stripTag(tag);
@@ -250,7 +251,7 @@ hope.register( 'hope.editor', function() {
 			return tagOrder[tag];
 		}
 		return 'p';
-	}
+	};
 
 	hopeEditor.prototype.commands = {
 		'Control+b': function(range) {
@@ -321,7 +322,7 @@ hope.register( 'hope.editor', function() {
 		if ( this.refs.annotations ) {
 			this.refs.annotations.innerHTML = this.fragment.annotations+'';
 		}
-	}
+	};
 
 	hopeEditor.prototype.command = function( key, callback, keyup ) {
 		if ( keyup ) {
@@ -329,10 +330,10 @@ hope.register( 'hope.editor', function() {
 		} else {
 			this.commands[key] = callback;
 		}
-	}
+	};
 
 	this.create = function( textEl, annotationsEl, outputEl, previewEl ) {
 		return new hopeEditor( textEl, annotationsEl, outputEl, previewEl);
-	}
+	};
 
 });

@@ -50,7 +50,7 @@ var hope = this.hope = ( function( global ) {
 		this.message = message;
 		this.code = code;
 		this.name = 'hope.Exception';
-	}
+	};
 
 	return hope;
 
@@ -113,7 +113,7 @@ hope.register( 'hope.range', function() {
 		get length () {
 			return this.end - this.start;
 		}
-	}
+	};
 
 	hopeRange.prototype.collapse = function( toEnd ) {
 		var start = this.start;
@@ -138,24 +138,24 @@ hope.register( 'hope.range', function() {
 			return -1;
 		}
 		return 0;
-	}
+	};
 
 	hopeRange.prototype.equals = function( range ) {
-		return this.compare(range)==0;
-	}
+		return this.compare(range)===0;
+	};
 
 	hopeRange.prototype.smallerThan = function( range ) {
 		return ( this.compare( range ) == -1 );
-	}
+	};
 
 	hopeRange.prototype.largerThan = function( range ) {
 		return ( this.compare( range ) == 1 );
-	}
+	};
 
 	hopeRange.prototype.contains = function( range ) {
 		range = hope.range.create(range);
 		return this.start <= range.start && this.end >= range.end;
-	}
+	};
 
 	hopeRange.prototype.overlaps = function( range ) {
 		range = hope.range.create(range);
@@ -164,11 +164,11 @@ hope.register( 'hope.range', function() {
 		}
 
 		return ( range.start <= this.end && range.end >= this.start );
-	}
+	};
 
 	hopeRange.prototype.isEmpty = function() {
 		return this.start >= this.end;
-	}
+	};
 
 	hopeRange.prototype.overlap = function( range ) {
 		range = hope.range.create(range);
@@ -187,7 +187,7 @@ hope.register( 'hope.range', function() {
 			}
 		}
 		return new hopeRange(start, end); // FIXME: is this range( 0, 0 ) a useful return value when there is no overlap?
-	}
+	};
 
 	hopeRange.prototype.exclude = function( range ) {
 		// return parts of this that do not overlap with range
@@ -212,15 +212,15 @@ hope.register( 'hope.range', function() {
 			right = left;
 		}
 		return [ left, right ];
-	}
+	};
 
 	hopeRange.prototype.excludeLeft = function( range ) {
 		return this.exclude(range)[0];
-	}
+	};
 
 	hopeRange.prototype.excludeRight = function( range ) {
 		return this.exclude(range)[1];
-	}
+	};
 
 	/** 
 	 * remove overlapping part of range from this range
@@ -244,12 +244,12 @@ hope.register( 'hope.range', function() {
 			result = result.move( -exclude.length );
 		}
 		return result;
-	}
+	};
 
 	hopeRange.prototype.copy = function( range ) {
 		range = hope.range.create(range);
 		return new hopeRange( 0, this.overlap( range ).length );
-	}
+	};
 
 	hopeRange.prototype.extend = function( length, direction ) {
 		var start = this.start;
@@ -263,7 +263,7 @@ hope.register( 'hope.range', function() {
 			start = Math.max( 0, start - length );
 		}
 		return new hopeRange(start, end);
-	}
+	};
 
 	hopeRange.prototype.toString = function() {
 		if ( this.start != this.end ) {
@@ -271,7 +271,7 @@ hope.register( 'hope.range', function() {
 		} else {
 			return this.start + '';
 		}
-	}
+	};
 
 	hopeRange.prototype.grow = function( size ) {
 		var end = this.end + size;
@@ -279,11 +279,11 @@ hope.register( 'hope.range', function() {
 			end = this.start;
 		}
 		return new hopeRange(this.start, end);
-	}
+	};
 
 	hopeRange.prototype.shrink = function( size ) {
 		return this.grow( -size );
-	}
+	};
 
 	hopeRange.prototype.move = function( length, min, max ) {
 		var start = this.start;
@@ -300,7 +300,7 @@ hope.register( 'hope.range', function() {
 			end = Math.min( max, start );
 		}
 		return new hopeRange(start, end);
-	}
+	};
 
 	this.create = function( start, end ) {
 		if ( start instanceof hopeRange ) {
@@ -313,7 +313,7 @@ hope.register( 'hope.range', function() {
 			start = start[0];
 		}
 		return new hopeRange( start, end );
-	}
+	};
 
 });hope.register( 'hope.annotation', function() {
 
@@ -325,41 +325,40 @@ hope.register( 'hope.range', function() {
 
 	hopeAnnotation.prototype.delete = function( range ) {
 		return new hopeAnnotation( this.range.delete( range ), this.tag );	
-	}
+	};
 
 	hopeAnnotation.prototype.copy   = function( range ) {
 		return new hopeAnnotation( this.range.copy( range ), this.tag );
-	}
+	};
 
 	hopeAnnotation.prototype.compare = function( annotation ) {
 		return this.range.compare( annotation.range );
-	}
+	};
 
 	hopeAnnotation.prototype.has = function( tag ) {
 		//FIXME: should be able to specify attributes and attribute values as well
 		return this.stripTag() == hope.annotation.stripTag(tag);
-	}
+	};
 
 	hopeAnnotation.prototype.toString = function() {
 		return this.range + ':' + this.tag;
-	}
+	};
 
 	hopeAnnotation.prototype.stripTag = function() {
 		return hope.annotation.stripTag(this.tag);
-	}
+	};
 
 	hopeAnnotation.prototype.isBlock = function() {
 		return ( ['h1','h2','h3','p','li'].indexOf(hope.annotation.stripTag(this.tag)) != -1 );
-	}
+	};
 
 	this.create = function( range, tag ) {
 		return new hopeAnnotation( range, tag );
-	}
+	};
 
 	this.stripTag = function(tag) {
 		return tag.split(' ')[0];
-	}
-
+	};
 });
 
 hope.register( 'hope.fragment', function() {
@@ -531,6 +530,8 @@ hope.register( 'hope.fragment.annotations', function() {
 	};
 
 	hopeAnnotationList.prototype.grow = function( position, size ) {
+		var i;
+
 		function getBlockIndexes(list, index, position) {
 			var blockIndexes = [];
 			for ( var i=index-1; i>=0; i-- ) {
@@ -546,11 +547,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		var growRange = false;
 		var removeList = [];
 		if ( size < 0 ) {
-			var removeRange = hope.range.create( position + size, position );
+			removeRange = hope.range.create( position + size, position );
 		} else {
-			var growRange = hope.range.create( position, position + size );
+			growRange = hope.range.create( position, position + size );
 		}
-		for ( var i=0, l=list.length; i<l; i++ ) {
+		for ( i=0, l=list.length; i<l; i++ ) {
 			if ( removeRange ) { // && removeRange.overlaps( list[i].range ) ) {
 				if ( removeRange.contains( list[i].range ) ) {
 					removeList.push(i);
@@ -560,7 +561,7 @@ hope.register( 'hope.fragment.annotations', function() {
 						// block annotation must be merged with previous annotation, if available 
 						// get block annotation at start of removeRange
 						var prevBlockIndexes = getBlockIndexes(list, i, removeRange.start);
-						if ( prevBlockIndexes.length == 0 ) {
+						if ( prevBlockIndexes.length === 0 ) {
 							// no block element in removeRange.start, so just move this block element
 							list[i] = hope.annotation.create( list[i].range.delete( removeRange ), list[i].tag );
 						} else {
@@ -569,8 +570,11 @@ hope.register( 'hope.fragment.annotations', function() {
 								var prevBlockIndex = prevBlockIndexes[ii];
 								var prevBlock = list[ prevBlockIndex ];
 								list[ prevBlockIndex ] = hope.annotation.create(
-									hope.range.create( prevBlock.range.start, list[i].range.end ).delete( removeRange )
-									, prevBlock.tag
+									hope.range.create( 
+										prevBlock.range.start,
+										list[i].range.end
+									).delete( removeRange ),
+									prevBlock.tag
 								);
 							}
 							removeList.push(i);
@@ -586,27 +590,29 @@ hope.register( 'hope.fragment.annotations', function() {
 					list[i] = hope.annotation.create( list[i].range.delete( removeRange ), list[i].tag );
 				}
 			} else if (growRange) {
+				var range;
 				if ( list[i].range.start > position ) {
-					var range = list[i].range.move( size, position );
+					range = list[i].range.move( size, position );
 					list[i] = hope.annotation.create( range, list[i].tag );
 				} else if ( list[i].range.end >= position ) {
-					var range = list[i].range.grow( size );
+					range = list[i].range.grow( size );
 					list[i] = hope.annotation.create( range, list[i].tag );
 				}
 			}
 		}
 		// now remove indexes in removeList from list
-		for ( var i=removeList.length-1; i>=0; i--) {
+		for ( i=removeList.length-1; i>=0; i--) {
 			list.splice( removeList[i], 1);
 		}
 		return new hopeAnnotationList(list).clean();
 	};
 
 	hopeAnnotationList.prototype.clear = function( range ) {
+		var i;
 		range = hope.range.create(range);
 		var list = this.list.slice();
 		var remove = [];
-		for ( var i=0, l=list.length; i<l; i++ ) {
+		for ( i=0, l=list.length; i<l; i++ ) {
 			var listRange = list[i].range;
 			if ( listRange.overlaps( range ) && !listRange.contains( range ) ) {
 				if ( range.contains( listRange ) ) {
@@ -619,18 +625,19 @@ hope.register( 'hope.fragment.annotations', function() {
 				}
 			}
 		}
-		for ( var i=remove.length-1; i>=0; i--) {
+		for ( i=remove.length-1; i>=0; i-- ) {
 			list.splice( remove[i], 1);
 		}
 		return new hopeAnnotationList(list).clean();
-	}
+	};
 
 	hopeAnnotationList.prototype.remove = function( range, tag ) {
+		var i;
 		range = hope.range.create(range);
 		var list = this.list.slice();
 		var remove = [];
 		var add = [];
-		for ( var i=0, l=list.length; i<l; i++ ) {
+		for ( i=0, l=list.length; i<l; i++ ) {
 			var listRange = list[i].range;
 			if ( !list[i].has( tag ) ) {
 				continue;
@@ -670,12 +677,12 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 
 		}
-		for ( var i=remove.length-1;i>=0; i--) {
+		for ( i=remove.length-1;i>=0; i-- ) {
 			list.splice( remove[i], 1);
 		}
 		list = list.concat(add);
 		return new hopeAnnotationList(list).clean();
-	}
+	};
 
 	hopeAnnotationList.prototype.delete = function( range ) {
 		range = hope.range.create(range);
@@ -696,7 +703,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 		}
 		return new hopeAnnotationList( copy );
-	}
+	};
 
 	hopeAnnotationList.prototype.getAt = function( position ) {
 		if ( !position ) {
@@ -706,23 +713,24 @@ hope.register( 'hope.fragment.annotations', function() {
 		var matches = [];
 		for ( var i=0, l=this.list.length; i<l; i++ ) {
 			if ( this.list[i].range.overlaps( range ) ) {
-				matches.push( this.list[i] )
+				matches.push( this.list[i] );
 			}
 		}
 		return new hopeAnnotationList( matches );		
-	}
+	};
 
 	hopeAnnotationList.prototype.has = function(range, tag) {
 		range = hope.range.create(range);
 		for ( var i=0,l=this.list.length; i<l; i++ ) {
-			if ( this.list[i].range.overlaps( range ) 
-				&& this.list[i].has( tag )
+			if (
+				this.list[i].range.overlaps( range ) && 
+				this.list[i].has( tag )
 			) {
 				return this.list[i];
 			}
 		}
 		return false;
-	}
+	};
 
 	hopeAnnotationList.prototype.length = function() {
 		return this.list.length;
@@ -734,9 +742,9 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeAnnotationList.prototype.filter = function(f) {
 		var list = this.list.slice();
-		var list = list.filter( f );
+		list = list.filter( f );
 		return new hopeAnnotationList( list );
-	}
+	};
 
 	hopeAnnotationList.prototype.getEventList = function() {
 		function getUnsortedEventList() {
@@ -794,11 +802,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		relativeList = calculateRelativeOffsets.call( this, relativeList );
 		relativeList = groupByOffset.call( this, relativeList );
 		return relativeList;
-	}
+	};
 
 	this.create = function( annotations ) {
 		return new hopeAnnotationList( annotations );	
-	}
+	};
 
 });hope.register( 'hope.fragment.text', function() {
 
@@ -811,7 +819,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		get length () {
 			return this.content.length;
 		}
-	}
+	};
 
 	hopeTextFragment.prototype.delete   = function( range ) {
 		range = hope.range.create(range);
@@ -836,11 +844,11 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeTextFragment.prototype.toString = function() {
 		return this.content;
-	}
+	};
 
 	hopeTextFragment.prototype.search = function( re, matchIndex ) {
 		function escapeRegExp(s) {
-			return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
+			return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 		}
 		if ( ! ( re instanceof RegExp ) ) {
 			re = new RegExp( escapeRegExp( re ) , 'g' );
@@ -850,18 +858,18 @@ hope.register( 'hope.fragment.annotations', function() {
 		if ( !matchIndex ) {
 			matchIndex = 0;
 		}
-		while ( ( match = re.exec( this.content ) ) != null ) {
+		while ( ( match = re.exec( this.content ) ) !== null ) {
 			result.push( hope.range.create( match.index, match.index + match[matchIndex].length ) );
 			if ( !re.global ) {
 				break;
 			}
 		}
 		return result;
-	}
+	};
 
 	this.create = function( content ) {
 		return new hopeTextFragment( content );
-	}
+	};
 
 });hope.register( 'hope.render.html', function() {
 
@@ -871,11 +879,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		'block'		: [ 'address', 'dir', 'menu', 'hr', 'table', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'ul', 'ol', 'dl', 'div', 'blockquote', 'iframe' ]
 	};
 
-	nestingSets['all'] = nestingSets.block.concat( nestingSets.inline );
+	nestingSets.all = nestingSets.block.concat( nestingSets.inline );
 
 	this.rules = {
 		nesting: {
-			'a'         : nestingSets.inline.filter( function(element) { return element != 'a' } ),
+			'a'         : nestingSets.inline.filter( function(element) { return element != 'a'; } ),
 			'abbr'      : nestingSets.inline,
 			'acronym'   : nestingSets.inline,
 			'address'   : [ 'p' ].concat( nestingSets.inline ),
@@ -943,11 +951,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		},
 		// which html elements to allow as the top level, default is only block elements
 		'toplevel' : nestingSets.block + [ 'li', 'img', 'span', 'strong', 'em' ]
-	}
+	};
 
 	this.getTag = function( markup ) {
 		return markup.split(' ')[0].toLowerCase(); // FIXME: more robust parsing needed
-	}
+	};
 
 	this.getAnnotationStack = function( annotationSet ) {
 		// { index:nextAnnotationEntry.index, entry:nextAnnotation }
@@ -997,8 +1005,11 @@ hope.register( 'hope.fragment.annotations', function() {
 */
 		do {
 			annotationTag = this.getTag( annotation );
-			if ( ( !lastAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) 
-				|| ( lastAnnotationTag && ( !this.rules.nesting[ annotationTag ] || this.rules.nesting[ annotationTag ].indexOf( lastAnnotationTag ) == -1 ) ) ) {
+			if ( 
+				( !lastAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) || 
+				( lastAnnotationTag && ( !this.rules.nesting[ annotationTag ] || 
+				this.rules.nesting[ annotationTag ].indexOf( lastAnnotationTag ) == -1 ) ) 
+			) {
 				// not legal: lastAnnotationTag may not be set inside annotationTag - so we cannot apply annotationTag
 				// save it for another try later
 				skippedAnnotation.push( annotation );			
@@ -1006,32 +1017,39 @@ hope.register( 'hope.fragment.annotations', function() {
 				annotationStack.push( annotation );
 				lastAnnotationTag = this.getTag( annotation );
 			}
-		} while ( annotation = unfilteredStack.pop() );
+			annotation = unfilteredStack.pop();
+		} while ( annotation );
 
 		if ( skippedAnnotation.length ) {
 			// now try to find a spot for any annotation from the skippedAnnotation set
 			// most likely: inline annotation that was more generally applied than block annotation
 			// the order has been reversed
 			var topAnnotationTag = annotationStack[0];
-			while ( annotation = skippedAnnotation.pop() ) {
+			annotation = skippedAnnotation.pop();
+			while ( annotation ) {
 				annotationTag = this.getTag( annotation );
-				if (  ( !topAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) 
-					|| ( topAnnotationTag && ( !this.rules.nesting[ topAnnotationTag ] || this.rules.nesting[ topAnnotationTag ].indexOf( annotationTag ) == -1 ) ) ) {
+				if (  
+					( !topAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) || 
+					( topAnnotationTag && ( !this.rules.nesting[ topAnnotationTag ] || 
+					this.rules.nesting[ topAnnotationTag ].indexOf( annotationTag ) == -1 ) ) 
+				) {
 					// not legal, you could try another run... FIXME: should probably try harder 
 				} else {
 					annotationStack.unshift( annotation );
 					topAnnotationTag = annotationTag;
 				}
+				annotation = skippedAnnotation.pop();
 			}
 		}
 		// FIXME: this routine can be improved - it needs a more intelligent algorithm to reorder the annotation to maximize the applied
 		// annotation from the annotationSet in the annotationStack
 		return annotationStack.reverse();
-	}
+	};
 
 	this.getAnnotationDiff = function( annotationStackFrom, annotationStackTo, annotationsOnce ) {
+		var i;
 		var annotationDiff = [];
-		for ( var i=0, l=annotationsOnce.length; i<l; i++ ) {
+		for ( i=0, l=annotationsOnce.length; i<l; i++ ) {
 			annotationDiff.push( { type : 'insert', annotation : annotationsOnce[i] } );
 		}
 
@@ -1043,28 +1061,29 @@ hope.register( 'hope.fragment.annotations', function() {
 			commonStack.push( annotationStackFrom[i] );
 		}
 		var commonIndex = i-1;
-		for ( var i=annotationStackFrom.length-1; i>commonIndex; i-- ) {
+		for ( i=annotationStackFrom.length-1; i>commonIndex; i-- ) {
 			annotationDiff.push( { type : 'close', annotation : annotationStackFrom[i] } );
 		}
-		for ( var i=commonIndex+1, l=annotationStackTo.length; i<l; i++ ) {
+		for ( i=commonIndex+1, l=annotationStackTo.length; i<l; i++ ) {
 			annotationDiff.push( { type : 'start', annotation : annotationStackTo[i] } );
 		}
 
 		return annotationDiff;
-	}
+	};
 
 	this.renderAnnotationDiff = function( annotationDiff ) {
 		// FIXME: allow rendering of custom elements, must still be inserted into this.rules
 		var renderedDiff = '';
 		for ( var i=0, l=annotationDiff.length; i<l; i++ ) {
+			var annotationTag;
 			if ( annotationDiff[i].type == 'close' ) {
-				var annotationTag = this.getTag( annotationDiff[i].annotation );
+				annotationTag = this.getTag( annotationDiff[i].annotation );
 				if ( this.rules.noChildren.indexOf( annotationTag ) == -1 ) {
 					renderedDiff += '</' + annotationTag + '>';
 				}
 			} else if ( annotationDiff[i].type == 'insert' ) {
 				renderedDiff += '<' + annotationDiff[i].annotation + '>';
-				var annotationTag = this.getTag( annotationDiff[i].annotation );
+				annotationTag = this.getTag( annotationDiff[i].annotation );
 				if ( this.rules.noChildren.indexOf( annotationTag ) == -1 ) {
 					renderedDiff += '</' + annotationTag + '>';
 				}
@@ -1073,7 +1092,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 		}
 		return renderedDiff;
-	}
+	};
 
 	this.escape = function( content ) {
 		return content
@@ -1082,7 +1101,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			.replace(/>/g, "&gt;")
 			.replace(/"/g, "&quot;")
 			.replace(/'/g, "&#039;");
-	}
+	};
 
 	this.render = function( fragment ) {
 		// FIXME: annotation should be the relative annotation list to speed things up
@@ -1132,7 +1151,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			// calculate the difference - how to get from stack one to stack two with the minimum of tags
 			var diff = this.getAnnotationDiff( annotationStack, newAnnotationStack, newAnnotationsOnce );
 			// remove autoclosing annotation from the newAnnotationStack
-			var newAnnotationStack = this.getAnnotationStack( annotationSet );
+			newAnnotationStack = this.getAnnotationStack( annotationSet );
 			var diffHTML = this.renderAnnotationDiff( diff );
 			renderedHTML += diffHTML;
 			annotationStack = newAnnotationStack;
@@ -1144,7 +1163,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		}
 
 		return renderedHTML;
-	}
+	};
 
 } );hope.register('hope.events', function() {
 	
@@ -1178,9 +1197,10 @@ hope.register( 'hope.fragment.annotations', function() {
 			evt.cancelBubble = true;
 		}
 		return false;
-	}
+	};
 	
 } );hope.register( 'hope.keyboard', function() {
+	var i;
 
 	var self = this;
 
@@ -1293,21 +1313,21 @@ hope.register( 'hope.fragment.annotations', function() {
 	keyCodes[254] = 'Clear';
 
 	// a-z
-	for ( var i=65; i<=90; i++ ) {
+	for ( i=65; i<=90; i++ ) {
 		keyCodes[i] = String.fromCharCode( i ).toLowerCase();
 	}
 
 	// 0-9
-	for ( var i=48; i<=57; i++ ) {
+	for ( i=48; i<=57; i++ ) {
 		keyCodes[i] = String.fromCharCode( i );
 	}
 	// 0-9 keypad
-	for ( var i=96; i<=105; i++ ) {
+	for ( i=96; i<=105; i++ ) {
 		keyCodes[i] = ''+(i-95);
 	}
 
 	// F1 - F24
-	for ( var i=112; i<=135; i++ ) {
+	for ( i=112; i<=135; i++ ) {
 		keyCodes[i] = 'F'+(i-111);
 	}
 
@@ -1381,7 +1401,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			keyInfo += 'Unknown';
 		}
 		return keyInfo;
-	}
+	};
 
 	this.listen = function( el, key, callback, capture ) {
 		return hope.editor.events.listen( el, 'keydown', function(evt) {
@@ -1390,7 +1410,7 @@ hope.register( 'hope.fragment.annotations', function() {
 				callback.call( this, evt );
 			}
 		}, capture);
-	}
+	};
 
 } );hope.register( 'hope.editor', function() {
 	var hopeTokenCounter = 0;
@@ -1446,7 +1466,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		return {
 			text : textValue,
 			tags : tags
-		}
+		};
 	}
 
 	function tagsToText(tags) {
@@ -1475,7 +1495,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		this.selection = hope.editor.selection.create(0,0,this);
 		this.commandsKeyUp = {};
 
-		if (this.refs.output.innerHTML != '') {
+		if (this.refs.output.innerHTML !== '') {
 			this.refs.output.innerHTML = this.refs.output.innerHTML.replace(/\/p>/g, "/p>\n");
 			this.parseHTML();
 		}
@@ -1584,6 +1604,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 			return false;
 		}
+
 		var preOffset = offset - node.textContent.length;
 		range.setStart(node, start - preOffset );
 		while ( offset < end && node ) {
@@ -1599,10 +1620,10 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 			return false;
 		}
-		var preOffset = offset - node.textContent.length;
+
 		range.setEnd(node, end - preOffset );
 		return range;
-	}
+	};
 
 	hopeEditor.prototype.showCursor = function() {
 		var range = this.selection.getRange();
@@ -1612,7 +1633,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			htmlSelection.removeAllRanges();
 			htmlSelection.addRange(selection);
 		}
-	}
+	};
 
 
 	hopeEditor.prototype.getBlockAnnotation = function( position ) {
@@ -1624,12 +1645,12 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 		}
 		return null; // FIXME: define a null block annotation and return it with full range of document
-	}
+	};
 
 	hopeEditor.prototype.isBlockTag = function( tag ) {
 		tag = hope.annotation.stripTag(tag);
 		return ['h1','h2','h3','p','li'].includes(tag);
-	}
+	};
 
 	hopeEditor.prototype.getNextBlockTag = function( tag ) {
 		tag = hope.annotation.stripTag(tag);
@@ -1644,7 +1665,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			return tagOrder[tag];
 		}
 		return 'p';
-	}
+	};
 
 	hopeEditor.prototype.commands = {
 		'Control+b': function(range) {
@@ -1715,7 +1736,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		if ( this.refs.annotations ) {
 			this.refs.annotations.innerHTML = this.fragment.annotations+'';
 		}
-	}
+	};
 
 	hopeEditor.prototype.command = function( key, callback, keyup ) {
 		if ( keyup ) {
@@ -1723,11 +1744,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		} else {
 			this.commands[key] = callback;
 		}
-	}
+	};
 
 	this.create = function( textEl, annotationsEl, outputEl, previewEl ) {
 		return new hopeEditor( textEl, annotationsEl, outputEl, previewEl);
-	}
+	};
 
 });hope.register( 'hope.editor.selection', function() {
 
@@ -1780,7 +1801,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		if (this.end == this.start) {
 			this.collapse();
 		}
-	}
+	};
 
 	hopeEditorSelection.prototype.cursorCommands = [
 		'Shift+Home',
@@ -1807,33 +1828,33 @@ hope.register( 'hope.fragment.annotations', function() {
 		} else {
 			return hope.range.create( this.end, this.start );
 		}
-	}
+	};
 
 	hopeEditorSelection.prototype.getCursor = function () {
 		return this.end;
-	}
+	};
 
 	hopeEditorSelection.prototype.collapse = function(toEnd) {
 		var r = this.getRange().collapse(toEnd);
 		this.start = r.start;
 		this.end = r.end;
 		return this;
-	}
+	};
 
 	hopeEditorSelection.prototype.move = function(distance) {
 		this.start = Math.min( this.editor.fragment.text.length, Math.max( 0, this.start + distance ) );
 		this.end = Math.min( this.editor.fragment.text.length, Math.max( 0, this.end + distance ) );
 		return this;
-	}
+	};
 
 	hopeEditorSelection.prototype.isEmpty = function() {
 		return ( this.start==this.end );
-	}
+	};
 
 	hopeEditorSelection.prototype.grow = function(size) {
 		this.end = Math.min( this.editor.fragment.text.length, Math.max( 0, this.end + size ) );
 		return this;
-	}
+	};
 
 	hopeEditorSelection.prototype.getNextTextNode = function(textNode) {
 		var treeWalker = document.createTreeWalker( 
@@ -1846,7 +1867,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		);
 		treeWalker.currentNode = textNode;
 		return treeWalker.nextNode();
-	}
+	};
 
 	hopeEditorSelection.prototype.getPrevTextNode = function(textNode) {
 		var treeWalker = document.createTreeWalker( 
@@ -1859,15 +1880,17 @@ hope.register( 'hope.fragment.annotations', function() {
 		);
 		treeWalker.currentNode = textNode;
 		return treeWalker.previousNode();	
-	}
+	};
 
 	hopeEditorSelection.prototype.getTotalOffset = function( node ) {
 		offset = 0;
-		while ( node = this.getPrevTextNode(node) ) {
+		node = this.getPrevTextNode(node);
+		while ( node ) {
 			offset += node.textContent.length;
+			node = this.getPrevTextNode(node);
 		}
 		return offset;
-	}
+	};
 
 	hopeEditorSelection.prototype.getArrowDownPosition = function() {
 		// FIXME: handle columns, floats, etc.
@@ -1878,7 +1901,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			return null;
 		}
 		var cursorRect = cursorEl.getBoundingClientRect();
-		if ( this.xBias == null ) {
+		if ( this.xBias === null ) {
 			this.xBias = cursorRect.left;
 			console.log('set xbias: '+this.xBias);
 		}
@@ -1903,7 +1926,7 @@ hope.register( 'hope.fragment.annotations', function() {
 					}
 				}
 			}
-		} while ( node && nodeRect.height!=0 && nodeRect.top <= yBias ); //< cursorRect.bottom ); //left >= this.xBias );
+		} while ( node && nodeRect.height!==0 && nodeRect.top <= yBias ); //< cursorRect.bottom ); //left >= this.xBias );
 		
 		if ( node && nodeRect.right >= this.xBias ) {
 			// find range in textnode to set cursor to
@@ -1912,13 +1935,15 @@ hope.register( 'hope.fragment.annotations', function() {
 			var offset = 0;
 			do {
 				offset++;
-				range.setStart( node, offset)
+				range.setStart( node, offset);
 				range.setEnd( node, offset);
 				rangeRect = range.getBoundingClientRect();
 			} while ( 
-				offset < nodeLength 
-				&& ( (rangeRect.top <= yBias ) 
-					|| ( rangeRect.right < this.xBias) ) 
+				offset < nodeLength && 
+				( 
+					(rangeRect.top <= yBias ) || 
+					( rangeRect.right < this.xBias) 
+				) 
 			);
 
 			return range.endOffset + this.getTotalOffset(node); // should check distance for end-1 as well
@@ -1936,11 +1961,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		} else {
 			return this.getCursor();
 		}
-	}
+	};
 
 
 	this.create = function(start, end, editor) {
 		return new hopeEditorSelection(start, end, editor);
-	}
+	};
 
 });

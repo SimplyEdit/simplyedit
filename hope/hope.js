@@ -50,7 +50,7 @@ var hope = this.hope = ( function( global ) {
 		this.message = message;
 		this.code = code;
 		this.name = 'hope.Exception';
-	}
+	};
 
 	return hope;
 

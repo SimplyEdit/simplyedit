@@ -1,0 +1,60 @@
+<script>
+	editor.plugins.plainData = {
+		init : function() {
+			var button = document.createElement("button");
+			button.dataset.vedorAction = "vedor-plain";
+			button.innerHTML = '<i class="fa fa-suitcase"></i>Data view';
+			document.querySelector("#vedor-main-toolbar .vedor-buttons").appendChild(button);
+		}
+	};
+
+	editor.addAction("vedor-plain", function(el) {
+		if (document.body.classList.contains("vedor-plain")) {
+			// document.stash.body.childNodes[0].appendChild(document.body.querySelector("#vedor-editor"));
+			// document.body = document.stash.body.childNodes[0];
+			document.body.classList.remove("vedor-plain");
+
+			while (document.stash.head.childNodes) {
+				document.head.appendChild(document.stash.head.childNodes[0]);
+			}
+			delete document.stash;
+
+		} else {
+			document.stash = {
+				"head" : document.createDocumentFragment(),
+				"body" : document.createDocumentFragment()
+			};
+
+			var stylesheets = document.head.querySelectorAll("style, link[rel=stylesheet]");
+			for (var i=0; i<stylesheets.length; i++) {
+				if (!(stylesheets[i].id == "vedor-body-top")) { 
+					document.stash.head.appendChild(stylesheets[i]);
+				}
+			}
+
+			newBody = document.body.cloneNode(true);
+			document.stash.body.appendChild(document.body);
+
+			document.body = newBody;
+			document.body.removeChild(document.getElementById("vedor-editor"));
+
+			document.body.classList.add("vedor-plain");
+
+			editor.editmode.editable(document.body);
+
+			var bodyLists = document.body.querySelectorAll("[data-vedor-list]");
+			var stashLists = document.stash.body.childNodes[0].querySelectorAll("[data-vedor-list]");
+			for (i=0; i<stashLists.length; i++) {
+				bodyLists[i].templates = stashLists[i].templates;
+			}
+
+			// editor.editmode.init(); // deze niet, dan wordt er teveel gedaan
+			document.body.appendChild(document.stash.body.childNodes[0].querySelector("#vedor-editor"));
+			editor.editmode.sortable(document.body);
+			editor.toolbars['vedor-selectable'].init();
+
+			// el.parentNode.removeChild(el);
+		}
+	});
+	editor.plugins.plainData.init();
+</script>

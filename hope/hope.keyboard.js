@@ -1,4 +1,5 @@
 hope.register( 'hope.keyboard', function() {
+	var i;
 
 	var self = this;
 
@@ -111,21 +112,21 @@ hope.register( 'hope.keyboard', function() {
 	keyCodes[254] = 'Clear';
 
 	// a-z
-	for ( var i=65; i<=90; i++ ) {
+	for ( i=65; i<=90; i++ ) {
 		keyCodes[i] = String.fromCharCode( i ).toLowerCase();
 	}
 
 	// 0-9
-	for ( var i=48; i<=57; i++ ) {
+	for ( i=48; i<=57; i++ ) {
 		keyCodes[i] = String.fromCharCode( i );
 	}
 	// 0-9 keypad
-	for ( var i=96; i<=105; i++ ) {
+	for ( i=96; i<=105; i++ ) {
 		keyCodes[i] = ''+(i-95);
 	}
 
 	// F1 - F24
-	for ( var i=112; i<=135; i++ ) {
+	for ( i=112; i<=135; i++ ) {
 		keyCodes[i] = 'F'+(i-111);
 	}
 
@@ -199,7 +200,7 @@ hope.register( 'hope.keyboard', function() {
 			keyInfo += 'Unknown';
 		}
 		return keyInfo;
-	}
+	};
 
 	this.listen = function( el, key, callback, capture ) {
 		return hope.editor.events.listen( el, 'keydown', function(evt) {
@@ -208,6 +209,6 @@ hope.register( 'hope.keyboard', function() {
 				callback.call( this, evt );
 			}
 		}, capture);
-	}
+	};
 
 } );

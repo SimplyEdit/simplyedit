@@ -26,46 +26,47 @@ hope.register( 'hope.test', function() {
 		    n = n.replace(/"/g, "&quot;");
 
 		    return n;
-		}
+		};
 
 		this.diffString = function( o, n ) {
 		  o = o.replace(/\s+$/, '');
 		  n = n.replace(/\s+$/, '');
 
-		  var out = this.diff(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
+		  var out = this.diff(o === "" ? [] : o.split(/\s+/), n === "" ? [] : n.split(/\s+/) );
 		  var str = "";
 
 		  var oSpace = o.match(/\s+/g);
-		  if (oSpace == null) {
+		  if (oSpace === null) {
 		    oSpace = ["\n"];
 		  } else {
 		    oSpace.push("\n");
 		  }
 		  var nSpace = n.match(/\s+/g);
-		  if (nSpace == null) {
+		  if (nSpace === null) {
 		    nSpace = ["\n"];
 		  } else {
 		    nSpace.push("\n");
 		  }
 
-		  if (out.n.length == 0) {
-		      for (var i = 0; i < out.o.length; i++) {
+                  var i;
+		  if (out.n.length === 0) {
+		      for ( i = 0; i < out.o.length; i++) {
 		        str += '<del>' + this.escape(out.o[i]) + oSpace[i] + "</del>";
 		      }
 		  } else {
-		    if (out.n[0].text == null) {
-		      for (n = 0; n < out.o.length && out.o[n].text == null; n++) {
+		    if (out.n[0].text === null) {
+		      for (n = 0; n < out.o.length && out.o[n].text === null; n++) {
 		        str += '<del>' + this.escape(out.o[n]) + oSpace[n] + "</del>";
 		      }
 		    }
 
-		    for ( var i = 0; i < out.n.length; i++ ) {
-		      if (out.n[i].text == null) {
+		    for ( i = 0; i < out.n.length; i++ ) {
+		      if (out.n[i].text === null) {
 		        str += '<ins>' + this.escape(out.n[i]) + nSpace[i] + "</ins>";
 		      } else {
 		        var pre = "";
 
-		        for (n = out.n[i].row + 1; n < out.o.length && out.o[n].text == null; n++ ) {
+		        for (n = out.n[i].row + 1; n < out.o.length && out.o[n].text === null; n++ ) {
 		          pre += '<del>' + this.escape(out.o[n]) + oSpace[n] + "</del>";
 		        }
 		        str += " " + out.n[i].text + nSpace[i] + pre;
@@ -74,39 +75,40 @@ hope.register( 'hope.test', function() {
 		  }
 		  
 		  return str;
-		}
+		};
 
 		this.randomColor = function() {
 		    return "rgb(" + (Math.random() * 100) + "%, " + 
 		                    (Math.random() * 100) + "%, " + 
 		                    (Math.random() * 100) + "%)";
-		}
+		};
 
 		this.diffString2 = function( o, n ) {
 			o = o.replace(/\s+$/, '');
 			n = n.replace(/\s+$/, '');
 
-			var out = this.diff(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
+			var out = this.diff(o === "" ? [] : o.split(/\s+/), n === "" ? [] : n.split(/\s+/) );
 
 			var oSpace = o.match(/\s+/g);
-			if (oSpace == null) {
+			if (oSpace === null) {
 				oSpace = ["\n"];
 			} else {
 				oSpace.push("\n");
 			}
 			var nSpace = n.match(/\s+/g);
-			if (nSpace == null) {
+			if (nSpace === null) {
 				nSpace = ["\n"];
 			} else {
 				nSpace.push("\n");
 			}
 
 			var os = "";
-			var colors = new Array();
-			for (var i = 0; i < out.o.length; i++) {
+			var colors = [];
+			var i;
+			for (i = 0; i < out.o.length; i++) {
 				colors[i] = this.randomColor();
 
-				if (out.o[i].text != null) {
+				if (out.o[i].text !== null) {
 					os += '<span style="background-color: ' +colors[i]+ '">' + 
 			        	this.escape(out.o[i].text) + oSpace[i] + "</span>";
 				} else {
@@ -115,8 +117,8 @@ hope.register( 'hope.test', function() {
 			}
 
 			var ns = "";
-			for (var i = 0; i < out.n.length; i++) {
-			  if (out.n[i].text != null) {
+			for (i = 0; i < out.n.length; i++) {
+			  if (out.n[i].text !== null) {
 			      ns += '<span style="background-color: ' +colors[out.n[i].row]+ '">' + 
 			            this.escape(out.n[i].text) + nSpace[i] + "</span>";
 			  } else {
@@ -125,33 +127,34 @@ hope.register( 'hope.test', function() {
 			}
 
 			return { o : os , n : ns };
-		}
+		};
 
 		this.diff = function( o, n ) {
-			var ns = new Object();
-			var os = new Object();
+			var ns = {};
+			var os = {};
+			var i;
 
-			for ( var i = 0; i < n.length; i++ ) {
-				if ( ns[ n[i] ] == null )
-					ns[ n[i] ] = { rows: new Array(), o: null };
+			for ( i = 0; i < n.length; i++ ) {
+				if ( ns[ n[i] ] === null )
+					ns[ n[i] ] = { rows: [], o: null };
 				ns[ n[i] ].rows.push( i );
 			}
 
-			for ( var i = 0; i < o.length; i++ ) {
-				if ( os[ o[i] ] == null )
-					os[ o[i] ] = { rows: new Array(), n: null };
+			for ( i = 0; i < o.length; i++ ) {
+				if ( os[ o[i] ] === null )
+					os[ o[i] ] = { rows: [], n: null };
 				os[ o[i] ].rows.push( i );
 			}
 
-			for ( var i in ns ) {
+			for ( i in ns ) {
 				if ( ns[i].rows.length == 1 && typeof(os[i]) != "undefined" && os[i].rows.length == 1 ) {
 					n[ ns[i].rows[0] ] = { text: n[ ns[i].rows[0] ], row: os[i].rows[0] };
 					o[ os[i].rows[0] ] = { text: o[ os[i].rows[0] ], row: ns[i].rows[0] };
 				}
 			}
 
-			for ( var i = 0; i < n.length - 1; i++ ) {
-				if ( n[i].text != null && n[i+1].text == null && n[i].row + 1 < o.length && o[ n[i].row + 1 ].text == null && 
+			for ( i = 0; i < n.length - 1; i++ ) {
+				if ( n[i].text !== null && n[i+1].text === null && n[i].row + 1 < o.length && o[ n[i].row + 1 ].text === null && 
 					n[i+1] == o[ n[i].row + 1 ] ) 
 				{
 					n[i+1] = { text: n[i+1], row: n[i].row + 1 };
@@ -159,8 +162,8 @@ hope.register( 'hope.test', function() {
 				}
 			}
 
-			for ( var i = n.length - 1; i > 0; i-- ) {
-				if ( n[i].text != null && n[i-1].text == null && n[i].row > 0 && o[ n[i].row - 1 ].text == null && 
+			for ( i = n.length - 1; i > 0; i-- ) {
+				if ( n[i].text !== null && n[i-1].text === null && n[i].row > 0 && o[ n[i].row - 1 ].text === null && 
 					n[i-1] == o[ n[i].row - 1 ] ) 
 				{
 					n[i-1] = { text: n[i-1], row: n[i].row - 1 };
@@ -169,7 +172,7 @@ hope.register( 'hope.test', function() {
 			}
 
 			return { o: o, n: n };
-		}
+		};
 
 
 		this.isArray = function( o ) {
@@ -177,18 +180,18 @@ hope.register( 'hope.test', function() {
 				return true;
 			}
 			return false;
-		}
+		};
 
 		this.getPrototypeName = function( o ) {
 			return Object.prototype.toString.call( o );
-		}
+		};
 
 		this.isString = function( o ) {
 			if ( typeof o === 'string' ) {
 				return true;
 			}
 			return false;
-		}
+		};
 
 		this.assertTrue = function( expression ) {
 			this.countAssert++;
@@ -208,31 +211,33 @@ hope.register( 'hope.test', function() {
 			} else {
 				this.success++;
 			}
-		}
+		};
 
 		this.assertEquals = function( var1, var2 ) {
+			var i, ii, l;
 			this.countAssert++;
 			if ( var1 === var2 ) {
-				this.success++
+				this.success++;
 			} else {
 				var reason = '';
+				var diff;
 				if ( (typeof var1) !== (typeof var2) ) {
 					reason = 'typeof var1 '+(typeof var1)+' is not typeof var2 '+(typeof var2);
 				} else if ( var1 instanceof Object && ( this.getPrototypeName(var1) !== this.getPrototypeName(var2) ) ) {
 					reason = 'prototype of var1 '+this.getPrototypeName(var1)+' is not prototype of var2 '+this.getPrototypeName(var2);
 				} else if ( this.isString(var1) ) {
-					var diff = this.diffString2(var1, var2);
+					diff = this.diffString2(var1, var2);
 					reason = 'difference: <div style="overflow:hidden; margin-left: 20px;"><div style="float:left; margin-right:20px;">'+diff.o+'</div><div style="float:left">'+diff.n+'</div></div>';
 					
 				} else if ( this.isArray(var1) ) {
-					var diff1 = [];
-					for ( var i=0, l=var1.length; i<l; i++ ) {
+					diff = [];
+					for ( i=0, l=var1.length; i<l; i++ ) {
 						if ( var1[i] !== var2[i] ) {
 							diff[i] = i + ': ' + var1[i] + ' is not ' + var2[i];
 						}
 					}
 					if ( i<var2.length ) {
-						for ( var ii=i, l=var2.length; ii<l; ii++ ) {
+						for ( ii=i, l=var2.length; ii<l; ii++ ) {
 							diff[ii] = ii + ': undefined is not ' + var2[ii];
 						}
 					}
@@ -240,16 +245,16 @@ hope.register( 'hope.test', function() {
 						reason = 'arraydiff: ' + diff.join("\n");
 					}
 				} else if ( var1 instanceof Object ) {
-					var diff = [];
+					diff = [];
 					var seen = {};
 					var count = 0;
-					for ( var i in var1 ) {
+					for ( i in var1 ) {
 						if ( var1[i] !== var2[i] ) {
 							diff[count++] = i + ': ' + var1[i] + ' is not ' + var2[i];
 							seen[i] = true;
 						}
 					}
-					for ( var i in var2 ) {
+					for (i in var2 ) {
 						if ( !seen[i] && var1[i] != var2[i] ) {
 							diff[count++] = i + ': ' + var1[i] + ' is not ' + var2[i];
 						}
@@ -267,7 +272,7 @@ hope.register( 'hope.test', function() {
 					this.success++;
 				}
 			}
-		}
+		};
 
 		this.run = function() {
 			this.errors = [];
@@ -292,12 +297,12 @@ hope.register( 'hope.test', function() {
 			} else {
 				console.log( message );
 			}
-		}
+		};
 
 	}
 
 	this.create = function() {
 		return new hopeTest();
-	}
+	};
 
 });

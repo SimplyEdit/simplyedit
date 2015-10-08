@@ -6,11 +6,11 @@ hope.register( 'hope.render.html', function() {
 		'block'		: [ 'address', 'dir', 'menu', 'hr', 'table', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'ul', 'ol', 'dl', 'div', 'blockquote', 'iframe' ]
 	};
 
-	nestingSets['all'] = nestingSets.block.concat( nestingSets.inline );
+	nestingSets.all = nestingSets.block.concat( nestingSets.inline );
 
 	this.rules = {
 		nesting: {
-			'a'         : nestingSets.inline.filter( function(element) { return element != 'a' } ),
+			'a'         : nestingSets.inline.filter( function(element) { return element != 'a'; } ),
 			'abbr'      : nestingSets.inline,
 			'acronym'   : nestingSets.inline,
 			'address'   : [ 'p' ].concat( nestingSets.inline ),
@@ -78,11 +78,11 @@ hope.register( 'hope.render.html', function() {
 		},
 		// which html elements to allow as the top level, default is only block elements
 		'toplevel' : nestingSets.block + [ 'li', 'img', 'span', 'strong', 'em' ]
-	}
+	};
 
 	this.getTag = function( markup ) {
 		return markup.split(' ')[0].toLowerCase(); // FIXME: more robust parsing needed
-	}
+	};
 
 	this.getAnnotationStack = function( annotationSet ) {
 		// { index:nextAnnotationEntry.index, entry:nextAnnotation }
@@ -132,8 +132,11 @@ hope.register( 'hope.render.html', function() {
 */
 		do {
 			annotationTag = this.getTag( annotation );
-			if ( ( !lastAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) 
-				|| ( lastAnnotationTag && ( !this.rules.nesting[ annotationTag ] || this.rules.nesting[ annotationTag ].indexOf( lastAnnotationTag ) == -1 ) ) ) {
+			if ( 
+				( !lastAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) || 
+				( lastAnnotationTag && ( !this.rules.nesting[ annotationTag ] || 
+				this.rules.nesting[ annotationTag ].indexOf( lastAnnotationTag ) == -1 ) ) 
+			) {
 				// not legal: lastAnnotationTag may not be set inside annotationTag - so we cannot apply annotationTag
 				// save it for another try later
 				skippedAnnotation.push( annotation );			
@@ -141,32 +144,39 @@ hope.register( 'hope.render.html', function() {
 				annotationStack.push( annotation );
 				lastAnnotationTag = this.getTag( annotation );
 			}
-		} while ( annotation = unfilteredStack.pop() );
+			annotation = unfilteredStack.pop();
+		} while ( annotation );
 
 		if ( skippedAnnotation.length ) {
 			// now try to find a spot for any annotation from the skippedAnnotation set
 			// most likely: inline annotation that was more generally applied than block annotation
 			// the order has been reversed
 			var topAnnotationTag = annotationStack[0];
-			while ( annotation = skippedAnnotation.pop() ) {
+			annotation = skippedAnnotation.pop();
+			while ( annotation ) {
 				annotationTag = this.getTag( annotation );
-				if (  ( !topAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) 
-					|| ( topAnnotationTag && ( !this.rules.nesting[ topAnnotationTag ] || this.rules.nesting[ topAnnotationTag ].indexOf( annotationTag ) == -1 ) ) ) {
+				if (  
+					( !topAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) || 
+					( topAnnotationTag && ( !this.rules.nesting[ topAnnotationTag ] || 
+					this.rules.nesting[ topAnnotationTag ].indexOf( annotationTag ) == -1 ) ) 
+				) {
 					// not legal, you could try another run... FIXME: should probably try harder 
 				} else {
 					annotationStack.unshift( annotation );
 					topAnnotationTag = annotationTag;
 				}
+				annotation = skippedAnnotation.pop();
 			}
 		}
 		// FIXME: this routine can be improved - it needs a more intelligent algorithm to reorder the annotation to maximize the applied
 		// annotation from the annotationSet in the annotationStack
 		return annotationStack.reverse();
-	}
+	};
 
 	this.getAnnotationDiff = function( annotationStackFrom, annotationStackTo, annotationsOnce ) {
+		var i;
 		var annotationDiff = [];
-		for ( var i=0, l=annotationsOnce.length; i<l; i++ ) {
+		for ( i=0, l=annotationsOnce.length; i<l; i++ ) {
 			annotationDiff.push( { type : 'insert', annotation : annotationsOnce[i] } );
 		}
 
@@ -180,28 +190,29 @@ hope.register( 'hope.render.html', function() {
 			commonStack.push( annotationStackFrom[i] );
 		}
 		var commonIndex = i-1;
-		for ( var i=annotationStackFrom.length-1; i>commonIndex; i-- ) {
+		for ( i=annotationStackFrom.length-1; i>commonIndex; i-- ) {
 			annotationDiff.push( { type : 'close', annotation : annotationStackFrom[i] } );
 		}
-		for ( var i=commonIndex+1, l=annotationStackTo.length; i<l; i++ ) {
+		for ( i=commonIndex+1, l=annotationStackTo.length; i<l; i++ ) {
 			annotationDiff.push( { type : 'start', annotation : annotationStackTo[i] } );
 		}
 
 		return annotationDiff;
-	}
+	};
 
 	this.renderAnnotationDiff = function( annotationDiff ) {
 		// FIXME: allow rendering of custom elements, must still be inserted into this.rules
 		var renderedDiff = '';
 		for ( var i=0, l=annotationDiff.length; i<l; i++ ) {
+			var annotationTag;
 			if ( annotationDiff[i].type == 'close' ) {
-				var annotationTag = this.getTag( annotationDiff[i].annotation );
+				annotationTag = this.getTag( annotationDiff[i].annotation );
 				if ( this.rules.noChildren.indexOf( annotationTag ) == -1 ) {
 					renderedDiff += '</' + annotationTag + '>';
 				}
 			} else if ( annotationDiff[i].type == 'insert' ) {
 				renderedDiff += '<' + annotationDiff[i].annotation + '>';
-				var annotationTag = this.getTag( annotationDiff[i].annotation );
+				annotationTag = this.getTag( annotationDiff[i].annotation );
 				if ( this.rules.noChildren.indexOf( annotationTag ) == -1 ) {
 					renderedDiff += '</' + annotationTag + '>';
 				}
@@ -210,7 +221,7 @@ hope.register( 'hope.render.html', function() {
 			}
 		}
 		return renderedDiff;
-	}
+	};
 
 	this.escape = function( content ) {
 		return content
@@ -219,7 +230,7 @@ hope.register( 'hope.render.html', function() {
 			.replace(/>/g, "&gt;")
 			.replace(/"/g, "&quot;")
 			.replace(/'/g, "&#039;");
-	}
+	};
 
 	this.render = function( fragment ) {
 		// FIXME: annotation should be the relative annotation list to speed things up
@@ -269,7 +280,7 @@ hope.register( 'hope.render.html', function() {
 			// calculate the difference - how to get from stack one to stack two with the minimum of tags
 			var diff = this.getAnnotationDiff( annotationStack, newAnnotationStack, newAnnotationsOnce );
 			// remove autoclosing annotation from the newAnnotationStack
-			var newAnnotationStack = this.getAnnotationStack( annotationSet );
+			newAnnotationStack = this.getAnnotationStack( annotationSet );
 			var diffHTML = this.renderAnnotationDiff( diff );
 			renderedHTML += diffHTML;
 			annotationStack = newAnnotationStack;
@@ -281,6 +292,6 @@ hope.register( 'hope.render.html', function() {
 		}
 
 		return renderedHTML;
-	}
+	};
 
 } );
