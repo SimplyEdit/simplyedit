@@ -82,7 +82,7 @@ hope.register( 'hope.editor', function() {
 		this.commandsKeyUp = {};
 
 		if (this.refs.output.innerHTML !== '') {
-			this.refs.output.innerHTML = this.refs.output.innerHTML.replace(/\/p>/g, "/p>\n");
+			this.refs.output.innerHTML = this.refs.output.innerHTML.replace(/\/p>/g, "/p>");
 			this.parseHTML();
 		}
 
