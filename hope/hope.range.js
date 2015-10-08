@@ -26,7 +26,7 @@ hope.register( 'hope.range', function() {
 		get length () {
 			return this.end - this.start;
 		}
-	}
+	};
 
 	hopeRange.prototype.collapse = function( toEnd ) {
 		var start = this.start;
@@ -51,24 +51,24 @@ hope.register( 'hope.range', function() {
 			return -1;
 		}
 		return 0;
-	}
+	};
 
 	hopeRange.prototype.equals = function( range ) {
-		return this.compare(range)==0;
-	}
+		return this.compare(range)===0;
+	};
 
 	hopeRange.prototype.smallerThan = function( range ) {
 		return ( this.compare( range ) == -1 );
-	}
+	};
 
 	hopeRange.prototype.largerThan = function( range ) {
 		return ( this.compare( range ) == 1 );
-	}
+	};
 
 	hopeRange.prototype.contains = function( range ) {
 		range = hope.range.create(range);
 		return this.start <= range.start && this.end >= range.end;
-	}
+	};
 
 	hopeRange.prototype.overlaps = function( range ) {
 		range = hope.range.create(range);
@@ -77,11 +77,11 @@ hope.register( 'hope.range', function() {
 		}
 
 		return ( range.start <= this.end && range.end >= this.start );
-	}
+	};
 
 	hopeRange.prototype.isEmpty = function() {
 		return this.start >= this.end;
-	}
+	};
 
 	hopeRange.prototype.overlap = function( range ) {
 		range = hope.range.create(range);
@@ -100,7 +100,7 @@ hope.register( 'hope.range', function() {
 			}
 		}
 		return new hopeRange(start, end); // FIXME: is this range( 0, 0 ) a useful return value when there is no overlap?
-	}
+	};
 
 	hopeRange.prototype.exclude = function( range ) {
 		// return parts of this that do not overlap with range
@@ -125,15 +125,15 @@ hope.register( 'hope.range', function() {
 			right = left;
 		}
 		return [ left, right ];
-	}
+	};
 
 	hopeRange.prototype.excludeLeft = function( range ) {
 		return this.exclude(range)[0];
-	}
+	};
 
 	hopeRange.prototype.excludeRight = function( range ) {
 		return this.exclude(range)[1];
-	}
+	};
 
 	/** 
 	 * remove overlapping part of range from this range
@@ -157,12 +157,12 @@ hope.register( 'hope.range', function() {
 			result = result.move( -exclude.length );
 		}
 		return result;
-	}
+	};
 
 	hopeRange.prototype.copy = function( range ) {
 		range = hope.range.create(range);
 		return new hopeRange( 0, this.overlap( range ).length );
-	}
+	};
 
 	hopeRange.prototype.extend = function( length, direction ) {
 		var start = this.start;
@@ -176,7 +176,7 @@ hope.register( 'hope.range', function() {
 			start = Math.max( 0, start - length );
 		}
 		return new hopeRange(start, end);
-	}
+	};
 
 	hopeRange.prototype.toString = function() {
 		if ( this.start != this.end ) {
@@ -184,7 +184,7 @@ hope.register( 'hope.range', function() {
 		} else {
 			return this.start + '';
 		}
-	}
+	};
 
 	hopeRange.prototype.grow = function( size ) {
 		var end = this.end + size;
@@ -192,11 +192,11 @@ hope.register( 'hope.range', function() {
 			end = this.start;
 		}
 		return new hopeRange(this.start, end);
-	}
+	};
 
 	hopeRange.prototype.shrink = function( size ) {
 		return this.grow( -size );
-	}
+	};
 
 	hopeRange.prototype.move = function( length, min, max ) {
 		var start = this.start;
@@ -213,7 +213,7 @@ hope.register( 'hope.range', function() {
 			end = Math.min( max, start );
 		}
 		return new hopeRange(start, end);
-	}
+	};
 
 	this.create = function( start, end ) {
 		if ( start instanceof hopeRange ) {
@@ -226,6 +226,6 @@ hope.register( 'hope.range', function() {
 			start = start[0];
 		}
 		return new hopeRange( start, end );
-	}
+	};
 
 });
