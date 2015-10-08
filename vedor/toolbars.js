@@ -87,7 +87,6 @@
 							var action = editor.actions[el.getAttribute("data-vedor-action")];
 							if (action) {
 								var currentField = editor.node.getEditableField();
-								console.log(currentField);
 								if (currentField.hopeEditor) {
 									editor.context.skipUpdate = true;
 									currentField.hopeEditor.parseHTML();
@@ -756,7 +755,6 @@
 			var elem = document.activeElement;
 			if(elem && elem.tagName == 'IFRAME'){
 				if (editor.context.currentIframe != elem) {
-					console.log("iframe got focus");
 					editor.context.currentIframe = elem;
 					var sel = vdSelectionState.get();
 					sel.selectNode(elem);
