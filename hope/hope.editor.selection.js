@@ -49,7 +49,7 @@ hope.register( 'hope.editor.selection', function() {
 		if (this.end == this.start) {
 			this.collapse();
 		}
-	}
+	};
 
 	hopeEditorSelection.prototype.cursorCommands = [
 		'Shift+Home',
@@ -76,33 +76,33 @@ hope.register( 'hope.editor.selection', function() {
 		} else {
 			return hope.range.create( this.end, this.start );
 		}
-	}
+	};
 
 	hopeEditorSelection.prototype.getCursor = function () {
 		return this.end;
-	}
+	};
 
 	hopeEditorSelection.prototype.collapse = function(toEnd) {
 		var r = this.getRange().collapse(toEnd);
 		this.start = r.start;
 		this.end = r.end;
 		return this;
-	}
+	};
 
 	hopeEditorSelection.prototype.move = function(distance) {
 		this.start = Math.min( this.editor.fragment.text.length, Math.max( 0, this.start + distance ) );
 		this.end = Math.min( this.editor.fragment.text.length, Math.max( 0, this.end + distance ) );
 		return this;
-	}
+	};
 
 	hopeEditorSelection.prototype.isEmpty = function() {
 		return ( this.start==this.end );
-	}
+	};
 
 	hopeEditorSelection.prototype.grow = function(size) {
 		this.end = Math.min( this.editor.fragment.text.length, Math.max( 0, this.end + size ) );
 		return this;
-	}
+	};
 
 	hopeEditorSelection.prototype.getNextTextNode = function(textNode) {
 		var treeWalker = document.createTreeWalker( 
@@ -115,7 +115,7 @@ hope.register( 'hope.editor.selection', function() {
 		);
 		treeWalker.currentNode = textNode;
 		return treeWalker.nextNode();
-	}
+	};
 
 	hopeEditorSelection.prototype.getPrevTextNode = function(textNode) {
 		var treeWalker = document.createTreeWalker( 
@@ -128,15 +128,17 @@ hope.register( 'hope.editor.selection', function() {
 		);
 		treeWalker.currentNode = textNode;
 		return treeWalker.previousNode();	
-	}
+	};
 
 	hopeEditorSelection.prototype.getTotalOffset = function( node ) {
 		offset = 0;
-		while ( node = this.getPrevTextNode(node) ) {
+		node = this.getPrevTextNode(node);
+		while ( node ) {
 			offset += node.textContent.length;
+			node = this.getPrevTextNode(node);
 		}
 		return offset;
-	}
+	};
 
 	hopeEditorSelection.prototype.getArrowDownPosition = function() {
 		// FIXME: handle columns, floats, etc.
@@ -147,7 +149,7 @@ hope.register( 'hope.editor.selection', function() {
 			return null;
 		}
 		var cursorRect = cursorEl.getBoundingClientRect();
-		if ( this.xBias == null ) {
+		if ( this.xBias === null ) {
 			this.xBias = cursorRect.left;
 			console.log('set xbias: '+this.xBias);
 		}
@@ -172,7 +174,7 @@ hope.register( 'hope.editor.selection', function() {
 					}
 				}
 			}
-		} while ( node && nodeRect.height!=0 && nodeRect.top <= yBias ); //< cursorRect.bottom ); //left >= this.xBias );
+		} while ( node && nodeRect.height!==0 && nodeRect.top <= yBias ); //< cursorRect.bottom ); //left >= this.xBias );
 		
 		if ( node && nodeRect.right >= this.xBias ) {
 			// find range in textnode to set cursor to
@@ -181,13 +183,15 @@ hope.register( 'hope.editor.selection', function() {
 			var offset = 0;
 			do {
 				offset++;
-				range.setStart( node, offset)
+				range.setStart( node, offset);
 				range.setEnd( node, offset);
 				rangeRect = range.getBoundingClientRect();
 			} while ( 
-				offset < nodeLength 
-				&& ( (rangeRect.top <= yBias ) 
-					|| ( rangeRect.right < this.xBias) ) 
+				offset < nodeLength && 
+				( 
+					(rangeRect.top <= yBias ) || 
+					( rangeRect.right < this.xBias) 
+				) 
 			);
 
 			return range.endOffset + this.getTotalOffset(node); // should check distance for end-1 as well
@@ -205,11 +209,11 @@ hope.register( 'hope.editor.selection', function() {
 		} else {
 			return this.getCursor();
 		}
-	}
+	};
 
 
 	this.create = function(start, end, editor) {
 		return new hopeEditorSelection(start, end, editor);
-	}
+	};
 
 });
