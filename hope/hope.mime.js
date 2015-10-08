@@ -27,7 +27,8 @@ hope.register( 'hope.mime', function() {
 		var line = null;
 		var headers = {};
 		var temp = {};
-		while ( line = message.match(/^.*$/m)[0] ) {
+		line = message.match(/^.*$/m)[0];
+		while ( line ) {
 			message = message.substring( line.length );
 			temp = parseHeader( line );
 			for ( var i in temp ) {
@@ -37,12 +38,13 @@ hope.register( 'hope.mime', function() {
 			if ( returns[0] ) {
 				message = message.substring( returns[0].length );
 			}
+			line = message.match(/^.*$/m)[0];
 		}
 		return {
 			headers: headers,
 			message: message.substring(1)
-		}
-	}
+		};
+	};
 
 	self.encode = function( parts, message, headers ) {
 		var boundary = 'hopeBoundary'+Date.now();
@@ -58,23 +60,25 @@ hope.register( 'hope.mime', function() {
 			result += '\n--'+boundary+'\n' + parts[i];
 		}
 		return result;
-	}
+	};
 
 	self.decode = function( message ) {
 		var parsed = self.getHeaders( message );
 		if ( parsed.headers.boundary ) {
 			var parts = parsed.message.split( '\n--'+parsed.headers.boundary+"\n" );
-			var message = parts.shift();
+			message = parts.shift();
 			if ( message ) {
 				parsed.message = message;
 			}
 			parsed.parts = [];
-			while ( part = parts.shift() ) {
+			part = parts.shift();
+			while ( part ) {
 				parsed.parts.push( self.decode(part) );		
+				part = parts.shift();
 			}
 		}
 		return parsed;
-	}
+	};
 
 	return self;
 
