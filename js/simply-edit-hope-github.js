@@ -727,6 +727,8 @@
 							dataFields[i].hopeMarkup = document.createElement("textarea");
 							dataFields[i].hopeRenderedSource = document.createElement("DIV");
 							dataFields[i].hopeEditor = hope.editor.create( dataFields[i].hopeContent, dataFields[i].hopeMarkup, dataFields[i], dataFields[i].hopeRenderedSource );
+							dataFields[i].hopeEditor.field = dataFields[i];
+
 							var parseTimer = false;
 					
 /*							var nodeInserted = function(evt) {
