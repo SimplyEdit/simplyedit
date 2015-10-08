@@ -45,6 +45,30 @@ QUnit.module("editor init");
 		assert.ok(vdSelectionState, "vdSelectionState initialized");
 	});
 
+	QUnit.test("seperate p stay seperated", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello</p><p>world</p>";
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		assert.equal(testContent.innerHTML, "<p>Hello</p><p>world</p>", "innerHTML did not change");
+	});
+
+	QUnit.test("strong tag doesnt get extra p tags", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>He<strong>llo</strong> world</p>";
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+		setCaretPosition(testContent.querySelector("p"), 1, 0);
+		assert.equal(testContent.innerHTML, "<p>He<strong>llo</strong> world</p>", "innerHTML did not change");
+	});
+
+	QUnit.test("code tag is not removed from div tag", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<div>test1</div><div><code>Hello</code></div>";
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+		setCaretPosition(testContent.querySelector("div"), 1, 0);
+		assert.equal(testContent.innerHTML, "<div>test1</div><div><code>Hello</code></div>", "innerHTML did not change");
+	});
+
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -55,7 +79,6 @@ QUnit.module("editor context");
 		assert.equal(context, "vedor-text-cursor");
 	});
 
-QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello world";
@@ -149,6 +172,8 @@ QUnit.module("editor text cursor");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = '<h2><a name="title">Hello world</a></h2>';
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+
+		console.log(testContent.innerHTML);
 
 		setCaretPosition(testContent.querySelector("a"), 2, 0);
 		editor.actions['vedor-text-blockstyle']('h1');
