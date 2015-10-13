@@ -47,7 +47,7 @@
 			document.querySelector("#vedor-main-toolbar button").focus();
 			event.preventDefault();
 		} else if (key == 37) { // left
-			var target = this.querySelector(".vedor-section.active :focus"); 
+			var target = this.querySelector(".vedor-section.active button:focus, .vedor-section.active select:focus, #vedor-main-toolbar :focus"); 
 			if (target) {
 				var previousSibling = target.parentNode.previousSibling;
 				while (previousSibling) {
@@ -78,7 +78,7 @@
 				event.preventDefault();
 			}
 		} else if (key == 39) { // right
-			var target = this.querySelector(".vedor-section.active :focus"); 
+			var target = this.querySelector(".vedor-section.active button:focus, .vedor-section.active select:focus, #vedor-main-toolbar :focus"); 
 			if (target) {
 				var nextSibling = target.parentNode.nextSibling;
 				while (nextSibling) {
@@ -108,7 +108,10 @@
 				event.preventDefault();
 			}
 		} else {
-			editor.context.toolbar.hide = true;
+			var target = this.querySelector('.vedor-section.active :focus');
+			if (!target) {
+				editor.context.toolbar.hide = true;
+			}
 		}
 	};
 
