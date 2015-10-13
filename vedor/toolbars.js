@@ -647,6 +647,9 @@
 			if (editor.context.skipUpdate) {
 				return;
 			}
+			if (editor.context.touching) {
+				return;
+			}
 			editor.context.fixSelection();
 			editor.context.show();
 			vdHtmlContextStack = editor.context.getTagStack();
@@ -795,7 +798,9 @@
 			editor.context.touching = true;
 		});
 		muze.event.attach( document, 'touchend', function(evt) {
-			editor.context.touching = false;
+			window.setTimeout(function() {
+				editor.context.touching = false;
+			}, 1);
 		});
 
 		monitorIframe();
