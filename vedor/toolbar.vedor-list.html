@@ -39,6 +39,7 @@
 					if (template === null) {
 						template = Object.keys(targetObjectList.templates)[0];
 					}
+
 					editor.plugins.list.insertTemplate(targetObjectList, template);
 				}
 			},
@@ -69,8 +70,17 @@
 		},
 		insertTemplate : function(list, templateName) {
 			var template = list.templates[templateName];
+
 			if (template) {
 				var newNode = document.importNode(template.content, true);
+
+				// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
+				var originalTemplates = list.templates[templateName].content.querySelectorAll("template");
+				var importedTemplates = newNode.querySelectorAll("template");
+
+				for (var i=0; i<importedTemplates.length; i++) {
+					importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
+				}
 
 				editor.data.list.init({}, newNode);
 
