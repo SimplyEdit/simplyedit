@@ -1,0 +1,69 @@
+<script type="text/javascript">
+	var spanListener = function(ev) {
+		if (ev.target.tagName=='SPAN') {
+			editor.node.unwrap(ev.target);
+		}
+	};
+
+	editor.addToolbar({
+		name : 'vedor-paste-handler',
+		init : function() {
+			document.addEventListener("keydown", function(event) {
+				switch (event.keyCode) {
+					case 8:		// backspace
+					case 46: 	// delete
+						event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+					break;
+				}
+			});
+
+			document.addEventListener("keyup", function(event) {
+				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+			});
+
+			document.addEventListener("paste", function(event) {
+				var pastedText = undefined;
+				var pastedHtml = undefined;
+					
+				// No IE support is needed, since only webkit/chrome is broken.
+				if (event.clipboardData && event.clipboardData.getData) {
+					pastedText = event.clipboardData.getData('text/plain');
+					pastedHtml = event.clipboardData.getData('text/html');
+				}
+
+				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+						
+				if (pastedHtml) {
+					var tempNode = event.target.ownerDocument.createElement("DIV");
+					tempNode.innerHTML = pastedHtml;
+				
+					// Remove the startfragment and endfragment bits;
+					for (var i=tempNode.childNodes.length-1; i>-1; i--) {
+						if (tempNode.childNodes[i].nodeType == 8) {
+							if ((tempNode.childNodes[i].data == "StartFragment") || (tempNode.childNodes[i].data == "EndFragment")) {
+								tempNode.removeChild(tempNode.childNodes[i]);
+							}
+						}
+					}
+				
+					// Remove inline styles;
+					var tempNodes = tempNode.querySelectorAll("*");
+					for (var i=0; i<tempNodes.length; i++) {
+						tempNodes[i].removeAttribute("style", '');
+					}
+					event.preventDefault();
+
+					event.target.ownerDocument.execCommand("insertHtml", false, tempNode.innerHTML);
+					event.target.ownerDocument.removeEventListener(spanListener);
+						
+					return false;
+				}
+				if (pastedText) {
+					event.preventDefault();
+					event.target.ownerDocument.execCommand("insertText", false, pastedText);
+					event.target.ownerDocument.removeEventListener(spanListener);
+				}
+			});
+		}
+	});
+</script>
