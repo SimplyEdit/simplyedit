@@ -260,7 +260,7 @@ QUnit.module("editor text selection");
 
 	QUnit.test("text style init italic", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = "<p>He<em>llo</em> world</p>";
+		testContent.innerHTML = "<p>He<em>llo there</em> world</p>";
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("em"), 0, 3);
@@ -271,13 +271,13 @@ QUnit.module("editor text selection");
 
 	QUnit.test("text style unset italic", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = "<p>He<em>llo</em> world</p>";
+		testContent.innerHTML = "<p>He<em>llo there</em> world</p>";
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("em"), 0, 3);
 		editor.actions['vedor-text-italic']();
 
-		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "EM tag removed");
+		assert.equal(testContent.innerHTML, '<p>Hello there world</p>', "EM tag removed");
 	});
 
 	QUnit.test("text style init italic", function(assert) {
