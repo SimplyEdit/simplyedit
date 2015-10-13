@@ -35,7 +35,7 @@
 						var target = toolbar.querySelector('.vedor-toolbar-section.' + rel );
 						if ( target ) {
 							target.className += ' vedor-selected';
-							var focusTarget = target.querySelector("LI > *");
+							var focusTarget = target.querySelector("input,button,select");
 							if (focusTarget) {
 								focusTarget.focus();
 							}
