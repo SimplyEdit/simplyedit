@@ -979,7 +979,9 @@
                         editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
                         editor.baseURL + "vedor/plugin.vedor-symbol.html",
 //                        editor.baseURL + "vedor/plugin.vedor-plain.html",
-                        editor.baseURL + "vedor/plugin.vedor-dropbox.html"
+                        editor.baseURL + "vedor/plugin.vedor-dropbox.html",
+			editor.baseURL + "vedor/plugin.vedor-paste.html",
+			editor.baseURL + "vedor/plugin.vedor-keyboard.html"
 		]
 	});
 
