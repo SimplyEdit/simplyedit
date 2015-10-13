@@ -15,10 +15,10 @@ Voor later:
 ---------
 Bugs:
 - als een slip reorder start, moeten de toolbars weg
-- na aanmaken van een nieuwe hyperlink (editor.plugins.hyperlink.create) wordt de selectie aangepast en raak je de selectie kwijt
-- klik in de text van een hyperlink (zonder selectie) en klik op bold - had verwacht dat dan de hyperlink bold zou worden?
-- als in de data nog geen entry is voor een pad, kun je niet opslaan
 - drop event voor images werkt alleen voor data-vedor-field images
+- opslaan van vreemde tekens, bijvoorbeeld copyright symbool naar ariadne storage gaat nog ergens niet goed
+- sortable: als je een lijst in lijst toevoegt wordt slip niet beperkt tot de sublists;
+- na drag van buitenste lijst zijn de kinderen niet meer draggable
 
 Done:
 [v] Meerdere templates per lijst
@@ -49,3 +49,4 @@ Done:
 [v] Meta title/megatags
 [v] symbol plugin
 [v] dropbox image plugin proof of concept
+[v] github template save
