@@ -1,7 +1,6 @@
 <script type="text/javascript">
 	var documentHandler = function(event) {
 		var key = event.keyCode || event.which;
-		console.log(key);
 
 		if (key == 66 && event.ctrlKey) { // Ctrl-B
 			if (typeof editor.actions["vedor-text-bold"] === "function") {
