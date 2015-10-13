@@ -520,7 +520,7 @@
 			var activeSection = document.getElementById(currentContext);
 			// console.log(activeSection);
 
-			if (activeSection && !vdHideToolbars) {
+			if (activeSection && !editor.context.toolbar.hide) {
 				var htmlContext = activeSection.querySelectorAll("div.vedor-toolbar-status")[0];
 				if ( htmlContext ) {
 					if (!htmlContext.classList.contains("vedor-selected")) {
@@ -594,7 +594,7 @@
 				case "vedor-table-cell-selection":
 				case "vedor-image" :
 				case "vedor-hyperlink" :
-					vdHideToolbars = false;
+					editor.context.toolbar.hide = false;
 				break;
 				default:
 				break;
@@ -718,7 +718,7 @@
 	editor.addAction("vedor-dialog-fullscreen", editor.plugins.dialog.fullscreen);
 	editor.addAction("vedor-dialog-close", editor.plugins.dialog.close);
 
-	vdHideToolbars = false;
+	editor.context.toolbar.hide = false;
 
 	if( window.getSelection ) {
 		var selection = document.defaultView.getSelection();
@@ -791,7 +791,10 @@
 
 		muze.event.attach( document, 'selectionchange', editor.context.update );
 		muze.event.attach( document, 'keyup', editor.context.update );
-		muze.event.attach( document, 'mouseup', editor.context.update );
+		muze.event.attach( document, 'mouseup', function() {
+			editor.context.toolbar.hide = false;
+			editor.context.update();
+		});
 
 		muze.event.attach( document, 'scroll', editor.context.toolbar.reposition );
 		muze.event.attach( document, 'touchstart', function(evt) {
