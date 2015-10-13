@@ -585,10 +585,6 @@
 			}
 		},
 		initProperties : function(context) {
-			if (editor.toolbars[context] && editor.toolbars[context].update) {
-				return editor.toolbars[context].update(document.getElementById(context));
-			}
-
 			switch (context) {
 				case "vedor-text-selection" :
 				case "vedor-table-cell-selection":
@@ -598,6 +594,10 @@
 				break;
 				default:
 				break;
+			}
+			
+			if (editor.toolbars[context] && editor.toolbars[context].update) {
+				return editor.toolbars[context].update(document.getElementById(context));
 			}
 		},
 		fixSelection : function() {
