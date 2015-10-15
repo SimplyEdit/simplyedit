@@ -11,67 +11,6 @@
 
 	var editor = {
 		baseURL : "http://yvo.muze.nl/simply-edit/",
-		storage : {
-			url : 'http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-edit-data/',
-			save : function(data, callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "save";
-				var params = "data=" + escape(data);
-				params += "&key=" + editor.storage.key;
-
-				http.open("POST", url, true);
-				//Send the proper header information along with the request
-				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-				       		callback();
-					}
-				};
-				http.send(params);
-			},
-			load : function(callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "get";
-				url += "?t=" + (new Date().getTime());
-
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback(http.responseText);
-					}
-				};
-				http.send();
-			},
-			validateKey : function(key) {
-				if (key == "demo") {
-					return true;
-				}
-				if (key == "08716d61df433e26cd4b540c22b147e243f8443b") {
-					return true;
-				}
-			},
-			connect : function() {
-				if (!editor.storage.key) {
-					editor.storage.key = localStorage.storageKey;
-				}
-				if (!editor.storage.key) {
-					editor.storage.key = prompt("Please enter your authentication key");
-				}
-
-				if (editor.storage.validateKey(editor.storage.key)) {
-					localStorage.storageKey = editor.storage.key;
-					return true;
-				} else {
-					delete localStorage.storageKey;
-					return editor.storage.connect();
-				}
-			},
-			disconnect : function() {
-				delete editor.storage.key;
-				delete localStorage.storageKey;
-			}
-		},
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -562,6 +501,7 @@
 				editor.editmode.toolbars = config.toolbars;
 			}
 			editor.loadBaseStyles();
+			editor.storage = storage.init(config.endpoint);
 			editor.data.load();
 		},
 		editmode : {
@@ -898,6 +838,205 @@
 		}
 	};
 
+	var storage = {
+		getType : function(endpoint) {
+			if (endpoint.indexOf("github.io") !== -1) {
+				return "github";
+			} else if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
+				return "ariadne";
+			}
+			return "default";
+		},
+		init : function(endpoint) {
+			var storageType = storage.getType(endpoint);
+			if (!storage[storageType]) {
+				storageType = "default";
+			}
+			var result = storage[storageType];
+			result.url = endpoint;
+			if (typeof result.init === "function") {
+				result.init();
+			}
+			return result;
+		},
+		ariadne : {
+			save : function(data, callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "save";
+				var params = "data=" + escape(data);
+				params += "&key=" + editor.storage.key;
+
+				http.open("POST", url, true);
+				//Send the proper header information along with the request
+				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback();
+					}
+				};
+				http.send(params);
+			},
+			load : function(callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "get";
+				url += "?t=" + (new Date().getTime());
+
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback(http.responseText);
+					}
+				};
+				http.send();
+			},
+			validateKey : function(key) {
+				if (key == "demo") {
+					return true;
+				}
+				if (key == "08716d61df433e26cd4b540c22b147e243f8443b") {
+					return true;
+				}
+			},
+			connect : function() {
+				if (!editor.storage.key) {
+					editor.storage.key = localStorage.storageKey;
+				}
+				if (!editor.storage.key) {
+					editor.storage.key = prompt("Please enter your authentication key");
+				}
+
+				if (editor.storage.validateKey(editor.storage.key)) {
+					localStorage.storageKey = editor.storage.key;
+					return true;
+				} else {
+					delete localStorage.storageKey;
+					return editor.storage.connect();
+				}
+			},
+			disconnect : function() {
+				delete editor.storage.key;
+				delete localStorage.storageKey;
+			}
+		},
+		github : {
+			repoName : null,
+			repoUser : null,
+			repoBranch : "gh-pages",
+			dataFile : "data.json",
+			init : function(endpoint) {
+				var script = document.createElement("SCRIPT");
+				script.src = "http://se-cdn.muze.nl/github.js";
+				document.head.appendChild(script);
+
+				// FIXME: Dit moet endpoint zijn ipv document.location.
+				this.repoUser = document.location.hostname.split(".")[0];
+				this.repoName = document.location.pathname.split("/")[1];
+
+				this.repoBranch = "gh-pages";
+				this.dataFile = "data.json";
+			},
+			connect : function() {
+				if (!editor.storage.key) {
+					editor.storage.key = localStorage.storageKey;
+				}
+				if (!editor.storage.key) {
+					editor.storage.key = prompt("Please enter your authentication key");
+				}
+
+				if (editor.storage.validateKey(editor.storage.key)) {
+					if (!this.repo) {
+						localStorage.storageKey = editor.storage.key;
+						var github = new Github({
+							token: editor.storage.key,
+							auth: "oauth"
+						});
+						this.repo = github.getRepo(this.repoUser, this.repoName);
+					}
+					return true;
+				} else {
+					return editor.storage.connect();
+				}
+			},
+			disconnect : function() {
+				delete this.repo;
+				delete localStorage.storageKey;
+			},
+			validateKey : function(key) {
+				return true;
+			},
+			save : function(data, callback) {
+				this.repo.write(this.repoBranch, this.dataFile, data, "Commit message", callback);
+			},
+			load : function(callback) {
+				var http = new XMLHttpRequest();
+				var url = "https://raw.githubusercontent.com/" + this.repoUser + "/" + this.repoName + "/" + this.repoBranch + "/" + this.dataFile;
+				url += "?t=" + (new Date().getTime());
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback(http.responseText);
+					}
+					if(http.readyState == 4 && http.status == 404) {
+						callback("{}");
+					}
+				};
+				http.send();
+			},
+			saveTemplate : function(pageTemplate, callback) {
+				var dataPath = location.pathname.split(/\//, 3)[2];
+				if (dataPath.match(/\/$/)) {
+					dataPath += "index.html";
+				}
+
+				var repo = this.repo;
+				repo.read(this.repoBranch, pageTemplate, function(err, data) {
+					if (data) {
+						repo.write(this.repoBranch, dataPath, data, pageTemplate + " (copy)", callback);
+					}
+				});
+			}
+		},
+		default : {
+			save : function(data, callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "data/data.json";
+
+				http.open("PUT", url, true);
+				//Send the proper header information along with the request
+				http.setRequestHeader("Content-type", "application/json");
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback();
+					}
+				};
+				http.send(data);
+			},
+			load : function(callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "data/data.json";
+				url += "?t=" + (new Date().getTime());
+
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback(http.responseText);
+					}
+				};
+				http.send();
+			},
+			connect : function() {
+				return true;
+			},
+			disconnect : function() {
+				delete editor.storage.key;
+				delete localStorage.storageKey;
+			}
+		}
+	};
+
+
 	editor.actions = {
 		"vedor-save" : editor.data.save,
 		"vedor-logout" : editor.editmode.stop
@@ -965,12 +1104,13 @@
 */
 	window.editor = editor;
 	editor.init({
+		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : location.hostname,
 		toolbars : [
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-image.html",
 //			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
-                        editor.baseURL + "vedor/toolbar.vedor-iframe.html",
+			editor.baseURL + "vedor/toolbar.vedor-iframe.html",
                         editor.baseURL + "vedor/toolbar.vedor-selectable.html",
                         editor.baseURL + "vedor/toolbar.vedor-list.html",
                         editor.baseURL + "vedor/plugin.vedor-template.html",
@@ -984,5 +1124,4 @@
 			editor.baseURL + "vedor/plugin.vedor-keyboard.html"
 		]
 	});
-
 }());
