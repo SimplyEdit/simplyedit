@@ -119,7 +119,8 @@
 			}
 		} else {
 			if (!editor.plugins.symbol.currentSel.collapsed) {
-				execCommand('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+				vdSelectionState.restore(editor.plugins.symbol.currentSel);
+				document.execCommand('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
 			}
 			vdSelection.setHTMLText(editor.plugins.symbol.currentSel, "&#" + el.dataset.value + ";");
 		}

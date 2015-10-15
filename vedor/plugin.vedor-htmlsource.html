@@ -136,7 +136,7 @@
 				}
 			},
 			open : function() {
-				editor.plugins.htmlsource.currentSel = vdSelectionState.get();
+				editor.plugins.htmlsource.currentSel = vdSelectionState.get().cloneRange();
 				editor.plugins.htmlsource.currentField = editor.node.getEditableField();
 				vdSelectionState.save(editor.plugins.htmlsource.currentSel);
 
@@ -191,7 +191,8 @@
 					field.innerHTML = source;
 				} else {
 					if (!editor.plugins.htmlsource.currentSel.collapsed) {
-						execCommand('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+						vdSelectionState.restore(editor.plugins.htmlsource.currentSel);
+						document.execCommand('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
 					}
 					vdSelection.setHTMLText(editor.plugins.htmlsource.currentSel, source);
 				}
