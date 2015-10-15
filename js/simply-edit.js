@@ -8,9 +8,10 @@
 	if (window.editor) {
 		return;
 	}
-
+	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
+	
 	var editor = {
-		baseURL : "http://yvo.muze.nl/simply-edit/",
+	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -863,6 +864,9 @@
 			return result;
 		},
 		ariadne : {
+                        init : function(endpoint) {
+                                this.url = endpoint;
+                        },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "save";
@@ -1009,6 +1013,11 @@
 			}
 		},
 		default : {
+		        init : function(endpoint) {
+		        	var parser = document.createElement('a');
+				parser.href = endpoint;
+                                this.url = parser.origin;
+		        },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "data/data.json";
@@ -1115,7 +1124,7 @@
 */
 	window.editor = editor;
 	editor.init({
-		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : location.origin,
+		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : location.href,
 		toolbars : [
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
