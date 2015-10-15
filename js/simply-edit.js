@@ -870,12 +870,13 @@
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "save";
-				var params = "data=" + escape(data);
+				var params = "data=" + encodeURIComponent(data);
 				params += "&key=" + editor.storage.key;
 
 				http.open("POST", url, true);
 				//Send the proper header information along with the request
 				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				http.setRequestHeader("charset", "UTF-8");
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
@@ -1025,6 +1026,7 @@
 				http.open("PUT", url, true);
 				//Send the proper header information along with the request
 				http.setRequestHeader("Content-type", "application/json");
+				http.setRequestHeader("charset", "UTF-8");
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
