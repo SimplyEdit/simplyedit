@@ -501,6 +501,7 @@
 				editor.editmode.toolbars = config.toolbars;
 			}
 			editor.loadBaseStyles();
+
 			editor.storage = storage.init(config.endpoint);
 			editor.data.load();
 		},
@@ -842,6 +843,8 @@
 		getType : function(endpoint) {
 			if (endpoint.indexOf("github.io") !== -1) {
 				return "github";
+			} else if (endpoint.indexOf("github.com") !== -1) {
+				return "github";
 			} else if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
 				return "ariadne";
 			}
@@ -855,7 +858,7 @@
 			var result = storage[storageType];
 			result.url = endpoint;
 			if (typeof result.init === "function") {
-				result.init();
+				result.init(endpoint);
 			}
 			return result;
 		},
@@ -929,11 +932,19 @@
 				script.src = "http://se-cdn.muze.nl/github.js";
 				document.head.appendChild(script);
 
-				// FIXME: Dit moet endpoint zijn ipv document.location.
-				this.repoUser = document.location.hostname.split(".")[0];
-				this.repoName = document.location.pathname.split("/")[1];
+				var parser = document.createElement('a');
+				parser.href = endpoint;
 
-				this.repoBranch = "gh-pages";
+				if (parser.hostname == "github.com") {
+					this.repoUser = parser.pathname.split("/")[1];
+					this.repoName = parser.pathname.split("/")[2];
+					this.repoBranch = "master";
+				} else {
+					this.repoUser = parser.hostname.split(".")[0];
+					this.repoName = parser.pathname.split("/")[1];
+					this.repoBranch = "gh-pages";
+				}
+
 				this.dataFile = "data.json";
 			},
 			connect : function() {
