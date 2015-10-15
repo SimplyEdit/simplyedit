@@ -89,7 +89,10 @@
 								var currentField = editor.node.getEditableField();
 								if (currentField.hopeEditor) {
 									editor.context.skipUpdate = true;
-									currentField.hopeEditor.parseHTML();
+									if (!editor.toolbar.getToolbarEl(el).parentNode.classList.contains("vedor-dialog")) {
+										currentField.hopeEditor.parseHTML();
+									}
+									
 									window.setTimeout(function() {
 										editor.context.skipUpdate = false;
 									}, 50);
@@ -114,6 +117,16 @@
 			var handleChange = function(evt) {
 				var action = editor.actions[this.getAttribute("data-vedor-action")];
 				if (action) {
+					if (hopeEditor) {
+						editor.context.skipUpdate = true;
+						if (!editor.toolbar.getSectionEl(this).classList.contains("vedor-dialog")) {
+							hopeEditor.parseHTML();
+						}
+						window.setTimeout(function() {
+							editor.context.skipUpdate = false;
+						}, 50);
+					}
+					
 					var result = action(this.value);
 				} else {
 					console.log(this.getAttribute("data-vedor-action") + " not yet implemented");
