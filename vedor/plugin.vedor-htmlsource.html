@@ -191,7 +191,7 @@
 					field.innerHTML = source;
 				} else {
 					if (!editor.plugins.htmlsource.currentSel.collapsed) {
-						editor.plugins.text.formatInline('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+						execCommand('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
 					}
 					vdSelection.setHTMLText(editor.plugins.htmlsource.currentSel, source);
 				}
