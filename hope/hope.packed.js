@@ -1876,6 +1876,9 @@ hope.register( 'hope.fragment.annotations', function() {
 	};
 
 	hopeEditorSelection.prototype.getNextTextNode = function(textNode) {
+		if (!textNode) {
+			return false;
+		}
 		var treeWalker = document.createTreeWalker( 
 			this.editor.refs.output, 
 			NodeFilter.SHOW_TEXT, 
@@ -1889,6 +1892,10 @@ hope.register( 'hope.fragment.annotations', function() {
 	};
 
 	hopeEditorSelection.prototype.getPrevTextNode = function(textNode) {
+		if (!textNode) {
+			return false;
+		}
+		
 		var treeWalker = document.createTreeWalker( 
 			this.editor.refs.output, 
 			NodeFilter.SHOW_TEXT, 

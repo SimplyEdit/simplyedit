@@ -105,6 +105,9 @@ hope.register( 'hope.editor.selection', function() {
 	};
 
 	hopeEditorSelection.prototype.getNextTextNode = function(textNode) {
+		if (!textNode) {
+			return false;
+		}
 		var treeWalker = document.createTreeWalker( 
 			this.editor.refs.output, 
 			NodeFilter.SHOW_TEXT, 
@@ -118,6 +121,10 @@ hope.register( 'hope.editor.selection', function() {
 	};
 
 	hopeEditorSelection.prototype.getPrevTextNode = function(textNode) {
+		if (!textNode) {
+			return false;
+		}
+		
 		var treeWalker = document.createTreeWalker( 
 			this.editor.refs.output, 
 			NodeFilter.SHOW_TEXT, 
