@@ -1476,7 +1476,8 @@ hope.register( 'hope.fragment.annotations', function() {
 				}
 			} else if (target.childNodes[i].nodeType == 3) {
 				var textContent = target.childNodes[i].nodeValue;
-				textContent = textContent.replace(/\u00AD+/g, "\u00AD");
+				textContent = textContent.replace(/\u00AD+/g, "");
+
 				hopeTokenCounter += textContent.length;
 				textValue += textContent;
 			}
