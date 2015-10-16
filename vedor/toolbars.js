@@ -71,6 +71,23 @@
 				toolbar.insertBefore(marker, toolbar.firstChild);
 			}
 		},
+		beforeAction : function() {
+			if (!hopeEditor) {
+				var currentField = editor.node.getEditableField();
+				hopeEditor = currentField.hopeEditor;
+			}
+
+			if (hopeEditor) {
+				editor.context.skipUpdate = true;
+				if (!document.querySelector(".vedor-dialog.active")) {
+					hopeEditor.parseHTML();
+				}
+				
+				window.setTimeout(function() {
+					editor.context.skipUpdate = false;
+				}, 50);
+			}
+		},
 		init : function(toolbar) {
 			toolbar.addEventListener("click", function(evt) {
 				evt.preventDefault();
@@ -86,18 +103,7 @@
 						default:
 							var action = editor.actions[el.getAttribute("data-vedor-action")];
 							if (action) {
-								var currentField = editor.node.getEditableField();
-								if (currentField.hopeEditor) {
-									editor.context.skipUpdate = true;
-									if (!editor.toolbar.getToolbarEl(el).parentNode.classList.contains("vedor-dialog")) {
-										currentField.hopeEditor.parseHTML();
-									}
-									
-									window.setTimeout(function() {
-										editor.context.skipUpdate = false;
-									}, 50);
-								}
-
+								editor.toolbar.beforeAction();
 								var result = action(el);
 								if (!result) {
 									return;
@@ -117,16 +123,7 @@
 			var handleChange = function(evt) {
 				var action = editor.actions[this.getAttribute("data-vedor-action")];
 				if (action) {
-					if (hopeEditor) {
-						editor.context.skipUpdate = true;
-						if (!editor.toolbar.getSectionEl(this).classList.contains("vedor-dialog")) {
-							hopeEditor.parseHTML();
-						}
-						window.setTimeout(function() {
-							editor.context.skipUpdate = false;
-						}, 50);
-					}
-					
+					editor.toolbar.beforeAction();
 					var result = action(this.value);
 				} else {
 					console.log(this.getAttribute("data-vedor-action") + " not yet implemented");
@@ -663,9 +660,12 @@
 			if (editor.context.touching) {
 				return;
 			}
+			var field = editor.node.getEditableField();
+			hopeEditor = field.hopeEditor;
 			editor.context.fixSelection();
 			editor.context.show();
 			vdHtmlContextStack = editor.context.getTagStack();
+
 		}
 	};
 
