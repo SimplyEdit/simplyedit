@@ -641,12 +641,12 @@
 				for (i=0; i<dataFields.length; i++) {
 				//	dataFields[i].contentEditable = true;
 					switch (dataFields[i].tagName.toLowerCase()) {
-						case "img":
 						case "iframe":
 						case "meta":
 						case "title":
 							dataFields[i].contentEditable = true;
 						break;
+						case "img":
 						default:
 							dataFields[i].hopeContent = document.createElement("textarea");
 							dataFields[i].hopeMarkup = document.createElement("textarea");
