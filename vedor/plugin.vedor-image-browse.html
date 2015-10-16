@@ -104,7 +104,7 @@
 		currentSel : null,
 		currentField : null,
 		currentJail : null,
-		path : '/SingerTemplate/img/',
+		path : document.querySelector("[data-vedor-images]") ? document.querySelector("[data-vedor-images]").getAttribute("data-vedor-images") : null,
 		dialog : {
 			open : function() {
 				editor.plugins.imageBrowse.currentSel = vdSelectionState.get();
@@ -167,13 +167,15 @@
 			}
 		},
 		init : function() {
-			var target = document.querySelector("#vedor-image .vedor-toolbar .vedor-buttons");
-			if (target) {
-				var button = document.createElement("LI");
-				button.innerHTML = '<button data-vedor-action="vedor-image-browse"><i class="fa fa-folder"></i>Browse</button>';
-				target.appendChild(button);
-			} else {
-				window.setTimeout(editor.plugins.imageBrowse.init, 200);
+			if (editor.plugins.imageBrowse.path) {
+				var target = document.querySelector("#vedor-image .vedor-toolbar .vedor-buttons");
+				if (target) {
+					var button = document.createElement("LI");
+					button.innerHTML = '<button data-vedor-action="vedor-image-browse"><i class="fa fa-folder"></i>Browse</button>';
+					target.appendChild(button);
+				} else {
+					window.setTimeout(editor.plugins.imageBrowse.init, 200);
+				}
 			}
 		}
 	};
