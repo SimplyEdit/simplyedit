@@ -79,13 +79,18 @@
 		},
 		reselect : function() {
 			var sel = window.getSelection();
-			if (sel.baseNode.nextSibling.nodeType == 1 && sel.baseNode.nextSibling.tagName.toLowerCase() == "img") {
+			var image = sel.baseNode.nextSibling;
+			if (!image) {
+				image = sel.baseNode.parentNode.nextSibling;
+			}
+			if (image.nodeType == 1 && image.tagName.toLowerCase() == "img") {
 				var range = document.createRange();
-				range.setStartBefore(sel.baseNode.nextSibling);
-				range.setEndAfter(sel.baseNode.nextSibling);
+				range.setStartBefore(image);
+				range.setEndAfter(image);
 
 				sel.removeAllRanges();
 				sel.addRange(range);
+				vdSelectionState.save();
 			} else {
 				sel.removeAllRanges();
 			}
@@ -181,17 +186,17 @@
 				var range = hopeEditor.selection.getRange();
 				var annotation = hopeEditor.fragment.has(range, "img");
 
+				var type=vdGetProperty('vdImageType');
+				var align=vdGetProperty('vdImageAlign');
+
 				if (annotation) {
 					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
 
-					var type=vdGetProperty('vdImageType');
 					if (type) {
 						tempNode.setAttribute('data-vedor-image-type',type);
 					} else {
 						tempNode.removeAttribute('data-vedor-image-type');
 					}
-
-					var align=vdGetProperty('vdImageAlign');
 
 					tempNode.classList.remove("vedor-image-align-left");
 					tempNode.classList.remove("vedor-image-align-right");
@@ -214,6 +219,28 @@
 					hopeEditor.update();
 					editor.plugins.image.reselect();
 					vdStoreUndo();
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					if (type) {
+						hopeEditor.field.setAttribute('data-vedor-image-type',type);
+					} else {
+						hopeEditor.field.removeAttribute('data-vedor-image-type');
+					}
+					hopeEditor.field.classList.remove("vedor-image-align-left");
+					hopeEditor.field.classList.remove("vedor-image-align-right");
+					hopeEditor.field.classList.remove("vedor-image-align-top");
+					hopeEditor.field.classList.remove("vedor-image-align-bottom");
+					hopeEditor.field.classList.remove("vedor-image-align-middle");
+
+					switch (align) {
+						case 'left':
+						case 'right':
+						case 'top':
+						case 'bottom':
+						case 'middle':
+							hopeEditor.field.classList.add("vedor-image-align-" + align);
+						break;
+					}
+					
 				}
 			};
 
@@ -274,12 +301,18 @@
 					if (value) {
 						tempNode.setAttribute("alt", value);
 					} else {
-						tempNode.removeAttribute("alt", value);
+						tempNode.removeAttribute("alt");
 					}
 					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
 					hopeEditor.update();
 					editor.plugins.image.reselect();
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					if (value) {
+						hopeEditor.field.setAttribute("alt", value);
+					} else {
+						hopeEditor.field.removeAttribute("alt");
+					}
 				}
 			},
 			"vedor-image-title" : function(value) {
@@ -290,12 +323,18 @@
 					if (value) {
 						tempNode.setAttribute("title", value);
 					} else {
-						tempNode.removeAttribute("title", value);
+						tempNode.removeAttribute("title");
 					}
 					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
 					hopeEditor.update();
 					editor.plugins.image.reselect();
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					if (value) {
+						hopeEditor.field.setAttribute("title", value);
+					} else {
+						hopeEditor.field.removeAttribute("title");
+					}
 				}
 			},
 			"vedor-image-src" : function(value) {
@@ -312,6 +351,12 @@
 					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
 					hopeEditor.update();
 					editor.plugins.image.reselect();
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					if (value) {
+						hopeEditor.field.setAttribute("src", value);
+					} else {
+						hopeEditor.field.setAttribute("src", editor.plugins.image.placeholder());
+					}
 				}
 			},
 			"vedor-insert-image" : function() {
