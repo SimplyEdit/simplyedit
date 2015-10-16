@@ -72,7 +72,7 @@
 			}
 		},
 		beforeAction : function() {
-			if (!hopeEditor) {
+			if (typeof hopeEditor == "undefined") {
 				var currentField = editor.node.getEditableField();
 				hopeEditor = currentField.hopeEditor;
 			}
