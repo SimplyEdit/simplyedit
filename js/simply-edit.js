@@ -1017,7 +1017,7 @@
 		        init : function(endpoint) {
 		        	var parser = document.createElement('a');
 				parser.href = endpoint;
-                                this.url = parser.origin;
+                                this.url = parser.origin + "/";
 		        },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
