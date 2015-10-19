@@ -423,10 +423,10 @@
 					rtop = pos.bottom;
 				}
 
-				ltop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
-				lleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
-				rtop += document.body.scrollTop ? document.body.scrollTop : pageYOffset;
-				rleft += document.body.scrollLeft ? document.body.scrollLeft : pageXOffset;
+				ltop += Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+				lleft += Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
+				rtop += Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+				rleft += Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
 
 				top = Math.max(ltop, rtop);
 				left = lleft + ((rleft - lleft) / 2);
@@ -470,7 +470,7 @@
 				// - if edit pane content can be scrolled down, no problem
 				// - else: add space on the bottom so that you can scroll down
 				var editPaneRect = {
-					height : document.body.scrollTop + window.innerHeight
+					height : Math.max(document.body.scrollTop, document.documentElement.scrollTop) + window.innerHeight
 				};
 
 				var toolbarRect = activeSection.getBoundingClientRect();
