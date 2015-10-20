@@ -1015,9 +1015,7 @@
 		},
 		default : {
 		        init : function(endpoint) {
-		        	var parser = document.createElement('a');
-				parser.href = endpoint;
-                                this.url = parser.origin + "/";
+                                this.url = endpoint;
 		        },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
@@ -1126,7 +1124,7 @@
 */
 	window.editor = editor;
 	editor.init({
-		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : location.href,
+		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : location.origin + "/",
 		toolbars : [
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
