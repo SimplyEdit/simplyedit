@@ -501,6 +501,7 @@
 	margin-bottom: auto;
 	top: 0px;
 	right: 0px;
+	z-index: 1000;
 }
 #vedor-main-toolbar .vedor-toolbar {
 	position: static;
