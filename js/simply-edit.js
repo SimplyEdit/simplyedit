@@ -867,7 +867,7 @@
 		ariadne : {
                         init : function(endpoint) {
 				if (endpoint === null) {
-					endpoint = location.origin + "/",
+					endpoint = location.origin + "/";
 				}
                                 this.url = endpoint;
                         },
@@ -908,7 +908,7 @@
 		neocities : {
                         init : function(endpoint) {
 				if (endpoint === null) {
-					endpoint = location.origin + "/",
+					endpoint = location.origin + "/";
 				}
                                 this.url = endpoint;
                         },
@@ -972,7 +972,7 @@
 			dataFile : "data.json",
 			init : function(endpoint) {
 				if (endpoint === null) {
-					endpoint = document.location,
+					endpoint = document.location;
 				}
 				var script = document.createElement("SCRIPT");
 				script.src = "http://se-cdn.muze.nl/github.js";
@@ -1057,7 +1057,7 @@
 		default : {
 		        init : function(endpoint) {
 				if (endpoint === null) {
-					endpoint = location.origin + "/",
+					endpoint = location.origin + "/";
 				}
                                 this.url = endpoint;
 		        },
