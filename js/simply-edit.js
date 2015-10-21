@@ -859,7 +859,6 @@
 				storageType = "default";
 			}
 			var result = storage[storageType];
-			result.url = endpoint;
 			if (typeof result.init === "function") {
 				result.init(endpoint);
 			}
@@ -867,6 +866,9 @@
 		},
 		ariadne : {
                         init : function(endpoint) {
+				if (endpoint === null) {
+					endpoint = location.origin + "/",
+				}
                                 this.url = endpoint;
                         },
 			save : function(data, callback) {
@@ -905,6 +907,9 @@
 		},
 		neocities : {
                         init : function(endpoint) {
+				if (endpoint === null) {
+					endpoint = location.origin + "/",
+				}
                                 this.url = endpoint;
                         },
 			save : function(data, callback) {
@@ -966,6 +971,9 @@
 			repoBranch : "gh-pages",
 			dataFile : "data.json",
 			init : function(endpoint) {
+				if (endpoint === null) {
+					endpoint = document.location,
+				}
 				var script = document.createElement("SCRIPT");
 				script.src = "http://se-cdn.muze.nl/github.js";
 				document.head.appendChild(script);
@@ -1048,6 +1056,9 @@
 		},
 		default : {
 		        init : function(endpoint) {
+				if (endpoint === null) {
+					endpoint = location.origin + "/",
+				}
                                 this.url = endpoint;
 		        },
 			save : function(data, callback) {
@@ -1157,7 +1168,7 @@
 */
 	window.editor = editor;
 	editor.init({
-		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : location.origin + "/",
+		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : null,
 		toolbars : [
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
