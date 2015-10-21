@@ -11,8 +11,7 @@
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
 	var editor = {
-//	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
-		baseURL : "http://yvo.muze.nl/simply-edit/",
+	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -1172,7 +1171,7 @@
                         editor.baseURL + "vedor/plugin.vedor-meta.html",
                         editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
                         editor.baseURL + "vedor/plugin.vedor-symbol.html",
-                        editor.baseURL + "vedor/plugin.vedor-plain.html",
+//                        editor.baseURL + "vedor/plugin.vedor-plain.html",
                         editor.baseURL + "vedor/plugin.vedor-dropbox.html",
 			editor.baseURL + "vedor/plugin.vedor-paste.html",
 			editor.baseURL + "vedor/plugin.vedor-keyboard.html"
