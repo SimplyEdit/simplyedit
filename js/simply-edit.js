@@ -842,6 +842,10 @@
 
 	var storage = {
 		getType : function(endpoint) {
+		        if (endpoint === null) {
+                                endpoint = document.location.href;
+                        }
+                        
 			if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
 				return "ariadne";
 			} else if (endpoint.indexOf("github.io") !== -1) {
