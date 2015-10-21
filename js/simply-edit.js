@@ -11,7 +11,8 @@
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
 	var editor = {
-	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
+//	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
+		baseURL : "http://yvo.muze.nl/simply-edit/",
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -842,12 +843,14 @@
 
 	var storage = {
 		getType : function(endpoint) {
-			if (endpoint.indexOf("github.io") !== -1) {
+			if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
+				return "ariadne";
+			} else if (endpoint.indexOf("github.io") !== -1) {
 				return "github";
 			} else if (endpoint.indexOf("github.com") !== -1) {
 				return "github";
-			} else if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
-				return "ariadne";
+			} else if (endpoint.indexOf("neocities.org") !== -1) {
+				return "neocities";
 			}
 			return "default";
 		},
@@ -869,15 +872,52 @@
                         },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "save";
-				var params = "data=" + encodeURIComponent(data);
-				params += "&key=" + editor.storage.key;
+				var url = editor.storage.url + "data.json";
+
+				http.open("PUT", url, true);
+				http.withCredentials = true;
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback();
+					}
+				};
+				http.send(data);
+			},
+			load : function(callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "data.json";
+				url += "?t=" + (new Date().getTime());
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback(http.responseText);
+					}
+				};
+				http.send();
+			},
+			connect : function() {
+				return true;
+			},
+			disconnect : function() {
+				delete editor.storage.key;
+				delete localStorage.storageKey;
+			}
+		},
+		neocities : {
+                        init : function(endpoint) {
+                                this.url = endpoint;
+                        },
+			save : function(data, callback) {
+				var http = new XMLHttpRequest();
+				var url = "https://neocities.org/api/upload";
+				var params = "data.json=" + encodeURIComponent(data);
 
 				http.open("POST", url, true);
 				//Send the proper header information along with the request
-				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				http.setRequestHeader("charset", "UTF-8");
-
+				http.withCredentials = true;
+				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=utf-8");
+				http.setRequestHeader("Authorization", "Basic " + editor.storage.key);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
 						callback();
@@ -887,7 +927,7 @@
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "get";
+				var url = editor.storage.url + "data.json";
 				url += "?t=" + (new Date().getTime());
 
 				http.open("GET", url, true);
@@ -898,13 +938,8 @@
 				};
 				http.send();
 			},
-			validateKey : function(key) {
-				if (key == "demo") {
-					return true;
-				}
-				if (key == "08716d61df433e26cd4b540c22b147e243f8443b") {
-					return true;
-				}
+			validateKey : function() {
+				return true;
 			},
 			connect : function() {
 				if (!editor.storage.key) {
@@ -918,7 +953,6 @@
 					localStorage.storageKey = editor.storage.key;
 					return true;
 				} else {
-					delete localStorage.storageKey;
 					return editor.storage.connect();
 				}
 			},
@@ -1129,7 +1163,7 @@
 			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
 			editor.baseURL + "vedor/toolbar.vedor-hope-image.html",
-//			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
+			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
 			editor.baseURL + "vedor/toolbar.vedor-iframe.html",
                         editor.baseURL + "vedor/toolbar.vedor-selectable.html",
                         editor.baseURL + "vedor/toolbar.vedor-list.html",
@@ -1138,7 +1172,7 @@
                         editor.baseURL + "vedor/plugin.vedor-meta.html",
                         editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
                         editor.baseURL + "vedor/plugin.vedor-symbol.html",
-//                        editor.baseURL + "vedor/plugin.vedor-plain.html",
+                        editor.baseURL + "vedor/plugin.vedor-plain.html",
                         editor.baseURL + "vedor/plugin.vedor-dropbox.html",
 			editor.baseURL + "vedor/plugin.vedor-paste.html",
 			editor.baseURL + "vedor/plugin.vedor-keyboard.html"
