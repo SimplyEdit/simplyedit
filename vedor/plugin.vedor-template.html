@@ -113,14 +113,16 @@
 		},
 		apply : function() {
 			var pageTemplate = vedor.widgets.properties.get("vedor-page-template-list");
-
+			
 			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
 			editor.plugins.dialog.close();
 			var reloadPage = function() {
 				if (editor.storage.saveTemplate) {
 					editor.storage.saveTemplate(pageTemplate, function() {
-						document.location.reload()
+						document.location.reload();
 					});
+				} else {
+					document.location.reload();
 				}
 			}
 			editor.actions['vedor-aftersave'] = reloadPage;

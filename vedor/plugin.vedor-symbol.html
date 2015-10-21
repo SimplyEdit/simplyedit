@@ -112,10 +112,11 @@
 				if ( range.length ) {
 					hopeEditor.fragment = hopeEditor.fragment.delete(range);
 				}
-				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, charTyped );
+				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, charTyped);
+				hopeEditor.selection.move(1);
 				setTimeout( function() {
 					hopeEditor.update();
-				}, 0 );
+				}, 0);
 			}
 		} else {
 			if (!editor.plugins.symbol.currentSel.collapsed) {
