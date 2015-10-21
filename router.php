@@ -1,5 +1,5 @@
 <?php
-	$json = file_get_contents("http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-edit-data/get");
+	$json = file_get_contents("http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/data.json");
 	$data = json_decode($json, true);
 
 	if (isset($data[$_SERVER["REQUEST_URI"]])) {
