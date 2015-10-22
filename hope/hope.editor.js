@@ -178,9 +178,18 @@ hope.register( 'hope.editor', function() {
 	hopeEditor.prototype.getEditorRange = function(start, end ) {
 		var treeWalker = document.createTreeWalker( 
 			this.refs.output, 
-			NodeFilter.SHOW_TEXT, 
+			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, 
 			function(node) {
-				return NodeFilter.FILTER_ACCEPT; 
+				if (
+					node.nodeType == 3 ||
+					node.tagName.toLowerCase() == "img" ||
+					node.tagName.toLowerCase() == "br" ||
+					node.tagName.toLowerCase() == "hr"
+				) {
+					return NodeFilter.FILTER_ACCEPT;
+				} else {
+					return NodeFilter.FILTER_SKIP;
+				}
 			},
 			false
 		);
@@ -192,7 +201,11 @@ hope.register( 'hope.editor', function() {
 			lastNode = node;
 			node = treeWalker.nextNode();
 			if ( node ) {
-				offset += node.textContent.length;
+				if (node.nodeType == 1) {
+					offset += 1;
+				} else {
+					offset += node.textContent.length;
+				}
 			}			
 		} while ( offset < start && node );
 		if ( !node ) {
@@ -209,7 +222,11 @@ hope.register( 'hope.editor', function() {
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
-				offset += node.textContent.length;
+				if (node.nodeType == 1) {
+					offset += 1;
+				} else {
+					offset += node.textContent.length;
+				}
 			}
 		}
 		if ( !node ) {

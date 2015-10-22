@@ -137,8 +137,36 @@ hope.register( 'hope.editor.selection', function() {
 		return treeWalker.previousNode();	
 	};
 
+	hopeEditorSelection.prototype.getPlaceHolderOffset = function(node) {
+		if (!node) {
+			return false;
+		}
+		var treeWalker = document.createTreeWalker(
+			this.editor.refs.output,
+			NodeFilter.SHOW_ELEMENT,
+			function(node) {
+				if (
+					node.tagName.toLowerCase() == "img" ||
+					node.tagName.toLowerCase() == "br" ||
+					node.tagName.toLowerCase() == "hr"
+				) {
+					return NodeFilter.FILTER_ACCEPT;
+				}
+			},
+			false
+		);
+		treeWalker.currentNode = node;
+		var count = 0;
+		while (treeWalker.previousNode()) {
+			count++;
+		}
+		return count;
+	};
+
 	hopeEditorSelection.prototype.getTotalOffset = function( node ) {
 		offset = 0;
+		offset = this.getPlaceHolderOffset(node);
+		
 		node = this.getPrevTextNode(node);
 		while ( node ) {
 			offset += node.textContent.length;

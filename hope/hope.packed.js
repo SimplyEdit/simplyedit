@@ -1620,9 +1620,18 @@ hope.register( 'hope.fragment.annotations', function() {
 	hopeEditor.prototype.getEditorRange = function(start, end ) {
 		var treeWalker = document.createTreeWalker( 
 			this.refs.output, 
-			NodeFilter.SHOW_TEXT, 
+			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, 
 			function(node) {
-				return NodeFilter.FILTER_ACCEPT; 
+				if (
+					node.nodeType == 3 ||
+					node.tagName.toLowerCase() == "img" ||
+					node.tagName.toLowerCase() == "br" ||
+					node.tagName.toLowerCase() == "hr"
+				) {
+					return NodeFilter.FILTER_ACCEPT;
+				} else {
+					return NodeFilter.FILTER_SKIP;
+				}
 			},
 			false
 		);
@@ -1634,7 +1643,11 @@ hope.register( 'hope.fragment.annotations', function() {
 			lastNode = node;
 			node = treeWalker.nextNode();
 			if ( node ) {
-				offset += node.textContent.length;
+				if (node.nodeType == 1) {
+					offset += 1;
+				} else {
+					offset += node.textContent.length;
+				}
 			}			
 		} while ( offset < start && node );
 		if ( !node ) {
@@ -1651,7 +1664,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
-				offset += node.textContent.length;
+				if (node.nodeType == 1) {
+					offset += 1;
+				} else {
+					offset += node.textContent.length;
+				}
 			}
 		}
 		if ( !node ) {
@@ -1932,8 +1949,36 @@ hope.register( 'hope.fragment.annotations', function() {
 		return treeWalker.previousNode();	
 	};
 
+	hopeEditorSelection.prototype.getPlaceHolderOffset = function(node) {
+		if (!node) {
+			return false;
+		}
+		var treeWalker = document.createTreeWalker(
+			this.editor.refs.output,
+			NodeFilter.SHOW_ELEMENT,
+			function(node) {
+				if (
+					node.tagName.toLowerCase() == "img" ||
+					node.tagName.toLowerCase() == "br" ||
+					node.tagName.toLowerCase() == "hr"
+				) {
+					return NodeFilter.FILTER_ACCEPT;
+				}
+			},
+			false
+		);
+		treeWalker.currentNode = node;
+		var count = 0;
+		while (treeWalker.previousNode()) {
+			count++;
+		}
+		return count;
+	};
+
 	hopeEditorSelection.prototype.getTotalOffset = function( node ) {
 		offset = 0;
+		offset = this.getPlaceHolderOffset(node);
+		
 		node = this.getPrevTextNode(node);
 		while ( node ) {
 			offset += node.textContent.length;
