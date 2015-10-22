@@ -284,6 +284,18 @@ hope.register( 'hope.render.html', function() {
 			// add any content that has no change in annotation
 			var offset = annotationChangeSet.offset;
 			if ( offset > 0 ) {
+				console.log(diffHTML);
+
+				if (diffHTML && (
+					diffHTML.indexOf("<br>") !== -1 ||
+					diffHTML.indexOf("<hr>") !== -1 ||
+					diffHTML.indexOf("<img") !== -1
+				) ) {
+					// skip the placeholder char for the rendering;
+					cursor++;
+					offset--;
+				}
+
 				renderedHTML += this.escape( content.substr(cursor, offset) );
 				cursor+=offset;
 			}
@@ -297,6 +309,7 @@ hope.register( 'hope.render.html', function() {
 			// remove autoclosing annotation from the newAnnotationStack
 			newAnnotationStack = this.getAnnotationStack( annotationSet );
 			var diffHTML = this.renderAnnotationDiff( diff );
+
 			renderedHTML += diffHTML;
 			annotationStack = newAnnotationStack;
 

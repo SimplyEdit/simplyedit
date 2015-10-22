@@ -1157,6 +1157,18 @@ hope.register( 'hope.fragment.annotations', function() {
 			// add any content that has no change in annotation
 			var offset = annotationChangeSet.offset;
 			if ( offset > 0 ) {
+				console.log(diffHTML);
+
+				if (diffHTML && (
+					diffHTML.indexOf("<br>") !== -1 ||
+					diffHTML.indexOf("<hr>") !== -1 ||
+					diffHTML.indexOf("<img") !== -1
+				) ) {
+					// skip the placeholder char for the rendering;
+					cursor++;
+					offset--;
+				}
+
 				renderedHTML += this.escape( content.substr(cursor, offset) );
 				cursor+=offset;
 			}
@@ -1170,6 +1182,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			// remove autoclosing annotation from the newAnnotationStack
 			newAnnotationStack = this.getAnnotationStack( annotationSet );
 			var diffHTML = this.renderAnnotationDiff( diff );
+
 			renderedHTML += diffHTML;
 			annotationStack = newAnnotationStack;
 
@@ -1442,10 +1455,20 @@ hope.register( 'hope.fragment.annotations', function() {
 
 		for (var i in target.childNodes) {
 			if (target.childNodes[i].nodeType == 1) {
-				if (target.childNodes[i].tagName.toLowerCase() == 'img') {
+				if (
+					target.childNodes[i].tagName.toLowerCase() == 'img' ||
+					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
+					target.childNodes[i].tagName.toLowerCase() == 'hr'
+				) {
 					tagStart = hopeTokenCounter;
 					hopeTokenCounter += 1;
-					textValue += "\u00AD";
+
+					if (target.childNodes[i].tagName.toLowerCase() == 'img') {
+						textValue += "\u00AD";
+					} else {
+						textValue += "\n";
+					}
+
 					tagEnd = hopeTokenCounter;
 
 					tags.push({

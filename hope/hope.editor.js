@@ -11,10 +11,20 @@ hope.register( 'hope.editor', function() {
 
 		for (var i in target.childNodes) {
 			if (target.childNodes[i].nodeType == 1) {
-				if (target.childNodes[i].tagName.toLowerCase() == 'img') {
+				if (
+					target.childNodes[i].tagName.toLowerCase() == 'img' ||
+					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
+					target.childNodes[i].tagName.toLowerCase() == 'hr'
+				) {
 					tagStart = hopeTokenCounter;
 					hopeTokenCounter += 1;
-					textValue += "\u00AD";
+
+					if (target.childNodes[i].tagName.toLowerCase() == 'img') {
+						textValue += "\u00AD";
+					} else {
+						textValue += "\n";
+					}
+
 					tagEnd = hopeTokenCounter;
 
 					tags.push({
