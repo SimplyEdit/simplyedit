@@ -49,10 +49,38 @@ QUnit.module("editor init");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello</p><p>world</p>";
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
-		setCaretPosition(testContent.querySelector("p"), 2, 0);
 		assert.equal(testContent.innerHTML, "<p>Hello</p><p>world</p>", "innerHTML did not change");
 	});
 
+	QUnit.test("seperate br stay seperated", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello<br><br>world</p>";
+
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+		console.log(testContent.hopeEditor.refs.annotations.value);
+		assert.equal(testContent.innerHTML, "<p>Hello<br><br>world</p>", "innerHTML did not change");
+	});
+
+	QUnit.test("seperate hr stay seperated", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "hello<hr><hr>world";
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+		assert.equal(testContent.innerHTML, "hello<hr><hr>world", "innerHTML did not change");
+	});
+
+	QUnit.test("seperate hr stay seperated", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>hello</p><hr><hr><p>world</p>";
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+		assert.equal(testContent.innerHTML, "<p>hello</p><hr><hr><p>world</p>", "innerHTML did not change");
+	});
+
+	QUnit.test("seperate divs stay seperated", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "hello<div></div><div></div>world";
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+		assert.equal(testContent.innerHTML, "hello<div></div><div></div>world", "innerHTML did not change");
+	});
 	QUnit.test("strong tag doesnt get extra p tags", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>He<strong>llo</strong> world</p>";
