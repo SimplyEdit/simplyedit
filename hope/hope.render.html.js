@@ -284,8 +284,6 @@ hope.register( 'hope.render.html', function() {
 			// add any content that has no change in annotation
 			var offset = annotationChangeSet.offset;
 			if ( offset > 0 ) {
-				console.log(diffHTML);
-
 				if (diffHTML && (
 					diffHTML.indexOf("<br>") !== -1 ||
 					diffHTML.indexOf("<hr>") !== -1 ||
