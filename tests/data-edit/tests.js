@@ -45,6 +45,8 @@ QUnit.module("editor init");
 		assert.ok(vdSelectionState, "vdSelectionState initialized");
 	});
 
+QUnit.module("hope editor behaviour");
+
 	QUnit.test("seperate p stay seperated", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello</p><p>world</p>";
