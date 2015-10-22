@@ -105,6 +105,7 @@
 							if (action) {
 								editor.toolbar.beforeAction();
 								var result = action(el);
+								editor.context.show();
 								if (!result) {
 									return;
 								}
@@ -519,7 +520,7 @@
 				var sections = document.querySelectorAll("section.vedor-section");
 				for (var j=0; j<sections.length; j++) {
 					if (!(sections[j].className.match(/active/))) {
-						if (parseInt(sections[j].style.left)) {
+						if (parseInt(sections[j].style.left) > -1) {
 							sections[j].style.left = "-10000px";
 						}
 					}
