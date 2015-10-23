@@ -1,0 +1,419 @@
+<!--
+Author: W3layouts
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!doctype html>
+<html>
+<head>
+	<title>Vision a Personal Portfolio Flat bootstrap Responsive website Template | Home :: w3layouts</title>
+	<link href="css/style.css" type="text/css" rel="stylesheet" media="all">
+	<link href="css/bootstrap.css" type="text/css" rel="stylesheet" media="all">
+	<!--web-font-->
+	<link href='http://fonts.googleapis.com/css?family=Pathway+Gothic+One' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Titillium+Web:400,200,300,200italic,300italic,400italic,600,600italic,700,700italic,900' rel='stylesheet' type='text/css'>
+	<!--//web-font-->
+	<!-- Custom Theme files -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="Vision Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template, 
+		Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+	<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<!-- //Custom Theme files -->
+	<!-- js -->
+	<script src="js/jquery.min.js"></script>
+	<!-- //js -->	
+	<!-- start-smoth-scrolling-->
+	<script type="text/javascript" src="js/move-top.js"></script>
+	<script type="text/javascript" src="js/easing.js"></script>	
+	<script type="text/javascript" src="js/modernizr.custom.53451.js"></script>
+	<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$(".scroll").click(function(event){		
+					event.preventDefault();
+					$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
+				});
+			});
+	</script>
+	<!--//end-smoth-scrolling-->
+</head>
+<body>
+	<!--header-->
+	<div class="header" id="home">
+		<div class="container">
+			<div class="header-logo">
+				<a href="index.html"><img src="images/logo.png" alt="logo"/></a>
+			</div>
+			<div class="top-nav">
+				<span class="menu"><img src="images/menu-icon.png" alt=""/></span>
+				<ul class="nav1">
+					<li><a href="index.html" class="active" data-simply-field="home link">HOME</a></li>
+					<li><a href="#about" class="scroll" data-simply-field="about link">ABOUT</a></li>
+					<li><a href="#services" class="scroll" data-simply-field="services link">SERVICES</a></li>
+					<li><a href="#portfolio" class="scroll" data-simply-field="portfolio link">PORTFOLIO</a></li>
+					<li><a href="#contact" class="scroll" data-simply-field="contact link">CONTACT</a></li>
+				</ul>
+				<!-- script-for-menu -->
+				 <script>
+				   $( "span.menu" ).click(function() {
+					 $( "ul.nav1" ).slideToggle( 300, function() {
+					 // Animation complete.
+					  });
+					 });
+				</script>
+				<!-- /script-for-menu -->
+			</div>
+			<div class="clearfix"> </div>
+		</div>	
+	</div>
+	<!--//header-->
+	<!--banner-->
+	<div class="banner">				
+				<!--//End-slider-script -->
+				<script src="js/responsiveslides.min.js"></script>
+				 <script>
+					// You can also use "$(window).load(function() {"
+					$(function () {
+					  // Slideshow 4
+					  $("#slider3").responsiveSlides({
+						auto: false,
+						pager: true,
+						nav: true,
+						speed: 500,
+						namespace: "callbacks",
+						before: function () {
+						  $('.events').append("<li>before event fired.</li>");
+						},
+						after: function () {
+						  $('.events').append("<li>after event fired.</li>");
+						}
+					  });
+				
+					});
+				  </script>
+				<div  id="top" class="callbacks_container">
+					<ul class="rslides" id="slider3" data-simply-list="banner">
+						<template data-simply-template="Banner 1">
+							<li>
+								<div class="banner1">
+									<div class="container">
+										<div class="banner-title">
+											<div class="bnr-top-text">
+												<h1 data-simply-field="banner title">We Are Smart, creative...</h1>
+											</div>
+											<div class="bnr-bottom-text">
+												<p data-simply-field="banner text">"Lorem Ipsum"<br> is the common name for dummy
+												  text often used in the design, printing, and typesetting industries.</p>
+												<div class="arrow">
+													<span class="arrw"> </span>
+												</div>
+											</div>	
+										</div>
+									</div>
+								</div>
+							</li>
+						</template>
+						<template data-simply-template="Banner 2">
+							<li>
+								<div class="banner1 banner2">
+									<div class="container">
+										<div class="banner-title">
+											<div class="bnr-top-text">
+												<h1 data-simply-field="banner title">We Are Smart, creative...</h1>
+											</div>
+											<div class="bnr-bottom-text">
+												<p data-simply-field="banner text">"Lorem Ipsum"<br> is the common name for dummy
+												  text often used in the design, printing, and typesetting industries.</p>
+												<div class="arrow">
+													<span class="arrw"> </span>
+												</div>
+											</div>	
+										</div>
+									</div>
+								</div>
+							</li>
+						</template>
+					</ul>
+				</div>		
+		<div class="clearfix"> </div>
+	</div>
+	<!--//banner-->
+	<!--about-->
+	<div id="about" class="about">
+		<div class="container">
+			<div class="about-text">
+				<h3 data-simply-field="about title">ABOUT US</h3>
+				<span class="abt-trngl"></span>
+			</div>	
+			<p data-simply-field="about text">Printers have been using Lorem Ipsum since at least the 1500s, and it has remain essentially unchanged into the electronic age. 
+				It was re-popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages.</p>
+			<div class="about-team">
+				<h4 data-simply-field="team title">THE TEAM</h4>
+				<span class="undln"></span>
+				<div class="col-md-3 about-team-grids">
+					<img data-simply-field="team image 1" src="images/img4.jpg" alt=""/>
+					<div class="team-text">
+						<h5 data-simply-field="team name 1">JOHN DOE</h5>
+						<h6 data-simply-field="team position 1">Founder</h6>
+					</div>
+					<div class="abt-team-caption" data-simply-hidden>
+						<a></a>
+					</div>
+				</div>
+				<div class="col-md-3 about-team-grids">
+					<img data-simply-field="team image 2" src="images/img5.jpg" alt=""/>
+					<div class="team-text">
+						<h5 data-simply-field="team name 2">JERRY JON</h5>
+						<h6 data-simply-field="team position 2">Co-founder</h6>
+					</div>
+					<div class="abt-team-caption" data-simply-hidden>
+						<a></a>
+					</div>
+				</div>
+				<div class="col-md-3 about-team-grids">
+					<img data-simply-field="team image 3" src="images/img6.jpg" alt=""/>
+					<div class="team-text">
+						<h5 data-simply-field="team name 3">JAME MONY</h5>
+						<h6 data-simply-field="team position 3">Designer</h6>
+					</div>
+					<div class="abt-team-caption" data-simply-hidden>
+						<a></a>
+					</div>
+				</div>
+				<div class="col-md-3 about-team-grids">
+					<img data-simply-field="team image 4" src="images/img7.jpg" alt=""/>
+					<div class="team-text">
+						<h5 data-simply-field="team name 4">JOHN SMITH</h5>
+						<h6 data-simply-field="team position 4">Developer</h6>
+					</div>
+					<div class="abt-team-caption" data-simply-hidden>
+						<a></a>
+					</div>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+	</div>
+	<!--//about-->
+	<!--services-->
+	<div class="services" id="services">
+		<div class="container">
+			<h3 data-simply-field="services title">OUR SERVICES</h3>
+			<span class="trngl"></span>
+			<p data-simply-field="services text">Printers have been using Lorem Ipsum since at least the 1500s, and it has remain essentially unchanged into the electronic age. 
+				It was re-popularised in the 1960s with the release of Letraset sheets containing.</p>
+			<div class="services-grids">
+				<div class="col-md-3 services-grids-info sgi-one">
+					<div class="services-grids-text">
+						<img data-simply-field="services image 1" src="images/icon2.png" alt=""/>
+						<h5 data-simply-field="services name 1">Web Optimization</h5>
+						<p data-simply-field="services description 1">Designers discovered long ago that if you used real text with your design mockups </p>
+						<div class="round-more">
+							<a href="#" data-simply-field="services link 1">More</a>
+						</div>
+					</div>	
+				</div>
+				<div class="col-md-3 services-grids-info">
+					<div class="services-grids-text">
+						<img data-simply-field="services image 2" src="images/icon3.png" alt=""/>
+						<h5 data-simply-field="services name 2">Web Optimization</h5>
+						<p data-simply-field="services description 2">Designers discovered long ago that if you used real text with your design mockups </p>
+						<div class="round-more">
+							<a href="#" data-simply-field="services link 2">More</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 services-grids-info sgi-one">
+					<div class="services-grids-text">
+						<img data-simply-field="services image 3" src="images/icon4.png" alt=""/>
+						<h5 data-simply-field="services name 3">Web Optimization</h5>
+						<p data-simply-field="services description 3">Designers discovered long ago that if you used real text with your design mockups </p>
+						<div class="round-more">
+							<a href="#" data-simply-field="services link 3">More</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 services-grids-info">
+					<div class="services-grids-text">
+						<img data-simply-field="services image 4" src="images/icon5.png" alt=""/>
+						<h5 data-simply-field="services name 4">Web Optimization</h5>
+						<p data-simply-field="services description 4">Designers discovered long ago that if you used real text with your design mockups </p>
+						<div class="round-more">
+							<a href="#" data-simply-field="services link 4">More</a>
+						</div>
+					</div>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+	</div>		
+	<!--//services-->
+	<!--work-->
+	<div class="work" id="portfolio">
+		<div class="container">
+			<h3 data-simply-field="portfolio title">OUR WORK</h3>
+			<span class="trngl"></span>
+			<p data-simply-field="portfolio text">Printers have been using Lorem Ipsum since at least the 1500s, and it has remain essentially unchanged into the electronic age.</p>
+			<main class="cd-main-content">
+				<div class="cd-filter-block">
+					<div class="cd-filter-content">
+						<div class="cd-select cd-filters">
+							<select class="filter" name="selectThis" id="selectThis">
+								<option value="">ALL</option>
+								<option value=".option1">category 1</option>
+								<option value=".option2">category 2</option>
+								<option value=".option3">category 3</option>
+								<option value=".option4">category 4</option>
+							</select>
+						</div> 
+					</div> 
+				</div> 
+				<section class="cd-gallery">
+					<ul>
+						<li class="mix color-1  option1">
+							<a href="images/img9-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img9.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>
+						<li class="mix color-2  option2">
+							<a href="images/img8-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img8.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>
+						<li class="mix color-1  option3">
+							<a href="images/img13-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img13.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>						
+						<li class="mix color-1  option4">
+							<a href="images/img10-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img10.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>
+						<li class="mix color-1  option2">
+							<a href="images/img11-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img11.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>
+						<li class="mix color-2  option3">
+							<a href="images/img12-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img12.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>
+						<li class="mix color-2  option1">
+							<a href="images/img14-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img14.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>
+						<li class="mix color-1  option4">
+							<a href="images/img15-b.jpg" class=" mask b-link-stripe b-animate-go   swipebox"  title="Image Title">
+								<img src="images/img15.jpg" alt="" class="img-responsive zoom-img"/>
+							</a>
+						</li>
+						<li class="gap"></li>
+						<li class="gap"></li>
+						<li class="gap"></li>
+					</ul>
+					<div class="cd-fail-message">No results found</div>	
+				</section>
+				<div class="clearfix"> </div>
+			</main>
+			<script src="js/jquery-2.1.1.js"></script>
+			<script src="js/jquery.mixitup.min.js"></script>
+			<script src="js/main.js"></script> <!-- Resource jQuery -->
+			<script>
+				(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+				ga('create', 'UA-48014931-1', 'codyhouse.co');
+				ga('send', 'pageview');
+
+				jQuery(document).ready(function($){
+					$('.close-carbon-adv').on('click', function(){
+						$('#carbonads-container').hide();
+					});
+				});
+			</script>
+		</div>	
+	</div>
+	<!--//work-->
+	<!--contact-->
+	<div class="contact" id="contact">
+		<div class="map">
+			<iframe src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d15457.644695754216!2d79.9584287!3d14.40344505!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1426510338330"  frameborder="0" style="border:0"></iframe>
+			<div class="map-text">
+				<h3 data-simply-field="contact title">CONTACT US</h3>
+				<span class="trngl"></span>
+			</div>
+		</div>
+		<div class="contact-form">
+			<div class="container">
+				<div class="col-md-6 contact-left">
+					<p data-simply-field="contact text">"Lorem Ipsum"<br> is the common name dummy text often used in the design, printing, and type setting industries.</p>
+					<ul>
+						<li><span></span><var data-simply-field="contact address">123, City name. Country.</span></li>
+						<li><span class="mail"></span><a data-simply-field="contact email" href="mailto:example@email.com">mail@example.com</a></li>
+						<li><span class="ph-no"></span><var data-simply-field="contact phone">+123 4567 789</span></li>
+					</ul>
+
+				</div>
+				<div class="col-md-6 contact-right">
+					<form>
+						<input type="text" value="Your Name" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Your Name';}" required="">
+						<input type="email" value="Your Email" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Your Email';}" required="">
+						<textarea type="text"  onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Message';}" required="">Message</textarea>
+						<input type="submit" value="Send" >
+					</form>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+	</div>
+	<!--//contact-->
+	<!--footer-->
+	<div class="footer">
+		<div class="container">
+			<div class="footer-left">
+				<a href="index.html"><img src="images/footer-logo.png" alt="logo"/></a>
+			</div>
+			<div class="footer-right">
+				<p>© 2015 All rights reserved | Template by <a href="http://w3layouts.com/"> W3layouts</a></p>
+			</div>
+			<div class="clearfix"> </div>
+		</div>	
+	</div>
+	<!--//footer-->
+	<!--smooth-scrolling-of-move-up-->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			/*
+			var defaults = {
+				containerID: 'toTop', // fading element id
+				containerHoverID: 'toTopHover', // fading element hover id
+				scrollSpeed: 1200,
+				easingType: 'linear' 
+			};
+			*/
+			$().UItoTop({ easingType: 'easeOutQuart' });	
+		});
+	</script>
+	<a href="#home" class="scroll" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+	<!--//smooth-scrolling-of-move-up-->
+	<link rel="stylesheet" href="css/swipebox.css">
+	<script src="js/jquery.swipebox.min.js"></script> 
+	    <script type="text/javascript">
+			jQuery(function($) {
+				$(".swipebox").swipebox();
+			});
+		</script>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze" 
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/simply-edit/vision/images/"
+	></script>
+</body>
+</html>	

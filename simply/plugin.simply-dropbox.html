@@ -1,0 +1,48 @@
+<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="253tavht6n47odl"></script>
+<script>
+	editor.plugins.dropbox = {
+		init : function() {
+			var button = document.createElement("LI");
+			button.innerHTML = '<button data-simply-action="simply-dropbox-chooser"><i class="fa fa-dropbox"></i>Dropbox</button>';
+			document.querySelector("#simply-image .simply-toolbar .simply-buttons").appendChild(button);
+		}
+	};
+
+	editor.addAction("simply-dropbox-chooser", function(el) {
+		var options = {
+			// Required. Called when a user selects an item in the Chooser.
+			success: function(files) {
+				// var targetLink = files[0].link.replace("www.dropbox", "dl.dropbox");
+				var targetLink = files[0].thumbnailLink.replace("bounding_box=75", "bounding_box=256");
+
+				document.querySelector("#vdImageSrc").value = targetLink;
+				editor.actions["simply-image-src"](targetLink);
+			},
+
+			// Optional. Called when the user closes the dialog without selecting a file
+			// and does not include any parameters.
+			cancel: function() {
+
+			},
+
+			// Optional. "preview" (default) is a preview link to the document for sharing,
+			// "direct" is an expiring link to download the contents of the file. For more
+			// information about link types, see Link types below.
+			linkType: "preview", // or "preview"
+
+			// Optional. A value of false (default) limits selection to a single file, while
+			// true enables multiple file selection.
+			multiselect: false, // or true
+
+			// Optional. This is a list of file extensions. If specified, the user will
+			// only be able to select files with these extensions. You may also specify
+			// file types, such as "video" or "images" in the list. For more information,
+			// see File types below. By default, all extensions are allowed.
+			extensions: ['images'],
+		};
+
+		Dropbox.choose(options);
+	});
+
+	editor.plugins.dropbox.init();
+</script>

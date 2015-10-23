@@ -1,0 +1,128 @@
+<script type="text/javascript">
+	var documentHandler = function(event) {
+		var key = event.keyCode || event.which;
+
+		if (key == 66 && event.ctrlKey) { // Ctrl-B
+			if (typeof editor.actions["simply-text-bold"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-text-bold"]();
+				event.preventDefault();
+			}
+		} else if (key == 27) { // ESC
+			editor.context.toolbar.hide = true;
+			editor.context.update();
+			event.preventDefault();
+		} else if (key == 73 && event.ctrlKey) { // Ctrl-I
+			if (typeof editor.actions["simply-text-italic"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-text-italic"]();
+				event.preventDefault();
+			}
+		} else if (key == 85 && event.ctrlKey) { // Ctrl-U
+			if (typeof editor.actions["simply-text-underline"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-text-underline"]();
+				event.preventDefault();
+			}
+		} else if (key == 83 && event.ctrlKey) { // Ctrl-S
+			if (typeof editor.actions["simply-save"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-save"]();
+				event.preventDefault();
+			}
+		} else if (key == 32 && event.ctrlKey) { // Ctrl-space
+			editor.context.toolbar.hide = false;
+			editor.context.update();
+			var activeToolbar = document.querySelector(".simply-section.active");
+			if (activeToolbar) {
+				var firstButton = activeToolbar.querySelector("button");
+				if (firstButton) {
+					firstButton.focus();
+				}
+			}
+
+			var toolbarTarget = document.querySelector(".simply-section.active .simply-buttons > li");
+			
+			if (toolbarTarget) {
+				toolbarTarget.focus();
+			}
+			event.preventDefault();
+		} else if (key == 77 && event.ctrlKey) { // Ctrl-M
+			document.querySelector("#simply-main-toolbar button").focus();
+			event.preventDefault();
+		} else if (key == 37) { // left
+			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
+			if (target) {
+				var previousSibling = target.parentNode.previousSibling;
+				while (previousSibling) {
+					if (previousSibling.nodeType == 1) {
+						if (
+							previousSibling.childNodes[0] && 
+							previousSibling.offsetWidth > 0 
+						) {
+							break;
+						}
+					}
+					previousSibling = previousSibling.previousSibling;
+				}
+
+				if (previousSibling) {
+					previousSibling.querySelector("*").focus();
+				}
+				event.preventDefault();
+			}
+		} else if (key == 38) { // up
+			// close current toolbar section;
+			var targets = this.querySelectorAll('.simply-section.active .simply-selected');
+			if (targets.length) {
+				for (var i=0; i<targets.length; i++) {
+					targets[i].classList.remove("simply-selected");
+				}
+				targets[0].focus();
+				event.preventDefault();
+			}
+		} else if (key == 39) { // right
+			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
+			if (target) {
+				var nextSibling = target.parentNode.nextSibling;
+				while (nextSibling) {
+					if (nextSibling.nodeType == 1) {
+						if (nextSibling.childNodes[0] && nextSibling.offsetWidth > 0) {
+							break;
+						}
+					}
+					nextSibling = nextSibling.nextSibling;
+				}
+
+				if (nextSibling) {
+					nextSibling.querySelector("*").focus();
+				}
+				event.preventDefault();
+			}
+		} else if (key == 40) { // down
+			// open current toolbar section;
+			var target = this.querySelector('.simply-section.active :focus');
+			if (target) {
+				if (target.classList.contains("simply-expands")) {
+					if (target.classList.contains("simply-selected")) {
+						muze.event.fire(target, "click");
+					}
+					muze.event.fire(target, "click");
+				}
+				event.preventDefault();
+			}
+		} else {
+			var target = this.querySelector('.simply-section.active :focus');
+			if (!target) {
+				editor.context.toolbar.hide = true;
+			}
+		}
+	};
+
+	editor.addToolbar({
+		name : 'simply-keyboard-handler',
+		init : function() {
+			document.addEventListener("keydown", documentHandler);
+		}
+	});
+</script>

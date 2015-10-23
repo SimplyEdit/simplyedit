@@ -11,17 +11,18 @@
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
 	var editor = {
-	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
+		baseURL : "http://yvo.muze.nl/simply-edit/",
+//	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
 					editor.data.originalBody = document.body.cloneNode(true);
 				}
 
-				var dataFields = target.querySelectorAll("[data-vedor-field]");
+				var dataFields = target.querySelectorAll("[data-simply-field]");
 				for (var i=0; i<dataFields.length; i++) {
-					var dataName = dataFields[i].getAttribute("data-vedor-field");
-					var dataPath = dataFields[i].getAttribute("data-vedor-path") ? dataFields[i].getAttribute("data-vedor-path") : location.pathname;
+					var dataName = dataFields[i].getAttribute("data-simply-field");
+					var dataPath = dataFields[i].getAttribute("data-simply-path") ? dataFields[i].getAttribute("data-simply-path") : location.pathname;
 
 					if (data[dataPath] && data[dataPath][dataName]) {
 						editor.field.set(dataFields[i], data[dataPath][dataName]);
@@ -70,11 +71,11 @@
 				var dataName, dataPath, dataFields, dataLists, listItems;
 
 				var addListData = function(list) {
-					if (list.getAttribute("data-vedor-stashed")) {
+					if (list.getAttribute("data-simply-stashed")) {
 						return;
 					}
-					dataName = list.getAttribute("data-vedor-list");
-					dataPath = list.getAttribute("data-vedor-path") ? list.getAttribute("data-vedor-path") : location.pathname;
+					dataName = list.getAttribute("data-simply-list");
+					dataPath = list.getAttribute("data-simply-path") ? list.getAttribute("data-simply-path") : location.pathname;
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -84,7 +85,7 @@
 						data[dataPath][dataName] = [];
 					}
 
-					listItems = list.querySelectorAll("[data-vedor-list-item]");
+					listItems = list.querySelectorAll("[data-simply-list-item]");
 					var counter = 0;
 					for (j=0; j<listItems.length; j++) {
 						if (listItems[j].parentNode != list) {
@@ -97,47 +98,47 @@
 						var subData = editor.data.get(listItems[j]);
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
-								console.log("Notice: use of data-vedor-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
+								console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
 							}
 							data[dataPath][dataName][counter] = subData[subPath];
 						}
 						// data[dataPath][dataName][counter] = editor.data.get(listItems[j]);
-						if (listItems[j].getAttribute("data-vedor-template")) {
-							data[dataPath][dataName][counter]['data-vedor-template'] = listItems[j].getAttribute("data-vedor-template");						}
+						if (listItems[j].getAttribute("data-simply-template")) {
+							data[dataPath][dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");						}
 						counter++;
 					}
-					list.setAttribute("data-vedor-stashed", 1);
+					list.setAttribute("data-simply-stashed", 1);
 				};
 
 				var addData = function(field) {
-					if (field.getAttribute("data-vedor-stashed")) {
+					if (field.getAttribute("data-simply-stashed")) {
 						return;
 					}
 
-					dataName = field.getAttribute("data-vedor-field");
-					dataPath = field.getAttribute("data-vedor-path") ? field.getAttribute("data-vedor-path") : location.pathname;
+					dataName = field.getAttribute("data-simply-field");
+					dataPath = field.getAttribute("data-simply-path") ? field.getAttribute("data-simply-path") : location.pathname;
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
 
 					data[dataPath][dataName] = editor.field.get(field);
-					field.setAttribute("data-vedor-stashed", 1);
+					field.setAttribute("data-simply-stashed", 1);
 				};
 
-				dataLists = target.querySelectorAll("[data-vedor-list]");
+				dataLists = target.querySelectorAll("[data-simply-list]");
 				for (i=0; i<dataLists.length; i++) {
 					addListData(dataLists[i]);
 				}
-				if (target.nodeType == 1 && target.getAttribute("data-vedor-list")) {
+				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
 					addListData(target);
 				}
 
-				dataFields = target.querySelectorAll("[data-vedor-field]");
+				dataFields = target.querySelectorAll("[data-simply-field]");
 				for (i=0; i<dataFields.length; i++) {
 					addData(dataFields[i]);
 				}
-				if (target.nodeType == 1 && target.getAttribute("data-vedor-field")) {
+				if (target.nodeType == 1 && target.getAttribute("data-simply-field")) {
 					addData(target);
 				}
 
@@ -165,9 +166,9 @@
 					data = JSON.parse(localStorage.data);
 				}
 
-				var stashedFields = document.querySelectorAll("[data-vedor-stashed]");
+				var stashedFields = document.querySelectorAll("[data-simply-stashed]");
 				for (i=0; i<stashedFields.length; i++) {
-					stashedFields[i].removeAttribute("data-vedor-stashed");
+					stashedFields[i].removeAttribute("data-simply-stashed");
 				}
 
 				var newData = editor.data.get(document);
@@ -178,12 +179,12 @@
 			save : function() {
 				if (editor.storage.connect()) {
 					editor.data.stash();
-					if (editor.actions['vedor-beforesave']) {
-						editor.actions['vedor-beforesave']();
+					if (editor.actions['simply-beforesave']) {
+						editor.actions['simply-beforesave']();
 					}
 					editor.storage.save(localStorage.data, function() {
-						if (editor.actions['vedor-aftersave']) {
-							editor.actions['vedor-aftersave']();
+						if (editor.actions['simply-aftersave']) {
+							editor.actions['simply-aftersave']();
 						} else {
 							alert("Saved!");
 						}
@@ -200,7 +201,7 @@
 					editor.data.apply(editor.currentData, document);
 
 					var checkEdit = function() {
-						if (document.location.hash == "#vedor-edit") {
+						if (document.location.hash == "#simply-edit") {
 							if (editor.storage.connect()) {
 								editor.editmode.init();
 								var checkHope = function() {
@@ -232,11 +233,11 @@
 				},
 				init : function(data, target) {
 					var dataName, dataPath;
-					var dataLists = target.querySelectorAll("[data-vedor-list]");
+					var dataLists = target.querySelectorAll("[data-simply-list]");
 					for (var i=0; i<dataLists.length; i++) {
 						editor.data.list.parseTemplates(dataLists[i]);
-						dataName = dataLists[i].getAttribute("data-vedor-list");
-						dataPath = dataLists[i].getAttribute("data-vedor-path") ? dataLists[i].getAttribute("data-vedor-path") : location.pathname;
+						dataName = dataLists[i].getAttribute("data-simply-list");
+						dataPath = dataLists[i].getAttribute("data-simply-path") ? dataLists[i].getAttribute("data-simply-path") : location.pathname;
 						if (data[dataPath] && data[dataPath][dataName]) {
 							editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
 						}
@@ -245,16 +246,16 @@
 						for (var j=0; j<dataLists[i].childNodes.length; j++) {
 							if (
 								dataLists[i].childNodes[j].nodeType == 1 && 
-								dataLists[i].childNodes[j].getAttribute("data-vedor-list-item")
+								dataLists[i].childNodes[j].getAttribute("data-simply-list-item")
 							) {
 								hasChild = true;
 							}
 						}
 						if (!hasChild) {
 							if ("classList" in dataLists[i]) {
-								dataLists[i].classList.add("vedor-empty");
+								dataLists[i].classList.add("simply-empty");
 							} else {
-								dataLists[i].className += " vedor-empty";
+								dataLists[i].className += " simply-empty";
 							}
 						}
 						if ("addEventListener" in dataLists[i]) {
@@ -272,8 +273,8 @@
 					}
 				},
 				parseTemplates : function(list) {
-					var dataName = list.getAttribute("data-vedor-list");
-					var dataPath = list.getAttribute("data-vedor-path") ? list.getAttribute("data-vedor-path") : location.pathname;
+					var dataName = list.getAttribute("data-simply-list");
+					var dataPath = list.getAttribute("data-simply-path") ? list.getAttribute("data-simply-path") : location.pathname;
 
 //					var templates = list.querySelectorAll("template");
 					var templates = list.getElementsByTagName("template");
@@ -282,7 +283,7 @@
 						list.templates = {};
 					}
 					for (var t=0; t<templates.length; t++) {
-						var templateName = templates[t].getAttribute("data-vedor-template") ? templates[t].getAttribute("data-vedor-template") : t;
+						var templateName = templates[t].getAttribute("data-simply-template") ? templates[t].getAttribute("data-simply-template") : t;
 
 //						list.templates[templateName] = templates[t].cloneNode(true);
 						list.templates[templateName] = templates[t];
@@ -311,7 +312,7 @@
 					var initFields = function(clone) {
 
 						var handleFields = function(elm) {
-							dataName = elm.getAttribute("data-vedor-field");
+							dataName = elm.getAttribute("data-simply-field");
 							if (listData[j][dataName]) {
 								editor.field.set(elm, listData[j][dataName]);
 							}
@@ -319,7 +320,7 @@
 
 						var handleLists = function(elm) {
 							editor.data.list.parseTemplates(elm);
-							dataName = elm.getAttribute("data-vedor-list");
+							dataName = elm.getAttribute("data-simply-list");
 							if (listData[j][dataName]) {
 								editor.data.list.applyTemplates(elm, listData[j][dataName]);
 							}
@@ -328,40 +329,40 @@
 							for (var m=0; m<elm.childNodes.length; m++) {
 								if (
 									elm.childNodes[m].nodeType == 1 &&
-									elm.childNodes[m].getAttribute("data-vedor-list-item")
+									elm.childNodes[m].getAttribute("data-simply-list-item")
 								) {
 									hasChild = true;
 								}
 							}
 							if (!hasChild) {
 								if ("classList" in elm) {
-									elm.classList.add("vedor-empty");
+									elm.classList.add("simply-empty");
 								} else {
-									elm.className += " vedor-empty";
+									elm.className += " simply-empty";
 								}
 							}
 						};
 
 						var dataName;
-						var dataFields = clone.querySelectorAll("[data-vedor-field]");
+						var dataFields = clone.querySelectorAll("[data-simply-field]");
 						for (k=0; k<dataFields.length; k++) {
 							handleFields(dataFields[k]);
 						}
-						if (clone.nodeType == 1 && clone.getAttribute("data-vedor-field")) {
+						if (clone.nodeType == 1 && clone.getAttribute("data-simply-field")) {
 							handleFields(clone);
 						}
 
-						var dataLists = clone.querySelectorAll("[data-vedor-list]");
+						var dataLists = clone.querySelectorAll("[data-simply-list]");
 						for (k=0; k<dataLists.length; k++) {
 							handleLists(dataLists[k]);
 						}
-						if (clone.nodeType == 1 && clone.getAttribute("data-vedor-list")) {
+						if (clone.nodeType == 1 && clone.getAttribute("data-simply-list")) {
 							handleLists(clone);
 						}
 					};
 
 					for (j=0; j<listData.length; j++) {
-						var requestedTemplate = listData[j]["data-vedor-template"];
+						var requestedTemplate = listData[j]["data-simply-template"];
 
 						if (!list.templates[requestedTemplate]) {
 							for (t in list.templates) {
@@ -393,11 +394,11 @@
 							}
 							
 							if (counter > 1) {
-								clone.firstElementChild.setAttribute("data-vedor-template", requestedTemplate);
+								clone.firstElementChild.setAttribute("data-simply-template", requestedTemplate);
 							}
 
-							clone.firstElementChild.setAttribute("data-vedor-list-item", true);
-							clone.firstElementChild.setAttribute("data-vedor-selectable", true);
+							clone.firstElementChild.setAttribute("data-simply-list-item", true);
+							clone.firstElementChild.setAttribute("data-simply-selectable", true);
 							list.appendChild(clone);
 							editor.data.list.init(listData[j], clone);
 						} else {
@@ -411,17 +412,17 @@
 									counter++;
 								}
 								if (counter > 1) {
-									clone.setAttribute("data-vedor-template", requestedTemplate);
+									clone.setAttribute("data-simply-template", requestedTemplate);
 								}
-								clone.setAttribute("data-vedor-list-item", true);
-								clone.setAttribute("data-vedor-selectable", true);
+								clone.setAttribute("data-simply-list-item", true);
+								clone.setAttribute("data-simply-selectable", true);
 
 								list.appendChild(clone);
 								editor.data.list.init(listData[j], clone);
 							}
 						}
 					}
-					list.setAttribute("data-vedor-selectable", true);
+					list.setAttribute("data-simply-selectable", true);
 				}
 			}
 		},
@@ -490,7 +491,7 @@
 		},
 		loadBaseStyles : function() {
 			var baseStyles = document.createElement("link");
-			baseStyles.setAttribute("href", editor.baseURL + "vedor/vedor-base.css");
+			baseStyles.setAttribute("href", editor.baseURL + "simply/simply-base.css");
 			baseStyles.setAttribute("rel", "stylesheet");
 			baseStyles.setAttribute("type", "text/css");
 			document.getElementsByTagName("HEAD")[0].appendChild(baseStyles);
@@ -510,11 +511,11 @@
 			toolbars : null,
 			init : function() {
 				var toolbarsContainer = document.createElement("DIV");
-				toolbarsContainer.id = "vedor-editor";
+				toolbarsContainer.id = "simply-editor";
 				document.body.appendChild(toolbarsContainer);
 
 				var http = new XMLHttpRequest();
-				var url = editor.baseURL + "vedor/toolbars.html";
+				var url = editor.baseURL + "simply/toolbars.html";
 				url += "?t=" + (new Date().getTime());
 
 				var loadToolbars = function() {
@@ -561,7 +562,7 @@
 									}
 								}
 
-								var newToolbars = toolbarNode.querySelectorAll(".vedor-toolbar,.vedor-dialog-body");
+								var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
 								for (i=0; i<newToolbars.length; i++) {
 									editor.toolbar.init(newToolbars[i]);
 								}
@@ -626,7 +627,7 @@
 				};
 
 				// Add slip.js for sortable items;
-				addScript(editor.baseURL + "vedor/slip.js");
+				addScript(editor.baseURL + "simply/slip.js");
 
 				// Add hope
 				addScript(editor.baseURL + "hope/hope.packed.js");
@@ -636,7 +637,7 @@
 			editable : function(target) {
 				var i;
 
-				var dataFields = target.querySelectorAll("[data-vedor-field]");
+				var dataFields = target.querySelectorAll("[data-simply-field]");
 
 				for (i=0; i<dataFields.length; i++) {
 				//	dataFields[i].contentEditable = true;
@@ -675,9 +676,9 @@
 					// FIXME: Add support to keep fields that point to the same field within the same path in sync here;
 				}
 
-				var dataLists = target.querySelectorAll("[data-vedor-list]");
+				var dataLists = target.querySelectorAll("[data-simply-list]");
 				for (i=0; i<dataLists.length; i++) {
-					dataLists[i].setAttribute("data-vedor-selectable", true);
+					dataLists[i].setAttribute("data-simply-selectable", true);
 				}
 
 				var hyperlinks = target.querySelectorAll("a");
@@ -688,16 +689,16 @@
 						var pathname = this.pathname;
 						var hostname = this.hostname;
 						if (hostname == document.location.hostname && (typeof editor.currentData[this.pathname] == "undefined")) {
-							history.pushState(null, null, this.href + "#vedor-edit");
+							history.pushState(null, null, this.href + "#simply-edit");
 							document.body.innerHTML = editor.data.originalBody.innerHTML;
 							editor.data.load();
 							var openTemplateDialog = function() {
-								if (editor.actions['vedor-template']) {
-									if (!document.getElementById("vedor-template")) {
+								if (editor.actions['simply-template']) {
+									if (!document.getElementById("simply-template")) {
 										window.setTimeout(openTemplateDialog, 200);
 										return;
 									}
-									editor.actions['vedor-template']();
+									editor.actions['simply-template']();
 								} else {
 									alert("This page does not exist yet. Save it to create it!");
 								}
@@ -705,7 +706,7 @@
 							openTemplateDialog();
 							evt.preventDefault();
 						} else {
-							document.location.href = this.href + "#vedor-edit";
+							document.location.href = this.href + "#simply-edit";
 						}
 					}
 				};
@@ -718,7 +719,7 @@
 					hyperlinks[i].addEventListener("click", handleClick);
 				}
 
-				var images = target.querySelectorAll("img[data-vedor-field]");
+				var images = target.querySelectorAll("img[data-simply-field]");
 				var imageDrop = function(event) {
 					var imageData = event.dataTransfer.getData("text/html");
 
@@ -739,7 +740,7 @@
 				for (i=0; i<images.length; i++) {
 					images[i].addEventListener("drop", imageDrop);
 					images[i].contentEditable = true; // needs to be true for drop event?
-					images[i].setAttribute("data-vedor-selectable", true);
+					images[i].setAttribute("data-simply-selectable", true);
 				}
 
 				// FIXME: Have a way to now init plugins as well;
@@ -755,14 +756,14 @@
 					return;
 				}
 
-				var list = target.querySelectorAll("[data-vedor-sortable]");
+				var list = target.querySelectorAll("[data-simply-sortable]");
 				
 				var preventDefault = function(evt) {
 					evt.preventDefault();
 				};
 				
 				var addBeforeOrderEvent = function(e) {
-					var sublists = this.querySelectorAll("[data-vedor-sortable]");
+					var sublists = this.querySelectorAll("[data-simply-sortable]");
 					for (var j=0; j<sublists.length; j++) {
 						sublists[j].addEventListener('slip:beforereorder', preventDefault);
 					}
@@ -770,7 +771,7 @@
 				var removeBeforeOrderEvent = function(e) {
 					e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
 								
-					var sublists = this.querySelectorAll("[data-vedor-sortable]");
+					var sublists = this.querySelectorAll("[data-simply-sortable]");
 					for (var j=0; j<sublists.length; j++) {
 						sublists[j].removeEventListener('slip:beforereorder', preventDefault);
 					}
@@ -780,7 +781,7 @@
 				for (var i=0; i<list.length; i++) {
 					list[i].addEventListener('slip:reorder', removeBeforeOrderEvent, false);
 				
-					if (list[i].querySelectorAll('[data-vedor-sortable]').length) {
+					if (list[i].querySelectorAll('[data-simply-sortable]').length) {
 						list[i].addEventListener('slip:beforereorder', addBeforeOrderEvent, false);
 					}
 					
@@ -788,7 +789,7 @@
 				}
 			},
 			textonly : function(target) {
-				var textonly = target.querySelectorAll("[data-vedor-content='text']");
+				var textonly = target.querySelectorAll("[data-simply-content='text']");
 				var preventNodeInsert = function(evt) {
 					if (evt.target.tagName) {
 						editor.node.unwrap(evt.target);
@@ -804,24 +805,24 @@
 				document.location.href = document.location.href.split("#")[0];
 			},
 			toolbarMonitor : function() {
-				var target = document.querySelector('#vedor-main-toolbar');
+				var target = document.querySelector('#simply-main-toolbar');
 				if (!target) {
 					window.setTimeout(editor.editmode.toolbarMonitor, 100);
 					return false;
 				}
 
 				var setBodyTop = function() {
-					var style = document.head.querySelector("#vedor-body-top");
+					var style = document.head.querySelector("#simply-body-top");
 					if (!style) {
 						style = document.createElement("style");
 						style.setAttribute("type", "text/css");
 
-						style.id = "vedor-body-top";
+						style.id = "simply-body-top";
 						document.head.appendChild(style);
 					}
 
-					if (document.getElementById("vedor-main-toolbar")) {
-						var toolbarHeight = document.getElementById("vedor-main-toolbar").offsetHeight;
+					if (document.getElementById("simply-main-toolbar")) {
+						var toolbarHeight = document.getElementById("simply-main-toolbar").offsetHeight;
 						style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
 					}
 				};
@@ -1106,8 +1107,8 @@
 
 
 	editor.actions = {
-		"vedor-save" : editor.data.save,
-		"vedor-logout" : editor.editmode.stop
+		"simply-save" : editor.data.save,
+		"simply-logout" : editor.editmode.stop
 	};
 
 	editor.toolbars = {};
@@ -1172,24 +1173,24 @@
 */
 	window.editor = editor;
 	editor.init({
-		endpoint : document.querySelector("[data-vedor-endpoint]") ? document.querySelector("[data-vedor-endpoint]").getAttribute("data-vedor-endpoint") : null,
+		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
 		toolbars : [
-			editor.baseURL + "vedor/toolbar.vedor-main-toolbar.html",
-			editor.baseURL + "vedor/toolbar.vedor-hope-text.html",
-			editor.baseURL + "vedor/toolbar.vedor-hope-image.html",
-			editor.baseURL + "vedor/plugin.vedor-image-browse.html",
-			editor.baseURL + "vedor/toolbar.vedor-iframe.html",
-                        editor.baseURL + "vedor/toolbar.vedor-selectable.html",
-                        editor.baseURL + "vedor/toolbar.vedor-list.html",
-//                        editor.baseURL + "vedor/plugin.vedor-template.html",
-                        editor.baseURL + "vedor/plugin.vedor-save.html",
-                        editor.baseURL + "vedor/plugin.vedor-meta.html",
-                        editor.baseURL + "vedor/plugin.vedor-htmlsource.html",
-                        editor.baseURL + "vedor/plugin.vedor-symbol.html",
-//                        editor.baseURL + "vedor/plugin.vedor-plain.html",
-//                        editor.baseURL + "vedor/plugin.vedor-dropbox.html",
-			editor.baseURL + "vedor/plugin.vedor-paste.html",
-			editor.baseURL + "vedor/plugin.vedor-keyboard.html"
+			editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
+			editor.baseURL + "simply/toolbar.simply-text.html",
+			editor.baseURL + "simply/toolbar.simply-image.html",
+			editor.baseURL + "simply/plugin.simply-image-browse.html",
+			editor.baseURL + "simply/toolbar.simply-iframe.html",
+                        editor.baseURL + "simply/toolbar.simply-selectable.html",
+                        editor.baseURL + "simply/toolbar.simply-list.html",
+                        editor.baseURL + "simply/plugin.simply-template.html",
+                        editor.baseURL + "simply/plugin.simply-save.html",
+                        editor.baseURL + "simply/plugin.simply-meta.html",
+                        editor.baseURL + "simply/plugin.simply-htmlsource.html",
+                        editor.baseURL + "simply/plugin.simply-symbol.html",
+                        editor.baseURL + "simply/plugin.simply-plain.html",
+                        editor.baseURL + "simply/plugin.simply-dropbox.html",
+			editor.baseURL + "simply/plugin.simply-paste.html",
+			editor.baseURL + "simply/plugin.simply-keyboard.html"
 		]
 	});
 }());

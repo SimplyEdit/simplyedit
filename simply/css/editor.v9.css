@@ -1,0 +1,675 @@
+		*[data-simply-hidden] {
+			display: none !important;
+		}
+		*[data-simply-field] {
+			outline: 2px dashed rgba(128,128,128,0.3);
+			transition: 0.6s outline-color ease, 0.6s background-color ease;
+		}
+		*[data-simply-field]:hover {
+			outline: 2px dashed rgba(128, 240, 210, 0.3);
+		}
+		*[data-simply-field]:focus {
+			outline: 2px dashed rgba(240, 210, 128, 0.3);
+			background-color: rgba(128,128,128,0.2);
+		}
+
+		*[data-simply-list]:not(.simply-empty):before,
+		*[data-simply-list-item]:before {
+			font-weight: normal;
+			font-style: normal;
+			font-family: FontAwesome;
+			border: 1px solid #ccc;
+			border-top: 2px solid #ea5922;
+			background-color: white;
+			color: #666;
+			border-bottom-left-radius: 3px;
+			border-bottom-right-radius: 3px;
+			padding: 5px;
+			position: absolute;
+			margin-top: -24px;
+			margin-left: 5px;
+			opacity: 0.2;
+			transition: 0.3s opacity ease;
+			box-shadow: 0px 0px 2px #ccc;
+			-webkit-box-shadow: 0px 0px 2px #ccc;
+			-moz-box-shadow: 0px 0px 2px #ccc;
+		}
+		*[data-simply-list]:not(.simply-empty):hover:before,
+		*[data-simply-list-item]:hover:before {
+			opacity: 1;
+		}
+		*[data-simply-list-item]:before {
+			content: "\f1b2"; /* cube */
+			margin-left: 40px;
+		}
+		*[data-simply-list]:not(.simply-empty):before {
+			content: "\f1b3"; /* cubes */
+			margin-left: 0px;
+		}
+
+		#simply-editor {
+			font-family: arial;
+		}
+
+		i.simply-logo {
+			background-image: url('../simply.png');
+			background-size: contain;
+			background-repeat: no-repeat;
+			height: 25px;
+		}
+		.simply-toolbar {
+			font-family: arial;
+			font-size: 11px;
+			color: #666;
+			background-color: white;
+			-webkit-border-radius: 0px 0px 3px 3px;
+			-moz-border-radius: 0px 0px 3px 3px;
+			border-radius: 0px 0px 3px 3px;
+			line-height: 0px;
+			position: relative;
+			border: 1px solid #aaa;
+			border-top: 5px solid #ea5922;
+			-webkit-box-shadow: 0px 0px 4px #CCC;
+			-moz-box-shadow: 0px 0px 4px #CCC;
+			box-shadow: 0px 0px 4px #CCC;
+			z-index: 1000;
+		}
+		.simply-toolbar::after, .simply-toolbar > ul::after, .simply-toolbar-section > ul::after {
+			content: "";
+			clear: both;
+			display: block;
+		}
+		.simply-toolbar .marker {
+			content: "";
+			display: block;
+			position: absolute;
+			margin-top: -12px;
+			left: 50%;
+			margin-left: -12px;
+			width: 0;
+			border-bottom: 12px solid #ea5922;
+			border-top: 0px;
+			border-left: 12px solid transparent;
+			border-right: 12px solid transparent;
+		}
+		.simply-toolbar > ul {
+			background: linear-gradient(to bottom, white 0%, #FFF 95%, #DDD 100%);
+			width: 100%;
+		}
+		.simply-toolbar > ul,
+		.simply-toolbar > ul > li,
+		.simply-toolbar-section > ul,
+		.simply-toolbar-section > ul > li {
+			margin: 0px;
+			padding: 0px;
+			border: 0px;
+			list-style: none;
+			white-space: nowrap;
+		}
+		.simply-toolbar-section > ul > li.simply-text-format {
+			margin-right: 4px;
+		}
+		.simply-toolbar li {
+			xdisplay: inline-block;
+			position: relative;
+			float: left;
+		}
+		#vdTablePopup {
+			left: 40px;
+			top: 0px;
+			padding-bottom: 20px;
+			width: auto;
+			height: auto;
+		}
+		#vdTableText {
+			position: absolute;
+			bottom: 10px;
+			width: 100%;
+		}
+		#vdTablePreview table {
+			border-spacing: 2px;
+			border-collapse: separate;
+			width: 110px;
+			height: 110px;
+		}
+		
+		.simply-toolbar button {
+			border: 0px;
+			margin: 0px;
+			padding: 0px 4px;
+			background: transparent;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+			position: relative;
+			min-width: 50px;
+			text-align: center;
+			height: 60px;
+			font-size: 11px;
+			color: #666;
+			box-sizing: border-box;
+			font-weight: inherit;
+			letter-spacing: 0;
+			line-height: inherit;
+			text-transform: inherit;
+			font-family: inherit;
+			box-shadow: inherit;			
+		}
+		.simply-toolbar button > i,
+		.simply-toolbar button > span.fa-stack {
+			line-height: 50px;
+			font-size: 19px;
+			display: inline-block;
+			padding: 0px 4px;
+			line-height: 34px;
+			display: block;
+			margin: -13px auto 0px;
+    			position: relative;
+		}
+		.simply-toolbar button.simply-selected {
+			background-color: #EEE;
+			position: relative;
+			border-left: 1px solid #DDD;
+			border-right: 1px solid white;
+		}
+		.simply-toolbar button.simply-disabled {
+			opacity: 0.3;
+		}
+
+		.simply-toolbar button:focus {
+			border-bottom: 2px solid orange !important;
+		}
+
+		button.simply-selected::first-child {
+			border-left: 0px;
+		}
+		button.simply-selected::last-child {
+			border-right: 0px;
+		}
+
+		.simply-toolbar-section {
+			background-color: #EEE;
+			display: none;
+			clear: both;
+		}
+		section.simply-section.active {
+			opacity: 1;
+			z-index: 100000;
+		}
+		section.simply-section {
+			position: absolute;
+			opacity: 0;
+			-webkit-transition: opacity 0.2s ease-in-out;
+			-moz-transition: opacity 0.2s ease-in-out;
+			-ms-transition: opacity 0.2s ease-in-out;
+			-o-transition: opacity 0.2s ease-in-out;
+			transition: opacity 0.2s ease-in-out;
+		}
+		.tagStack li {
+			padding-right: 5px;
+		}
+		.simply-toolbar-section ul {
+			background: linear-gradient(to bottom, #EEE 0%, #DDD 100%);
+			padding: 4px 2px;
+		}
+		.simply-toolbar-section.simply-selected {
+			display: block;
+			white-space: nowrap; 
+		}
+		.simply-toolbar-section button {
+			height: 40px;
+			min-width: 23px;
+			border: 1px solid transparent;
+		}
+		.simply-toolbar-section button > i,
+		.simply-toolbar-section button > span.fa-stack {
+			font-size: 14px;
+			line-height: 16px;
+			width: 23px;
+			margin: 0px auto 4px;
+		}
+		.simply-toolbar-section button.simply-selected {
+			background-color: #D7D7D7;
+			border: 1px solid #EEE;
+			border-left: 1px solid #888;
+			border-top: 1px solid #888;
+			border-radius: 2px;
+		}
+		section.simply-section {
+			margin-bottom: 150px;
+		}
+		section.simply-section h1 {
+			font-size: 16px;
+			font-weight: bold;
+			display: none;
+		}
+		button.simply-expands::after {
+			content: "";
+			display: block;
+			position: absolute;
+			bottom: 6px;
+			left: 50%;
+			margin-left: -3px;
+			width: 0;
+			border-top: 3px solid #888;
+			border-bottom: 0px;
+			border-left: 3px solid transparent;
+			border-right: 3px solid transparent;
+		}
+		button.simply-selected.simply-expands::after {
+			display: none;
+		}
+		.simply-toolbar-section > div {
+			padding-left: 80px;
+		}
+
+		.simply-toolbar-section label {
+			width: 60px;
+			font-size: 12px;
+			display: inline-block;
+			font-weight: normal;
+			padding-left: 10px;
+			margin: inherit;
+			margin-left: -80px;
+			color: inherit;
+		}
+		.simply-toolbar-section input,
+		.simply-toolbar-section select {
+			background-color: white;
+			margin-top: 3px;
+			margin-bottom: 3px;
+			border: 1px solid #888;
+			border-bottom-color: #EEE;
+			border-right-color: #EEE;
+			border-radius: 2px;
+			line-height: 22px;
+			min-height: 22px;
+			width: 100%;
+			font-family: inherit;
+			font-size: inherit;
+			display: inline-block;
+		}
+		.simply-toolbar-section select {
+			padding: 4px 0px;
+		}
+		.simply-toolbar button:focus {
+			outline: none;
+		}
+		.simply-context-html {
+			padding-left: 8px;
+			background-color: #EEE;
+			background: linear-gradient(to bottom, #EEE 0%, #DDD 100%);			
+			overflow: hidden;
+		}
+		.simply-context-html ul,
+		.simply-context-html li {
+			display: block;
+			float: left;
+		}
+		a.simply-context-tag {
+			color: black;
+			font-size: 11px;
+			line-height: 12px;
+			padding: 0px 2px;
+			margin: 2px 0px;
+			display: inline-block;
+			cursor: pointer;
+		}
+		a.simply-context-tag.simply-selected {
+			background-color: #CCC;
+			border: 1px solid #EEE;
+			border-left: 1px solid #888;
+			border-top: 1px solid #888;
+			border-radius: 2px;		
+		}
+		.simply-context-html li:last-child a.simply-context-tag::after {
+			content: "";
+		}
+
+		/* larger style html context */
+		a.simply-context-tag {
+			font-size: 12px;
+			line-height: 14px;
+			display: block;
+			float: left;
+			padding: 2px;
+			margin: 2px;
+			border: 1px solid #666;
+			border-radius: 2px;
+			color: black;
+			background-color: #CCC;
+		}
+		a.simply-context-tag.simply-selected {
+			background-color: #FFFFCC;
+		}
+		.simply-float-right {
+			float: right;
+		}
+		.simply-toolbar button.simply-small > i,
+		.simply-toolbar button.simply-small > span.fa-stack {
+			line-height: 24px;
+			font-size: 14px;
+			margin: 0px;
+		}
+		.simply-toolbar button.simply-small {
+			height: auto;
+			width: auto;
+			min-width: 20px;
+		}
+		/* end */
+
+		li.simply-text-format {
+			line-height: 32px;
+			vertical-align: top;
+			width: 100%;
+		}
+
+		input[type="number"] {
+			width: 40px;
+		}
+		.simply-slideshow-properties input,
+		.simply-gallery-properties input,
+		.simply-table-width input,
+		.simply-table-height input,
+		.simply-cell-width input,
+		.simply-cell-height input {
+			width: 40px;
+		}
+		li.simply-seperator label:before {
+			display: block;
+			position: absolute;
+			border-left: 1px solid #DDD;
+			border-right: 1px solid white;
+			height: 40px;
+			content: "";
+			margin-top: -14px;
+			margin-left: -4px;
+		}
+
+		label.simply-subsection {
+			text-align: center;
+			vertical-align: top;
+			line-height: 14px;
+		}
+		.simply-disabled {
+			color: #BBB;
+		}
+		#vdTextStyle {
+			height: auto;
+			width: auto;
+			overflow-x: inherit;
+			margin-left: auto;
+			padding: auto;
+		}
+		.simply-cell-width select,
+		.simply-cell-height select,
+		.simply-table-width select,
+		.simply-table-height select {
+			width: 40px;
+		}
+		button[data-simply-section=simply-clipboard],
+		.simply-clipboard {
+			display: none;
+		}
+		.simply-context-html {
+			xdisplay: none;
+		}
+		#editorPane, #vdMetaDataSlide {
+			-webkit-overflow-scrolling: touch !important;
+		}
+		/* simply dropdown list */
+		.simply-list {
+			display: inline-block;
+			position: relative;
+			-webkit-user-select: none;
+		}
+		ul.simply-list-items {
+			position: absolute;
+			width: 100%;
+			min-width: 120px;
+			background-color: white;
+			box-sizing: border-box;
+			padding: 2px;
+			display: none;
+			margin: 0;
+			border: 1px solid #ccc;
+		}
+		.simply-list-items li {
+			list-style: none;
+			float: none;
+			padding: 2px 4px;
+		}
+		.simply-list-items input {
+			margin-right: 5px;
+		}
+		.simply-list-items label {
+			font-size: 13px;
+			line-height: 18px;
+			font-weight: normal;
+			display: block;
+		}
+		.simply-list.visible .simply-list-items {
+			display: block;
+		}
+		/* context menu */
+		.simply-context-section {
+			position: absolute;
+			right: 20px;
+			top: 130px;
+			width: 210px;
+			height: 240px;
+			border: 1px solid #ccc;
+			box-shadow: 0px 0px 5px #888;
+			padding: 5px;
+			background: #F4F4F4;
+			display: none;
+		}
+		.simply-context-section.simply-selected {
+			display: block;
+		}
+		.simply-context-section .simply-close {
+			position: absolute;
+			top: -18px;
+			right: -18px;
+			width: 36px;
+			height: 36px;
+			background-image: url('<pinp> make_url(currentsite()); </pinp>graphics/close.png');
+			margin: 0px;
+			padding: 0px;
+			border: 0px;
+			min-width: 36px;
+		}
+		.simply-context-section iframe {
+			border: 0px;
+			margin: 0px;
+			padding: 0px;
+			width: 100%;
+			height: 100%;
+		}
+		.simply-context-section.simply-help {
+			top: 200px;
+			left: 50%;
+			width: 400px;
+			height: 250px;
+			margin-left: -200px;
+		}
+
+#simply-main-toolbar {
+	left: 0px !important;
+	opacity: 1 !important;
+	position: fixed;
+	margin-bottom: auto;
+	top: 0px;
+	right: 0px;
+	z-index: 1000;
+}
+#simply-main-toolbar .simply-toolbar {
+	position: static;
+}
+#simply-main-toolbar .simply-toolbar:before {
+	display: none;
+}
+
+#simply-main-toolbar .simply-selected {
+	border: 0px;
+}
+#vdToolbars {
+	height: auto;
+	border: 0px;
+	margin-right: 0px;
+}
+#vdEditPane {
+	border: 0px;
+}
+#simply-main-toolbar .simply-buttons {
+	white-space: normal;
+}
+#simply-main-toolbar > .simply-toolbar > ul.simply-buttons > li.simply-seperator {
+	border-right: 1px solid #ddd;
+	height: 58px;
+	vertical-align: top;
+}
+#simply-main-toolbar i.simply-logo {
+	margin-bottom: 10px;
+	position: relative;
+	top: 4px;
+	width: 24px;
+	box-sizing: border-box;
+}
+.simply-hidden {
+	display: none !important;
+}
+
+/* Dialogs */
+.simply-dialog {
+	display: none;
+}
+.simply-dialog.active {
+	display: block;
+	border: 1px solid #aaa;
+	border-top: 5px solid #ea5922;
+	background-color: white;
+	font-family: arial, helvetica, sans-serif;
+	color: black;
+	padding: 0px;
+	position: fixed;
+	z-index: 100000;
+	box-shadow: 0px 0px 8px #444;
+}
+
+.simply-toolbar .simply-right {
+	float: right;
+}
+.simply-dialog .marker {
+	display: none;
+}
+.simply-dialog .simply-toolbar {
+	border: 0;
+	border-top: 1px solid #eee;
+	box-shadow: none;
+	width: 100%;
+}
+.simply-dialog-body {
+	padding: 66px 5px;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+.simply-dialog-body:first-child {
+	padding: 5px;
+}
+.simply-dialog .simply-toolbar:first-child {
+	position: absolute;
+	top: 0px;
+}
+.simply-dialog .simply-toolbar:last-child {
+	position: absolute;
+	bottom: 0px;
+}
+
+@media (max-width: 481px) {
+	.simply-dialog {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	[data-simply-action="simply-dialog-fullscreen"] {
+		display: none;
+	}
+}
+
+.simply-empty[data-simply-list] {
+	min-height: 24px;
+	background-color: rgba(128,128,128,0.1);
+	outline: 2px dashed rgba(128,128,128,0.3);
+	text-align: center;
+}
+.simply-empty[data-simply-list]:before {
+	content: "\f1b3"; /* cubes */
+	text-align: center;
+	font-family: FontAwesome;
+	font-size: 20px;
+	color: #888;
+	width: 100%;
+	line-height: 24px;
+	vertical-align: middle;
+	padding-top: 5px;
+}
+.simply-empty[data-simply-list]:after {
+	content: "(Empty list)";
+	text-align: center;
+	font-family: arial;
+	font-size: 12px;
+	color: #888;
+	width: 100%;
+	line-height: 24px;
+	vertical-align: middle;
+	padding-bottom: 5px;
+}
+
+/* plain view */
+body.simply-plain [data-simply-field],
+body.simply-plain [data-simply-list],
+body.simply-plain [data-simply-list-item] {
+	display: block !important;
+	position: static !important;
+	vertical-align: top;
+	margin-left: 20px;
+}
+body.simply-plain [data-simply-field]:before {
+	content: "(Field) " attr(data-simply-field);
+}
+body.simply-plain [data-simply-list]:before {
+	content: "(List) " attr(data-simply-list);
+	position: static;
+	opacity: 1;
+}
+body.simply-plain [data-simply-list-item]:before {
+	content: "(List item) " attr(data-simply-template);
+	position: static;
+	opacity: 1;
+}
+
+body.simply-plain [data-simply-list]:before,
+body.simply-plain [data-simply-list-item]:before,
+body.simply-plain [data-simply-field]:before {
+	border: 1px solid #999;
+	border-radius: 24px;
+	background-color: #eee;
+	color: #333;
+	display: inline-block;
+	width: auto;
+	margin: 5px;
+	padding: 5px;
+	font-size: 12px;
+	font-family: arial;
+	font-weight: normal;
+	font-style: normal;
+}

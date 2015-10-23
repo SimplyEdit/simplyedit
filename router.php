@@ -6,7 +6,7 @@
 		header("HTTP/1.1 200 OK");
 
 		$template = "index.html";
-		$pageTemplate = $data[$_SERVER["REQUEST_URI"]]['data-vedor-page-template']['content'];
+		$pageTemplate = $data[$_SERVER["REQUEST_URI"]]['data-simply-page-template']['content'];
 		if (file_exists($pageTemplate) && preg_match("/\.html$/", $pageTemplate)) {
 			$template = $pageTemplate;
 		}

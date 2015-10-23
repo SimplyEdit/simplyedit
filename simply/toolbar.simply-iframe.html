@@ -1,0 +1,53 @@
+<section id="simply-iframe" class="simply-section">
+	<h1>HTML Iframe Toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-iframe-properties" class="simply-expands"><i class="fa fa-link"></i>IFrame target</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-iframe-properties">
+			<div><label>URL</label><input type="text" id="vdIframeSrc" data-simply-action="simply-iframe-src"></div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+	var currentIframe;
+
+	editor.addToolbar({
+		"name" : "simply-iframe",
+		"filter" : {
+			"selector" : "IFRAME",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var iframe = vdSelection.getNode(sel);
+
+			vdSelectionState.currentSelection = sel;
+			vdSelectionState.currentNode = iframe;
+
+			var src=iframe.getAttribute('src');
+			simply.widgets.properties.set('vdIframeSrc', src);
+		},
+		"init" : function() {
+		},
+		"actions" : {
+			"simply-iframe-delete" : function() {
+				var sel = vdSelectionState.get();
+				var iframe = vdSelection.getNode(sel);
+				iframe.parentNode.removeChild(iframe);
+			},
+			"simply-iframe-src" : function(value) {
+				console.log("src change");
+				if (vdSelectionState.currentNode) {
+					if (value) {
+						vdSelectionState.currentNode.setAttribute("src", value);
+					} else {
+						vdSelectionState.currentNode.setAttribute("src", '');
+					}
+				}
+			}
+		}
+	});
+</script>

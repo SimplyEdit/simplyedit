@@ -179,19 +179,19 @@ QUnit.module("editor data apply");
 
 	QUnit.test("apply title", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "<div data-vedor-field='title'>Wrong content</div>";
+		target.innerHTML = "<div data-simply-field='title'>Wrong content</div>";
 		var data = {};
 		data[location.pathname] = {
 			"title" : "Test title"
 		};
 		editor.data.apply(data, target);
 
-		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data vedor field set correctly");
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data simply field set correctly");
 	});
 
 	QUnit.test("apply title with path", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "<div data-vedor-field='title' data-vedor-path='/'>Wrong content</div>";
+		target.innerHTML = "<div data-simply-field='title' data-simply-path='/'>Wrong content</div>";
 		var data = {
 			"/" : {
 				"title" : "Test title"
@@ -199,12 +199,12 @@ QUnit.module("editor data apply");
 		};
 		editor.data.apply(data, target);
 
-		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data vedor field set correctly");
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data simply field set correctly");
 	});
 
 	QUnit.test("apply list", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "<ul data-vedor-list='menu' data-vedor-path='/'><template><li data-vedor-field='item'>Menu item</li></template></ul>";
+		target.innerHTML = "<ul data-simply-list='menu' data-simply-path='/'><template><li data-simply-field='item'>Menu item</li></template></ul>";
 		var data = {
 			"/" : {
 				"menu" : [
@@ -214,14 +214,14 @@ QUnit.module("editor data apply");
 			}
 		};
 		editor.data.apply(data, target);
-		assert.notOk(document.querySelector("#testContent ul").className.match(/vedor-empty/), "vedor-empty is set on empty list");
+		assert.notOk(document.querySelector("#testContent ul").className.match(/simply-empty/), "simply-empty is set on empty list");
 		assert.equal(document.querySelector("#testContent ul > li").innerHTML, "Home", "Home item was found");
 		assert.equal(document.querySelector("#testContent ul > li + li").innerHTML, "Second item", "Second item was found");
 	});
 
 	QUnit.test("apply empty list", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "<ul data-vedor-list='menu' data-vedor-path='/'><template><li data-vedor-field='item'>Menu item</li></template></ul>";
+		target.innerHTML = "<ul data-simply-list='menu' data-simply-path='/'><template><li data-simply-field='item'>Menu item</li></template></ul>";
 		var data = {
 			"/" : {
 				"menu" : [
@@ -230,12 +230,12 @@ QUnit.module("editor data apply");
 		};
 		editor.data.apply(data, target);
 
-		assert.ok(document.querySelector("#testContent ul").className.match(/vedor-empty/), "vedor-empty is set on empty list");
+		assert.ok(document.querySelector("#testContent ul").className.match(/simply-empty/), "simply-empty is set on empty list");
 	});
 
 	QUnit.test("apply 2nd degree list", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = '<ul data-vedor-list="menu" data-vedor-path="/"><template><li data-vedor-list="items"><template><span data-vedor-field="item">Menu item</span></template></li></template></ul>';
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
 		var data = {
 			"/" : {
 				"menu" : [
@@ -263,7 +263,7 @@ QUnit.module("editor data get");
 
 	QUnit.test("get title", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "<div data-vedor-field='title'>Test title</div>";
+		target.innerHTML = "<div data-simply-field='title'>Test title</div>";
 		var data = editor.data.get(target);
 
 		assert.equal(data[location.pathname].title, "Test title", "title found in data");
@@ -271,7 +271,7 @@ QUnit.module("editor data get");
 
 	QUnit.test("get data on document", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "<div data-vedor-field='title'>Test title</div>";
+		target.innerHTML = "<div data-simply-field='title'>Test title</div>";
 		var data = editor.data.get(document);
 
 		assert.equal(data[location.pathname].title, "Test title", "title found in data");
@@ -279,7 +279,7 @@ QUnit.module("editor data get");
 
 	QUnit.test("get title with path", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "<div data-vedor-field='title' data-vedor-path='/'>Test title</div>";
+		target.innerHTML = "<div data-simply-field='title' data-simply-path='/'>Test title</div>";
 		var data = editor.data.get(target);
 
 		assert.equal(data["/"].title, "Test title", "title for / found");
@@ -287,7 +287,7 @@ QUnit.module("editor data get");
 
 	QUnit.test("get list", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = '<ul data-vedor-list="menu" data-vedor-path="/"><template><li data-vedor-field="item">Menu item</li></template></ul>';
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-field="item">Menu item</li></template></ul>';
 		var data = {
 			"/" : {
 				"menu" : [
@@ -304,7 +304,7 @@ QUnit.module("editor data get");
 
 	QUnit.test("get 2nd degree list", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = '<ul data-vedor-list="menu" data-vedor-path="/"><template><li data-vedor-list="items"><template><span data-vedor-field="item">Menu item</span></template></li></template></ul>';
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
 		var data = {
 			"/" : {
 				"menu" : [
@@ -327,7 +327,7 @@ QUnit.module("editor data get");
 
 	QUnit.test("get 2nd degree list deeper structure", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = '<ul data-vedor-list="menu" data-vedor-path="/"><template><li data-vedor-list="items"><template><a><span data-vedor-field="item">Menu item</span></a></template></li></template></ul>';
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><a><span data-simply-field="item">Menu item</span></a></template></li></template></ul>';
 		var data = {
 			"/" : {
 				"menu" : [
@@ -471,10 +471,10 @@ QUnit.module("data merge");
 QUnit.module("editor list fixFirstElementChild");
 	QUnit.test("get title", function(assert) {
 		var target = document.querySelector("#testContent");
-		target.innerHTML = "Test 123 <div data-vedor-field='title'>Test title</div>";
+		target.innerHTML = "Test 123 <div data-simply-field='title'>Test title</div>";
 		editor.data.list.fixFirstElementChild(target);
 		
 		assert.equal(target.firstElementChild.nodeType, 1, "First child is an element");
 		assert.equal(target.firstElementChild.innerHTML, "Test title", "First child innerHTML found");
-		assert.equal(target.firstElementChild.getAttribute("data-vedor-field"), "title", "First child getAttribute");
+		assert.equal(target.firstElementChild.getAttribute("data-simply-field"), "title", "First child getAttribute");
 	});

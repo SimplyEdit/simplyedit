@@ -1,0 +1,196 @@
+<section id="simply-meta" class="simply-dialog">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button class="simply-expands simply-selected" data-simply-action="simply-metadata" data-simply-section="simply-metadata"><i class="fa fa-clone fa-flip-horizontal"></i>Meta tags</li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-metadata simply-selected">
+			<div class="field">
+				<label for="simply-meta-title">Page title</label>
+				<input type="text" id="simply-meta-title">
+			</div>
+			<div class="field">
+				<label for="simply-meta-description">Page description</label>
+				<input type="text" id="simply-meta-description">
+			</div>
+			<div class="field">
+				<label for="simply-meta-author">Author</label>
+				<input type="text" id="simply-meta-author">
+			</div>
+			<div class="field">
+				<label>Robots</label>
+				<ul class="simply-buttons">
+					<li><button data-simply-action="simply-meta-robots" data-value="nofollow"><i class="fa fa-chain-broken"></i>No follow</button></li>
+					<li><button data-simply-action="simply-meta-robots" data-value="noindex"><i class="fa fa-eye-slash"></i>No index</button></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-right'><button data-simply-action="simply-meta-apply"><i class="fa fa-check"></i>Apply</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#simply-meta {
+		top: 50%;
+		height: 400px;
+		max-height: 80%;
+		margin-top: -200px;
+
+		left: 50%;
+		width: 480px;
+		margin-left: -240px;
+		background-color: #EEE;
+	}
+	#simply-meta.fullscreen {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	#simply-meta .simply-toolbar-section ul {
+		background: transparent;
+	}
+	#simply-meta .simply-metadata button:not(.simply-selected) {
+		background: white;
+	}
+
+	#simply-meta .simply-toolbar-section {
+		background: #eee;
+		padding: 10px 5px;
+	}
+	#simply-meta .simply-metadata .simply-buttons {
+		margin-top: 0px;
+		margin-left: -3px;
+		display: inline-block;
+	}
+	#simply-meta .simply-metadata .simply-buttons li {
+		margin-right: 5px;
+		list-style: none;
+	}
+	#simply-meta .simply-metadata .field {
+		margin-bottom: 10px;
+		padding-left: 120px;
+		margin-right: 20px;
+	}
+	#simply-meta .simply-metadata .field label {
+		margin-left: -120px;
+		display: inline-block;
+		width: 95px;
+		vertical-align: top;
+		margin-top: 12px;
+	}
+	#simply-meta .simply-metadata input {
+		width: 100%;
+	}
+	@media (max-width: 481px) {
+		#simply-meta {
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+			width: auto;
+			margin-left: 0px;
+			margin-top: 0px;
+		}
+		#simply-meta [data-simply-action="simply-meta-fullscreen"] {
+			display: none;
+		}
+	}
+</style>
+<script>
+	editor.plugins.meta = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-meta'), editor.plugins.meta.dialog.update);
+			},
+			update : function() {
+				var title = document.head.querySelector("title") ? document.head.querySelector("title").innerHTML : "";
+				var description = document.head.querySelector("meta[name=description]") ? document.head.querySelector("meta[name=description]").getAttribute("content") : "";
+				var author = document.head.querySelector("meta[name=author]") ? document.head.querySelector("meta[name=author]").getAttribute("content") : "";
+
+				simply.widgets.properties.set("simply-meta-title", title);
+				simply.widgets.properties.set("simply-meta-description", description);
+				simply.widgets.properties.set("simply-meta-author", author);
+				var metaRobots = document.head.querySelector('meta[name=robots]');
+				if (metaRobots) {
+					var allButtons = document.querySelectorAll("[data-simply-action=simply-meta-robots]");
+					for (var j=0; j<allButtons.length; j++) {
+						allButtons[j].classList.remove("simply-selected");
+					}
+					var instructions = metaRobots.getAttribute("content").split(",");
+					for (var i=0; i<instructions.length; i++) {
+						var query = "[data-simply-action=simply-meta-robots][data-value=" + instructions[i] + "]";
+
+						var targetButton = document.querySelector("[data-simply-action=simply-meta-robots][data-value=" + instructions[i] + "]");
+						if (targetButton) {
+							targetButton.classList.add("simply-selected");
+						}
+					}
+				}
+			}
+		},
+		apply : function() {
+			editor.plugins.meta.setTitle(simply.widgets.properties.get("simply-meta-title"));
+			editor.plugins.meta.setMeta("description", simply.widgets.properties.get("simply-meta-description"));
+			editor.plugins.meta.setMeta("author", simply.widgets.properties.get("simply-meta-author"));
+
+			var metaRobots = document.querySelectorAll(".simply-selected[data-simply-action=simply-meta-robots]");
+			var instructions = [];
+			for (var i=0; i<metaRobots.length; i++) {
+				instructions.push(metaRobots[i].getAttribute("data-value"));
+			}
+
+			editor.plugins.meta.setMeta("robots", instructions.join(","));
+			editor.plugins.dialog.close();
+		},
+		setTitle : function(value) {
+			var title = document.head.querySelector("title");
+			if (!title) {
+				title = document.createElement("TITLE");
+				document.head.appendChild(title);
+			}
+			if (value) {
+				title.innerHTML = value;
+			} else {
+				document.head.removeChild(title);
+			}
+		},
+		setMeta : function(name, value) {
+			var metaTag = document.head.querySelector("meta[name=" + name + "]");
+			if (!metaTag) {
+				metaTag = document.createElement("meta");
+				metaTag.setAttribute("name", name);
+				document.head.appendChild(metaTag);
+			}
+			if (value) {
+				metaTag.setAttribute("content", value);
+			} else {
+				document.head.removeChild(metaTag);
+			}
+		}
+	};
+
+	editor.addAction("simply-metadata", function(el) {
+		el.classList.toggle("simply-selected");
+		document.querySelector("#simply-meta .simply-metadata").classList.toggle("simply-selected");
+	});
+
+	editor.addAction("simply-meta-robots", function(el) {
+		el.classList.toggle('simply-selected');
+	});
+	editor.addAction("simply-meta", editor.plugins.meta.dialog.open);
+	editor.addAction("simply-meta-apply", editor.plugins.meta.apply);
+</script>

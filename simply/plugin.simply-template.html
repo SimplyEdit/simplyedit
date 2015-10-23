@@ -1,0 +1,165 @@
+<section id="simply-template" class="simply-dialog">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button class="simply-expands simply-selected" data-simply-action="simply-page-template" data-simply-section="simply-page-template"><i class="fa fa-paint-brush"></i>Page template</li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-page-template simply-selected">
+			<div class="field">
+				<label for="simply-page-template-list">Page template</label>
+				<select id="simply-page-template-list">
+					<option value="index.html">Hoofdpagina</option>
+					<option value="index-1.html">Bio</option>
+					<option value="index-2.html">Music</option>
+					<option value="index-3.html">Discography</option>
+					<option value="index-4.html">Photo & video</option>
+					<option value="index-5.html">Contact</option>
+					<option value="index-6.html">Privacy policy</option>
+				</select>
+			</div>
+			<div class="field">
+				<label><strong>Notice: </strong>when you apply, the page will be saved and reloaded with the new template;</label>
+			</div>
+		</div>
+	</div>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-right'><button data-simply-action="simply-template-apply"><i class="fa fa-check"></i>Apply</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#simply-template {
+		top: 50%;
+		height: 400px;
+		max-height: 80%;
+		margin-top: -200px;
+
+		left: 50%;
+		width: 480px;
+		margin-left: -240px;
+		background-color: #EEE;
+	}
+	#simply-template.fullscreen {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	#simply-template .simply-toolbar-section ul {
+		background: transparent;
+	}
+	#simply-template .simply-page-template button:not(.simply-selected) {
+		background: white;
+	}
+
+	#simply-template .simply-toolbar-section {
+		background: #eee;
+		padding: 10px 5px;
+	}
+	#simply-template .simply-page-template .simply-buttons {
+		margin-top: 0px;
+		margin-left: -3px;
+		display: inline-block;
+	}
+	#simply-template .simply-page-template .simply-buttons li {
+		margin-right: 5px;
+		list-style: none;
+	}
+	#simply-template .simply-page-template .field {
+		margin-bottom: 10px;
+		padding-left: 120px;
+		margin-right: 20px;
+	}
+	#simply-template .simply-page-template .field label {
+		margin-left: -120px;
+		display: inline-block;
+		width: 95px;
+		vertical-align: top;
+		margin-top: 12px;
+	}
+	#simply-template .simply-page-template input {
+		width: 100%;
+	}
+	@media (max-width: 481px) {
+		#simply-template {
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+			width: auto;
+			margin-left: 0px;
+			margin-top: 0px;
+		}
+		#simply-template [data-simply-action="simply-page-template-fullscreen"] {
+			display: none;
+		}
+	}
+</style>
+<script>
+	editor.plugins.pageTemplate = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-template'), editor.plugins.pageTemplate.dialog.update);
+			},
+			update : function() {
+				var pageTemplate = document.head.querySelector("meta[name=page-template]") ? document.head.querySelector("meta[name=page-template]").getAttribute("content") : "index.html";
+				simply.widgets.properties.set("simply-page-template-list", pageTemplate);
+			}
+		},
+		apply : function() {
+			var pageTemplate = simply.widgets.properties.get("simply-page-template-list");
+			
+			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
+			editor.plugins.dialog.close();
+			var reloadPage = function() {
+				if (editor.storage.saveTemplate) {
+					editor.storage.saveTemplate(pageTemplate, function() {
+						document.location.reload();
+					});
+				} else {
+					document.location.reload();
+				}
+			}
+			editor.actions['simply-aftersave'] = reloadPage;
+			editor.data.save();
+		},
+		setMeta : function(name, value) {
+			var metaTag = document.head.querySelector("meta[name=" + name + "]");
+			if (!metaTag) {
+				metaTag = document.createElement("meta");
+				metaTag.setAttribute("name", name);
+				document.head.appendChild(metaTag);
+			}
+			if (value) {
+				metaTag.setAttribute("content", value);
+			} else {
+				document.head.removeChild(metaTag);
+			}
+		},
+		init : function() {
+			var button = document.createElement("button");
+			button.dataset.simplyAction = "simply-template";
+			button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(button);
+		}
+	};
+
+	editor.addAction("simply-page-template", function(el) {
+		el.classList.toggle("simply-selected");
+	});
+
+	editor.addAction("simply-template", editor.plugins.pageTemplate.dialog.open);
+	editor.addAction("simply-template-apply", editor.plugins.pageTemplate.apply);
+	editor.plugins.pageTemplate.init();
+</script>

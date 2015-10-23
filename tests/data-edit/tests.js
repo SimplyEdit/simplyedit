@@ -3,7 +3,7 @@ QUnit.config.autostart = false;
 localStorage.storageKey = "demo";
 editor.storage.key = "demo";
 
-document.location.hash = "#vedor-edit";
+document.location.hash = "#simply-edit";
 
 var checkEditor = function() {
 	if (editor && editor.plugins && editor.plugins.text) {
@@ -106,7 +106,7 @@ QUnit.module("editor context");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 		setCaretPosition(testContent, 2, 0);
 		var context = editor.context.get();
-		assert.equal(context, "vedor-text-cursor");
+		assert.equal(context, "simply-text-cursor");
 	});
 
 	QUnit.test("text context", function(assert) {
@@ -115,7 +115,7 @@ QUnit.module("editor context");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 		setCaretPosition(testContent, 2, 3);
 		var context = editor.context.get();
-		assert.equal(context, "vedor-text-selection");
+		assert.equal(context, "simply-text-selection");
 	});
 
 QUnit.module("editor text cursor");
@@ -129,42 +129,42 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['vedor-text-align-right']();
+		editor.actions['simply-text-align-right']();
 
-		assert.equal(testContent.innerHTML, '<p class="vedor-text-align-right">Hello world</p>', "Found align class");
+		assert.equal(testContent.innerHTML, '<p class="simply-text-align-right">Hello world</p>', "Found align class");
 	});
 
 	QUnit.test("text set align from right to left within paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = '<p class="vedor-text-align-right">Hello world</p>';
+		testContent.innerHTML = '<p class="simply-text-align-right">Hello world</p>';
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 		
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['vedor-text-align-left']();
+		editor.actions['simply-text-align-left']();
 
-		assert.equal(testContent.innerHTML, '<p class="vedor-text-align-left">Hello world</p>', "Found align class");
+		assert.equal(testContent.innerHTML, '<p class="simply-text-align-left">Hello world</p>', "Found align class");
 	});
 
 	QUnit.test("text set align from right to none within paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = '<p class="vedor-text-align-right">Hello world</p>';
+		testContent.innerHTML = '<p class="simply-text-align-right">Hello world</p>';
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['vedor-text-align-none']();
+		editor.actions['simply-text-align-none']();
 
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "Found align class");
 	});
 
 	QUnit.test("text set align from center to justify within paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = '<p class="vedor-text-align-center">Hello world</p>';
+		testContent.innerHTML = '<p class="simply-text-align-center">Hello world</p>';
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['vedor-text-align-justify']();
+		editor.actions['simply-text-align-justify']();
 
-		assert.equal(testContent.innerHTML, '<p class="vedor-text-align-justify">Hello world</p>', "Found align class");
+		assert.equal(testContent.innerHTML, '<p class="simply-text-align-justify">Hello world</p>', "Found align class");
 	});
 
 	QUnit.test("text style init paragraph", function(assert) {
@@ -173,7 +173,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var currentStyle = document.querySelector("#vedor-text-cursor select[name=textStyle]").value;
+		var currentStyle = document.querySelector("#simply-text-cursor select[name=textStyle]").value;
 		assert.equal(currentStyle, "p", "text style is correctly updated");
 	});
 
@@ -183,7 +183,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("h2"), 2, 0);
-		var currentStyle = document.querySelector("#vedor-text-cursor select[name=textStyle]").value;
+		var currentStyle = document.querySelector("#simply-text-cursor select[name=textStyle]").value;
 		assert.equal(currentStyle, "h2", "text style is correctly updated");
 	});
 
@@ -194,8 +194,19 @@ QUnit.module("editor text cursor");
 
 		setCaretPosition(testContent.querySelector("h2"), 2, 0);
 
-		editor.actions['vedor-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 		assert.equal(testContent.innerHTML, '<h1>Hello world</h1>');
+	});
+
+	QUnit.test("text style set h2 with multiple classes to h1", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<h2 class="hello world class">Hello world</h2>';
+		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
+
+		setCaretPosition(testContent.querySelector("h2"), 2, 0);
+
+		editor.actions['simply-text-blockstyle']('h1');
+		assert.equal(testContent.innerHTML, '<h1 class="hello world class">Hello world</h1>');
 	});
 
 	QUnit.test("text style set h2 with anchor to h1", function(assert) {
@@ -206,7 +217,7 @@ QUnit.module("editor text cursor");
 		console.log(testContent.innerHTML);
 
 		setCaretPosition(testContent.querySelector("a"), 2, 0);
-		editor.actions['vedor-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 		assert.equal(testContent.innerHTML, '<h1><a name="title">Hello world</a></h1>');
 	});
 
@@ -216,7 +227,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent, 2, 0);
-		editor.actions['vedor-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 		assert.equal(testContent.innerHTML, '<h1>Hello world</h1>');
 	});
 
@@ -226,7 +237,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("h2"), 2, 0);
-		editor.actions['vedor-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 		assert.equal(testContent.innerHTML, '<h1>Hello world</h1>');
 	});
 
@@ -238,7 +249,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent, 2, 3);
-		editor.actions['vedor-text-bold']();
+		editor.actions['simply-text-bold']();
 
 		assert.equal(testContent.innerHTML, 'He<strong>llo</strong> world', "Bold uses STRONG tag");
 	});
@@ -249,7 +260,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("p"), 2, 3);
-		editor.actions['vedor-text-bold']();
+		editor.actions['simply-text-bold']();
 
 		assert.equal(testContent.innerHTML, '<p>He<strong>llo</strong> world</p>', "Bold uses STRONG tag");
 	});
@@ -260,7 +271,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("strong"), 0, 3);
-		editor.actions['vedor-text-bold']();
+		editor.actions['simply-text-bold']();
 
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "STRONG tag removed");
 	});
@@ -271,7 +282,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent, 2, 3);
-		editor.actions['vedor-text-italic']();
+		editor.actions['simply-text-italic']();
 
 		assert.equal(testContent.innerHTML, 'He<em>llo</em> world', "Italic uses EM tag");
 	});
@@ -282,7 +293,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("p"), 2, 3);
-		editor.actions['vedor-text-italic']();
+		editor.actions['simply-text-italic']();
 
 		assert.equal(testContent.innerHTML, '<p>He<em>llo</em> world</p>', "Italic uses EM tag");
 	});
@@ -294,9 +305,9 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("em"), 0, 3);
-		var targetButton = document.querySelector("#vedor-text-selection button[data-vedor-action='vedor-text-italic']");
+		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-italic']");
 
-		assert.ok(targetButton.classList.contains("vedor-selected"), "text style is correctly updated");
+		assert.ok(targetButton.classList.contains("simply-selected"), "text style is correctly updated");
 	});
 
 	QUnit.test("text style unset italic", function(assert) {
@@ -305,7 +316,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("em"), 0, 3);
-		editor.actions['vedor-text-italic']();
+		editor.actions['simply-text-italic']();
 
 		assert.equal(testContent.innerHTML, '<p>Hello there world</p>', "EM tag removed");
 	});
@@ -319,8 +330,8 @@ QUnit.module("editor text selection");
 		setCaretPosition(testContent, 2);
 		setSelectionEnd(testContent.querySelector("em"),1);
 
-		var targetButton = document.querySelector("#vedor-text-selection button[data-vedor-action='vedor-text-italic']");
-		assert.ok(targetButton.classList.contains("vedor-selected"), "text style is correctly updated");
+		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-italic']");
+		assert.ok(targetButton.classList.contains("simply-selected"), "text style is correctly updated");
 	});
 
 QUnit.module("text hyperlinks");
@@ -331,7 +342,7 @@ QUnit.module("text hyperlinks");
 
 		setCaretPosition(testContent.querySelector("a"), 3);
 
-		assert.ok(editor.context.get(), "vedor-hyperlink", "hyperlink context");
+		assert.ok(editor.context.get(), "simply-hyperlink", "hyperlink context");
 	});
 
 	QUnit.test("change hyperlink", function(assert) {
@@ -340,7 +351,7 @@ QUnit.module("text hyperlinks");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("a"), 3);
-		editor.actions['vedor-hyperlink-href']("http://www.muze.nl");
+		editor.actions['simply-hyperlink-href']("http://www.muze.nl");
 
 		var hyperlink = testContent.querySelector("A");
 		
@@ -354,7 +365,7 @@ QUnit.module("text hyperlinks");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("a"), 3);
-		editor.actions['vedor-hyperlink-title']("Hello");
+		editor.actions['simply-hyperlink-title']("Hello");
 
 		var hyperlink = testContent.querySelector("A");
 		
@@ -368,7 +379,7 @@ QUnit.module("text hyperlinks");
 		testContent.hopeEditor ? testContent.hopeEditor.parseHTML() : false;
 
 		setCaretPosition(testContent.querySelector("P"), 0, 6);
-		editor.actions['vedor-hyperlink-href']("http://www.muze.nl/");
+		editor.actions['simply-hyperlink-href']("http://www.muze.nl/");
 		var hyperlink = testContent.querySelector("A");
 		assert.ok(hyperlink.getAttribute("href"), "http://www.muze.nl/", "hyperlink created");
 		assert.ok(testContent.innerHTML, '<p><a href="http://www.muze.nl/">Hello </a>world</p>', "hyperlink created");
@@ -381,17 +392,17 @@ QUnit.module("text hyperlinks");
 
 		setCaretPosition(testContent.querySelector("a"), 3);
 
-		var targetInput = document.querySelector("#vedor-text-selection #vdHyperlinkHref");
+		var targetInput = document.querySelector("#simply-text-selection #vdHyperlinkHref");
 		assert.equal(targetInput.value, "test/", "href init done");
 
-		targetInput = document.querySelector("#vedor-text-selection #vdHyperlinkName");
+		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkName");
 		assert.equal(targetInput.value, "mylink", "name init done");
 
-		targetInput = document.querySelector("#vedor-text-selection #vdHyperlinkTitle");
+		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkTitle");
 		assert.equal(targetInput.value, "mytitle", "title init done");
 
-		targetInput = document.querySelector("#vedor-text-selection button[data-vedor-action='vedor-hyperlink-nofollow']");
-		assert.ok(targetInput.classList.contains('vedor-selected'), "nofollow init done");
+		targetInput = document.querySelector("#simply-text-selection button[data-simply-action='simply-hyperlink-nofollow']");
+		assert.ok(targetInput.classList.contains('simply-selected'), "nofollow init done");
 	});
 
 
@@ -400,5 +411,5 @@ QUnit.module("no context");
 	QUnit.test("remove selection at end of tests", function(assert) {
 		window.getSelection().removeAllRanges();
 		editor.context.update();
-		assert.equal(editor.context.get(), "vedor-no-context");
+		assert.equal(editor.context.get(), "simply-no-context");
 	});
