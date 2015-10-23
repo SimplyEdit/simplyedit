@@ -5,6 +5,12 @@
 		}
 	};
 
+	var divListener = function(ev) {
+		if (ev.target.tagName=='DIV') {
+			editor.node.unwrap(ev.target);
+		}
+	}
+
 	editor.addToolbar({
 		name : 'vedor-paste-handler',
 		init : function() {
@@ -14,11 +20,15 @@
 					case 46: 	// delete
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
 					break;
+					case 13:	// enter
+						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
+					break;
 				}
 			});
 
 			document.addEventListener("keyup", function(event) {
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+				event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
 			});
 
 			document.addEventListener("paste", function(event) {
