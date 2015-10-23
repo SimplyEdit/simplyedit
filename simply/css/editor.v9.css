@@ -50,13 +50,6 @@
 		#simply-editor {
 			font-family: arial;
 		}
-
-		i.simply-logo {
-			background-image: url('../simply.png');
-			background-size: contain;
-			background-repeat: no-repeat;
-			height: 25px;
-		}
 		.simply-toolbar {
 			font-family: arial;
 			font-size: 11px;
