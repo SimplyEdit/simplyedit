@@ -480,10 +480,13 @@
 				} else {
 					var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
 					if (blockAnnotation) {
-						var nodeInfo = blockAnnotation.tag.split(/ /, 2);
+						var nodeInfo = false;
+						if (blockAnnotation.tag.indexOf(" ") !== -1) {
+							nodeInfo = blockAnnotation.tag.substr(blockAnnotation.tag.indexOf(" ")+1);
+						}
 						var newValue = value;
-						if (nodeInfo[1]) {
-							newValue += " " + nodeInfo[1];
+						if (nodeInfo) {
+							newValue += " " + nodeInfo;
 						}
 						hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
 						hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
