@@ -157,6 +157,11 @@
 			}
 		},
 		init : function() {
+			var button = document.createElement("button");
+			button.dataset.simplyAction = "simply-file-browse-sitemap";
+			button.innerHTML = '<i class="fa fa-sitemap"></i>Sitemap';
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(button);
+
 			var target = document.querySelectorAll('[data-simply-action="simply-hyperlink-href"]');
 			if (target) {
 				for (var i=0; i<target.length; i++) {
@@ -176,14 +181,21 @@
 			muze.event.fire(el.parentNode.parentNode.querySelector("input"), "change");
 			editor.plugins.dialog.close();
 		};
+		editor.plugins.fileBrowse.path = editor.storage.endpoint;
+		editor.plugins.fileBrowse.dialog.open();
+	});
+	editor.addAction("simply-file-browse-sitemap", function(el) {
+		editor.actions["simply-file-browse-insert"] = function(button) {
+			var target = button.getAttribute("data-value");
+			target = target.replace(editor.storage.endpoint + "data.json", "");
+			document.location.href = target + "#simply-edit";
+			editor.plugins.dialog.close();
+		};
+		editor.plugins.fileBrowse.path = editor.storage.endpoint + "data.json";
 		editor.plugins.fileBrowse.dialog.open();
 	});
 	editor.addAction("simply-file-browse-directory", function(el) {
 		editor.plugins.fileBrowse.dialog.loadFiles(el.dataset.value);
-	});
-	editor.addAction("simply-file-browse-insert", function(el) {
-		editor.actions["simply-file-src"](el.getAttribute("data-value"));
-		editor.plugins.dialog.close();
 	});
 
 	editor.plugins.fileBrowse.init();
