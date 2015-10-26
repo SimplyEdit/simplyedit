@@ -878,7 +878,10 @@
 				}
                                 this.url = endpoint;
 				this.list = storage.default.list;
+				this.sitemap = storage.default.sitemap;
+				this.listSitemap = storage.default.listSitemap;
 
+				this.endpoint = endpoint;
                         },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
@@ -901,7 +904,7 @@
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
-						callback(http.responseText);
+						callback(http.responseText.replace(/data-vedor/g, "data-simply"));
 					}
 				};
 				http.send();
@@ -920,6 +923,7 @@
 					endpoint = location.origin + "/";
 				}
                                 this.url = endpoint;
+				this.endpoint = endpoint;
                         },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
@@ -1000,8 +1004,11 @@
 					this.repoBranch = "gh-pages";
 				}
 				this.endpoint = endpoint;
-
 				this.dataFile = "data.json";
+
+				this.sitemap = storage.default.sitemap;
+				this.listSitemap = storage.default.listSitemap;
+
 			},
 			connect : function() {
 				if (!editor.storage.key) {
@@ -1063,81 +1070,9 @@
 					}
 				});
 			},
-			sitemap : function() {
-				var output = {
-					children : {},
-					name : 'Sitemap'
-				};
-				for (i in editor.currentData) {
-					var chain = i.split("/");
-					chain.shift();
-
-					var currentNode = output.children;
-					var prevNode;
-					for (var j = 0; j < chain.length; j++) {
-						var wantedNode = chain[j];
-						var lastNode = currentNode;
-						for (var k = 0; k < currentNode.length; k++) {
-							if (currentNode[k].name == wantedNode) {
-								currentNode = currentNode[k].children;
-								break;
-							}
-						}
-						// If we couldn't find an item in this list of children
-						// that has the right name, create one:
-						if (lastNode == currentNode) {
-							currentNode[wantedNode] = {
-								name : wantedNode,
-								children : {}
-							}
-							currentNode = currentNode[wantedNode].children;
-						}
-					}
-				}
-
-				return output;
-
-			},
 			list : function(url, callback) {
 				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
-					var subpath = url.replace(editor.storage.endpoint + "data.json", "");
-					var sitemap = editor.storage.sitemap();
-					var result = {
-						folders : [],
-						files : []
-					};
-					if (subpath != "") {
-						var pathicles = subpath.split("/");
-						pathicles.shift();
-						for (var i=0; i<pathicles.length; i++) {
-							sitemap = sitemap.children[pathicles[i]];
-						}
-						result.folders.push({
-							url : url.replace(/\/[^\/]+$/, ''),
-							name : 'Parent'
-						});
-					} else {
-						result.folders.push({
-							url : url.replace(/\/[^\/]+$/, '/'),
-							name : 'Parent'
-						});
-					}
-
-					for (var j in sitemap.children) {
-						if (Object.keys(sitemap.children[j].children).length) {
-							result.folders.push({
-								url : url + "/" + j,
-								name : j
-							});
-						} else {
-							result.files.push({
-								url : url + "/" + j,
-								name : j
-							});
-						}
-					}
-
-					return callback(result);
+					return this.listSitemap(url, callback);
 				}
 
 				var parser = document.createElement('a');
@@ -1212,8 +1147,9 @@
 				if (endpoint === null) {
 					endpoint = location.origin + "/";
 				}
-								this.url = endpoint;
-				},
+				this.url = endpoint;
+				this.endpoint = endpoint;
+			},
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "data/data.json";
@@ -1250,7 +1186,89 @@
 				delete editor.storage.key;
 				delete localStorage.storageKey;
 			},
+			sitemap : function() {
+				var output = {
+					children : {},
+					name : 'Sitemap'
+				};
+				for (i in editor.currentData) {
+					var chain = i.split("/");
+					chain.shift();
+					var lastItem = chain.pop();
+					if (lastItem !== "") {
+						chain.push(lastItem);
+					}
+					var currentNode = output.children;
+					var prevNode;
+					for (var j = 0; j < chain.length; j++) {
+						var wantedNode = chain[j];
+						var lastNode = currentNode;
+						for (var k in currentNode) {
+							if (currentNode[k].name == wantedNode) {
+								currentNode = currentNode[k].children;
+								break;
+							}
+						}
+						// If we couldn't find an item in this list of children
+						// that has the right name, create one:
+						if (lastNode == currentNode) {
+							currentNode[wantedNode] = {
+								name : wantedNode,
+								children : {}
+							}
+							currentNode = currentNode[wantedNode].children;
+						}
+					}
+				}
+				return output;
+			},
+			listSitemap : function(url, callback) {
+				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+					var subpath = url.replace(editor.storage.endpoint + "data.json", "");
+					var sitemap = editor.storage.sitemap();
+					var result = {
+						folders : [],
+						files : []
+					};
+					if (subpath != "") {
+						var pathicles = subpath.split("/");
+						pathicles.shift();
+						for (var i=0; i<pathicles.length; i++) {
+							sitemap = sitemap.children[pathicles[i]];
+						}
+						result.folders.push({
+							url : url.replace(/\/[^\/]+$/, ''),
+							name : 'Parent'
+						});
+					} else {
+						result.folders.push({
+							url : url.replace(/\/[^\/]+$/, '/'),
+							name : 'Parent'
+						});
+					}
+
+					for (var j in sitemap.children) {
+						if (Object.keys(sitemap.children[j].children).length) {
+							result.folders.push({
+								url : url + "/" + j,
+								name : j
+							});
+						} else {
+							result.files.push({
+								url : url + "/" + j,
+								name : j
+							});
+						}
+					}
+
+					return callback(result);
+				}
+			},
 			list : function(url, callback) {
+				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+					return this.listSitemap(url, callback);
+				}
+
 				var iframe = document.createElement("IFRAME");
 				iframe.src = url;
 				iframe.style.opacity = 0;
