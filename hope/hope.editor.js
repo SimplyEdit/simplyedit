@@ -167,7 +167,6 @@ hope.register( 'hope.editor', function() {
 		hopeTokenCounter = 0;
 
 		var data = unrender(this.refs.output);
-
 		this.refs.annotations.value = tagsToText(data.tags);
 		this.refs.text.value = data.text;
 		this.fragment = hope.fragment.create( this.refs.text.value, this.refs.annotations.value );
@@ -237,9 +236,12 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
-		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
+		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 0);
 
 		range.setEnd(node, end - preOffset );
+		if (node.nodeType == 1) {
+			range.setEndAfter(node);
+		}
 		return range;
 	};
 
@@ -352,7 +354,7 @@ hope.register( 'hope.editor', function() {
 			this.refs.render.innerHTML = html.replace('&','&amp;').replace('<', '&lt;').replace('>', '&gt');
 		}
 		if ( this.refs.annotations ) {
-			this.refs.annotations.innerHTML = this.fragment.annotations+'';
+			this.refs.annotations.value = this.fragment.annotations+'';
 		}
 	};
 
