@@ -217,7 +217,7 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
-		var preOffset = offset - node.textContent.length;
+		var preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
 		range.setStart(node, start - preOffset );
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
@@ -237,7 +237,7 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
-		preOffset = offset - node.textContent.length;
+		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
 
 		range.setEnd(node, end - preOffset );
 		return range;
