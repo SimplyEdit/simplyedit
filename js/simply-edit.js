@@ -1013,11 +1013,11 @@
 				if (editor.storage.validateKey(editor.storage.key)) {
 					if (!this.repo) {
 						localStorage.storageKey = editor.storage.key;
-						var github = new Github({
+						this.github = new Github({
 							token: editor.storage.key,
 							auth: "oauth"
 						});
-						this.repo = github.getRepo(this.repoUser, this.repoName);
+						this.repo = this.github.getRepo(this.repoUser, this.repoName);
 					}
 					return true;
 				} else {
@@ -1062,24 +1062,155 @@
 					}
 				});
 			},
-			list : function(path, callback) {
-				var repo = this.repo;
-				var path = "/" + url.replace(this.endpoint, '');
+			sitemap : function() {
+				var output = {
+					children : {},
+					name : 'Sitemap'
+				};
+				for (i in editor.currentData) {
+					var chain = i.split("/");
+					chain.shift();
 
-				repo.read(this.repoBranch, path, function(err, data) {
+					var currentNode = output.children;
+					var prevNode;
+					for (var j = 0; j < chain.length; j++) {
+						var wantedNode = chain[j];
+						var lastNode = currentNode;
+						for (var k = 0; k < currentNode.length; k++) {
+							if (currentNode[k].name == wantedNode) {
+								currentNode = currentNode[k].children;
+								break;
+							}
+						}
+						// If we couldn't find an item in this list of children
+						// that has the right name, create one:
+						if (lastNode == currentNode) {
+							currentNode[wantedNode] = {
+								name : wantedNode,
+								children : {}
+							}
+							currentNode = currentNode[wantedNode].children;
+						}
+					}
+				}
+
+				return output;
+
+			},
+			list : function(url, callback) {
+				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+					var subpath = url.replace(editor.storage.endpoint + "data.json", "");
+					var sitemap = editor.storage.sitemap();
+					var result = {
+						folders : [],
+						files : []
+					};
+					if (subpath != "") {
+						var pathicles = subpath.split("/");
+						pathicles.shift();
+						for (var i=0; i<pathicles.length; i++) {
+							sitemap = sitemap.children[pathicles[i]];
+						}
+						result.folders.push({
+							url : url.replace(/\/[^\/]+$/, ''),
+							name : 'Parent'
+						});
+					} else {
+						result.folders.push({
+							url : url.replace(/\/[^\/]+$/, '/'),
+							name : 'Parent'
+						});
+					}
+
+					for (var j in sitemap.children) {
+						if (Object.keys(sitemap.children[j].children).length) {
+							result.folders.push({
+								url : url + "/" + j,
+								name : j
+							});
+						} else {
+							result.files.push({
+								url : url + "/" + j,
+								name : j
+							});
+						}
+					}
+
+					return callback(result);
+				}
+
+				var parser = document.createElement('a');
+				parser.href = url;
+				var pathInfo;
+			
+				var repoUser, repoName, repoBranch;
+
+				if (parser.hostname == "github.com") {
+					pathInfo = parser.pathname.split("/");
+					pathInfo.shift();
+
+					repoUser = pathInfo.shift(); //parser.pathname.split("/")[1];
+					repoName =  pathInfo.shift(); // parser.pathname.split("/")[2];
+					repoBranch = "master";
+				} else {
+					//github.io;
+					pathInfo = parser.pathname.split("/");
+					pathInfo.shift();
+
+					repoUser = parser.hostname.split(".")[0];
+					repoName = pathInfo.shift(); // parser.pathname.split("/")[1];
+					repoBranch = "gh-pages";
+				}
+
+				var github = new Github({});
+				var repo = github.getRepo(repoUser, repoName);
+
+				var path = pathInfo.join("/");
+				path = path.replace(/\/$/, '');
+
+				repo.read(repoBranch, path, function(err, data) {
 					if (data) {
-						console.log(data);
+						data = JSON.parse(data);
+						var result = {
+							images : [],
+							folders : [],
+							files : []
+						};
+
+						for (var i=0; i<data.length; i++) {
+							if (data[i].type == "file") {
+								var fileData = {
+									url : url + data[i].name,
+									src : url + data[i].name,
+									name : data[i].name // data[i].download_url
+								};
+								if (url === editor.storage.endpoint && data[i].name === "data.json") {
+									fileData.name = "My pages";
+									result.folders.push(fileData);
+								} else {
+									result.files.push(fileData);
+									result.images.push(fileData);
+								}
+							} else if (data[i].type == "dir") {
+								result.folders.push({
+									url : url + data[i].path,
+									name : data[i].name
+								});
+							}
+						}
+
+						callback(result);
 					}
 				});
 			}
 		},
 		default : {
-		        init : function(endpoint) {
+			init : function(endpoint) {
 				if (endpoint === null) {
 					endpoint = location.origin + "/";
 				}
-                                this.url = endpoint;
-		        },
+								this.url = endpoint;
+				},
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "data/data.json";
@@ -1125,7 +1256,8 @@
 				iframe.addEventListener("load", function() {
 					var result = {
 						images : [],
-						folders : []
+						folders : [],
+						files : []
 					};
 
 					var images = iframe.contentDocument.body.querySelectorAll("a");
@@ -1139,7 +1271,10 @@
 						if (href.substring(href.length-1, href.length) === "/") {
 							result.folders.push({url : targetUrl, name : images[i].innerHTML});
 						} else {
-							result.images.push({url : targetUrl});
+							result.files.push({url : targetUrl});
+							if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/)) {
+								result.images.push({url : targetUrl});
+							}
 						}
 					}
 
@@ -1225,16 +1360,17 @@
 			editor.baseURL + "simply/toolbar.simply-text.html",
 			editor.baseURL + "simply/toolbar.simply-image.html",
 			editor.baseURL + "simply/plugin.simply-image-browse.html",
+			editor.baseURL + "simply/plugin.simply-file-browse.html",
 			editor.baseURL + "simply/toolbar.simply-iframe.html",
-                        editor.baseURL + "simply/toolbar.simply-selectable.html",
-                        editor.baseURL + "simply/toolbar.simply-list.html",
-                        editor.baseURL + "simply/plugin.simply-template.html",
-                        editor.baseURL + "simply/plugin.simply-save.html",
-                        editor.baseURL + "simply/plugin.simply-meta.html",
-                        editor.baseURL + "simply/plugin.simply-htmlsource.html",
-                        editor.baseURL + "simply/plugin.simply-symbol.html",
-                        editor.baseURL + "simply/plugin.simply-plain.html",
-                        editor.baseURL + "simply/plugin.simply-dropbox.html",
+			editor.baseURL + "simply/toolbar.simply-selectable.html",
+			editor.baseURL + "simply/toolbar.simply-list.html",
+			editor.baseURL + "simply/plugin.simply-template.html",
+			editor.baseURL + "simply/plugin.simply-save.html",
+			editor.baseURL + "simply/plugin.simply-meta.html",
+			editor.baseURL + "simply/plugin.simply-htmlsource.html",
+			editor.baseURL + "simply/plugin.simply-symbol.html",
+			editor.baseURL + "simply/plugin.simply-plain.html",
+			editor.baseURL + "simply/plugin.simply-dropbox.html",
 			editor.baseURL + "simply/plugin.simply-paste.html",
 			editor.baseURL + "simply/plugin.simply-keyboard.html"
 		]

@@ -1,0 +1,190 @@
+<section id="simply-file-browse" class="simply-dialog">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+	</div>
+	<div class="simply-dialog-body">
+	</div>
+</section>
+<style type="text/css">
+	#simply-file-browse {
+		top: 50%;
+		height: 400px;
+		max-height: 80%;
+		margin-top: -200px;
+		left: 50%;
+		margin-left: -235px;
+		background-color: #EEE;
+		padding-top: 61px;
+		box-sizing: border-box;
+	}
+	#simply-file-browse.fullscreen {
+		top: 0px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		max-width: 100%;
+		max-height: 100%;
+		height: auto;
+		width: auto;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	#simply-file-browse .simply-dialog-body {
+		overflow-y: scroll;
+		padding: 0px;
+		width: 470px;
+		padding-left: 2px;
+	}
+	#simply-file-browse.fullscreen .simply-dialog-body {
+		width: 100%;
+	}
+	#simply-file-browse .simply-dialog-body button {
+		border: 1px solid #eee;
+		background-color: white;
+		height: 149px;
+		width: 149px;
+		font-family: inherit;
+		font-size: 20px;
+		position: relative;
+		padding: 5px;
+		color: #999;
+		display: inline-block;
+		vertical-align: top;
+	}
+	#simply-file-browse .simply-dialog-body button:before {
+		display: block;
+		content: '';
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		height: 100%;
+		width: 100%;
+	}
+        #simply-file-browse .simply-dialog-body button i {
+		font-size: 48px;
+		display: block;
+		width: 100%;
+		text-align: center;
+	}
+	#simply-file-browse .simply-dialog-body button img {
+		max-width: 100%;
+		max-height: 100%;
+	}
+
+	@media (max-width: 481px) {
+		#simply-file-browse {
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+			width: auto;
+			margin-left: 0px;
+			margin-top: 0px;
+		}
+		#simply-file-browse [data-simply-action="simply-file-browse-fullscreen"] {
+			display: none;
+		}
+		#simply-file-browse .simply-dialog-body {
+			max-width: 100%;
+		}
+		#simply-file-browse .simply-dialog-body button {
+			width: 50%;
+		}
+	}
+</style>
+<script>
+	editor.plugins.fileBrowse = {
+		currentSel : null,
+		currentField : null,
+		currentJail : null,
+		path : editor.storage.endpoint ? editor.storage.endpoint : null,
+		dialog : {
+			open : function() {
+				editor.plugins.fileBrowse.currentSel = vdSelectionState.get();
+				editor.plugins.fileBrowse.currentField = editor.node.getEditableField();
+				editor.plugins.fileBrowse.currentJail = null;
+
+				vdSelectionState.save(editor.plugins.fileBrowse.currentSel);
+				editor.plugins.dialog.open(document.getElementById('simply-file-browse'), editor.plugins.fileBrowse.dialog.update);
+			},
+			fullscreen : function() {
+				var fullscreen = document.querySelector("[data-simply-action=simply-file-browse-fullscreen]");
+				if (document.getElementById('simply-file-browse').classList.contains("fullscreen")) {
+					fullscreen.classList.remove("simply-selected");
+					document.getElementById('simply-file-browse').classList.remove("fullscreen");
+					document.body.classList.remove("simply-overflow-hidden");
+				} else {
+					fullscreen.classList.add("simply-selected");
+					document.getElementById('simply-file-browse').classList.add("fullscreen");
+					document.body.classList.add("simply-overflow-hidden");
+				}
+			},
+			loadFiles : function(url) {
+				var targetList = document.querySelector("#simply-file-browse .simply-dialog-body");
+				if (editor.plugins.fileBrowse.currentJail === null) {
+					var parser = document.createElement("A");
+					parser.href = url;
+					editor.plugins.fileBrowse.currentJail = parser.href;
+				}
+
+				editor.storage.list(url, function(fileData) {
+					var i;
+					var targetList = document.querySelector("#simply-file-browse .simply-dialog-body");
+					var newHtml = '';
+					for (i=0; i<fileData.folders.length; i++) {
+						if (fileData.folders[i].url.indexOf(editor.plugins.fileBrowse.currentJail) === 0) {
+							newHtml += "<button data-simply-action='simply-file-browse-directory' data-value='" + fileData.folders[i].url + "'><i class='fa fa-folder'></i>" + fileData.folders[i].name + "</button>";
+						}
+					}
+					for (i=0; i<fileData.files.length; i++) {
+						if (fileData.files[i].url.indexOf(editor.plugins.fileBrowse.currentJail) === 0) {
+							newHtml += "<button data-simply-action='simply-file-browse-insert' data-value='" + fileData.files[i].url + "'><i class='fa fa-file-text-o'></i>" + fileData.files[i].name + "</button>";
+						}
+					}
+					targetList.innerHTML = newHtml;
+					targetList.scrollTop = 0;
+				});
+			},
+			update : function() {
+				// var parent = vdSelection.getNode(editor.plugins.fileBrowse.currentSel);
+				editor.plugins.fileBrowse.dialog.loadFiles(editor.plugins.fileBrowse.path);
+			}
+		},
+		init : function() {
+			var target = document.querySelectorAll('[data-simply-action="simply-hyperlink-href"]');
+			if (target) {
+				for (var i=0; i<target.length; i++) {
+					var button = document.createElement("div");
+					button.innerHTML = '<button data-simply-action="simply-file-browse"><i class="fa fa-folder"></i></button>';
+					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
+				}
+			} else {
+				window.setTimeout(editor.plugins.fileBrowse.init, 200);
+			}
+		}
+	};
+
+	editor.addAction("simply-file-browse", function(el) {
+		editor.actions["simply-file-browse-insert"] = function(button) {
+			el.parentNode.parentNode.querySelector("input").value = button.getAttribute("data-value");
+			muze.event.fire(el.parentNode.parentNode.querySelector("input"), "change");
+			editor.plugins.dialog.close();
+		};
+		editor.plugins.fileBrowse.dialog.open();
+	});
+	editor.addAction("simply-file-browse-directory", function(el) {
+		editor.plugins.fileBrowse.dialog.loadFiles(el.dataset.value);
+	});
+	editor.addAction("simply-file-browse-insert", function(el) {
+		editor.actions["simply-file-src"](el.getAttribute("data-value"));
+		editor.plugins.dialog.close();
+	});
+
+	editor.plugins.fileBrowse.init();
+</script>

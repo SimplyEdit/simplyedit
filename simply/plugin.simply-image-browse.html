@@ -145,7 +145,12 @@
 					}
 					for (i=0; i<imageData.images.length; i++) {
 						if (imageData.images[i].url.indexOf(editor.plugins.imageBrowse.currentJail) === 0) {
-							newHtml += "<button data-simply-action='simply-image-browse-insert'><img src='" + imageData.images[i].url + "'></button>";
+							var src = imageData.images[i].url;
+							if (typeof imageData.images[i].src !== "undefined") {
+								src = imageData.images[i].src;
+							}
+
+							newHtml += "<button data-simply-action='simply-image-browse-insert'><img src='" + src + "'></button>";
 						}
 					}
 					targetList.innerHTML = newHtml;
@@ -165,6 +170,15 @@
 					var button = document.createElement("LI");
 					button.innerHTML = '<button data-simply-action="simply-image-browse"><i class="fa fa-folder"></i>Browse</button>';
 					target.appendChild(button);
+
+					target = document.querySelectorAll('[data-simply-action="simply-image-src"]');
+					if (target) {
+						for (var i=0; i<target.length; i++) {
+							var button = document.createElement("div");
+							button.innerHTML = '<button data-simply-action="simply-image-browse"><i class="fa fa-folder"></i></button>';
+							target[i].parentNode.querySelector("label").appendChild(button.firstChild);
+						}
+					}
 				} else {
 					window.setTimeout(editor.plugins.imageBrowse.init, 200);
 				}
