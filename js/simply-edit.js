@@ -706,6 +706,7 @@
 							openTemplateDialog();
 							evt.preventDefault();
 						} else {
+							// FIXME: check for dirty fields and stash/save the changes
 							document.location.href = this.href + "#simply-edit";
 						}
 					}
