@@ -112,6 +112,14 @@ hope.register( 'hope.render.html', function() {
 				return 1;
 			}
 
+			// hack om hyperlinks met images er in te laten werken.
+			if (a.tag.split(/ /)[0] == 'a') {
+				return -1;
+			}
+			if (b.tag.split(/ /)[0] == 'a') {
+				return 1;
+			}
+
 			// daarna komen inline elementen
 			if (nestingSets['inline'].indexOf(a.tag.split(/ /)[0]) != '-1') {
 				return -1;
@@ -120,13 +128,6 @@ hope.register( 'hope.render.html', function() {
 				return 1;
 			}
 
-			// hack om hyperlinks met images er in te laten werken.
-			if (a.tag.split(/ /)[0] == 'a') {
-				return -1;
-			}
-			if (b.tag.split(/ /)[0] == 'a') {
-				return 1;
-			}
 			return 0;
 		});
 		var unfilteredStack = [];
