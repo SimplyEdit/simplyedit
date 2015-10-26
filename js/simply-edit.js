@@ -864,6 +864,7 @@
 				storageType = "default";
 			}
 			var result = storage[storageType];
+
 			if (typeof result.init === "function") {
 				result.init(endpoint);
 			}
@@ -875,6 +876,8 @@
 					endpoint = location.origin + "/";
 				}
                                 this.url = endpoint;
+				this.list = storage.default.list;
+
                         },
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
@@ -995,6 +998,7 @@
 					this.repoName = parser.pathname.split("/")[1];
 					this.repoBranch = "gh-pages";
 				}
+				this.endpoint = endpoint;
 
 				this.dataFile = "data.json";
 			},
@@ -1057,6 +1061,16 @@
 						repo.write(this.repoBranch, dataPath, data, pageTemplate + " (copy)", callback);
 					}
 				});
+			},
+			list : function(path, callback) {
+				var repo = this.repo;
+				var path = "/" + url.replace(this.endpoint, '');
+
+				repo.read(this.repoBranch, path, function(err, data) {
+					if (data) {
+						console.log(data);
+					}
+				});
 			}
 		},
 		default : {
@@ -1101,6 +1115,38 @@
 			disconnect : function() {
 				delete editor.storage.key;
 				delete localStorage.storageKey;
+			},
+			list : function(url, callback) {
+				var iframe = document.createElement("IFRAME");
+				iframe.src = url;
+				iframe.style.opacity = 0;
+				iframe.style.position = "absolute";
+				iframe.style.left = "-10000px";
+				iframe.addEventListener("load", function() {
+					var result = {
+						images : [],
+						folders : []
+					};
+
+					var images = iframe.contentDocument.body.querySelectorAll("a");
+					for (var i=0; i<images.length; i++) {
+						href = images[i].getAttribute("href");
+						if (href.substring(0, 1) === "?") {
+							continue;
+						}
+
+						var targetUrl = images[i].href;
+						if (href.substring(href.length-1, href.length) === "/") {
+							result.folders.push({url : targetUrl, name : images[i].innerHTML});
+						} else {
+							result.images.push({url : targetUrl});
+						}
+					}
+
+					document.body.removeChild(iframe);
+					callback(result);
+				});
+				document.body.appendChild(iframe);
 			}
 		}
 	};
