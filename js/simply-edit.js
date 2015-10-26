@@ -1189,7 +1189,9 @@
 									result.folders.push(fileData);
 								} else {
 									result.files.push(fileData);
-									result.images.push(fileData);
+									if (fileData.url.match(/(jpg|gif|png|bmp|tif|svg)$/)) {
+										result.images.push(fileData);
+									}
 								}
 							} else if (data[i].type == "dir") {
 								result.folders.push({
