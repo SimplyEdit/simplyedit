@@ -2,9 +2,6 @@
 - mogelijkheid voor github login ipv huidige key? (is voor oauth meer voor nodig, zie https://github.com/prose/gatekeeper)
 
 Integratie met CMS (voor later dus):
-- browse knop voor image url, hyperlink url
-- Link insert plugin?
-- Sitemap / site management / pagina aanmaken etc;
 - Iets van een server die de merge van html en data serverside doet
 
 Voor later:
@@ -16,7 +13,6 @@ Voor later:
 Bugs:
 - als een slip reorder start, moeten de toolbars weg
 - drop event voor images werkt alleen voor data-vedor-field images
-- opslaan van vreemde tekens, bijvoorbeeld copyright symbool naar ariadne storage gaat nog ergens niet goed
 - sortable: als je een lijst in lijst toevoegt wordt slip niet beperkt tot de sublists;
 - na drag van buitenste lijst zijn de kinderen niet meer draggable
 
@@ -50,3 +46,6 @@ Done:
 [v] symbol plugin
 [v] dropbox image plugin proof of concept
 [v] github template save
+[v] browse knop voor image url, hyperlink url
+[v] Link insert plugin?
+[v] Sitemap / site management / pagina aanmaken etc;
