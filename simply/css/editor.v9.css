@@ -154,7 +154,7 @@
 			font-size: 19px;
 			display: inline-block;
 			padding: 0px 4px;
-			line-height: 34px;
+			line-height: 38px;
 			display: block;
 			margin: -13px auto 0px;
     			position: relative;
@@ -172,7 +172,9 @@
 		.simply-toolbar button:focus {
 			border-bottom: 2px solid orange !important;
 		}
-
+		.simply-toolbar label button:focus {
+			border-bottom: 0px !important;
+		}
 		button.simply-selected::first-child {
 			border-left: 0px;
 		}
