@@ -1292,9 +1292,13 @@
 						if (href.substring(href.length-1, href.length) === "/") {
 							result.folders.push({url : targetUrl, name : images[i].innerHTML});
 						} else {
-							result.files.push({url : targetUrl});
-							if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/)) {
-								result.images.push({url : targetUrl});
+							if (targetUrl === editor.storage.endpoint + "data.json") {
+								result.folders.push({url : targetUrl, name: "My pages"});
+							} else {
+								result.files.push({url : targetUrl});
+								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/)) {
+									result.images.push({url : targetUrl});
+								}
 							}
 						}
 					}
