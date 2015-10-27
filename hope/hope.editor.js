@@ -209,8 +209,8 @@ hope.register( 'hope.editor', function() {
 		} while ( offset < start && node );
 		if ( !node ) {
 			if (lastNode) {
-				range.setStart(lastNode, lastNode.textContent ? lastNode.textContent.length : 0 );
-				range.setEnd(lastNode, lastNode.textContent ? lastNode.textContent.length : 0 );
+				range.setStart(lastNode, lastNode.textContent ? lastNode.textContent.length : 1 );
+				range.setEnd(lastNode, lastNode.textContent ? lastNode.textContent.length : 1 );
 				return range;
 			}
 			return false;
@@ -230,13 +230,13 @@ hope.register( 'hope.editor', function() {
 		}
 		if ( !node ) {
 			if (lastNode) {
-				range.setEnd(lastNode, lastNode.textContent ? lastNode.textContent.length : 0 );
+				range.setEnd(lastNode, lastNode.textContent ? lastNode.textContent.length : 1 );
 				return range;
 			}
 			return false;
 		}
 
-		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 0);
+		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
 
 		range.setEnd(node, end - preOffset );
 		if (node.nodeType == 1) {
