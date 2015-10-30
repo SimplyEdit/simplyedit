@@ -22,12 +22,34 @@
 			editor.context.update();
 		
 			window.setTimeout(function() {
-				removeMouseSelectionEvent = muze.event.attach(document, "mousedown", function() {
+				removeMouseSelectionEvent = muze.event.attach(document, "mousedown", function(evt) {
+					var target = muze.event.target(evt);
+					// Keep the selection when the click is within a toolbar;
+					if (editor.node.hasToolbarParent(target)) {
+						return;
+					}
+
+					if (document.querySelector(":focus") &&
+						editor.node.hasToolbarParent(document.querySelector(":focus"))) {
+						return;
+					}
+
 					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
 					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
 					vdSelectionState.remove(sel);
 				});
 				removeTouchSelectionEvent = muze.event.attach(document, "touchstart", function() {
+					var target = muze.event.target(evt);
+					// Keep the selection when the click is within a toolbar;
+					if (editor.node.hasToolbarParent(target)) {
+						return;
+					}
+
+					if (document.querySelector(":focus") &&
+						editor.node.hasToolbarParent(document.querySelector(":focus"))) {
+						return;
+					}
+
 					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
 					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
 					vdSelectionState.remove(sel);
