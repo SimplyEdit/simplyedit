@@ -1,5 +1,5 @@
 /*
-	Vedor editor - Simply edit the Web
+	Simply edit the Web
 
 	Written by Yvo Brevoort
 	Copyright Muze 2015, all rights reserved.
@@ -1197,7 +1197,10 @@
 					var lastItem = chain.pop();
 					if (lastItem !== "") {
 						chain.push(lastItem);
+					} else {
+						chain.push(chain.pop() + "/");
 					}
+					
 					var currentNode = output.children;
 					var prevNode;
 					for (var j = 0; j < chain.length; j++) {
