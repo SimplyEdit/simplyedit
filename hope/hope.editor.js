@@ -209,15 +209,30 @@ hope.register( 'hope.editor', function() {
 		} while ( offset < start && node );
 		if ( !node ) {
 			if (lastNode) {
-				range.setStart(lastNode, lastNode.textContent ? lastNode.textContent.length : 1 );
-				range.setEnd(lastNode, lastNode.textContent ? lastNode.textContent.length : 1 );
+				if (lastNode.nodeType == 1) {
+					range.setStart(lastNode, 0);
+					range.setEndAfter(lastNode);
+				} else {
+					range.setStart(lastNode, lastNode.textContent ? lastNode.textContent.length : 1 );
+					range.setEnd(lastNode, lastNode.textContent ? lastNode.textContent.length : 1 );
+				}
 				return range;
 			}
 			return false;
 		}
 
 		var preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
-		range.setStart(node, start - preOffset );
+		if (node.nodeType == 1) {
+			range.setStart(node, 0)
+		} else {
+			if (start-preOffset == node.textContent.length) {
+				var nextNode = treeWalker.nextNode();
+				treeWalker.previousNode();
+				range.setStartBefore(nextNode);
+			} else {
+				range.setStart(node, start - preOffset );
+			}
+		}
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
@@ -238,9 +253,10 @@ hope.register( 'hope.editor', function() {
 
 		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
 
-		range.setEnd(node, end - preOffset );
 		if (node.nodeType == 1) {
 			range.setEndAfter(node);
+		} else {
+			range.setEnd(node, end - preOffset );
 		}
 		return range;
 	};
