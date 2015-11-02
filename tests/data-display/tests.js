@@ -478,3 +478,22 @@ QUnit.module("editor list fixFirstElementChild");
 		assert.equal(target.firstElementChild.innerHTML, "Test title", "First child innerHTML found");
 		assert.equal(target.firstElementChild.getAttribute("data-simply-field"), "title", "First child getAttribute");
 	});
+
+QUnit.module("github storage");
+	QUnit.test("get repo info", function(assert) {
+		var url = "http://github.com/ylebre/simply-edit/data.json";
+		var repoInfo = editor.storageConnectors.github.getRepoInfo(url);
+		assert.equal(repoInfo.repoName, "simply-edit");
+		assert.equal(repoInfo.repoBranch, "master");
+		assert.equal(repoInfo.repoPath, "data.json");
+		assert.equal(repoInfo.repoUser, "ylebre");
+	});
+
+	QUnit.test("get repo info for gh-pages", function(assert) {
+		var url = "http://ylebre.gihub.io/simply-edit/data.json";
+		var repoInfo = editor.storageConnectors.github.getRepoInfo(url);
+		assert.equal(repoInfo.repoName, "simply-edit");
+		assert.equal(repoInfo.repoBranch, "gh-pages");
+		assert.equal(repoInfo.repoPath, "data.json");
+		assert.equal(repoInfo.repoUser, "ylebre");
+	});
