@@ -988,20 +988,18 @@
 				var parser = document.createElement('a');
 				parser.href = endpoint;
 
-
 				var pathInfo;
-				if (parser.hostname == "github.com") {
-					pathInfo = parser.pathname.split("/");
+				pathInfo = parser.pathname.split("/");
+				if (parser.pathname.indexOf("/") === 0) {
 					pathInfo.shift();
+				}
 
+				if (parser.hostname == "github.com") {
 					result.repoUser = pathInfo.shift();
 					result.repoName =  pathInfo.shift();
 					result.repoBranch = "master";
 				} else {
 					//github.io;
-					pathInfo = parser.pathname.split("/");
-					pathInfo.shift();
-
 					result.repoUser = parser.hostname.split(".")[0];
 					result.repoName = pathInfo.shift();
 					result.repoBranch = "gh-pages";
