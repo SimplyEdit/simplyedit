@@ -157,10 +157,12 @@
 			}
 		},
 		init : function() {
+			var listItem = document.createElement("LI");
 			var button = document.createElement("button");
 			button.dataset.simplyAction = "simply-file-browse-sitemap";
 			button.innerHTML = '<i class="fa fa-sitemap"></i>Sitemap';
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(button);
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
 			var target = document.querySelectorAll('[data-simply-action="simply-hyperlink-href"]');
 			if (target) {

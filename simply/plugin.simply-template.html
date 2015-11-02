@@ -148,10 +148,12 @@
 			}
 		},
 		init : function() {
+			var listItem = document.createElement("li");
 			var button = document.createElement("button");
 			button.dataset.simplyAction = "simply-template";
 			button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(button);
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 		}
 	};
 

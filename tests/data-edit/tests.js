@@ -413,3 +413,9 @@ QUnit.module("no context");
 		editor.context.update();
 		assert.equal(editor.context.get(), "simply-no-context");
 	});
+
+QUnit.module("plugin buttons");
+	QUnit.test("buttons have list item containers", function(assert) {
+		var buttons = document.querySelectorAll("#simply-main-toolbar .simply-buttons > button");
+		assert.equal(buttons.length, 0);
+	});

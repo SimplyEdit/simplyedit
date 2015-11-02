@@ -1,10 +1,12 @@
 <script>
 	editor.plugins.plainData = {
 		init : function() {
+			var listItem = document.createElement("li");
 			var button = document.createElement("button");
 			button.dataset.simplyAction = "simply-plain";
 			button.innerHTML = '<i class="fa fa-suitcase"></i>Data view';
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(button);
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 		}
 	};
 
