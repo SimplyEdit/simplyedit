@@ -72,14 +72,18 @@
 				event.preventDefault();
 			}
 		} else if (key == 38) { // up
-			// close current toolbar section;
-			var targets = this.querySelectorAll('.simply-section.active .simply-selected');
-			if (targets.length) {
-				for (var i=0; i<targets.length; i++) {
-					targets[i].classList.remove("simply-selected");
+			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
+			if (target) {
+				// close current toolbar section;
+
+				var targets = this.querySelectorAll('.simply-section.active .simply-selected');
+				if (targets.length) {
+					for (var i=0; i<targets.length; i++) {
+						targets[i].classList.remove("simply-selected");
+					}
+					targets[0].focus();
+					event.preventDefault();
 				}
-				targets[0].focus();
-				event.preventDefault();
 			}
 		} else if (key == 39) { // right
 			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
