@@ -983,6 +983,36 @@
 			repoUser : null,
 			repoBranch : "gh-pages",
 			dataFile : "data.json",
+			getRepoInfo : function(endpoint) {
+				var result = {};
+				var parser = document.createElement('a');
+				parser.href = endpoint;
+
+
+				var pathInfo;
+				if (parser.hostname == "github.com") {
+					pathInfo = parser.pathname.split("/");
+					pathInfo.shift();
+
+					result.repoUser = pathInfo.shift();
+					result.repoName =  pathInfo.shift();
+					result.repoBranch = "master";
+				} else {
+					//github.io;
+					pathInfo = parser.pathname.split("/");
+					pathInfo.shift();
+
+					result.repoUser = parser.hostname.split(".")[0];
+					result.repoName = pathInfo.shift();
+					result.repoBranch = "gh-pages";
+				}
+
+				var repoPath = pathInfo.join("/");
+				repoPath = repoPath.replace(/\/$/, '');
+
+				result.repoPath = repoPath;
+				return result;
+			},
 			init : function(endpoint) {
 				if (endpoint === null) {
 					endpoint = document.location;
@@ -991,18 +1021,11 @@
 				script.src = "http://se-cdn.muze.nl/github.js";
 				document.head.appendChild(script);
 
-				var parser = document.createElement('a');
-				parser.href = endpoint;
+				var repoInfo = this.getRepoInfo(endpoint);
+				this.repoUser = repoInfo.repoUser;
+				this.repoName = repoInfo.repoName;
+				this.repoBranch = repoInfo.repoBranch;
 
-				if (parser.hostname == "github.com") {
-					this.repoUser = parser.pathname.split("/")[1];
-					this.repoName = parser.pathname.split("/")[2];
-					this.repoBranch = "master";
-				} else {
-					this.repoUser = parser.hostname.split(".")[0];
-					this.repoName = parser.pathname.split("/")[1];
-					this.repoBranch = "gh-pages";
-				}
 				this.endpoint = endpoint;
 				this.dataFile = "data.json";
 
@@ -1075,35 +1098,15 @@
 					return this.listSitemap(url, callback);
 				}
 
-				var parser = document.createElement('a');
-				parser.href = url;
-				var pathInfo;
-			
-				var repoUser, repoName, repoBranch;
+				var repoInfo = this.getRepoInfo(url);
 
-				if (parser.hostname == "github.com") {
-					pathInfo = parser.pathname.split("/");
-					pathInfo.shift();
-
-					repoUser = pathInfo.shift(); //parser.pathname.split("/")[1];
-					repoName =  pathInfo.shift(); // parser.pathname.split("/")[2];
-					repoBranch = "master";
-				} else {
-					//github.io;
-					pathInfo = parser.pathname.split("/");
-					pathInfo.shift();
-
-					repoUser = parser.hostname.split(".")[0];
-					repoName = pathInfo.shift(); // parser.pathname.split("/")[1];
-					repoBranch = "gh-pages";
-				}
+				var repoUser = repoInfo.repoUser;
+				var repoName = repoInfo.repoName;
+				var repoBranch = repoInfo.repoBranch;
+				var repoPath = repoInfo.repoPath;
 
 				var github = new Github({});
 				var repo = github.getRepo(repoUser, repoName);
-
-				var path = pathInfo.join("/");
-				path = path.replace(/\/$/, '');
-
 				repo.read(repoBranch, path, function(err, data) {
 					if (data) {
 						data = JSON.parse(data);
@@ -1381,6 +1384,7 @@
 	});
 */
 	window.editor = editor;
+	editor.storageConnectors = storage;
 	editor.init({
 		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
 		toolbars : [
