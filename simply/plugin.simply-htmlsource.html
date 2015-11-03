@@ -141,12 +141,6 @@
 				editor.plugins.htmlsource.currentField = editor.node.getEditableField();
 				vdSelectionState.save(editor.plugins.htmlsource.currentSel);
 
-				if (editor.plugins.htmlsource.currentField.hopeEditor) {
-					editor.plugins.htmlsource.currentField.hopeEditor.selection.updateRange();
-					var range = editor.plugins.htmlsource.currentField.hopeEditor.selection.getRange();
-					editor.plugins.htmlsource.currentField.hopeEditor.currentRange = range;
-				}
-
 				editor.plugins.dialog.open(document.getElementById('simply-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
 				editor.plugins.htmlsource.dialog.setWarning();
 
@@ -221,8 +215,6 @@
 
 			if (hopeEditor) {
 				hopeEditor.parseHTML();
-				hopeEditor.selection.updateRange(hopeEditor.currentRange.start, hopeEditor.currentRange.end);
-				hopeEditor.showCursor();
 			}
 
 			vdSelectionState.selectAll = false;

@@ -673,13 +673,21 @@
 	editor.plugins.dialog = {
 		backdrop : null,
 		open : function(target, callback) {
-			vdSelectionState.save();
+			vdSelectionState.save(vdSelectionState.get());
 			if (!editor.plugins.dialog.backdrop) {
 				editor.plugins.dialog.createBackdrop();
 			}
 			document.body.classList.add("simply-overflow-hidden");
 			editor.plugins.dialog.backdrop.style.display = "block";
 			target.classList.add("active");
+
+			editor.plugins.dialog.currentField = editor.node.getEditableField();
+			if (editor.plugins.dialog.currentField.hopeEditor) {
+				editor.plugins.dialog.currentField.hopeEditor.selection.updateRange();
+				var range = editor.plugins.dialog.currentField.hopeEditor.selection.getRange();
+				editor.plugins.dialog.currentField.hopeEditor.currentRange = range;
+			}
+
 			if (typeof callback == "function") {
 				callback();
 			}
@@ -689,8 +697,15 @@
 			editor.plugins.dialog.backdrop.style.display = "none";
 			document.body.classList.remove("simply-overflow-hidden");
 			target.classList.remove("active");
-			vdSelectionState.restore();
 			vdSelectionState.remove();
+
+			var hopeEditor = editor.plugins.dialog.currentField.hopeEditor;
+			if (hopeEditor) {
+				hopeEditor.parseHTML();
+				hopeEditor.selection.updateRange(hopeEditor.currentRange.start, hopeEditor.currentRange.end);
+				hopeEditor.showCursor();
+			}
+
 			if (typeof callback == "function") {
 				callback();
 			}
