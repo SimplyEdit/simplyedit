@@ -13,6 +13,10 @@
 			background-color: rgba(128,128,128,0.2);
 		}
 
+		*[data-simply-htmlsource] {
+			outline: 1px dashed rgba(0, 0, 255, 0.3);
+		}
+
 		*[data-simply-list]:not(.simply-empty):before,
 		*[data-simply-list-item]:before {
 			font-weight: normal;
