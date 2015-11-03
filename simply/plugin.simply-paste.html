@@ -2,12 +2,20 @@
 	var spanListener = function(ev) {
 		if (ev.target.tagName=='SPAN') {
 			editor.node.unwrap(ev.target);
+			var sel = window.getSelection();
+			var range = sel.getRangeAt(0);
+			sel.removeAllRanges();
+			sel.addRange(range);
 		}
 	};
 
 	var divListener = function(ev) {
 		if (ev.target.tagName=='DIV') {
 			editor.node.unwrap(ev.target);
+			var sel = window.getSelection();
+			var range = sel.getRangeAt(0);
+			sel.removeAllRanges();
+			sel.addRange(range);
 		}
 	}
 
