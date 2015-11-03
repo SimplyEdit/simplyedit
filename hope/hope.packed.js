@@ -1863,15 +1863,18 @@ hope.register( 'hope.fragment.annotations', function() {
 		hope.events.listen(this.editor.refs.output, 'mousedown', updateRange, true);
 	}
 
-	hopeEditorSelection.prototype.updateRange = function () {
-		var sel = window.getSelection();
-		if (sel.focusNode == this.editor.refs.output) {
-			this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-			this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
-		} else {
-			this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-			this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+	hopeEditorSelection.prototype.updateRange = function (start, end) {
+		if ((typeof start === undefined) && (typeof end === undefined)) {
+			var sel = window.getSelection();
+			if (sel.focusNode == this.editor.refs.output) {
+				this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
+				this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
+			} else {
+				this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
+				this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			}
 		}
+
 		if (this.end < this.start) {
 			var temp = this.start;
 			this.start = this.end;
