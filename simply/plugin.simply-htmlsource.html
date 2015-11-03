@@ -2,7 +2,7 @@
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li><button data-simply-action="simply-htmlsource-selectall"><i class="fa fa-quote-right"></i>Select field</button></li>
-			<li><button data-simply-action="simply-htmlsource-editable"><i class="fa fa-lock"></i>Source is static</button></li>
+			<li><button data-simply-action="simply-htmlsource-editable"><i class="fa fa-lock"></i>Lock source</button></li>
 			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
 			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
 		</ul>
@@ -120,6 +120,7 @@
 				document.getElementById('vdInsertHTMLSource').value = source;
 
 				var span = editor.plugins.htmlsource.getSourceSpan();
+
 				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (span) {
 					button.classList.add("simply-selected");
@@ -149,9 +150,9 @@
 			setWarning : function() {
 				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
-					document.getElementById('vdInsertHTMLWarning').style.display='block';
-				} else {
 					document.getElementById('vdInsertHTMLWarning').style.display='none';
+				} else {
+					document.getElementById('vdInsertHTMLWarning').style.display='block';
 				}
 			},
 			fullscreen : function() {
@@ -185,10 +186,22 @@
 				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
 					var encodedsource = simply.util.base64.encode(source); // this makes sure IE doesn't touch the sourcecode.
-					source = '<div data-simply-htmlsource="'+encodedsource+'" contenteditable="false">'+source+'</div>';
+					var decodedsource = source;
+
+					source = '<div data-simply-selectable data-simply-htmlsource="'+encodedsource+'" contenteditable="false">'+source+'</div>';
 				}
+				var span = editor.plugins.htmlsource.getSourceSpan();
+	
 				if (vdSelectionState.selectAll) {
 					field.innerHTML = source;
+				} else if (span) {
+					if (button && button.classList.contains("simply-selected")) {
+						span.innerHTML = decodedsource;
+						span.setAttribute("data-simply-htmlsource", encodedsource);
+					} else {
+						span.innerHTML = source;
+						editor.node.unwrap(span);
+					}
 				} else {
 					if (!editor.plugins.htmlsource.currentSel.collapsed) {
 						vdSelectionState.restore(editor.plugins.htmlsource.currentSel);
