@@ -62,7 +62,9 @@
 				}, 100);
 
 				if (typeof jQuery !== "undefined") {
-					jQuery.holdReady(false);
+					if (typeof jQuery.holdReady === "function") {
+						jQuery.holdReady(false);
+					}
 				}
 			},
 			get : function(target) {
@@ -844,10 +846,10 @@
 
 	var storage = {
 		getType : function(endpoint) {
-		        if (endpoint === null) {
-                                endpoint = document.location.href;
-                        }
-                        
+			if (endpoint === null) {
+				endpoint = document.location.href;
+			}
+			
 			if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
 				return "ariadne";
 			} else if (endpoint.indexOf("github.io") !== -1) {
@@ -872,17 +874,17 @@
 			return result;
 		},
 		ariadne : {
-                        init : function(endpoint) {
+			init : function(endpoint) {
 				if (endpoint === null) {
 					endpoint = location.origin + "/";
 				}
-                                this.url = endpoint;
+				this.url = endpoint;
 				this.list = storage.default.list;
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 
 				this.endpoint = endpoint;
-                        },
+			},
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "data.json";
@@ -918,13 +920,13 @@
 			}
 		},
 		neocities : {
-                        init : function(endpoint) {
+			init : function(endpoint) {
 				if (endpoint === null) {
 					endpoint = location.origin + "/";
 				}
-                                this.url = endpoint;
+				this.url = endpoint;
 				this.endpoint = endpoint;
-                        },
+			},
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
 				var url = "https://neocities.org/api/upload";
@@ -1176,7 +1178,9 @@
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
 						callback(http.responseText);
-					}
+					} else if (http.readyState == 4 && http.status == 404) {
+                                                callback("{}");
+                                        }
 				};
 				http.send();
 			},
@@ -1359,7 +1363,9 @@
 	}
 
 	if (typeof jQuery !== "undefined") {
-		jQuery.holdReady(true);
+		if (typeof jQuery.holdReady === "function") {
+			jQuery.holdReady(true);
+		}
 	}
 
 	// Add fake window.console for IE8/9
