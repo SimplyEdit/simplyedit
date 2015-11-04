@@ -108,15 +108,14 @@
 			var hopeEditor = editor.plugins.symbol.currentField.hopeEditor;
 			var range = hopeEditor.selection.getRange();
 			var charTyped = String.fromCharCode(el.dataset.value);
+
 			if ( charTyped ) { // ignore non printable characters
 				if ( range.length ) {
 					hopeEditor.fragment = hopeEditor.fragment.delete(range);
 				}
 				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, charTyped);
 				hopeEditor.selection.move(1);
-				setTimeout( function() {
-					hopeEditor.update();
-				}, 0);
+				hopeEditor.update();
 			}
 		} else {
 			if (!editor.plugins.symbol.currentSel.collapsed) {
