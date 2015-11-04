@@ -23,6 +23,10 @@
 		name : 'simply-paste-handler',
 		init : function() {
 			document.addEventListener("keydown", function(event) {
+				if (editor.toolbar.getSectionEl(event.target)) {
+					return true;
+				}
+
 				switch (event.keyCode) {
 					case 8:		// backspace
 					case 46: 	// delete
@@ -35,11 +39,19 @@
 			});
 
 			document.addEventListener("keyup", function(event) {
+				if (editor.toolbar.getSectionEl(event.target)) {
+					return true;
+				}
+
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
 			});
 
 			document.addEventListener("paste", function(event) {
+				if (editor.toolbar.getSectionEl(event.target)) {
+					return true;
+				}
+
 				var pastedText = undefined;
 				var pastedHtml = undefined;
 					
@@ -72,14 +84,14 @@
 					event.preventDefault();
 
 					event.target.ownerDocument.execCommand("insertHtml", false, tempNode.innerHTML);
-					event.target.ownerDocument.removeEventListener(spanListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
 						
 					return false;
 				}
 				if (pastedText) {
 					event.preventDefault();
 					event.target.ownerDocument.execCommand("insertText", false, pastedText);
-					event.target.ownerDocument.removeEventListener(spanListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
 				}
 			});
 		}
