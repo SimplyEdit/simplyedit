@@ -32,7 +32,13 @@ hope.register( 'hope.fragment.annotations', function() {
 			this.list = parseMarkup( annotations + '' );
 		}
 		this.list.sort( function( a, b ) {
-			return a.compare( b );
+			if (a.range.start > b.range.start) {
+				return -1;
+			}
+			if (a.range.start < b.range.start) {
+				return 1;
+			}
+			return 0;
 		});
 	}
 
@@ -50,7 +56,13 @@ hope.register( 'hope.fragment.annotations', function() {
 		//	return (a.range.length>0);
 		//});
 		list.sort( function( a, b ) {
-			return a.compare( b );
+			if (a.range.start > b.range.start) {
+				return -1;
+			}
+			if (a.range.start < b.range.start) {
+				return 1;
+			}
+			return 0;
 		});
 		return new hopeAnnotationList(list);
 	};
