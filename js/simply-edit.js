@@ -1107,7 +1107,7 @@
 
 				var github = new Github({});
 				var repo = github.getRepo(repoUser, repoName);
-				repo.read(repoBranch, path, function(err, data) {
+				repo.read(repoBranch, repoPath, function(err, data) {
 					if (data) {
 						data = JSON.parse(data);
 						var result = {
