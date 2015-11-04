@@ -285,6 +285,24 @@
 					result += " " + node.attributes[i].name + "=\"" + node.attributes[i].value + "\"";
 				}
 				return result;
+			},
+			apply : function(hopeEditor, tag) {
+				var range = hopeEditor.selection.getRange();
+				var annotation = hopeEditor.fragment.has(range, tag);
+				if (annotation) {
+					if ((annotation.range.start === range.start) && (annotation.range.end === range.end)) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					} else {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+						var newRange = hope.range.create(annotation.range.start, range.start);
+						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, tag);
+						newRange = hope.range.create(range.end, annotation.range.end);
+						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, tag);
+					}
+				} else {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, tag);
+				}
+				hopeEditor.update();
 			}
 		}
 	};
@@ -328,44 +346,16 @@
 				hopeEditor.update();
 			},
 			'simply-text-bold' : function() {
-				var range = hopeEditor.selection.getRange();
-				var annotation = hopeEditor.fragment.has(range, "strong");
-				if (annotation) {
-					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
-				} else {
-					hopeEditor.fragment = hopeEditor.fragment.apply(range, "strong");
-				}
-				hopeEditor.update();
+				editor.plugins.hope.annotation.apply(hopeEditor, "strong");
 			},
 			'simply-text-italic' : function(el) {
-				var range = hopeEditor.selection.getRange();
-				var annotation = hopeEditor.fragment.has(range, "em");
-				if (annotation) {
-					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
-				} else {
-					hopeEditor.fragment = hopeEditor.fragment.apply(range, "em");
-				}
-				hopeEditor.update();
+				editor.plugins.hope.annotation.apply(hopeEditor, "em");
 			},
 			'simply-text-underline' : function() {
-				var range = hopeEditor.selection.getRange();
-				var annotation = hopeEditor.fragment.has(range, "u");
-				if (annotation) {
-					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
-				} else {
-					hopeEditor.fragment = hopeEditor.fragment.apply(range, "u");
-				}
-				hopeEditor.update();
+				editor.plugins.hope.annotation.apply(hopeEditor, "u");
 			},
 			'simply-text-code' : function() {
-				var range = hopeEditor.selection.getRange();
-				var annotation = hopeEditor.fragment.has(range, "code");
-				if (annotation) {
-					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
-				} else {
-					hopeEditor.fragment = hopeEditor.fragment.apply(range, "code");
-				}
-				hopeEditor.update();
+				editor.plugins.hope.annotation.apply(hopeEditor, "code");
 			},
 			'simply-text-align-left' : function() {
 				var range = hopeEditor.selection.getRange();
