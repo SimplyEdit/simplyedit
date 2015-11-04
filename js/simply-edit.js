@@ -690,8 +690,14 @@
 					) {
 						var pathname = this.pathname;
 						var hostname = this.hostname;
-						if (hostname == document.location.hostname && (typeof editor.currentData[this.pathname] == "undefined")) {
+						var extraCheck = true;
+						if (typeof editor.storage.checkJail === "function") {
+							extraCheck = editor.storage.checkJail(this.href);
+						}
+							
+						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[this.pathname] == "undefined")) {
 							history.pushState(null, null, this.href + "#simply-edit");
+					
 							document.body.innerHTML = editor.data.originalBody.innerHTML;
 							editor.data.load();
 							var openTemplateDialog = function() {
@@ -1013,6 +1019,9 @@
 				result.repoPath = repoPath;
 				return result;
 			},
+			checkJail : function(url) {
+				return url.indexOf(this.endpoint) === 0;
+			},
 			init : function(endpoint) {
 				if (endpoint === null) {
 					endpoint = document.location.href.replace(document.location.hash, "");
@@ -1031,7 +1040,6 @@
 
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
-
 			},
 			connect : function() {
 				if (!editor.storage.key) {
