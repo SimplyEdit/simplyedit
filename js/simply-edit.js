@@ -1020,7 +1020,18 @@
 				return result;
 			},
 			checkJail : function(url) {
-				return url.indexOf(this.endpoint) === 0;
+				var repo1 = this.getRepoInfo(url);
+				var repo2 = this.getRepoInfo(this.endpoint);
+				
+				
+				if (
+					(repo1.repoUser == repo2.repoUser) && 
+					(repo1.repoName == repo2.repoName) &&
+					(repo1.repoBranch == repo2.repoBranch)
+				) {
+					return true;
+				}
+				return false;
 			},
 			init : function(endpoint) {
 				if (endpoint === null) {
