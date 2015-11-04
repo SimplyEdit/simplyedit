@@ -141,8 +141,10 @@
 			} else {
 				toolbar.querySelector("[name='textStyle'] option[value='p']").selected = true;
 			}
+			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "block";
 		} else {
 			toolbar.querySelector("[name='textStyle'] option[value='p']").selected = true;
+			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
 		}
 
 
