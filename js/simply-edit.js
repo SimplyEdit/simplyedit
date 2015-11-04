@@ -1013,7 +1013,7 @@
 			},
 			init : function(endpoint) {
 				if (endpoint === null) {
-					endpoint = document.location;
+					endpoint = document.location.href.replace(document.location.hash, "");
 				}
 				var script = document.createElement("SCRIPT");
 				script.src = "http://se-cdn.muze.nl/github.js";
