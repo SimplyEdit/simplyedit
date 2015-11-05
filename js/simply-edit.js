@@ -508,6 +508,7 @@
 
 			editor.storage = storage.init(config.endpoint);
 			editor.data.load();
+			editor.profile = config.profile;
 		},
 		editmode : {
 			toolbars : null,
@@ -518,7 +519,9 @@
 
 				var http = new XMLHttpRequest();
 				var url = editor.baseURL + "simply/toolbars.html";
-				url += "?t=" + (new Date().getTime());
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
 
 				var loadToolbars = function() {
 					if (!editor.toolbar || (typeof muze === "undefined")) {
@@ -527,56 +530,61 @@
 						return;
 					}
 
-					var loadToolbar = function(url) {
+					var loadToolbarList = function(toolbarList) {
+						var url = toolbarList.shift();
 						var i;
 						var http = new XMLHttpRequest();
-						url += "?t=" + (new Date().getTime());
-
+						if (editor.profile == "dev") {
+							url += "?t=" + (new Date().getTime());
+						}
 						http.open("GET", url, true);
 						http.onreadystatechange = function() {//Call a function when the state changes.
-							if(http.readyState == 4 && http.status == 200) {
-								var toolbars = document.createElement("TEMPLATE");
-								toolbars.innerHTML = http.responseText;
+							if(http.readyState == 4) {
+								if (http.status == 200) {
+									var toolbars = document.createElement("TEMPLATE");
+									toolbars.innerHTML = http.responseText;
 
-								if (!("content" in toolbars)) {
-									var fragment = document.createDocumentFragment();
-									while (toolbars.children.length) {
-										fragment.appendChild(toolbars.children[0]);
-									}
-									toolbars.content = fragment;
-								}
-								// editor.brokenImport = true;
-								var toolbarNode = document.importNode(toolbars.content, true);
-								if (editor.brokenImport) {
-									editor.importScripts = true;
-								}
-								if (editor.importScripts) {
-									var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
-									for (i=0; i<scriptTags.length; i++) {
-										var newNode = document.createElement("SCRIPT");
-										if (scriptTags[i].src) {
-											newNode.src = scriptTags[i].src;
+									if (!("content" in toolbars)) {
+										var fragment = document.createDocumentFragment();
+										while (toolbars.children.length) {
+											fragment.appendChild(toolbars.children[0]);
 										}
-										if (scriptTags[i].innerHTML) {
-											newNode.innerHTML = scriptTags[i].innerHTML;
-										}
-										document.head.appendChild(newNode);
+										toolbars.content = fragment;
 									}
-								}
+									// editor.brokenImport = true;
+									var toolbarNode = document.importNode(toolbars.content, true);
+									if (editor.brokenImport) {
+										editor.importScripts = true;
+									}
+									if (editor.importScripts) {
+										var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
+										for (i=0; i<scriptTags.length; i++) {
+											var newNode = document.createElement("SCRIPT");
+											if (scriptTags[i].src) {
+												newNode.src = scriptTags[i].src;
+											}
+											if (scriptTags[i].innerHTML) {
+												newNode.innerHTML = scriptTags[i].innerHTML;
+											}
+											document.head.appendChild(newNode);
+										}
+									}
 
-								var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
-								for (i=0; i<newToolbars.length; i++) {
-									editor.toolbar.init(newToolbars[i]);
+									var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
+									for (i=0; i<newToolbars.length; i++) {
+										editor.toolbar.init(newToolbars[i]);
+									}
+									toolbarsContainer.appendChild(toolbarNode);
 								}
-								toolbarsContainer.appendChild(toolbarNode);
+								if (toolbarList.length) {
+									loadToolbarList(toolbarList);
+								}
 							}
 						};
 						http.send();
 					};
 
-					for (var i=0; i<editor.editmode.toolbars.length; i++) {
-						loadToolbar(editor.editmode.toolbars[i]);
-					}
+					loadToolbarList(editor.editmode.toolbars);
 
 					editor.editmode.toolbarMonitor();
 				};
@@ -907,7 +915,9 @@
 			load : function(callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "data.json";
-				url += "?t=" + (new Date().getTime());
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
@@ -952,7 +962,9 @@
 			load : function(callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "data.json";
-				url += "?t=" + (new Date().getTime());
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
 
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
@@ -1086,7 +1098,9 @@
 			load : function(callback) {
 				var http = new XMLHttpRequest();
 				var url = "https://raw.githubusercontent.com/" + this.repoUser + "/" + this.repoName + "/" + this.repoBranch + "/" + this.dataFile;
-				url += "?t=" + (new Date().getTime());
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
@@ -1190,8 +1204,9 @@
 			load : function(callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "data/data.json";
-				url += "?t=" + (new Date().getTime());
-
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && http.status == 200) {
@@ -1427,6 +1442,7 @@
 			editor.baseURL + "simply/plugin.simply-dropbox.html",
 			editor.baseURL + "simply/plugin.simply-paste.html",
 			editor.baseURL + "simply/plugin.simply-keyboard.html"
-		]
+		],
+		profile : 'dev'
 	});
 }());
