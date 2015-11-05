@@ -33,7 +33,7 @@ hope.register( 'hope.editor.selection', function() {
 	}
 
 	hopeEditorSelection.prototype.updateRange = function (start, end) {
-		if ((typeof start === undefined) && (typeof end === undefined)) {
+		if ((typeof start === 'undefined') && (typeof end === 'undefined')) {
 			var sel = window.getSelection();
 			if (sel.focusNode == this.editor.refs.output) {
 				this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
