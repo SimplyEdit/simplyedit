@@ -214,6 +214,8 @@
 									}
 								};
 								checkHope();
+							} else {
+								window.setTimeout(checkEdit, 100);
 							}
 						}
 					};
@@ -1064,6 +1066,10 @@
 				this.listSitemap = storage.default.listSitemap;
 			},
 			connect : function() {
+				if (typeof Github === "undefined") {
+					return false;
+				}
+
 				if (!editor.storage.key) {
 					editor.storage.key = localStorage.storageKey;
 				}
