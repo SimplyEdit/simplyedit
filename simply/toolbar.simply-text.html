@@ -288,9 +288,12 @@
 			},
 			apply : function(hopeEditor, tag) {
 				var range = hopeEditor.selection.getRange();
+				console.log(range);
 				var annotation = hopeEditor.fragment.has(range, tag);
 				if (annotation) {
 					if ((annotation.range.start === range.start) && (annotation.range.end === range.end)) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					} else if (range.start === range.end) {
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					} else {
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
