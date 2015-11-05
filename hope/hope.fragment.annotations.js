@@ -31,15 +31,6 @@ hope.register( 'hope.fragment.annotations', function() {
 		} else {
 			this.list = parseMarkup( annotations + '' );
 		}
-		this.list.sort( function( a, b ) {
-			if (a.range.start > b.range.start) {
-				return -1;
-			}
-			if (a.range.start < b.range.start) {
-				return 1;
-			}
-			return 0;
-		});
 	}
 
 	hopeAnnotationList.prototype.toString = function() {
@@ -52,18 +43,6 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeAnnotationList.prototype.clean = function() {
 		var list = this.list.slice();
-		//list.filter( function( a ) {
-		//	return (a.range.length>0);
-		//});
-		list.sort( function( a, b ) {
-			if (a.range.start > b.range.start) {
-				return -1;
-			}
-			if (a.range.start < b.range.start) {
-				return 1;
-			}
-			return 0;
-		});
 		return new hopeAnnotationList(list);
 	};
 
