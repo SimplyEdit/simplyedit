@@ -94,7 +94,10 @@
 			<div><label>URL</label><input type="text" id="vdHyperlinkHref" data-simply-action="simply-hyperlink-href"></div>
 			<div><label>Title</label><input type="text" id="vdHyperlinkTitle" data-simply-action="simply-hyperlink-title"></div>
 			<div><label>Name</label><input type="text" id="vdHyperlinkName" data-simply-action="simply-hyperlink-name"></div>
-			<div><button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button></div>
+			<div>
+				<button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-hand-stop-o"></i>Nofollow</button>
+				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
+			</div>
 		</div>
 		<div class="simply-toolbar-section simply-text-align" data-type="simply-buttongroup-radio">
 			<ul>
@@ -206,11 +209,21 @@
 					hyperlinkNofollow.classList.remove("simply-selected");
 				}
 			}
+
+			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+			if (hyperlinkUnlink) {
+				toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
+			}
 		} else {
 			simply.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), '');
 			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), '');
 			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), '');
-			
+
+			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+			if (hyperlinkUnlink) {
+				toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "none";
+			}
+
 			var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
 			if (hyperlinkNofollow) {
 				hyperlinkNofollow.classList.remove("simply-selected");
@@ -516,6 +529,14 @@
 					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
 				}
 				hopeEditor.update();
+			},
+			"simply-hyperlink-unlink" : function() {
+				var range = hopeEditor.selection.getRange();
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+				if (hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.update();
+				}
 			},
 			"simply-hyperlink-title" : function(value) {
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
