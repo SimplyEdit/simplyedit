@@ -978,10 +978,10 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 
 			// block elementen komen voor andere elementen
-			if (nestingSets['block'].indexOf(a.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets.block.indexOf(a.tag.split(/ /)[0]) != '-1') {
 				return -1;
 			}
-			if (nestingSets['block'].indexOf(b.tag.split(/ /)[0]) != '-1') {
+			if (nestingSetsblock.indexOf(b.tag.split(/ /)[0]) != '-1') {
 				return 1;
 			}
 
@@ -994,10 +994,10 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 
 			// daarna komen inline elementen
-			if (nestingSets['inline'].indexOf(a.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets.inline.indexOf(a.tag.split(/ /)[0]) != '-1') {
 				return -1;
 			}
-			if (nestingSets['inline'].indexOf(b.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets.inline.indexOf(b.tag.split(/ /)[0]) != '-1') {
 				return 1;
 			}
 
@@ -1666,7 +1666,7 @@ hope.register( 'hope.fragment.annotations', function() {
 
 		var preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
 		if (node.nodeType == 1) {
-			range.setStart(node, 0)
+			range.setStart(node, 0);
 		} else {
 			if (start-preOffset == node.textContent.length) {
 				var nextNode = treeWalker.nextNode();

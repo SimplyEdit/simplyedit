@@ -105,10 +105,10 @@ hope.register( 'hope.render.html', function() {
 			}
 
 			// block elementen komen voor andere elementen
-			if (nestingSets['block'].indexOf(a.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets.block.indexOf(a.tag.split(/ /)[0]) != '-1') {
 				return -1;
 			}
-			if (nestingSets['block'].indexOf(b.tag.split(/ /)[0]) != '-1') {
+			if (nestingSetsblock.indexOf(b.tag.split(/ /)[0]) != '-1') {
 				return 1;
 			}
 
@@ -121,10 +121,10 @@ hope.register( 'hope.render.html', function() {
 			}
 
 			// daarna komen inline elementen
-			if (nestingSets['inline'].indexOf(a.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets.inline.indexOf(a.tag.split(/ /)[0]) != '-1') {
 				return -1;
 			}
-			if (nestingSets['inline'].indexOf(b.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets.inline.indexOf(b.tag.split(/ /)[0]) != '-1') {
 				return 1;
 			}
 
