@@ -225,7 +225,7 @@ hope.register( 'hope.range', function() {
 			end = start[1];
 			start = start[0];
 		}
-		return new hopeRange( start, end );
+		return new hopeRange( parseInt(start), parseInt(end) );
 	};
 
 });

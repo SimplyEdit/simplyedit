@@ -312,7 +312,7 @@ hope.register( 'hope.range', function() {
 			end = start[1];
 			start = start[0];
 		}
-		return new hopeRange( start, end );
+		return new hopeRange( parseInt(start), parseInt(end) );
 	};
 
 });hope.register( 'hope.annotation', function() {
@@ -499,6 +499,9 @@ hope.register( 'hope.fragment.annotations', function() {
 		} else {
 			this.list = parseMarkup( annotations + '' );
 		}
+		this.list.sort( function( a, b ) {
+			return a.compare( b );
+		});
 	}
 
 	hopeAnnotationList.prototype.toString = function() {
@@ -511,6 +514,12 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeAnnotationList.prototype.clean = function() {
 		var list = this.list.slice();
+		//list.filter( function( a ) {
+		//	return (a.range.length>0);
+		//});
+		list.sort( function( a, b ) {
+			return a.compare( b );
+		});
 		return new hopeAnnotationList(list);
 	};
 
