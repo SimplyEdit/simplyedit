@@ -981,7 +981,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			if (nestingSets.block.indexOf(a.tag.split(/ /)[0]) != '-1') {
 				return -1;
 			}
-			if (nestingSetsblock.indexOf(b.tag.split(/ /)[0]) != '-1') {
+			if (nestingSets.block.indexOf(b.tag.split(/ /)[0]) != '-1') {
 				return 1;
 			}
 
