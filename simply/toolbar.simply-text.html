@@ -299,6 +299,7 @@
 				}
 				return result;
 			},
+			tagToggle : [],
 			apply : function(hopeEditor, tag) {
 				var range = hopeEditor.selection.getRange();
 				var annotation = hopeEditor.fragment.has(range, tag);
@@ -315,7 +316,46 @@
 						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, tag);
 					}
 				} else {
-					hopeEditor.fragment = hopeEditor.fragment.apply(range, tag);
+					if (range.start === range.end) {
+						var addTag = function(event) {
+							var currentRange = hopeEditor.selection.getRange();
+							if (currentRange.start === range.start && currentRange.end === range.end) {
+								var rangeLength = event.newValue.length - event.prevValue.length;
+								event.preventDefault();
+
+								event.target.textContent = event.newValue;
+								hopeEditor.parseHTML();
+								hopeEditor.selection.move(rangeLength);
+								var newRange = hope.range.create(range.start, range.start + rangeLength);
+
+								for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
+									hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+								}
+								hopeEditor.update();
+							}
+							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+							editor.plugins.hope.annotation.tagToggle = [];
+						};
+
+						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
+							hopeEditor.field.addEventListener("DOMCharacterDataModified", addTag);
+							var removeAddTagListener = function() {
+								hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+							}
+						}
+
+						var index = editor.plugins.hope.annotation.tagToggle.indexOf(tag);
+						if (index !== -1) {
+							editor.plugins.hope.annotation.tagToggle.splice(index, 1);
+						} else {
+							editor.plugins.hope.annotation.tagToggle.push(tag);
+						}
+						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
+							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+						}
+					} else {
+						hopeEditor.fragment = hopeEditor.fragment.apply(range, tag);
+					}
 				}
 				hopeEditor.update();
 			}
