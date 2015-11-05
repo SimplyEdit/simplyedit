@@ -649,7 +649,6 @@
 						case "title":
 							dataFields[i].contentEditable = true;
 						break;
-						case "img":
 						default:
 							dataFields[i].hopeContent = document.createElement("textarea");
 							dataFields[i].hopeMarkup = document.createElement("textarea");
@@ -1215,7 +1214,7 @@
 					children : {},
 					name : 'Sitemap'
 				};
-				for (i in editor.currentData) {
+				for (var i in editor.currentData) {
 					var chain = i.split("/");
 					chain.shift();
 					var lastItem = chain.pop();
@@ -1242,7 +1241,7 @@
 							currentNode[wantedNode] = {
 								name : wantedNode,
 								children : {}
-							}
+							};
 							currentNode = currentNode[wantedNode].children;
 						}
 					}
@@ -1257,7 +1256,7 @@
 						folders : [],
 						files : []
 					};
-					if (subpath != "") {
+					if (subpath !== "") {
 						var pathicles = subpath.split("/");
 						pathicles.shift();
 						for (var i=0; i<pathicles.length; i++) {
