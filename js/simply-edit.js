@@ -693,20 +693,19 @@
 					dataLists[i].setAttribute("data-simply-selectable", true);
 				}
 
-				var hyperlinks = target.querySelectorAll("a");
 				var handleDblClick = function(evt) {
 					if (
-						this.pathname
+						evt.target.pathname
 					) {
-						var pathname = this.pathname;
-						var hostname = this.hostname;
+						var pathname = evt.target.pathname;
+						var hostname = evt.target.hostname;
 						var extraCheck = true;
 						if (typeof editor.storage.checkJail === "function") {
-							extraCheck = editor.storage.checkJail(this.href);
+							extraCheck = editor.storage.checkJail(evt.target.href);
 						}
 							
-						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[this.pathname] == "undefined")) {
-							history.pushState(null, null, this.href + "#simply-edit");
+						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[evt.target.pathname] == "undefined")) {
+							history.pushState(null, null, evt.target.href + "#simply-edit");
 					
 							document.body.innerHTML = editor.data.originalBody.innerHTML;
 							editor.data.load();
@@ -725,7 +724,7 @@
 							evt.preventDefault();
 						} else {
 							// FIXME: check for dirty fields and stash/save the changes
-							document.location.href = this.href + "#simply-edit";
+							document.location.href = evt.target.href + "#simply-edit";
 						}
 					}
 				};
@@ -733,10 +732,18 @@
 					event.preventDefault();
 				};
 
-				for (i=0; i<hyperlinks.length; i++) {
-					hyperlinks[i].addEventListener("dblclick", handleDblClick);
-					hyperlinks[i].addEventListener("click", handleClick);
-				}
+				target.addEventListener("dblclick", function(event) {
+					console.log(event.target);
+					if (event.target.tagName.toLowerCase() === "a") {
+						handleDblClick(event);
+					}
+				}, true);
+
+				target.addEventListener("click", function(event) {
+					if (event.target.tagName.toLowerCase() === "a") {
+						handleClick(event);
+					}
+				});
 
 				var images = target.querySelectorAll("img[data-simply-field]");
 				var imageDrop = function(event) {
