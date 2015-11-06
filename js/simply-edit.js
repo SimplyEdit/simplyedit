@@ -587,7 +587,7 @@
 						http.send();
 					};
 
-					loadToolbarList(editor.editmode.toolbars);
+					loadToolbarList(editor.editmode.toolbars.slice()); // slice to copy the toolbars;
 
 					editor.editmode.toolbarMonitor();
 				};
