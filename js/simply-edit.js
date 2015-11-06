@@ -176,7 +176,21 @@
 				var newData = editor.data.get(document);
 				data = editor.data.merge(data, newData);
 	
-				localStorage.data = JSON.stringify(data, null, "\t");
+				var jsonData = JSON.stringify(data, null, "\t");
+
+				// Replace characters for encoding with btoa, needed for github;
+				jsonData = jsonData.replace(
+					/[^\x00-\x7F]/g,
+					function ( char ) {
+						var hex = char.charCodeAt( 0 ).toString( 16 );
+						while ( hex.length < 4 ) {
+							hex = '0' + hex;
+						}
+						return '\\u' + hex;
+					}
+				);
+
+				localStorage.data = jsonData;
 			},
 			save : function() {
 				if (editor.storage.connect()) {
@@ -184,11 +198,19 @@
 					if (editor.actions['simply-beforesave']) {
 						editor.actions['simply-beforesave']();
 					}
-					editor.storage.save(localStorage.data, function() {
-						if (editor.actions['simply-aftersave']) {
-							editor.actions['simply-aftersave']();
+					editor.storage.save(localStorage.data, function(result) {
+						if (result && result.message) {
+							if (editor.actions['simply-aftersave-error']) {
+								editor.actions['simply-aftersave-error'](result.message);
+							} else {
+								alert("Error saving: " + result.message);
+							}
 						} else {
-							alert("Saved!");
+							if (editor.actions['simply-aftersave']) {
+								editor.actions['simply-aftersave']();
+							} else {
+								alert("Saved!");
+							}
 						}
 					});
 				} 
@@ -484,7 +506,7 @@
 						allowedAttributes = ["src"];
 					break;
 					default:
-					return field.innerHTML;
+						return field.innerHTML;
 				}
 				for (attr in allowedAttributes) {
 					attr = allowedAttributes[attr];
@@ -509,9 +531,9 @@
 			}
 			editor.loadBaseStyles();
 
+			editor.profile = config.profile;
 			editor.storage = storage.init(config.endpoint);
 			editor.data.load();
-			editor.profile = config.profile;
 		},
 		editmode : {
 			toolbars : null,
@@ -693,20 +715,19 @@
 					dataLists[i].setAttribute("data-simply-selectable", true);
 				}
 
-				var hyperlinks = target.querySelectorAll("a");
 				var handleDblClick = function(evt) {
 					if (
-						this.pathname
+						evt.target.pathname
 					) {
-						var pathname = this.pathname;
-						var hostname = this.hostname;
+						var pathname = evt.target.pathname;
+						var hostname = evt.target.hostname;
 						var extraCheck = true;
 						if (typeof editor.storage.checkJail === "function") {
-							extraCheck = editor.storage.checkJail(this.href);
+							extraCheck = editor.storage.checkJail(evt.target.href);
 						}
 							
-						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[this.pathname] == "undefined")) {
-							history.pushState(null, null, this.href + "#simply-edit");
+						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[evt.target.pathname] == "undefined")) {
+							history.pushState(null, null, evt.target.href + "#simply-edit");
 					
 							document.body.innerHTML = editor.data.originalBody.innerHTML;
 							editor.data.load();
@@ -725,7 +746,7 @@
 							evt.preventDefault();
 						} else {
 							// FIXME: check for dirty fields and stash/save the changes
-							document.location.href = this.href + "#simply-edit";
+							document.location.href = evt.target.href + "#simply-edit";
 						}
 					}
 				};
@@ -733,10 +754,17 @@
 					event.preventDefault();
 				};
 
-				for (i=0; i<hyperlinks.length; i++) {
-					hyperlinks[i].addEventListener("dblclick", handleDblClick);
-					hyperlinks[i].addEventListener("click", handleClick);
-				}
+				target.addEventListener("dblclick", function(event) {
+					if (event.target.tagName.toLowerCase() === "a") {
+						handleDblClick(event);
+					}
+				}, true);
+
+				target.addEventListener("click", function(event) {
+					if (event.target.tagName.toLowerCase() === "a") {
+						handleClick(event);
+					}
+				});
 
 				var images = target.querySelectorAll("img[data-simply-field]");
 				var imageDrop = function(event) {
@@ -1100,7 +1128,18 @@
 				return true;
 			},
 			save : function(data, callback) {
-				this.repo.write(this.repoBranch, this.dataFile, data, "Commit message", callback);
+				var saveCallback = function(err) {
+					if (err === null) {
+						return callback();
+					}
+
+					if (err.error == 401) {
+						return callback({message : "Authorization failed."});
+					}
+					return callback({message : "Could not store."});
+				};
+
+				this.repo.write(this.repoBranch, this.dataFile, data, "Commit message", saveCallback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();

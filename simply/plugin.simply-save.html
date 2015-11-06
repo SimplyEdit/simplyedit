@@ -62,9 +62,18 @@
 					editor.plugins.dialog.close();
 				}, 800);
 			}, 300);
+		},
+		afterSaveError : function(message) {
+			window.setTimeout(function() {
+				document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
+				window.setTimeout(function() {
+					editor.plugins.dialog.close();
+				}, 2000);
+			}, 300);
 		}
 	};
 
 	editor.addAction("simply-beforesave", editor.plugins.save.beforeSave);
 	editor.addAction("simply-aftersave", editor.plugins.save.afterSave);
+	editor.addAction("simply-aftersave-error", editor.plugins.save.afterSaveError);
 </script>

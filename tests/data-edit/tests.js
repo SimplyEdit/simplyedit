@@ -98,6 +98,13 @@ QUnit.module("hope editor behaviour");
 		assert.equal(testContent.innerHTML, "<div>test1</div><div><code>Hello</code></div>", "innerHTML did not change");
 	});
 
+	QUnit.test("unnumbered list, li is rendered", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>test1</li><li>test2</li></ul>";
+		testContent.hopeEditor.parseHTML();
+		assert.equal(testContent.innerHTML, "<ul><li>test1</li><li>test2</li></ul>", "innerHTML did not change");
+	});
+
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");
