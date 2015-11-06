@@ -11,9 +11,17 @@
 
 	var divListener = function(ev) {
 		if (ev.target.tagName=='DIV') {
-			editor.node.unwrap(ev.target);
 			var sel = window.getSelection();
-			var range = sel.getRangeAt(0);
+
+			var newP = document.createElement("p");
+			newP.innerHTML = ev.target.innerHTML;
+			ev.target.innerHTML = '';
+			ev.target.appendChild(newP);
+
+			editor.node.unwrap(ev.target);
+
+			var range = document.createRange();
+			range.setStart(newP, 0);
 			sel.removeAllRanges();
 			sel.addRange(range);
 		}
