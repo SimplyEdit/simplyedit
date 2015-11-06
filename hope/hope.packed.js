@@ -876,7 +876,7 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	var nestingSets = {
 		'inline'	: [ 'tt', 'u', 'strike', 'em', 'strong', 'dfn', 'code', 'samp', 'kbd', 'var', 'cite', 'abbr', 'acronym', 'sub', 'sup', 'q', 'span', 'bdo', 'a', 'object', 'img', 'bd', 'br', 'i' ],
-		'block'		: [ 'address', 'dir', 'menu', 'hr', 'table', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'ul', 'ol', 'dl', 'div', 'blockquote', 'iframe' ]
+		'block'		: [ 'address', 'dir', 'menu', 'hr', 'li', 'table', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'ul', 'ol', 'dl', 'div', 'blockquote', 'iframe' ]
 	};
 
 	nestingSets.all = nestingSets.block.concat( nestingSets.inline );
