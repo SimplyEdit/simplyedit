@@ -1671,7 +1671,11 @@ hope.register( 'hope.fragment.annotations', function() {
 			if (start-preOffset == node.textContent.length) {
 				var nextNode = treeWalker.nextNode();
 				treeWalker.previousNode();
-				range.setStartBefore(nextNode);
+				if (nextNode) {
+					range.setStartBefore(nextNode);
+				} else {
+					range.setStartAfter(node);
+				}
 			} else {
 				range.setStart(node, start - preOffset );
 			}
