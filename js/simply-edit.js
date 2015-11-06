@@ -176,7 +176,21 @@
 				var newData = editor.data.get(document);
 				data = editor.data.merge(data, newData);
 	
-				localStorage.data = JSON.stringify(data, null, "\t");
+				var jsonData = JSON.stringify(data, null, "\t");
+
+				// Replace characters for encoding with btoa, needed for github;
+				jsonData = jsonData.replace(
+					/[^\x00-\x7F]/g,
+					function ( char ) {
+						var hex = char.charCodeAt( 0 ).toString( 16 );
+						while ( hex.length < 4 ) {
+							hex = '0' + hex;
+						}
+						return '\\u' + hex;
+					}
+				);
+
+				localStorage.data = jsonData;
 			},
 			save : function() {
 				if (editor.storage.connect()) {
@@ -184,11 +198,19 @@
 					if (editor.actions['simply-beforesave']) {
 						editor.actions['simply-beforesave']();
 					}
-					editor.storage.save(localStorage.data, function() {
-						if (editor.actions['simply-aftersave']) {
-							editor.actions['simply-aftersave']();
+					editor.storage.save(localStorage.data, function(result) {
+						if (result && result.message) {
+							if (editor.actions['simply-aftersave-error']) {
+								editor.actions['simply-aftersave-error'](result.message);
+							} else {
+								alert("Error saving: " + result.message);
+							}
 						} else {
-							alert("Saved!");
+							if (editor.actions['simply-aftersave']) {
+								editor.actions['simply-aftersave']();
+							} else {
+								alert("Saved!");
+							}
 						}
 					});
 				} 
@@ -484,7 +506,7 @@
 						allowedAttributes = ["src"];
 					break;
 					default:
-					return field.innerHTML;
+						return field.innerHTML;
 				}
 				for (attr in allowedAttributes) {
 					attr = allowedAttributes[attr];
@@ -509,9 +531,9 @@
 			}
 			editor.loadBaseStyles();
 
+			editor.profile = config.profile;
 			editor.storage = storage.init(config.endpoint);
 			editor.data.load();
-			editor.profile = config.profile;
 		},
 		editmode : {
 			toolbars : null,
@@ -733,7 +755,6 @@
 				};
 
 				target.addEventListener("dblclick", function(event) {
-					console.log(event.target);
 					if (event.target.tagName.toLowerCase() === "a") {
 						handleDblClick(event);
 					}
@@ -1107,7 +1128,18 @@
 				return true;
 			},
 			save : function(data, callback) {
-				this.repo.write(this.repoBranch, this.dataFile, data, "Commit message", callback);
+				var saveCallback = function(err) {
+					if (err === null) {
+						return callback();
+					}
+
+					if (err.error == 401) {
+						return callback({message : "Authorization failed."});
+					}
+					return callback({message : "Could not store."});
+				};
+
+				this.repo.write(this.repoBranch, this.dataFile, data, "Commit message", saveCallback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
