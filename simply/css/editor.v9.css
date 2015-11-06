@@ -143,7 +143,7 @@
 			text-align: center;
 			height: 60px;
 			font-size: 11px;
-			color: #666;
+			color: #666 !important;
 			box-sizing: border-box;
 			font-weight: inherit;
 			letter-spacing: 0;
