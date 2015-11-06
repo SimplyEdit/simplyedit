@@ -124,6 +124,10 @@
 	}, 3000);
 
 	var updateTextToolbar = function(toolbar) {
+		if (toolbar === null) {
+			return;
+		}
+		
 		var sel = vdSelectionState.get();
 		var parent = vdSelection.getNode(sel);
 		var field = editor.node.getEditableField();
