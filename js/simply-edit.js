@@ -239,6 +239,8 @@
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-simply-list]");
 					for (var i=0; i<dataLists.length; i++) {
+						dataLists[i].innerHTML = dataLists[i].innerHTML; // reset innerHTML to make sure templates are recognized;
+
 						editor.data.list.parseTemplates(dataLists[i]);
 						dataName = dataLists[i].getAttribute("data-simply-list");
 						dataPath = dataLists[i].getAttribute("data-simply-path") ? dataLists[i].getAttribute("data-simply-path") : location.pathname;
@@ -502,7 +504,6 @@
 		},
 		init : function(config) {
 			document.createElement("template");
-			document.body.innerHTML = document.body.innerHTML;
 			if (config.toolbars) {
 				editor.editmode.toolbars = config.toolbars;
 			}
