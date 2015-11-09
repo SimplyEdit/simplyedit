@@ -11,6 +11,12 @@
 			}
 			return el;
 		},
+		getDialogEl : function(el) {
+			while ( el && el.tagName!='div' && !/\bsimply-dialog\b/.test(el.className) ) {
+				el = el.parentNode;
+			}
+			return el;
+		},
 		handleButton : function(el) {
 			var toolbar = editor.toolbar.getToolbarEl(el);
 			var section = editor.toolbar.getSectionEl(el);

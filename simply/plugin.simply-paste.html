@@ -31,7 +31,10 @@
 		name : 'simply-paste-handler',
 		init : function() {
 			document.addEventListener("keydown", function(event) {
-				if (editor.toolbar.getSectionEl(event.target)) {
+				if (
+					editor.toolbar.getSectionEl(event.target) ||
+					editor.toolbar.getDialogEl(event.target)
+				) {
 					return true;
 				}
 
@@ -47,7 +50,10 @@
 			});
 
 			document.addEventListener("keyup", function(event) {
-				if (editor.toolbar.getSectionEl(event.target)) {
+				if (
+					editor.toolbar.getSectionEl(event.target) ||
+					editor.toolbar.getDialogEl(event.target)
+				) {
 					return true;
 				}
 
@@ -56,7 +62,10 @@
 			});
 
 			document.addEventListener("paste", function(event) {
-				if (editor.toolbar.getSectionEl(event.target)) {
+				if (
+					editor.toolbar.getSectionEl(event.target) ||
+					editor.toolbar.getDialogEl(event.target)
+				) {
 					return true;
 				}
 
