@@ -503,7 +503,7 @@
 	margin-bottom: auto;
 	top: 0px;
 	right: 0px;
-	z-index: 1000;
+	z-index: 100001;
 }
 #simply-main-toolbar .simply-toolbar {
 	position: static;
