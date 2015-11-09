@@ -542,6 +542,28 @@
 	display: none !important;
 }
 
+#simply-main-toolbar.simply-collapse .simply-toolbar .marker {
+	margin-top: -5px;
+	margin-left: 0px;
+	left: 0;
+	width: 0;
+	border-bottom: 0;
+	border-top: 25px solid #ea5922;
+	border-left: 0;
+	border-right: 25px solid transparent;
+}
+#simply-main-toolbar.simply-collapse .simply-toolbar {
+	border-top-color: transparent;
+}
+
+#simply-main-toolbar.simply-collapse {
+	right: auto;
+}
+#simply-main-toolbar.simply-collapse li:nth-child(n+2) {
+	display: none;
+}
+
+
 /* Dialogs */
 .simply-dialog {
 	display: none;

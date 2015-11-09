@@ -92,7 +92,7 @@
 			toolbar.addEventListener("click", function(evt) {
 				evt.preventDefault();
 				var el = evt.target;
-				if ( el.tagName=='I' ) {
+				while (el != this && el.tagName.toLowerCase() != "button") {
 					el = el.parentNode;
 				}
 
@@ -746,6 +746,9 @@
 	};
 	editor.addAction("simply-dialog-fullscreen", editor.plugins.dialog.fullscreen);
 	editor.addAction("simply-dialog-close", editor.plugins.dialog.close);
+	editor.addAction("simply-main-collapse", function() {
+		document.querySelector("#simply-main-toolbar").classList.toggle("simply-collapse");
+	});
 
 	editor.context.toolbar.hide = false;
 
