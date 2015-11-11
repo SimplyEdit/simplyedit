@@ -858,8 +858,6 @@
 					}
 				};
 				var removeBeforeOrderEvent = function(e) {
-					e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
-								
 					var sublists = this.querySelectorAll("[data-simply-sortable]");
 					for (var j=0; j<sublists.length; j++) {
 						sublists[j].removeEventListener('slip:beforereorder', preventDefault);
@@ -868,14 +866,16 @@
 				};
 
 				for (var i=0; i<list.length; i++) {
-					list[i].addEventListener('slip:reorder', removeBeforeOrderEvent, false);
-				
-					if (list[i].querySelectorAll('[data-simply-sortable]').length) {
-						list[i].addEventListener('slip:beforereorder', addBeforeOrderEvent, false);
-					}
-					
+					list[i].addEventListener('slip:beforereorder', addBeforeOrderEvent, false);
+					list[i].addEventListener('slip:reorder', function(e) {
+						e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
+						return false;
+					});
+
 					new Slip(list[i]);
 				}
+				document.addEventListener("mouseup", removeBeforeOrderEvent, false);
+				document.addEventListener("touchend", removeBeforeOrderEvent, false);
 			},
 			textonly : function(target) {
 				var textonly = target.querySelectorAll("[data-simply-content='text']");
