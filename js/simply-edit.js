@@ -11,8 +11,7 @@
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
 	var editor = {
-		baseURL : "http://yvo.muze.nl/simply-edit/",
-//	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
+		baseURL : "https://beta.simply-edit.io/0/" + apiKey + "/simply-edit/",
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -1552,6 +1551,6 @@
 			editor.baseURL + "simply/plugin.simply-undo-redo.html",
 			editor.baseURL + "simply/plugin.simply-keyboard.html"
 		],
-		profile : 'dev'
+		profile : 'beta'
 	});
 }());
