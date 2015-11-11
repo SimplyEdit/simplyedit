@@ -456,7 +456,7 @@
 					list.setAttribute("data-simply-selectable", true);
 
 					var hasChild = false;
-					for (var j=0; j<list.childNodes.length; j++) {
+					for (j=0; j<list.childNodes.length; j++) {
 						if (
 							list.childNodes[j].nodeType == 1 && 
 							list.childNodes[j].getAttribute("data-simply-list-item")
@@ -932,11 +932,22 @@
 			return "default";
 		},
 		init : function(endpoint) {
-			var storageType = storage.getType(endpoint);
-			if (!storage[storageType]) {
-				storageType = "default";
+			var result;
+
+			if (document.querySelector("[data-simply-storage]")) {
+				var storageName = document.querySelector("[data-simply-storage]").getAttribute("data-simply-storage");
+				if (window[storageName]) {
+					result = window[storageName];
+				} else {
+					console.log("Warning: custom storage not found");
+				}
+			} else {
+				var storageType = storage.getType(endpoint);
+				if (!storage[storageType]) {
+					storageType = "default";
+				}
+				result = storage[storageType];
 			}
-			var result = storage[storageType];
 
 			if (typeof result.init === "function") {
 				result.init(endpoint);
