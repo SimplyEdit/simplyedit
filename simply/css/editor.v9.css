@@ -155,6 +155,9 @@
 		#simply-main-toolbar button {
 			vertical-align: top;
 		}
+		.simply-toolbar button[disabled] {
+			opacity: 0.3;
+		}
 		.simply-toolbar button > i,
 		.simply-toolbar button > span.fa-stack {
 			line-height: 50px;

@@ -20,6 +20,7 @@
 				}
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
+
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-simply-field");
 					var dataPath = dataFields[i].getAttribute("data-simply-path") ? dataFields[i].getAttribute("data-simply-path") : location.pathname;
@@ -106,7 +107,8 @@
 						}
 						// data[dataPath][dataName][counter] = editor.data.get(listItems[j]);
 						if (listItems[j].getAttribute("data-simply-template")) {
-							data[dataPath][dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");						}
+							data[dataPath][dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");
+						}
 						counter++;
 					}
 					list.setAttribute("data-simply-stashed", 1);
@@ -286,6 +288,7 @@
 								dataLists[i].className += " simply-empty";
 							}
 						}
+
 						if ("addEventListener" in dataLists[i]) {
 							dataLists[i].addEventListener("keydown", editor.data.list.keyDownHandler);
 						}
@@ -451,6 +454,29 @@
 						}
 					}
 					list.setAttribute("data-simply-selectable", true);
+
+					var hasChild = false;
+					for (var j=0; j<list.childNodes.length; j++) {
+						if (
+							list.childNodes[j].nodeType == 1 && 
+							list.childNodes[j].getAttribute("data-simply-list-item")
+						) {
+							hasChild = true;
+						}
+					}
+					if ("classList" in list) {
+						if (!hasChild) {
+							list.classList.add("simply-empty");
+						} else {
+							list.classList.remove("simply-empty");
+						}
+					} else {
+						if (!hasChild) {
+							list.className += " simply-empty";
+						} else {
+							list.className.replace(/ simply-empty/g, '');
+						}
+					}
 				}
 			}
 		},
@@ -1487,6 +1513,7 @@
 			editor.baseURL + "simply/plugin.simply-plain.html",
 			editor.baseURL + "simply/plugin.simply-dropbox.html",
 			editor.baseURL + "simply/plugin.simply-paste.html",
+			editor.baseURL + "simply/plugin.simply-undo-redo.html",
 			editor.baseURL + "simply/plugin.simply-keyboard.html"
 		],
 		profile : 'dev'

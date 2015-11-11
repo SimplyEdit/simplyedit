@@ -50,6 +50,16 @@
 		} else if (key == 77 && event.ctrlKey) { // Ctrl-M
 			document.querySelector("#simply-main-toolbar button").focus();
 			event.preventDefault();
+		} else if (key == 90 && event.ctrlKey) { // Ctrl-Z
+			if (typeof editor.actions["simply-undo"] === "function") {
+				editor.actions["simply-undo"]();
+				event.preventDefault();
+			}
+		} else if (key == 89 && event.ctrlKey) { // Ctrl-Y
+			if (typeof editor.actions["simply-redo"] === "function") {
+				editor.actions["simply-redo"]();
+				event.preventDefault();
+			}
 		} else if (key == 37) { // left
 			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
 			if (target) {

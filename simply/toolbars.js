@@ -24,7 +24,9 @@
 			var l;
 			var selectedSectionButtons;
 
-
+			if (el.getAttribute("disabled")) {
+				return true;
+			}
 			if ( !section ) {
 				var sections = toolbar.querySelectorAll('.simply-toolbar-section.simply-selected, .simply-toolbar-status');
 				for ( i=0, l=sections.length; i<l; i++ ) {
@@ -167,6 +169,19 @@
 					return true;
 				}
 				if (parent.parentNode.className && parent.parentNode.className.match(/\beditable\b/)) {
+					return true;
+				}
+				parent = parent.parentNode;
+			}
+			return false;
+		},
+		hasSimplyParent : function(checkParent) {
+			var parent = checkParent;
+			while (parent && parent.parentNode) {
+				if (parent.parentNode.getAttribute && parent.parentNode.getAttribute("data-simply-field")) {
+					return true;
+				}
+				if (parent.parentNode.getAttribute && parent.parentNode.getAttribute("data-simply-list")) {
 					return true;
 				}
 				parent = parent.parentNode;
