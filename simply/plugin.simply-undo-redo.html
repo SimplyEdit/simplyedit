@@ -23,8 +23,6 @@
 				currentData = editor.field.get(target);
 			}
 
-			console.log(JSON.stringify(target.previousData) != JSON.stringify(currentData));
-
 			if (saveCurrent) {
 				editor.plugins.undoRedo.undoSet.push({target: target, data: currentData});
 				target.previousData = currentData;
@@ -45,7 +43,6 @@
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo - 1];
 			if (typeof undoStep !== "undefined") {
 				if (!undoStep.target.undoSaved) {
-					console.log("saving last state");
 					editor.plugins.undoRedo.storeUndo(undoStep.target, true);
 				}
 				if (undoStep.target.getAttribute("data-simply-list")) {
@@ -99,9 +96,7 @@
 			return false;
 		},
 		changeHandler : function(evt) {
-			console.log(editor.plugins.undoRedo.undoing);
 			if (!editor.plugins.undoRedo.undoing) {
-				console.log("storing undo");
 				editor.plugins.undoRedo.storeUndo(this);
 				this.undoSaved = false;
 			}
