@@ -178,6 +178,9 @@
 				var newData = editor.data.get(document);
 				data = editor.data.merge(data, newData);
 	
+				localStorage.data = editor.data.stringify(data);
+			},
+			stringify : function(data) {
 				var jsonData = JSON.stringify(data, null, "\t");
 
 				// Replace characters for encoding with btoa, needed for github;
@@ -191,8 +194,7 @@
 						return '\\u' + hex;
 					}
 				);
-
-				localStorage.data = jsonData;
+				return jsonData;
 			},
 			save : function() {
 				if (editor.storage.connect()) {
@@ -692,9 +694,23 @@
 
 				// Add hope
 				addScript(editor.baseURL + "hope/hope.packed.js");
-			},
 
-			
+				var handleBeforeUnload = function(evt) {
+					if (editor.editmode.isDirty()) {
+						var message = "You have made changes to this page, if you leave these changes will not be saved.";
+						evt = evt || window.event;
+						// For IE and Firefox prior to version 4
+						if (evt) {
+							evt.returnValue = message;
+						}
+						// For Safari
+						return message;
+					}
+				};
+
+				document.body.onbeforeunload = handleBeforeUnload; // Must do it like this, not with addEventListener;
+				
+			},
 			editable : function(target) {
 				var i;
 
@@ -872,6 +888,15 @@
 				for (var i=0; i<textonly.length; i++) {
 					textonly[i].addEventListener("DOMNodeInserted", preventNodeInsert);
 				}
+			},
+			isDirty : function() {
+				editor.data.stash();
+				var newData = localStorage.data;
+				var oldData = editor.data.stringify(editor.currentData);
+				if (newData != oldData) {
+					return true;
+				}
+				return false;
 			},
 			stop : function() {
 				editor.storage.disconnect();
