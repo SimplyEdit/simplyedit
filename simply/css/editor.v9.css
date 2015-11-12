@@ -199,7 +199,7 @@
 		}
 		section.simply-section.active {
 			opacity: 1;
-			z-index: 100000;
+			z-index: 99999;
 		}
 		section.simply-section {
 			position: absolute;
