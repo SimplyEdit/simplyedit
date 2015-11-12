@@ -651,9 +651,11 @@
 				toolbarsContainer.appendChild(testNode);
 
 				var addScript = function(src) {
-					var scriptTag = document.createElement("SCRIPT");
-					scriptTag.setAttribute("src", src);
-					document.head.appendChild(scriptTag);
+					if (!document.head.querySelector('script[src="'+src+'"]')) {
+						var scriptTag = document.createElement("SCRIPT");
+						scriptTag.setAttribute("src", src);
+						document.head.appendChild(scriptTag);
+					}
 				};
 
 				var addStyleSheet = function(src) {
