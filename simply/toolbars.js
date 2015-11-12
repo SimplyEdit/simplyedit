@@ -853,7 +853,15 @@
 		vdSelectionState.init(window);
 		selectionchange.start(document); // onselectionchange event for Firefox
 
-		muze.event.attach( document, 'selectionchange', editor.context.update );
+		muze.event.attach( document, 'selectionchange', function() {
+			if (editor.context.touching) {
+				editor.context.touching = false; // force update when selection changed;
+				editor.context.update();
+				editor.context.touching = true;
+			} else {
+				editor.context.update();
+			}
+		});
 		muze.event.attach( document, 'keyup', editor.context.update );
 		muze.event.attach( document, 'mouseup', function() {
 			editor.context.toolbar.hide = false;
