@@ -723,6 +723,10 @@
 			if (typeof callback == "function") {
 				callback();
 			}
+			window.setTimeout(function() {
+				var sel = window.getSelection();
+				sel.removeAllRanges();
+			}, 10);
 		},
 		close : function(callback) {
 			target = document.querySelector(".simply-dialog.active");
