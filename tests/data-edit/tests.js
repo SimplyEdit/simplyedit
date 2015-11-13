@@ -36,7 +36,9 @@ function setSelectionEnd(elem, offset) {
 
 	sel.removeAllRanges();
 	sel.addRange(range);
-	elem.focus();
+	if (focus in elem) {
+		elem.focus();
+	}
 	editor.context.update();
 }
 
@@ -338,6 +340,33 @@ QUnit.module("editor text selection");
 
 		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-italic']");
 		assert.ok(targetButton.classList.contains("simply-selected"), "text style is correctly updated");
+	});
+
+	QUnit.test("block style over multiple blocks", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello</p><p>world</p><p>Is it big out there?</p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("p"), 2);
+
+		setSelectionEnd(testContent.querySelectorAll("p")[2].childNodes[0],5);
+
+                editor.actions['simply-text-blockstyle']('h1');
+
+		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> big out there?</p>');
+	});
+
+	QUnit.test("block style over multiple blocks", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello</p>world<p>Is it big out there?</p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("p"), 2);
+		setSelectionEnd(testContent.querySelectorAll("p")[1].childNodes[0],5);
+
+                editor.actions['simply-text-blockstyle']('h1');
+
+		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> big out there?</p>');
 	});
 
 QUnit.module("text hyperlinks");

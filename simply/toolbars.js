@@ -137,10 +137,21 @@
 				} else {
 					console.log(this.getAttribute("data-simply-action") + " not yet implemented");
 				}
+
+			};
+
+			var changeAndRefocus = function(evt) {
+				var sel = window.getSelection();
+				var range = sel.getRangeAt(0);
+				muze.event.fire(this, "change");
+				sel.removeAllRanges();
+				sel.addRange(range);
+				this.focus();
 			};
 
 			for (var i=0; i<inputs.length; i++) {
 				inputs[i].addEventListener("change", handleChange);
+				inputs[i].addEventListener("keyup", changeAndRefocus);
 			}
 
 			editor.toolbar.addMarker(toolbar);
@@ -712,6 +723,10 @@
 			if (typeof callback == "function") {
 				callback();
 			}
+			window.setTimeout(function() {
+				var sel = window.getSelection();
+				sel.removeAllRanges();
+			}, 10);
 		},
 		close : function(callback) {
 			target = document.querySelector(".simply-dialog.active");
@@ -842,7 +857,15 @@
 		vdSelectionState.init(window);
 		selectionchange.start(document); // onselectionchange event for Firefox
 
-		muze.event.attach( document, 'selectionchange', editor.context.update );
+		muze.event.attach( document, 'selectionchange', function() {
+			if (editor.context.touching) {
+				editor.context.touching = false; // force update when selection changed;
+				editor.context.update();
+				editor.context.touching = true;
+			} else {
+				editor.context.update();
+			}
+		});
 		muze.event.attach( document, 'keyup', editor.context.update );
 		muze.event.attach( document, 'mouseup', function() {
 			editor.context.toolbar.hide = false;

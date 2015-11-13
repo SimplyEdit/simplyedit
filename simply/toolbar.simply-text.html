@@ -362,6 +362,54 @@
 					}
 				}
 				hopeEditor.update();
+			},
+			blocks : function(range) {
+				var blocks = [];
+				if (range.start != range.end) {
+					var noBlockStart = -1;
+					for (var i=range.start; i<range.end+1; i++) {
+						var blockAnnotation = hopeEditor.getBlockAnnotation(i);
+						if (blockAnnotation) {
+							if (noBlockStart > -1) {
+								blocks.push({
+									range : {
+										start : noBlockStart,
+										end : i
+									},
+									tag : ""
+								});
+								noBlockStart = -1;
+							}
+
+							if (blocks.indexOf(blockAnnotation) === -1) {
+								blocks.push(blockAnnotation);
+							}
+						} else {
+							if (noBlockStart == -1) {
+								noBlockStart = i - 2;
+							}
+						}
+					}
+				} else {
+					blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+					if (blockAnnotation) {
+						blocks.push(blockAnnotation);
+					} else {
+						var sel = window.getSelection();
+						range = window.getSelection().getRangeAt(0);
+						range.setStart(sel.focusNode,0);
+						range.setEnd(sel.focusNode, sel.focusNode.length);
+						window.getSelection().removeAllRanges();
+						sel.addRange(range);
+						hopeEditor.selection.updateRange();
+						range = hopeEditor.selection.getRange();
+						blocks.push({
+							range : range,
+							tag : ""
+						});
+					}
+				}
+				return blocks;
 			}
 		}
 	};
@@ -418,138 +466,162 @@
 			},
 			'simply-text-align-left' : function() {
 				var range = hopeEditor.selection.getRange();
-				var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+				var blocks = editor.plugins.hope.annotation.blocks(range);
+				while (blocks.length) {
+					block = blocks.shift();
 
-				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
-				if (tempNode.classList.contains("simply-text-align-left")) {
-					tempNode.classList.remove("simply-text-align-left");
-				} else {
-					tempNode.classList.remove("simply-text-align-center");
-					tempNode.classList.remove("simply-text-align-justify");
-					tempNode.classList.remove("simply-text-align-right");
+					var tempNode = editor.plugins.hope.annotation.explode(block.tag);
+					if (tempNode.classList.contains("simply-text-align-left")) {
+						tempNode.classList.remove("simply-text-align-left");
+					} else {
+						tempNode.classList.remove("simply-text-align-center");
+						tempNode.classList.remove("simply-text-align-justify");
+						tempNode.classList.remove("simply-text-align-right");
 
-					tempNode.classList.add("simply-text-align-left");
-				}
+						tempNode.classList.add("simply-text-align-left");
+					}
 				
-				var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 
-				hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
-				hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
+					if (block.tag != "") {
+						hopeEditor.fragment = hopeEditor.fragment.remove(block.range, block.tag);
+					}
+					hopeEditor.fragment = hopeEditor.fragment.apply(block.range, newValue);
+				}
+
 				hopeEditor.update();
 			},
 			'simply-text-align-right' : function() {
 				var range = hopeEditor.selection.getRange();
-				var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+				var blocks = editor.plugins.hope.annotation.blocks(range);
+				while (blocks.length) {
+					block = blocks.shift();
 
-				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
-				if (tempNode.classList.contains("simply-text-align-right")) {
-					tempNode.classList.remove("simply-text-align-right");
-				} else {
-					tempNode.classList.remove("simply-text-align-left");
-					tempNode.classList.remove("simply-text-align-justify");
-					tempNode.classList.remove("simply-text-align-center");
+					var tempNode = editor.plugins.hope.annotation.explode(block.tag);
+					if (tempNode.classList.contains("simply-text-align-right")) {
+						tempNode.classList.remove("simply-text-align-right");
+					} else {
+						tempNode.classList.remove("simply-text-align-center");
+						tempNode.classList.remove("simply-text-align-justify");
+						tempNode.classList.remove("simply-text-align-left");
 
-					tempNode.classList.add("simply-text-align-right");
-				}
+						tempNode.classList.add("simply-text-align-right");
+					}
 				
-				var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 
-				hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
-				hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
+					if (block.tag != "") {
+						hopeEditor.fragment = hopeEditor.fragment.remove(block.range, block.tag);
+					}
+					hopeEditor.fragment = hopeEditor.fragment.apply(block.range, newValue);
+				}
 
 				hopeEditor.update();
 			},
 			'simply-text-align-center' : function() {
 				var range = hopeEditor.selection.getRange();
-				var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+				var blocks = editor.plugins.hope.annotation.blocks(range);
+				while (blocks.length) {
+					block = blocks.shift();
 
-				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
-				if (tempNode.classList.contains("simply-text-align-center")) {
-					tempNode.classList.remove("simply-text-align-center");
-				} else {
-					tempNode.classList.remove("simply-text-align-left");
-					tempNode.classList.remove("simply-text-align-justify");
-					tempNode.classList.remove("simply-text-align-right");
+					var tempNode = editor.plugins.hope.annotation.explode(block.tag);
+					if (tempNode.classList.contains("simply-text-align-center")) {
+						tempNode.classList.remove("simply-text-align-center");
+					} else {
+						tempNode.classList.remove("simply-text-align-right");
+						tempNode.classList.remove("simply-text-align-justify");
+						tempNode.classList.remove("simply-text-align-left");
 
-					tempNode.classList.add("simply-text-align-center");
-				}
+						tempNode.classList.add("simply-text-align-center");
+					}
 				
-				var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 
-				hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
-				hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
+					if (block.tag != "") {
+						hopeEditor.fragment = hopeEditor.fragment.remove(block.range, block.tag);
+					}
+					hopeEditor.fragment = hopeEditor.fragment.apply(block.range, newValue);
+				}
+
 				hopeEditor.update();
 			},
 			'simply-text-align-justify' : function() {
 				var range = hopeEditor.selection.getRange();
-				var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+				var blocks = editor.plugins.hope.annotation.blocks(range);
+				while (blocks.length) {
+					block = blocks.shift();
 
-				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
-				if (tempNode.classList.contains("simply-text-align-justify")) {
-					tempNode.classList.remove("simply-text-align-justify");
-				} else {
-					tempNode.classList.remove("simply-text-align-left");
-					tempNode.classList.remove("simply-text-align-right");
-					tempNode.classList.remove("simply-text-align-center");
+					var tempNode = editor.plugins.hope.annotation.explode(block.tag);
+					if (tempNode.classList.contains("simply-text-align-justify")) {
+						tempNode.classList.remove("simply-text-align-justify");
+					} else {
+						tempNode.classList.remove("simply-text-align-right");
+						tempNode.classList.remove("simply-text-align-center");
+						tempNode.classList.remove("simply-text-align-left");
 
-					tempNode.classList.add("simply-text-align-justify");
-				}
+						tempNode.classList.add("simply-text-align-justify");
+					}
 				
-				var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 
-				hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
-				hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
+					if (block.tag != "") {
+						hopeEditor.fragment = hopeEditor.fragment.remove(block.range, block.tag);
+					}
+					hopeEditor.fragment = hopeEditor.fragment.apply(block.range, newValue);
+				}
+
 				hopeEditor.update();
 			},
 			'simply-text-align-none' : function() {
 				var range = hopeEditor.selection.getRange();
-				var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+				var blocks = editor.plugins.hope.annotation.blocks(range);
+				while (blocks.length) {
+					block = blocks.shift();
 
-				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
-				tempNode.classList.remove("simply-text-align-justify");
-				tempNode.classList.remove("simply-text-align-left");
-				tempNode.classList.remove("simply-text-align-right");
-				tempNode.classList.remove("simply-text-align-center");
+					var tempNode = editor.plugins.hope.annotation.explode(block.tag);
+					tempNode.classList.remove("simply-text-align-justify");
+					tempNode.classList.remove("simply-text-align-left");
+					tempNode.classList.remove("simply-text-align-right");
+					tempNode.classList.remove("simply-text-align-center");
 
-				var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 
-				hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
-				hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
+					if (block.tag != "") {
+						hopeEditor.fragment = hopeEditor.fragment.remove(block.range, block.tag);
+					}
+					hopeEditor.fragment = hopeEditor.fragment.apply(block.range, newValue);
+				}
+
 				hopeEditor.update();
 			},
 			'simply-text-blockstyle' : function(value) {
 				var range = hopeEditor.selection.getRange();
+				var blocks = editor.plugins.hope.annotation.blocks(range);
 
-				if (range.start != range.end) {
-					if (hopeEditor.fragment.has(range, value)) {
-						hopeEditor.fragment = hopeEditor.fragment.remove(range, value);
+				while (blocks.length) {
+					var block = blocks.shift();
+					var newRange;
+					if (range.start != range.end) {
+						newRange = hope.range.create(Math.max(block.range.start, range.start), Math.min(block.range.end, range.end));
 					} else {
-						hopeEditor.fragment = hopeEditor.fragment.apply(range, value);
+						newRange = hope.range.create(block.range.start, block.range.end);
 					}
-				} else {
-					var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
-					if (blockAnnotation) {
-						var nodeInfo = false;
-						if (blockAnnotation.tag.indexOf(" ") !== -1) {
-							nodeInfo = blockAnnotation.tag.substr(blockAnnotation.tag.indexOf(" ")+1);
+
+					if (newRange.start == block.range.start && newRange.end == block.range.end) {
+						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + block.tag + "']")) {
+							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
 						}
-						var newValue = value;
-						if (nodeInfo) {
-							newValue += " " + nodeInfo;
-						}
-						hopeEditor.fragment = hopeEditor.fragment.remove(blockAnnotation.range, blockAnnotation.tag);
-						hopeEditor.fragment = hopeEditor.fragment.apply(blockAnnotation.range, newValue);
-					} else {
-						var sel = window.getSelection();
-						range = window.getSelection().getRangeAt(0);
-						range.setStart(sel.focusNode,0);
-						range.setEnd(sel.focusNode, sel.focusNode.length);
-						window.getSelection().removeAllRanges();
-						sel.addRange(range);
-						hopeEditor.selection.updateRange();
-						range = hopeEditor.selection.getRange();
-						hopeEditor.fragment = hopeEditor.fragment.apply(hopeEditor.selection.getRange(), value);
 					}
+					var nodeInfo = false;
+					if (block.tag.indexOf(" ") !== -1) {
+						nodeInfo = block.tag.substr(block.tag.indexOf(" ")+1);
+					}
+					var newValue = value;
+					if (nodeInfo) {
+						newValue += " " + nodeInfo;
+					}
+
+					hopeEditor.fragment = hopeEditor.fragment.apply(newRange, newValue);
 				}
 
 				hopeEditor.update();

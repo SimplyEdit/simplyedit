@@ -569,12 +569,6 @@
 				toolbarsContainer.id = "simply-editor";
 				document.body.appendChild(toolbarsContainer);
 
-				var http = new XMLHttpRequest();
-				var url = editor.baseURL + "simply/toolbars.html";
-				if (editor.profile == "dev") {
-					url += "?t=" + (new Date().getTime());
-				}
-
 				var loadToolbars = function() {
 					if (!editor.toolbar || (typeof muze === "undefined")) {
 						// Main toolbar code isn't loaded yet, delay a bit;
@@ -603,7 +597,6 @@
 										}
 										toolbars.content = fragment;
 									}
-									// editor.brokenImport = true;
 									var toolbarNode = document.importNode(toolbars.content, true);
 									if (editor.brokenImport) {
 										editor.importScripts = true;
@@ -641,51 +634,35 @@
 					editor.editmode.toolbarMonitor();
 				};
 
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						var i;
-
-						var toolbars = document.createElement("TEMPLATE");
-						toolbars.innerHTML = http.responseText;
-						if (!("content" in toolbars)) {
-							var fragment = document.createDocumentFragment();
-							while (toolbars.children.length) {
-								fragment.appendChild(toolbars.children[0]);
-							}
-							toolbars.content = fragment;
-						}
-
-						editor.brokenImport = true;
-						var toolbarNode = document.importNode(toolbars.content, true);
-						toolbarsContainer.appendChild(toolbarNode);
-						
-						if (editor.brokenImport) {
-							editor.importScripts = true;
-						}
-						if (editor.brokenImport) {
-							var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
-							for (i=0; i<scriptTags.length; i++) {
-								var newNode = document.createElement("SCRIPT");
-								if (scriptTags[i].src) {
-									newNode.src = scriptTags[i].src;
-								}
-								if (scriptTags[i].innerHTML) {
-									newNode.innerHTML = scriptTags[i].innerHTML;
-								}
-								document.head.appendChild(newNode);
-							}
-						}
-						loadToolbars();
+				// Test document import;  make sure we know if importDocument will execute scripts or not;
+				editor.brokenImport = true;
+				var testTemplate = document.createElement("TEMPLATE");
+				testTemplate.innerHTML = "<script> editor.brokenImport = false; </script>";
+				if (!("content" in testTemplate)) {
+					var fragment = document.createDocumentFragment();
+					while(testTemplate.children.length) {
+						fragment.appendChild(testTemplate.children[0]);
 					}
-				};
-				http.send();
+					testTemplate.content = fragment;
+				}
 
+				var testNode = document.importNode(testTemplate.content, true);
+				toolbarsContainer.appendChild(testNode);
 
 				var addScript = function(src) {
-					var scriptTag = document.createElement("SCRIPT");
-					scriptTag.setAttribute("src", src);
-					document.head.appendChild(scriptTag);
+					if (!document.head.querySelector('script[src="'+src+'"]')) {
+						var scriptTag = document.createElement("SCRIPT");
+						scriptTag.setAttribute("src", src);
+						document.head.appendChild(scriptTag);
+					}
+				};
+
+				var addStyleSheet = function(src) {
+					var styleTag = document.createElement("LINK");
+					styleTag.setAttribute("rel", "stylesheet");
+					styleTag.setAttribute("type", "text/css");
+					styleTag.href = src;
+					document.head.appendChild(styleTag);
 				};
 
 				// Add slip.js for sortable items;
@@ -693,6 +670,18 @@
 
 				// Add hope
 				addScript(editor.baseURL + "hope/hope.packed.js");
+
+				// Add editor stylesheet
+				addStyleSheet(editor.baseURL + "simply/css/editor.v9.css");
+
+				// Add font awesome
+				addStyleSheet("//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
+
+				// Add legacy scripts
+				addScript(editor.baseURL + "simply/scripts.js");
+
+				// Add toolbar scripts
+				addScript(editor.baseURL + "simply/toolbars.js");
 
 				var handleBeforeUnload = function(evt) {
 					if (editor.editmode.isDirty()) {
@@ -709,6 +698,8 @@
 
 				document.body.onbeforeunload = handleBeforeUnload; // Must do it like this, not with addEventListener;
 				
+				loadToolbars();
+
 			},
 			editable : function(target) {
 				var i;
@@ -857,8 +848,6 @@
 					}
 				};
 				var removeBeforeOrderEvent = function(e) {
-					e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
-								
 					var sublists = this.querySelectorAll("[data-simply-sortable]");
 					for (var j=0; j<sublists.length; j++) {
 						sublists[j].removeEventListener('slip:beforereorder', preventDefault);
@@ -867,14 +856,16 @@
 				};
 
 				for (var i=0; i<list.length; i++) {
-					list[i].addEventListener('slip:reorder', removeBeforeOrderEvent, false);
-				
-					if (list[i].querySelectorAll('[data-simply-sortable]').length) {
-						list[i].addEventListener('slip:beforereorder', addBeforeOrderEvent, false);
-					}
-					
+					list[i].addEventListener('slip:beforereorder', addBeforeOrderEvent, false);
+					list[i].addEventListener('slip:reorder', function(e) {
+						e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
+						return false;
+					});
+
 					new Slip(list[i]);
 				}
+				document.addEventListener("mouseup", removeBeforeOrderEvent, false);
+				document.addEventListener("touchend", removeBeforeOrderEvent, false);
 			},
 			textonly : function(target) {
 				var textonly = target.querySelectorAll("[data-simply-content='text']");
