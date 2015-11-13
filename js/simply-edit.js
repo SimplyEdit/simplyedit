@@ -1531,13 +1531,10 @@
 			editor.baseURL + "simply/toolbar.simply-iframe.html",
 			editor.baseURL + "simply/toolbar.simply-selectable.html",
 			editor.baseURL + "simply/toolbar.simply-list.html",
-			editor.baseURL + "simply/plugin.simply-template.html",
 			editor.baseURL + "simply/plugin.simply-save.html",
 			editor.baseURL + "simply/plugin.simply-meta.html",
 			editor.baseURL + "simply/plugin.simply-htmlsource.html",
 			editor.baseURL + "simply/plugin.simply-symbol.html",
-			editor.baseURL + "simply/plugin.simply-plain.html",
-			editor.baseURL + "simply/plugin.simply-dropbox.html",
 			editor.baseURL + "simply/plugin.simply-paste.html",
 			editor.baseURL + "simply/plugin.simply-undo-redo.html",
 			editor.baseURL + "simply/plugin.simply-keyboard.html"
