@@ -135,10 +135,10 @@
 		var field = editor.node.getEditableField();
 
 		hopeEditor = field.hopeEditor;
-
 		hopeEditor.selection.updateRange();
 
 		var range = hopeEditor.selection.getRange();
+		hopeEditor.currentRange = range;
 
 		var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
 
@@ -311,7 +311,7 @@
 			},
 			tagToggle : [],
 			apply : function(hopeEditor, tag) {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, tag);
 				if (annotation) {
 					if ((annotation.range.start === range.start) && (annotation.range.end === range.end)) {
@@ -328,7 +328,7 @@
 				} else {
 					if (range.start === range.end) {
 						var addTag = function(event) {
-							var currentRange = hopeEditor.selection.getRange();
+							var currentRange = hopeEditor.currentRange;
 							if (currentRange.start === range.start && currentRange.end === range.end) {
 								var rangeLength = event.newValue.length - event.prevValue.length;
 								event.preventDefault();
@@ -436,7 +436,7 @@
 		update : updateTextToolbar,
 		actions : {
 			'simply-text-class' : function(el) {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
 
 				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
@@ -471,7 +471,7 @@
 				editor.plugins.hope.annotation.apply(hopeEditor, "code");
 			},
 			'simply-text-align-left' : function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 				while (blocks.length) {
 					block = blocks.shift();
@@ -498,7 +498,7 @@
 				hopeEditor.update();
 			},
 			'simply-text-align-right' : function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 				while (blocks.length) {
 					block = blocks.shift();
@@ -525,7 +525,7 @@
 				hopeEditor.update();
 			},
 			'simply-text-align-center' : function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 				while (blocks.length) {
 					block = blocks.shift();
@@ -552,7 +552,7 @@
 				hopeEditor.update();
 			},
 			'simply-text-align-justify' : function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 				while (blocks.length) {
 					block = blocks.shift();
@@ -579,7 +579,7 @@
 				hopeEditor.update();
 			},
 			'simply-text-align-none' : function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 				while (blocks.length) {
 					block = blocks.shift();
@@ -601,7 +601,7 @@
 				hopeEditor.update();
 			},
 			'simply-text-blockstyle' : function(value) {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 
 				while (blocks.length) {
@@ -638,7 +638,8 @@
 					return;
 				}
 
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
+
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
 				if (!hyperlink) {
@@ -653,7 +654,7 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-unlink" : function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				if (hyperlink) {
 					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
@@ -666,7 +667,7 @@
 					return;
 				}
 
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
 				if (!hyperlink) {
@@ -686,7 +687,7 @@
 					return;
 				}
 
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
 				if (!hyperlink) {
@@ -712,7 +713,7 @@
 					return;
 				}
 
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
 				if (!hyperlink) {
