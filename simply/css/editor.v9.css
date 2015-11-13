@@ -152,6 +152,11 @@
 			font-family: inherit;
 			box-shadow: inherit;
 		}
+		@media (max-width: 480px) {
+			.simply-toolbar button {
+				min-width: 48px;
+			}
+		}
 		@media (max-width: 320px) {
 			.simply-toolbar button {
 				min-width: 40px;
