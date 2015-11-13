@@ -152,6 +152,11 @@
 			font-family: inherit;
 			box-shadow: inherit;
 		}
+		@media (max-width: 320px) {
+			.simply-toolbar button {
+				min-width: 40px;
+			}
+		}
 		#simply-main-toolbar button {
 			vertical-align: top;
 		}
