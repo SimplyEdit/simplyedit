@@ -8,6 +8,7 @@
 			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
 			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
 			<li><button data-simply-section="simply-code" data-simply-action="simply-edit-source"><i class="fa fa-code"></i>Code</button></li>
+			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
 		</ul>
 		<div class="simply-toolbar-section simply-image-style">
 			<div>
@@ -114,6 +115,8 @@
 			hopeEditor.selection.end = imagePos+1;
 
 			var range = hopeEditor.selection.getRange();
+			hopeEditor.currentRange = range;
+
 			var annotation = hopeEditor.fragment.has(range, "img");
 			
 			var type=image.getAttribute('data-simply-image-type');
@@ -144,7 +147,9 @@
 
 			var hyperlink = hopeEditor.fragment.has(range, "a");
 
+			toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "none";
 			if (hyperlink) {
+				toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
 				var linkNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
 				var hyperlinkHref = linkNode.getAttribute('href');
 				simply.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), hyperlinkHref);
@@ -183,7 +188,7 @@
 		},
 		"init" : function() {
 			vdSetImage = function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 
 				var type=vdGetProperty('vdImageType');
@@ -285,7 +290,7 @@
 				vdSetImage();
 			},
 			"simply-image-delete" : function() {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 
 				if (annotation) {
@@ -294,7 +299,7 @@
 				}
 			},
 			"simply-image-alt" : function(value) {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
 					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
@@ -316,7 +321,7 @@
 				}
 			},
 			"simply-image-title" : function(value) {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
 					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
@@ -338,7 +343,7 @@
 				}
 			},
 			"simply-image-src" : function(value) {
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
 					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
@@ -361,13 +366,12 @@
 			},
 			"simply-insert-image" : function() {
 				var imageSrc = editor.plugins.image.placeholder();
-				var range = hopeEditor.selection.getRange();
+				var range = hopeEditor.currentRange;
 
 				var imageFragment = hope.fragment.create("\u00AD", '0-1:img src="' + imageSrc + '"');
 				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, imageFragment);
 
-				hopeEditor.selection.end = hopeEditor.selection.start + 1;
-				range = hopeEditor.selection.getRange();
+				range = hope.range.create(range.start, range.start+1);
 
 				hopeEditor.fragment = hopeEditor.fragment.apply(range, 'img src="' + imageSrc + '"');
 				hopeEditor.update();

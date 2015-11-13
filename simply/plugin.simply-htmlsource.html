@@ -183,6 +183,9 @@
 
 			var field=editor.plugins.htmlsource.currentField;
 			if (field) {
+				vdSelectionState.restore(editor.plugins.htmlsource.currentSel);
+				editor.plugins.htmlsource.currentField.hopeEditor.selection.updateRange();
+
 				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
 					var encodedsource = simply.util.base64.encode(source); // this makes sure IE doesn't touch the sourcecode.

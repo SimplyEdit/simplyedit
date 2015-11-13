@@ -140,18 +140,8 @@
 
 			};
 
-			var changeAndRefocus = function(evt) {
-				var sel = window.getSelection();
-				var range = sel.getRangeAt(0);
-				muze.event.fire(this, "change");
-				sel.removeAllRanges();
-				sel.addRange(range);
-				this.focus();
-			};
-
 			for (var i=0; i<inputs.length; i++) {
 				inputs[i].addEventListener("change", handleChange);
-				inputs[i].addEventListener("keyup", changeAndRefocus);
 			}
 
 			editor.toolbar.addMarker(toolbar);
@@ -733,6 +723,7 @@
 			editor.plugins.dialog.backdrop.style.display = "none";
 			document.body.classList.remove("simply-overflow-hidden");
 			target.classList.remove("active");
+
 			vdSelectionState.remove();
 
 			var hopeEditor = editor.plugins.dialog.currentField.hopeEditor;

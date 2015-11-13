@@ -179,6 +179,9 @@
 
 	editor.addAction("simply-file-browse", function(el) {
 		editor.actions["simply-file-browse-insert"] = function(button) {
+			vdSelectionState.restore(editor.plugins.fileBrowse.currentSel);
+			hopeEditor.selection.updateRange();
+
 			el.parentNode.parentNode.querySelector("input").value = button.getAttribute("data-value");
 			muze.event.fire(el.parentNode.parentNode.querySelector("input"), "change");
 			editor.plugins.dialog.close();
