@@ -7,6 +7,7 @@
 			<li><button data-simply-section="simply-text-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-clipboard" class="simply-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
 			<li><button data-simply-section="simply-insert" class="simply-expands"><i class="fa fa-plus"></i>Insert</button></li>
+			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
 		</ul>
 		<div class="simply-toolbar-section simply-text-style">
 			<ul>
@@ -75,6 +76,7 @@
 			<li><button data-simply-section="simply-clipboard" class="simply-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
 			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
 			<li><button data-simply-section="simply-code" data-simply-action="simply-edit-source"><i class="fa fa-code"></i>Code</button></li>
+			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
 		</ul>
 		<div class="simply-toolbar-section simply-text-style">
 			<ul>
@@ -188,8 +190,12 @@
 		}
 
 		// Check hyperlink;
+		toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "none";
+
 		var hyperlink = hopeEditor.fragment.has(range, "a");
 		if (hyperlink || (hopeEditor.field.tagName.toLowerCase() === 'a')) {
+			toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
+
 			var tempNode;
 			if (hyperlink) {
 				tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
@@ -726,6 +732,19 @@
 					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
 				}
 				hopeEditor.update();
+			},
+			"simply-hyperlink-follow" : function(button) {
+				var target;
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					target = hopeEditor.field;
+				} else {
+					var sel = vdSelectionState.get();
+					target = vdSelection.getNode(sel);
+					if (target.tagName.toLowerCase() !== 'a') {
+						target = target.parentNode;
+					}
+				}
+				muze.event.fire(target, "dblclick");
 			}
 		}
 	});
