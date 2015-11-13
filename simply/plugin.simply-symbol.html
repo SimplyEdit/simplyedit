@@ -106,6 +106,10 @@
 	editor.addAction("simply-symbol-insert", function(el) {
 		if (editor.plugins.symbol.currentField.hopeEditor) {
 			var hopeEditor = editor.plugins.symbol.currentField.hopeEditor;
+
+			vdSelectionState.restore(editor.plugins.symbol.currentSel);
+			hopeEditor.selection.updateRange();
+
 			var range = hopeEditor.selection.getRange();
 			var charTyped = String.fromCharCode(el.dataset.value);
 
