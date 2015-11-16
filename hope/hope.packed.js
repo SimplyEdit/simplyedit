@@ -911,7 +911,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			'hr'        : [],
 			'img'       : [],
 			'kbd'       : nestingSets.inline,
-			'li'        : [ 'ol', 'ul', nestingSets.inline ],
+			'li'        : [ 'ol', 'ul'].concat( nestingSets.inline ),
 			'menu'      : [ 'li' ],
 			'object'    : [ 'param' ].concat( nestingSets.all ),
 			'ol'        : [ 'li' ],
