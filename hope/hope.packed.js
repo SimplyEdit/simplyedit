@@ -1042,7 +1042,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			// now try to find a spot for any annotation from the skippedAnnotation set
 			// most likely: inline annotation that was more generally applied than block annotation
 			// the order has been reversed
-			var topAnnotationTag = annotationStack[0];
+			var topAnnotationTag = this.getTag( annotationStack[0].tag );
 			annotation = skippedAnnotation.pop();
 			while ( annotation ) {
 				annotationTag = this.getTag( annotation.tag );
