@@ -36,13 +36,13 @@
 				<li><button data-simply-action="simply-text-class" data-value="none"><i class="fa fa-times"></i>Default</button></li>
 			</ul>
 		</div -->
-		<div class="simply-toolbar-section simply-text-align" data-type="simply-buttongroup-radio">
-			<ul>
-				<li><button data-simply-action="simply-text-align-left" data-value="left" class="simply-align-left"><i class="fa fa-align-left"></i>Left</button></li>
-				<li><button data-simply-action="simply-text-align-center" data-value="center" class="simply-align-center"><i class="fa fa-align-center"></i>Center</button></li>
-				<li><button data-simply-action="simply-text-align-right" data-value="right" class="simply-align-right"><i class="fa fa-align-right"></i>Right</button></li>
-				<li><button data-simply-action="simply-text-align-justify" data-value="justify" class="simply-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
-				<li><button data-simply-action="simply-text-align-none" data-value="none" class="simply-align-none"><i class="fa fa-times"></i>None</button></li>
+		<div class="simply-toolbar-section simply-text-align">
+			<ul data-type="simply-buttongroup-radio">
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-center"><i class="fa fa-align-center"></i>Center</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
 			</ul>
 		</div>
 		<div class="simply-toolbar-section simply-insert">
@@ -105,13 +105,13 @@
 				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
 			</div>
 		</div>
-		<div class="simply-toolbar-section simply-text-align" data-type="simply-buttongroup-radio">
-			<ul>
-				<li><button data-simply-action="simply-text-align-left" data-value="left" class="simply-align-left"><i class="fa fa-align-left"></i>Left</button></li>
-				<li><button data-simply-action="simply-text-align-center" data-value="center" class="simply-align-center"><i class="fa fa-align-center"></i>Center</button></li>
-				<li><button data-simply-action="simply-text-align-right" data-value="right" class="simply-align-right"><i class="fa fa-align-right"></i>Right</button></li>
-				<li><button data-simply-action="simply-text-align-justify" data-value="justify" class="simply-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
-				<li><button data-simply-action="simply-text-align-none" data-value="none" class="simply-align-none"><i class="fa fa-times"></i>None</button></li>
+		<div class="simply-toolbar-section simply-text-align">
+			<ul data-type="simply-buttongroup-radio">
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-center"><i class="fa fa-align-center"></i>Center</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
 			</ul>
 		</div>
 		<div class="simply-toolbar-section simply-clipboard">
@@ -255,30 +255,26 @@
 
 		// Check aligment
 		blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
-		var textAlign = toolbar.querySelector(".simply-text-align[data-type=simply-buttongroup-radio]");
+		var textAlign = toolbar.querySelector(".simply-text-align [data-type=simply-buttongroup-radio]");
 		if (blockAnnotation && textAlign) {
 			var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
-			if (tempNode.classList.contains("simply-text-align-left")) {
-				simply.widgets.properties.set(textAlign, "left");
-			} else if (tempNode.classList.contains("simply-text-align-right")) {
-				simply.widgets.properties.set(textAlign, "right");
-			} else if (tempNode.classList.contains("simply-text-align-center")) {
-				simply.widgets.properties.set(textAlign, "center");
-			} else if (tempNode.classList.contains("simply-text-align-justify")) {
-				simply.widgets.properties.set(textAlign, "justify");
-			} else {
-				simply.widgets.properties.set(textAlign, "none");
+			var buttons = textAlign.querySelectorAll("[data-value]");
+			simply.widgets.properties.set(textAlign, "none");
+			for (var j=0; j<buttons.length; j++) {
+				if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
+					simply.widgets.properties.set(textAlign, buttons[j].getAttribute("data-value"));
+				}
 			}
 
 			if (simply.widgets.properties.get(textAlign) != "none") {
 				// Set the parent icon for alignment as well;
-				var currentIcon = toolbar.querySelector("div.simply-text-align button.simply-selected i");
+				var currentIcon = textAlign.querySelector("button.simply-selected i");
 				var icons = toolbar.querySelectorAll("button[data-simply-section=simply-text-align] i");
 				for (i=0; i<icons.length; i++) {
 					icons[i].className = currentIcon.className;
 				}
 			} else {
-				var currentIcon = toolbar.querySelector("div.simply-text-align button i");
+				var currentIcon = textAlign.querySelector("button i");
 				var icons = toolbar.querySelectorAll("button[data-simply-section=simply-text-align] i");
 				for (i=0; i<icons.length; i++) {
 					icons[i].className = currentIcon.className;
