@@ -107,6 +107,13 @@ QUnit.module("hope editor behaviour");
 		assert.equal(testContent.innerHTML, "<ul><li>test1</li><li>test2</li></ul>", "innerHTML did not change");
 	});
 
+	QUnit.test("unnumbered list, strong in li is rendered", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li><strong>test1</strong></li><li>test2</li></ul>";
+		testContent.hopeEditor.parseHTML();
+		assert.equal(testContent.innerHTML, "<ul><li><strong>test1</strong></li><li>test2</li></ul>", "innerHTML did not change");
+	});
+
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -351,7 +358,7 @@ QUnit.module("editor text selection");
 
 		setSelectionEnd(testContent.querySelectorAll("p")[2].childNodes[0],5);
 
-                editor.actions['simply-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 
 		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> big out there?</p>');
 	});
@@ -364,9 +371,22 @@ QUnit.module("editor text selection");
 		setCaretPosition(testContent.querySelector("p"), 2);
 		setSelectionEnd(testContent.querySelectorAll("p")[1].childNodes[0],5);
 
-                editor.actions['simply-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 
 		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> big out there?</p>');
+	});
+
+	QUnit.test("strong within multiple list items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>Hello</li><li>world</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("li"), 0);
+		setSelectionEnd(testContent.querySelectorAll("li")[1].childNodes[0],3);
+
+		editor.actions['simply-text-bold']();
+
+		assert.equal(testContent.innerHTML, '<ul><li><strong>Hello</strong></li><li><strong>wor</strong>ld</li></ul>');
 	});
 
 QUnit.module("text hyperlinks");
