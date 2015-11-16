@@ -144,7 +144,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-right']();
+		document.querySelector("button[data-value='simply-text-align-right']").click();
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-right">Hello world</p>', "Found align class");
 	});
@@ -155,7 +155,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 		
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-left']();
+		document.querySelector("button[data-value='simply-text-align-left']").click();
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-left">Hello world</p>', "Found align class");
 	});
@@ -166,7 +166,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-none']();
+		document.querySelector("#simply-text-cursor div.simply-text-align button[data-value='none']").click();
 
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "Found align class");
 	});
@@ -177,7 +177,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-justify']();
+		document.querySelector("button[data-value='simply-text-align-justify']").click();
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-justify">Hello world</p>', "Found align class");
 	});
