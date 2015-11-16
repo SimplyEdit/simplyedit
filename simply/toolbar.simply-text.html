@@ -16,6 +16,8 @@
 					<option value="h2">Heading 2</option>
 					<option value="h3">Heading 3</option>
 					<option value="p">Paragraph</option>
+					<option value="ol">Numbered list</option>
+					<option value="ul">Unnumbered list</option>
 				</select></li>
 				<li class="simply-text-bold"><button data-simply-action="simply-text-bold"><i class="fa fa-bold"></i>Bold</button></li>
 				<li class="simply-text-italic"><button data-simply-action="simply-text-italic"><i class="fa fa-italic"></i>Italic</button></li>
@@ -85,6 +87,8 @@
 					<option value="h2">Heading 2</option>
 					<option value="h3">Heading 3</option>
 					<option value="p">Paragraph</option>
+					<option value="ol">Numbered list</option>
+					<option value="ul">Unnumbered list</option>
 				</select></li>
 				<li class="simply-text-bold"><button data-simply-action="simply-text-bold"><i class="fa fa-bold"></i>Bold</button></li>
 				<li class="simply-text-italic"><button data-simply-action="simply-text-italic"><i class="fa fa-italic"></i>Italic</button></li>
@@ -147,6 +151,15 @@
 			var foundTag = toolbar.querySelector("[name='textStyle'] option[value='" + tagName + "']");
 			if (foundTag) {
 				foundTag.selected = true;
+			} else if (tagName == "li") {
+				var annotation = hopeEditor.fragment.has(range, "ol");
+				if (annotation) {
+					toolbar.querySelector("[name='textStyle'] option[value='ol']").selected = true;
+				}
+				annotation = hopeEditor.fragment.has(range, "ul");
+				if (annotation) {
+					toolbar.querySelector("[name='textStyle'] option[value='ul']").selected = true;
+				}
 			} else {
 				toolbar.querySelector("[name='textStyle'] option[value='p']").selected = true;
 			}
@@ -603,6 +616,25 @@
 			'simply-text-blockstyle' : function(value) {
 				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
+
+				if (value == "ol" || value == "ul") {
+					var annotation = hopeEditor.fragment.has(range, "ul");
+					if (annotation) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, "ul");
+						range = annotation.range;
+						blocks = [];
+					}
+
+					annotation = hopeEditor.fragment.has(range, "ol");
+					if (annotation) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, "ol");
+						range = annotation.range;
+						blocks = [];
+					}
+
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, value);
+					value = "li";
+				}
 
 				while (blocks.length) {
 					var block = blocks.shift();
