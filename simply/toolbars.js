@@ -446,12 +446,12 @@
 					rtop = pos.bottom;
 				}
 
-				ltop += Math.max(document.body.scrollTop, document.documentElement.scrollTop);
-				lleft += Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
-				rtop += Math.max(document.body.scrollTop, document.documentElement.scrollTop);
-				rleft += Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
-
-				if (window.getComputedStyle(document.body).position != "static") {
+				if (window.getComputedStyle(document.body).position == "static") {
+					ltop += Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+					lleft += Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
+					rtop += Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+					rleft += Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
+				} else {
 					ltop -= document.body.getClientRects()[0].top;
 					rtop -= document.body.getClientRects()[0].top;
 				}
