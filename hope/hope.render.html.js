@@ -38,7 +38,7 @@ hope.register( 'hope.render.html', function() {
 			'hr'        : [],
 			'img'       : [],
 			'kbd'       : nestingSets.inline,
-			'li'        : [ 'ol', 'ul', nestingSets.inline ],
+			'li'        : [ 'ol', 'ul'].concat( nestingSets.inline ),
 			'menu'      : [ 'li' ],
 			'object'    : [ 'param' ].concat( nestingSets.all ),
 			'ol'        : [ 'li' ],
@@ -169,7 +169,7 @@ hope.register( 'hope.render.html', function() {
 			// now try to find a spot for any annotation from the skippedAnnotation set
 			// most likely: inline annotation that was more generally applied than block annotation
 			// the order has been reversed
-			var topAnnotationTag = annotationStack[0];
+			var topAnnotationTag = this.getTag( annotationStack[0].tag );
 			annotation = skippedAnnotation.pop();
 			while ( annotation ) {
 				annotationTag = this.getTag( annotation.tag );

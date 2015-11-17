@@ -17,15 +17,18 @@
 				</select>
 			</div>
 		</div>
-		<div class="simply-toolbar-section simply-image-align" data-type="simply-buttongroup-radio" id="vdImageAlign">
-		<ul>
-			<li><button class="simply-align-left" data-value="left" data-simply-action="simply-image-align-left"><i class="fa fa-align-left"></i>Left</button></li>
-			<li><button class="simply-align-right" data-value="right" data-simply-action="simply-image-align-right"><i class="fa fa-align-right"></i>Right</button></li>
-			<li><button class="simply-align-top" data-value="top" data-simply-action="simply-image-align-top"><i class="fa fa-chevron-up"></i>Top</button></li>
-			<li><button class="simply-align-bottom" data-value="bottom" data-simply-action="simply-image-align-bottom"><i class="fa fa-chevron-down"></i>Bottom</button></li>
-			<li><button class="simply-align-middle" data-value="middle" data-simply-action="simply-image-align-middle"><i class="fa fa-chevron-right"></i>Middle</button></li>
-			<li><button class="simply-align-none" data-value="none" data-simply-action="simply-image-align-none"><i class="fa fa-minus-circle"></i>None</button></li>
-		</ul>
+		<div class="simply-toolbar-section simply-image-align">
+			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
+			</ul>
+			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-top"><i class="fa fa-chevron-up"></i>Top</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-bottom"><i class="fa fa-chevron-down"></i>Bottom</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-middle"><i class="fa fa-chevron-right"></i>Middle</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
+			</ul>
 		</div>
 		<div class="simply-toolbar-section simply-image-properties">
 			<div><label>URL</label><input type="text" id="vdImageSrc" data-simply-action="simply-image-src"></div>
@@ -129,10 +132,17 @@
 			var alt=image.getAttribute('alt');
 			simply.widgets.properties.set('vdImageAlt',alt);
 
-			var alignOptions = ["left", "right", "top", "middle", "bottom"];
-			for (var i=0; i<alignOptions.length; i++) {
-				if (image.classList.contains("simply-image-align-" + alignOptions[i])) {
-					simply.widgets.properties.set('vdImageAlign', alignOptions[i]);
+			var imageClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
+			if (annotation && imageClasses) {
+				var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+				for (var i=0; i<imageClasses.length; i++) {
+					var buttons = imageClasses[i].querySelectorAll("[data-value]");
+					simply.widgets.properties.set(imageClasses[i], "none");
+					for (var j=0; j<buttons.length; j++) {
+						if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
+							simply.widgets.properties.set(imageClasses[i], buttons[j].getAttribute("data-value"));
+						}
+					}
 				}
 			}
 
@@ -179,20 +189,20 @@
 
 			// Set the parent icon for alignment as well;
 			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
-			if (currentIcon) {
-				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
-				for (var i=0; i<icons.length; i++) {
-					icons[i].className = currentIcon.className;
-				}
+			if (currentIcon && (currentIcon.parentNode.getAttribute("data-value") == "none")) {
+				currentIcon = document.querySelector("div.simply-image-align button i");
+			}			
+	
+			var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+			for (var i=0; i<icons.length; i++) {
+				icons[i].className = currentIcon.className;
 			}
 		},
 		"init" : function() {
 			vdSetImage = function() {
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
-
 				var type=vdGetProperty('vdImageType');
-				var align=vdGetProperty('vdImageAlign');
 
 				if (annotation) {
 					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
@@ -201,22 +211,6 @@
 						tempNode.setAttribute('data-simply-image-type',type);
 					} else {
 						tempNode.removeAttribute('data-simply-image-type');
-					}
-
-					tempNode.classList.remove("simply-image-align-left");
-					tempNode.classList.remove("simply-image-align-right");
-					tempNode.classList.remove("simply-image-align-top");
-					tempNode.classList.remove("simply-image-align-bottom");
-					tempNode.classList.remove("simply-image-align-middle");
-
-					switch (align) {
-						case 'left':
-						case 'right':
-						case 'top':
-						case 'bottom':
-						case 'middle':
-							tempNode.classList.add("simply-image-align-" + align);
-						break;
 					}
 
 					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
@@ -230,22 +224,6 @@
 					} else {
 						hopeEditor.field.removeAttribute('data-simply-image-type');
 					}
-					hopeEditor.field.classList.remove("simply-image-align-left");
-					hopeEditor.field.classList.remove("simply-image-align-right");
-					hopeEditor.field.classList.remove("simply-image-align-top");
-					hopeEditor.field.classList.remove("simply-image-align-bottom");
-					hopeEditor.field.classList.remove("simply-image-align-middle");
-
-					switch (align) {
-						case 'left':
-						case 'right':
-						case 'top':
-						case 'bottom':
-						case 'middle':
-							hopeEditor.field.classList.add("simply-image-align-" + align);
-						break;
-					}
-					
 				}
 			};
 
@@ -262,29 +240,31 @@
 			}
 		},
 		"actions" : {
-			"simply-image-align-left" : function() {
-				simply.widgets.properties.set("vdImageAlign", "left");
-				vdSetImage();
-			},
-			"simply-image-align-right" : function() {
-				simply.widgets.properties.set("vdImageAlign", "right");
-				vdSetImage();
-			},
-			"simply-image-align-top" : function() {
-				simply.widgets.properties.set("vdImageAlign", "top");
-				vdSetImage();
-			},
-			"simply-image-align-middle" : function() {
-				simply.widgets.properties.set("vdImageAlign", "middle");
-				vdSetImage();
-			},
-			"simply-image-align-bottom" : function() {
-				simply.widgets.properties.set("vdImageAlign", "bottom");
-				vdSetImage();
-			},
-			"simply-image-align-none" : function() {
-				simply.widgets.properties.set("vdImageAlign", "none");
-				vdSetImage();
+			'simply-image-class' : function(el) {
+				var range = hopeEditor.currentRange;
+				var annotation = hopeEditor.fragment.has(range, "img");
+				if (annotation) {
+					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+					if (tempNode.classList.contains(el.getAttribute("data-value"))) {
+						tempNode.classList.remove(el.getAttribute("data-value"));
+					} else {
+						var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
+						for (var i=0; i<buttons.length; i++) {
+							tempNode.classList.remove(buttons[i].getAttribute("data-value"));
+						}
+						if (el.getAttribute("data-value") !== "none") {
+							tempNode.classList.add(el.getAttribute("data-value"));
+						}
+					}
+				
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+
+					if (annotation.tag != "") {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					}
+					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, newValue);
+				}
+				hopeEditor.update();
 			},
 			"simply-image-type" : function() {
 				vdSetImage();

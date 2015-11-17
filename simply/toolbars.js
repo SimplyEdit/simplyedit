@@ -451,6 +451,11 @@
 				rtop += Math.max(document.body.scrollTop, document.documentElement.scrollTop);
 				rleft += Math.max(document.body.scrollLeft, document.documentElement.scrollLeft);
 
+				if (window.getComputedStyle(document.body).position != "static") {
+					ltop -= document.body.getClientRects()[0].top;
+					rtop -= document.body.getClientRects()[0].top;
+				}
+
 				top = Math.max(ltop, rtop);
 				left = lleft + ((rleft - lleft) / 2);
 
