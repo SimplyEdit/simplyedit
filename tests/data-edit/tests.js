@@ -107,6 +107,13 @@ QUnit.module("hope editor behaviour");
 		assert.equal(testContent.innerHTML, "<ul><li>test1</li><li>test2</li></ul>", "innerHTML did not change");
 	});
 
+	QUnit.test("unnumbered list, strong in li is rendered", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li><strong>test1</strong></li><li>test2</li></ul>";
+		testContent.hopeEditor.parseHTML();
+		assert.equal(testContent.innerHTML, "<ul><li><strong>test1</strong></li><li>test2</li></ul>", "innerHTML did not change");
+	});
+
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -137,7 +144,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-right']();
+		document.querySelector("button[data-value='simply-text-align-right']").click();
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-right">Hello world</p>', "Found align class");
 	});
@@ -148,7 +155,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 		
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-left']();
+		document.querySelector("button[data-value='simply-text-align-left']").click();
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-left">Hello world</p>', "Found align class");
 	});
@@ -159,7 +166,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-none']();
+		document.querySelector("#simply-text-cursor div.simply-text-align button[data-value='none']").click();
 
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "Found align class");
 	});
@@ -170,7 +177,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		editor.actions['simply-text-align-justify']();
+		document.querySelector("button[data-value='simply-text-align-justify']").click();
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-justify">Hello world</p>', "Found align class");
 	});
@@ -351,7 +358,7 @@ QUnit.module("editor text selection");
 
 		setSelectionEnd(testContent.querySelectorAll("p")[2].childNodes[0],5);
 
-                editor.actions['simply-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 
 		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> big out there?</p>');
 	});
@@ -364,9 +371,22 @@ QUnit.module("editor text selection");
 		setCaretPosition(testContent.querySelector("p"), 2);
 		setSelectionEnd(testContent.querySelectorAll("p")[1].childNodes[0],5);
 
-                editor.actions['simply-text-blockstyle']('h1');
+		editor.actions['simply-text-blockstyle']('h1');
 
 		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> big out there?</p>');
+	});
+
+	QUnit.test("strong within multiple list items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>Hello</li><li>world</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("li"), 0);
+		setSelectionEnd(testContent.querySelectorAll("li")[1].childNodes[0],3);
+
+		editor.actions['simply-text-bold']();
+
+		assert.equal(testContent.innerHTML, '<ul><li><strong>Hello</strong></li><li><strong>wor</strong>ld</li></ul>');
 	});
 
 QUnit.module("text hyperlinks");
