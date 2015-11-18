@@ -1335,7 +1335,11 @@
 					if (lastItem !== "") {
 						chain.push(lastItem);
 					} else {
-						chain.push(chain.pop() + "/");
+						var item = chain.pop();
+						if (typeof item === "undefined") {
+							item = '';
+						}
+						chain.push(item + "/");
 					}
 					
 					var currentNode = output.children;
