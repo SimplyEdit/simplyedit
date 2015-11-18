@@ -192,7 +192,7 @@
 	editor.addAction("simply-file-browse-sitemap", function(el) {
 		editor.actions["simply-file-browse-insert"] = function(button) {
 			var target = button.getAttribute("data-value");
-			target = target.replace(editor.storage.endpoint + "data.json", "");
+			target = target.replace(editor.storage.endpoint + "data.json/", "");
 			// FIXME: check for dirty fields and stash/save the changes
 			document.location.href = target + "#simply-edit";
 			editor.plugins.dialog.close();
