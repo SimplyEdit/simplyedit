@@ -576,8 +576,9 @@
 						newRange = hope.range.create(block.range.start, block.range.end);
 					}
 
-					if (newRange.start == block.range.start && newRange.end == block.range.end) {
-						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + block.tag + "']")) {
+					if ((newRange.start == block.range.start) && (newRange.end == block.range.end)) {
+						var tagName = block.tag.split(" ")[0];
+						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
 						}
 					}

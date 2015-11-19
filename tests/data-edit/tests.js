@@ -1,4 +1,5 @@
 QUnit.config.autostart = false;
+QUnit.config.reorder = false;
 
 localStorage.storageKey = "demo";
 editor.storage.key = "demo";
@@ -7,7 +8,7 @@ document.location.hash = "#simply-edit";
 
 var checkEditor = function() {
 	if (editor && editor.plugins && editor.plugins.text) {
-		window.setTimeout(QUnit.start, 1000);
+		QUnit.start();
 	} else {
 		window.setTimeout(checkEditor, 300);
 	}
@@ -26,7 +27,9 @@ function setCaretPosition(elem, start, length) {
 	var sel = window.getSelection();
 	sel.removeAllRanges();
 	sel.addRange(range);
-	elem.focus();
+	if (focus in elem) {
+		elem.focus();
+	}
 	editor.context.update();
 }
 function setSelectionEnd(elem, offset) {
@@ -60,7 +63,6 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello<br><br>world</p>";
 		testContent.hopeEditor.parseHTML();
-		console.log(testContent.hopeEditor.refs.annotations.value);
 		assert.equal(testContent.innerHTML, "<p>Hello<br><br>world</p>", "innerHTML did not change");
 	});
 
@@ -144,7 +146,8 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		document.querySelector("button[data-value='simply-text-align-right']").click();
+		var button = document.querySelector("button[data-value='simply-text-align-right']");
+		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-right">Hello world</p>', "Found align class");
 	});
@@ -155,7 +158,8 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 		
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		document.querySelector("button[data-value='simply-text-align-left']").click();
+		var button = document.querySelector("button[data-value='simply-text-align-left']");
+		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-left">Hello world</p>', "Found align class");
 	});
@@ -166,18 +170,20 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		document.querySelector("#simply-text-cursor div.simply-text-align button[data-value='none']").click();
+
+		var button = document.querySelector("#simply-text-cursor div.simply-text-align button[data-value='none']");
+		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "Found align class");
 	});
-
 	QUnit.test("text set align from center to justify within paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = '<p class="simply-text-align-center">Hello world</p>';
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		document.querySelector("button[data-value='simply-text-align-justify']").click();
+		var button = document.querySelector("button[data-value='simply-text-align-justify']");
+		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-justify">Hello world</p>', "Found align class");
 	});
@@ -196,8 +202,7 @@ QUnit.module("editor text cursor");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<h2>Hello world</h2>";
 		testContent.hopeEditor.parseHTML();
-
-		setCaretPosition(testContent.querySelector("h2"), 2, 0);
+		setCaretPosition(testContent.querySelector("h2"), 3, 0);
 		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, "h2", "text style is correctly updated");
 	});
@@ -213,6 +218,18 @@ QUnit.module("editor text cursor");
 		assert.equal(testContent.innerHTML, '<h1>Hello world</h1>');
 	});
 
+	QUnit.test("text style set h2 with one class to h1", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<h2 class="hello">Hello world</h2>';
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("h2"), 2, 0);
+
+		editor.actions['simply-text-blockstyle']('h1');
+
+		assert.equal(testContent.innerHTML, '<h1 class="hello">Hello world</h1>');
+	});
+
 	QUnit.test("text style set h2 with multiple classes to h1", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = '<h2 class="hello world class">Hello world</h2>';
@@ -221,6 +238,8 @@ QUnit.module("editor text cursor");
 		setCaretPosition(testContent.querySelector("h2"), 2, 0);
 
 		editor.actions['simply-text-blockstyle']('h1');
+
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, '<h1 class="hello world class">Hello world</h1>');
 	});
 
