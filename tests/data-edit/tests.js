@@ -7,7 +7,7 @@ document.location.hash = "#simply-edit";
 
 var checkEditor = function() {
 	if (editor && editor.plugins && editor.plugins.text) {
-		QUnit.start();
+		window.setTimeout(QUnit.start, 1000);
 	} else {
 		window.setTimeout(checkEditor, 300);
 	}
@@ -188,7 +188,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[name=textStyle]").value;
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, "p", "text style is correctly updated");
 	});
 
@@ -198,7 +198,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("h2"), 2, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[name=textStyle]").value;
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, "h2", "text style is correctly updated");
 	});
 
@@ -320,7 +320,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("em"), 0, 3);
-		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-italic']");
+		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-inline'][data-value='em']");
 
 		assert.ok(targetButton.classList.contains("simply-selected"), "text style is correctly updated");
 	});
@@ -339,13 +339,13 @@ QUnit.module("editor text selection");
 	QUnit.test("text style init italic", function(assert) {
 	// FIXME: In IE, als je klikt aan het begin van de <em> en dan naar rechts selecteerd is italic niet actief; Oorzaak is dat de range dan voor de <em> ligt in plaats van er binnen.
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = "<p>He<em>llo</em> world</p>";
+		testContent.innerHTML = "<p>He<em>llo wor</em>ld</p>";
 		testContent.hopeEditor.parseHTML();
 
-		setCaretPosition(testContent, 2);
-		setSelectionEnd(testContent.querySelector("em"),1);
+		setCaretPosition(testContent.querySelector("em"), 1, 2);
+		// setSelectionEnd(testContent.querySelector("em"),1);
 
-		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-italic']");
+		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-inline'][data-value='em']");
 		assert.ok(targetButton.classList.contains("simply-selected"), "text style is correctly updated");
 	});
 
