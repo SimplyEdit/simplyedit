@@ -147,13 +147,29 @@
 				document.head.removeChild(metaTag);
 			}
 		},
-		init : function() {
-			var listItem = document.createElement("li");
-			var button = document.createElement("button");
-			button.dataset.simplyAction = "simply-template";
-			button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
-			listItem.appendChild(button);
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+		init : function(config) {
+			if (
+				(typeof config !== "undefined") && 
+				(typeof config['templates'] !== undefined) && 
+				config['templates'].length
+			) {
+				var listItem = document.createElement("li");
+				var button = document.createElement("button");
+				button.dataset.simplyAction = "simply-template";
+				button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
+				listItem.appendChild(button);
+				document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+
+				var templateSelect = document.querySelector("#simply-page-template-list");
+
+				templateSelect.innerHTML = '';
+				for (var i=0; i<config['templates'].length; i++) {
+					var option = document.createElement("option");
+					option.value = config['templates'][i].template;
+					option.innerHTML = config['templates'][i].name;
+					templateSelect.appendChild(option);
+				}
+			}
 		}
 	};
 
@@ -163,5 +179,5 @@
 
 	editor.addAction("simply-template", editor.plugins.pageTemplate.dialog.open);
 	editor.addAction("simply-template-apply", editor.plugins.pageTemplate.apply);
-	editor.plugins.pageTemplate.init();
+	editor.plugins.pageTemplate.init(editor.settings['pageTemplates']);
 </script>
