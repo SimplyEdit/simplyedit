@@ -715,6 +715,9 @@
 						case "title":
 							dataFields[i].contentEditable = true;
 						break;
+						case "i":
+							dataFields[i].setAttribute("data-simply-selectable", true);
+						break;
 						default:
 							dataFields[i].hopeContent = document.createElement("textarea");
 							dataFields[i].hopeMarkup = document.createElement("textarea");

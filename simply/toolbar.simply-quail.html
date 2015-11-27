@@ -1,0 +1,88 @@
+<section id="simply-quail" class="simply-section">
+	<h1>Quail Toolbar</h1>
+	<div class="simply-toolbar">
+		<div class="message">Message goes here!</div>
+		<ul class="simply-buttons">
+			<li><button data-simply-action="simply-quail-dismiss"><i class="fa fa-check"></i>Got it!</button></li>
+		</ul>
+	</div>
+</section>
+<script type="text/javascript">
+	editor.addToolbar({
+		"name" : "simply-quail",
+		"filter" : {
+			"selector" : "[data-quail-result]",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var target = vdSelection.getNode(sel);
+
+			vdSelectionState.currentSelection = sel;
+			vdSelectionState.currentNode = target;
+			
+			document.querySelector("#simply-quail .message").innerHTML = target.getAttribute("data-quail-message");
+			document.querySelector("#simply-quail .message").setAttribute("data-quail-severity", target.getAttribute("data-quail-result"));
+		},
+		"init" : function() {
+			var listItem = document.createElement("li");
+			var button = document.createElement("button");
+			button.dataset.simplyAction = "simply-quail";
+			button.innerHTML = '<i class="fa fa-check-square-o"></i>Validate';
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+
+			var loadQuail = function() {
+				if (typeof jQuery !== "undefined") {
+					var quailScript = document.createElement("SCRIPT");
+					quailScript.src = "http://quailjs.org/dist/quail.jquery.min.js";
+					document.head.appendChild(quailScript);
+				} else {
+					jQueryScript = document.createElement("SCRIPT");
+					jQueryScript.src = "https://code.jquery.com/jquery-1.11.3.min.js"
+					window.setTimeout(loadQuail, 500);
+				}
+			};
+			loadQuail();
+		},
+		"actions" : {
+			"simply-quail-dismiss" : function() {
+				var sel = vdSelectionState.get();
+				var target = vdSelection.getNode(sel);
+
+				target.removeAttribute("data-quail-message");
+				target.removeAttribute("data-quail-result");
+			},
+			"simply-quail" : function() {
+				$('[data-simply-field]').quail({jsonPath : 'http://quailjs.org/dist', 
+					guideline : [ 'imgHasAlt', 'documentAbbrIsUsed', 'headerH1', 'headerH2', 'headerH3'],
+					testFailed : function(event) {
+						event.element.attr("data-quail-result", event.severity);
+						var message = event.test.description.en;
+						event.element.attr("data-quail-message", message);
+					},
+					complete: function(event) {
+						if (event.totals.severe + event.totals.moderate == 0) {
+							alert("All tests done, nothing severe or moderate.");
+						}
+					}
+		      		});
+			}
+		}
+	});
+</script>
+<!-- script src="http://quailjs.org/js/libs/jquery-1.10.2.js"></script -->
+<style type="text/css">
+	[data-quail-result] { outline-radius: 3px; box-shadow: 2px 2px 5px 2px #999}
+	[data-quail-result=severe] { outline: 2px dashed red; }
+	[data-quail-result=moderate] { outline: 2px dashed orange; }
+	[data-quail-result=reccomendation] { outline: 2px dashed lightgreen; }
+	[data-quail-result=suggestion] { outline: 2px dashed lightgreen; }
+	[data-quail-severity] {
+		padding: 10px;
+		padding-top: 20px;
+		font-size: 14px;
+	}
+</style>
