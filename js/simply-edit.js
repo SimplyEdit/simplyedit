@@ -714,6 +714,9 @@
 						case "title":
 							dataFields[i].contentEditable = true;
 						break;
+						case "i":
+							dataFields[i].setAttribute("data-simply-selectable", true);
+						break;
 						default:
 							dataFields[i].hopeContent = document.createElement("textarea");
 							dataFields[i].hopeMarkup = document.createElement("textarea");
@@ -1473,7 +1476,7 @@
 		}
 		editor.toolbars[toolbar.name] = toolbar;
 		if (toolbar.init) {
-			toolbar.init();
+			toolbar.init(editor.settings[toolbar.name]);
 		}
 	};
 
@@ -1524,6 +1527,8 @@
 */
 	window.editor = editor;
 	editor.storageConnectors = storage;
+	editor.settings = document.querySelector("[data-simply-settings]") ? window[document.querySelector("[data-simply-settings]").getAttribute("data-simply-settings")] : {};
+
 	editor.init({
 		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
 		toolbars : [
