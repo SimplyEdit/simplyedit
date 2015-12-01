@@ -1541,6 +1541,7 @@
 			editor.baseURL + "simply/toolbar.simply-iframe.html",
 			editor.baseURL + "simply/toolbar.simply-selectable.html",
 			editor.baseURL + "simply/toolbar.simply-list.html",
+			editor.baseURL + "simply/toolbar.simply-icon.html",
 			editor.baseURL + "simply/plugin.simply-template.html",
 			editor.baseURL + "simply/plugin.simply-save.html",
 			editor.baseURL + "simply/plugin.simply-meta.html",
