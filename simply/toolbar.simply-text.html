@@ -3,7 +3,7 @@
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
-			<!-- li><button data-simply-section="simply-text-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li -->
+			<li><button data-simply-section="simply-text-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
 			<li><button data-simply-section="simply-text-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-clipboard" class="simply-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
 			<li><button data-simply-section="simply-insert" class="simply-expands"><i class="fa fa-plus"></i>Insert</button></li>
@@ -11,7 +11,7 @@
 		</ul>
 		<div class="simply-toolbar-section simply-text-style">
 			<ul>
-				<li class="simply-text-format"><select name="textStyle" data-simply-action="simply-text-blockstyle">
+				<li class="simply-text-format"><select data-simply-action="simply-text-blockstyle">
 					<option value="h1">Heading 1</option>
 					<option value="h2">Heading 2</option>
 					<option value="h3">Heading 3</option>
@@ -19,23 +19,16 @@
 					<option value="ol">Numbered list</option>
 					<option value="ul">Unnumbered list</option>
 				</select></li>
-				<li class="simply-text-bold"><button data-simply-action="simply-text-bold"><i class="fa fa-bold"></i>Bold</button></li>
-				<li class="simply-text-italic"><button data-simply-action="simply-text-italic"><i class="fa fa-italic"></i>Italic</button></li>
-				<li class="simply-text-underline"><button data-simply-action="simply-text-underline"><i class="fa fa-underline"></i>Underline</button></li>
-				<li class="simply-text-code"><button data-simply-action="simply-text-code"><i class="fa fa-code"></i>[Code]</button></li>
+			</ul>
+			<ul class="simply-text-inline">
+				<li><button data-simply-action="simply-text-inline" data-value="strong"><i class="fa fa-bold"></i>Bold</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="em"><i class="fa fa-italic"></i>Italic</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="u"><i class="fa fa-underline"></i>Underline</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="code"><i class="fa fa-code"></i>[Code]</button></li>
 			</ul>
 		</div>
-		<!-- div class="simply-toolbar-section simply-text-class">
-			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
-				<li><button data-simply-action="simply-text-class" data-value="highlight"><i class="fa fa-sun-o"></i>Highlight</button></li>
-				<li><button data-simply-action="simply-text-class" data-value="none"><i class="fa fa-times"></i>Default</button></li>
-			</ul>
-			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
-				<li><button data-simply-action="simply-text-class" data-value="blue"><i class="fa fa-paint-brush"></i>Blue</button></li>
-				<li><button data-simply-action="simply-text-class" data-value="red"><i class="fa fa-paint-brush"></i>Red</button></li>
-				<li><button data-simply-action="simply-text-class" data-value="none"><i class="fa fa-times"></i>Default</button></li>
-			</ul>
-		</div -->
+		<div class="simply-toolbar-section simply-text-class">
+		</div>
 		<div class="simply-toolbar-section simply-text-align">
 			<ul data-type="simply-buttongroup-radio">
 				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-left"><i class="fa fa-align-left"></i>Left</button></li>
@@ -74,6 +67,7 @@
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
+			<li><button data-simply-section="simply-text-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
 			<li><button data-simply-section="simply-text-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-clipboard" class="simply-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
 			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
@@ -82,7 +76,7 @@
 		</ul>
 		<div class="simply-toolbar-section simply-text-style">
 			<ul>
-				<li class="simply-text-format"><select name="textStyle" data-simply-action="simply-text-blockstyle">
+				<li class="simply-text-format"><select data-simply-action="simply-text-blockstyle">
 					<option value="h1">Heading 1</option>
 					<option value="h2">Heading 2</option>
 					<option value="h3">Heading 3</option>
@@ -90,11 +84,15 @@
 					<option value="ol">Numbered list</option>
 					<option value="ul">Unnumbered list</option>
 				</select></li>
-				<li class="simply-text-bold"><button data-simply-action="simply-text-bold"><i class="fa fa-bold"></i>Bold</button></li>
-				<li class="simply-text-italic"><button data-simply-action="simply-text-italic"><i class="fa fa-italic"></i>Italic</button></li>
-				<li class="simply-text-underline"><button data-simply-action="simply-text-underline"><i class="fa fa-underline"></i>Underline</button></li>
-				<li class="simply-text-code"><button data-simply-action="simply-text-code"><i class="fa fa-code"></i>[Code]</button></li>
 			</ul>
+			<ul class="simply-text-inline">
+				<li><button data-simply-action="simply-text-inline" data-value="strong"><i class="fa fa-bold"></i>Bold</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="em"><i class="fa fa-italic"></i>Italic</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="u"><i class="fa fa-underline"></i>Underline</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="code"><i class="fa fa-code"></i>[Code]</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-text-class">
 		</div>
 		<div class="simply-toolbar-section simply-hyperlink">
 			<div><label>URL</label><input type="text" id="vdHyperlinkHref" data-simply-action="simply-hyperlink-href"></div>
@@ -129,6 +127,80 @@
 		editor.plugins.text = {};
 	}, 3000);
 
+	var initTextToolbar = function(config) {
+		var toolbar = document.querySelector("#" + this.name);
+		if (typeof config === "object" && toolbar) {
+
+			// Init blockstyles
+			if (config.block) {
+				var blockStyleSelect = toolbar.querySelector('select[data-simply-action=simply-text-blockstyle]');
+				if (blockStyleSelect) {
+					if (config.block.length) {
+						blockStyleSelect.innerHTML = '';
+						for (var i=0; i<config.block.length; i++) {
+							option = document.createElement("option");
+							option.value = config.block[i].tag;
+							option.innerHTML = config.block[i].name;
+							blockStyleSelect.appendChild(option);
+						}
+					} else {
+						blockStyleSelect.style.display = "none";
+					}
+				}
+			}
+
+			// Init inline styles
+			if (config.inline) {
+				var inlineStyles = toolbar.querySelector('ul.simply-text-inline');
+				if (inlineStyles) {
+					if (config.inline.length) {
+						inlineStyles.innerHTML = '';
+						for (var i=0; i<config.inline.length; i++) {
+							var item = document.createElement("li");
+							var button = document.createElement("button");
+							button.setAttribute("data-value", config.inline[i].tag);
+							button.setAttribute("data-simply-action", "simply-text-inline");
+							button.innerHTML = "<i class='fa " + config.inline[i].icon + "'></i>" + config.inline[i].name;
+							item.appendChild(button);
+							inlineStyles.appendChild(item);
+						}
+					} else {
+						inlineStyles.style.display = "none";
+					}
+				}
+			}
+
+			// Init block classes
+			if (config.class) {
+				var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-text-class');
+				if (classSection) {
+					if (config.class.length) {
+						classSection.innerHTML = '';
+						for (var i=0; i<config.class.length; i++) {
+							if (config.class[i].length) {
+								var classList = config.class[i].slice();
+								classList.push({class: "none", name: "Default", icon: "fa-times"});
+								var list = document.createElement("UL");
+								list.setAttribute("data-type", "simply-buttongroup-radio");
+								for (var j=0; j<classList.length; j++) {
+									var item = document.createElement("li");
+									var button = document.createElement("button");
+									button.setAttribute("data-value", classList[j].class);	
+									button.setAttribute("data-simply-action", "simply-text-class");
+									button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+									item.appendChild(button);
+									list.appendChild(item);
+								}
+
+								classSection.appendChild(list);
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+
 	var updateTextToolbar = function(toolbar) {
 		if (toolbar === null) {
 			return;
@@ -148,58 +220,41 @@
 
 		if (blockAnnotation) {
 			var tagName = blockAnnotation.tag.split(/ /, 2)[0].toLowerCase();
-			var foundTag = toolbar.querySelector("[name='textStyle'] option[value='" + tagName + "']");
+			var foundTag = toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']");
 			if (foundTag) {
 				foundTag.selected = true;
 			} else if (tagName == "li") {
 				var annotation = hopeEditor.fragment.has(range, "ol");
 				if (annotation) {
-					toolbar.querySelector("[name='textStyle'] option[value='ol']").selected = true;
+					toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ol']").selected = true;
 				}
 				annotation = hopeEditor.fragment.has(range, "ul");
 				if (annotation) {
-					toolbar.querySelector("[name='textStyle'] option[value='ul']").selected = true;
+					toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']").selected = true;
 				}
 			} else {
-				toolbar.querySelector("[name='textStyle'] option[value='p']").selected = true;
+				toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
 			}
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "block";
 		} else {
-			toolbar.querySelector("[name='textStyle'] option[value='p']").selected = true;
+			toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
 		}
 
-
-		// Check "Bold"
-		var textBold = toolbar.querySelector(".simply-text-bold button");
-		if (hopeEditor.fragment.has(range, "strong")) {
-			textBold.classList.add("simply-selected");
+		if (toolbar.querySelector(".simply-toolbar-section.simply-text-class ul")) {
+			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "block";
 		} else {
-			textBold.classList.remove("simply-selected");
+			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "none";
 		}
 
-		// Check "Italic"
-		var textItalic = toolbar.querySelector(".simply-text-italic button");
-		if (hopeEditor.fragment.has(range, "em")) {
-			textItalic.classList.add("simply-selected");
-		} else {
-			textItalic.classList.remove("simply-selected");
-		}
-
-		// Check "Underline"
-		var textUnderline = toolbar.querySelector(".simply-text-underline button");
-		if (hopeEditor.fragment.has(range, "u")) {
-			textUnderline.classList.add("simply-selected");
-		} else {
-			textUnderline.classList.remove("simply-selected");
-		}
-
-		// Check "Code"
-		var textCode = toolbar.querySelector(".simply-text-code button");
-		if (hopeEditor.fragment.has(range, "code")) {
-			textCode.classList.add("simply-selected");
-		} else {
-			textCode.classList.remove("simply-selected");
+		// Check inline styles;
+		var inlineStyles = toolbar.querySelectorAll("[data-simply-action='simply-text-inline']");
+		for (var i=0; i<inlineStyles.length; i++) {
+			if (hopeEditor.fragment.has(range, inlineStyles[i].getAttribute("data-value"))) {
+				inlineStyles[i].classList.add("simply-selected");
+			} else {
+				inlineStyles[i].classList.remove("simply-selected");
+			}
 		}
 
 		// Check hyperlink;
@@ -434,7 +489,8 @@
 		"filter" : {
 			"sel-collapsed" : true
 		},
-		update : updateTextToolbar
+		update : updateTextToolbar,
+		init : initTextToolbar
 	});
 
 	editor.addToolbar({
@@ -443,6 +499,7 @@
 			"sel-collapsed" : false
 		},
 		update : updateTextToolbar,
+		init : initTextToolbar,
 		actions : {
 			'simply-text-class' : function(el) {
 				var range = hopeEditor.currentRange;
@@ -471,16 +528,20 @@
 				}
 				hopeEditor.update();
 			},
+			'simply-text-inline' : function(el) {
+				editor.plugins.hope.annotation.apply(hopeEditor, el.getAttribute("data-value"));
+			},
+			// FIXME: These are here for the tests only, tests should be rewritten.
 			'simply-text-bold' : function() {
 				editor.plugins.hope.annotation.apply(hopeEditor, "strong");
 			},
 			'simply-text-italic' : function(el) {
 				editor.plugins.hope.annotation.apply(hopeEditor, "em");
 			},
-			'simply-text-underline' : function() {
+			'simply-text-underline' : function(el) {
 				editor.plugins.hope.annotation.apply(hopeEditor, "u");
 			},
-			'simply-text-code' : function() {
+			'simply-text-code' : function(el) {
 				editor.plugins.hope.annotation.apply(hopeEditor, "code");
 			},
 			'simply-text-blockstyle' : function(value) {
@@ -515,8 +576,9 @@
 						newRange = hope.range.create(block.range.start, block.range.end);
 					}
 
-					if (newRange.start == block.range.start && newRange.end == block.range.end) {
-						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + block.tag + "']")) {
+					if ((newRange.start == block.range.start) && (newRange.end == block.range.end)) {
+						var tagName = block.tag.split(" ")[0];
+						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
 						}
 					}

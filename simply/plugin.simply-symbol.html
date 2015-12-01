@@ -84,16 +84,39 @@
 				var targetList = document.querySelector("#simply-symbol .simply-dialog-body");
 				targetList.style.fontFamily = styles['font-family'];
 
+				var charset;
+				switch (targetList.style.fontFamily) {
+					case "FontAwesome":
+						charset = {
+							start : 61440,
+							middle : 61440 + 300,
+							end : 61440 + 750,
+							skip : {}
+						};
+					break;
+					default:
+						charset = {
+							start : 33,
+							middle : 400,
+							end : 2000,
+							skip : {
+								173: true // &shy;
+							}
+						};
+					break;
+				}
 				newHtml = '';
-				for (var i=33; i<400; i++) {
-					if (i == 173) {
+				// List all characters from start to middle directly... 
+				for (var i=charset.start; i<charset.middle; i++) {
+					if (charset.skip[i] && (charset.skip[i] === true)) {
 						continue; // &shy
 					}
 					newHtml += "<button data-simply-action='simply-symbol-insert' data-value=" + i + ">&#" + i + ";</button>";
 				}
 				targetList.innerHTML = newHtml;
 				window.setTimeout(function() {
-					for (var i=400; i<2000; i++) {
+					// ... and the middle to the end a bit later so it loads faster.
+					for (var i=charset.middle; i<charset.end; i++) {
 						newHtml += "<button data-simply-action='simply-symbol-insert' data-value=" + i + ">&#" + i + ";</button>";
 					}
 					targetList.innerHTML = newHtml;
@@ -121,6 +144,8 @@
 				hopeEditor.selection.move(1);
 				hopeEditor.update();
 			}
+		} else if (editor.plugins.symbol.currentField.tagName.toLowerCase() === "i") {
+			editor.plugins.symbol.currentField.innerHTML = "&#" + el.dataset.value + ";";
 		} else {
 			if (!editor.plugins.symbol.currentSel.collapsed) {
 				vdSelectionState.restore(editor.plugins.symbol.currentSel);

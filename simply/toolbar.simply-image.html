@@ -3,6 +3,7 @@
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
+			<li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
 			<li><button data-simply-section="simply-image-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-clipboard" class="simply-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
 			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
@@ -16,6 +17,8 @@
 					<option value="">Original</option>
 				</select>
 			</div>
+		</div>
+		<div class="simply-toolbar-section simply-image-class">
 		</div>
 		<div class="simply-toolbar-section simply-image-align">
 			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
@@ -132,9 +135,21 @@
 			var alt=image.getAttribute('alt');
 			simply.widgets.properties.set('vdImageAlt',alt);
 
-			var imageClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
-			if (annotation && imageClasses) {
-				var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+			if (toolbar.querySelector(".simply-toolbar-section.simply-image-class ul")) {
+				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
+			} else {
+				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "none";
+			}
+
+			var imageClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio], .simply-image-class [data-type=simply-buttongroup-radio]");
+			if (imageClasses) {
+				var tempNode;
+				if (annotation) {
+					tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					tempNode = hopeEditor.field;
+				}
+
 				for (var i=0; i<imageClasses.length; i++) {
 					var buttons = imageClasses[i].querySelectorAll("[data-value]");
 					simply.widgets.properties.set(imageClasses[i], "none");
@@ -199,7 +214,39 @@
 				}
 			}
 		},
-		"init" : function() {
+		"init" : function(config) {
+			var toolbar = document.querySelector("#" + this.name);
+			if (typeof config === "object" && toolbar) {
+				// Init block classes
+				if (config.class) {
+					var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-image-class');
+					if (classSection) {
+						if (config.class.length) {
+							classSection.innerHTML = '';
+							for (var i=0; i<config.class.length; i++) {
+								if (config.class[i].length) {
+									var classList = config.class[i].slice();
+									classList.push({class: "none", name: "Default", icon: "fa-times"});
+									var list = document.createElement("UL");
+									list.setAttribute("data-type", "simply-buttongroup-radio");
+									for (var j=0; j<classList.length; j++) {
+										var item = document.createElement("li");
+										var button = document.createElement("button");
+										button.setAttribute("data-value", classList[j].class);
+										button.setAttribute("data-simply-action", "simply-image-class");
+										button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+										item.appendChild(button);
+										list.appendChild(item);
+									}
+
+									classSection.appendChild(list);
+								}
+							}
+						}
+					}
+				}
+			}
+
 			vdSetImage = function() {
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
@@ -264,7 +311,16 @@
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					}
 					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, newValue);
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
+					for (var i=0; i<buttons.length; i++) {
+						hopeEditor.field.classList.remove(buttons[i].getAttribute("data-value"));
+					}
+					if (el.getAttribute("data-value") !== "none") {
+						hopeEditor.field.classList.add(el.getAttribute("data-value"));
+					}
 				}
+
 				hopeEditor.update();
 			},
 			"simply-image-type" : function() {
