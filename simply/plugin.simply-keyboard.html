@@ -80,6 +80,8 @@
 					previousSibling.querySelector("*").focus();
 				}
 				event.preventDefault();
+			} else {
+				editor.context.toolbar.hide = true;
 			}
 		} else if (key == 38) { // up
 			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
@@ -94,6 +96,8 @@
 					targets[0].focus();
 					event.preventDefault();
 				}
+			} else {
+				editor.context.toolbar.hide = true;
 			}
 		} else if (key == 39) { // right
 			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
@@ -112,6 +116,8 @@
 					nextSibling.querySelector("*").focus();
 				}
 				event.preventDefault();
+			} else {
+				editor.context.toolbar.hide = true;
 			}
 		} else if (key == 40) { // down
 			// open current toolbar section;
@@ -124,6 +130,8 @@
 					muze.event.fire(target, "click");
 				}
 				event.preventDefault();
+			} else {
+				editor.context.toolbar.hide = true;
 			}
 		} else {
 			var target = this.querySelector('.simply-section.active :focus');
