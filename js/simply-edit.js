@@ -1197,7 +1197,7 @@
 					return callback({message : "Could not store."});
 				};
 
-				this.repo.write(this.repoBranch, this.dataFile, data, "Commit message", saveCallback);
+				this.repo.write(this.repoBranch, this.dataFile, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
