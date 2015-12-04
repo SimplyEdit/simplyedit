@@ -1,0 +1,142 @@
+html,body {
+	padding: 0;
+	margin: 0;
+}
+
+@media (max-width: 481px) {
+	.article.large {
+		position: relative;
+		height: 100%;
+		width: 100%;
+		display: inline-block;
+		vertical-align: top;
+		box-sizing: border-box;
+		border: 5px solid transparent;
+	}
+	.article.small {
+		position: relative;
+		height: 50%;
+		width: 50%;
+		display: inline-block;
+		vertical-align: top;
+		border: 5px solid transparent;
+		box-sizing: border-box;
+	}
+}
+
+@media (min-width: 481px) {
+	.article.large {
+		position: relative;
+		height: 50%;
+		width: 50%;
+		display: inline-block;
+		vertical-align: top;
+		box-sizing: border-box;
+		border: 5px solid transparent;
+	}
+	.article.small {
+		position: relative;
+		height: 33.3333%;
+		width: 33.3333%;
+		display: inline-block;
+		vertical-align: top;
+		border: 5px solid transparent;
+		box-sizing: border-box;
+	}
+}
+@media (min-width: 768px) {
+	.article.large {
+		position: relative;
+		height: 50%;
+		width: 50%;
+		display: inline-block;
+		vertical-align: top;
+		box-sizing: border-box;
+		border: 5px solid transparent;
+	}
+	.article.small {
+		position: relative;
+		height: 25%;
+		width: 25%;
+		display: inline-block;
+		vertical-align: top;
+		border: 5px solid transparent;
+		box-sizing: border-box;
+	}
+}
+@media (min-width: 960px) {
+	body > div {
+		width: 960px;
+		margin: 0px auto;
+	}
+}
+
+.article a {
+	text-decoration: none;
+	color: inherit;
+}
+.article a img {
+	border: 0;
+}
+.article h1,
+.article h2 {
+	position: absolute;
+	z-index: 2;
+	font-family: helvetica;
+	padding: 10px;
+	width: 100%;
+	box-sizing: border-box;
+}
+.article h1 {
+	top: 0;
+	font-size: 16px;
+	background-color: rgba(255,255,255,0.6);
+}
+.article h2 {
+	bottom: 0;
+	font-size: 12px;
+	font-weight: normal;
+	background-color: rgba(255,255,255,0.8);
+	margin: 0;
+}
+.article.large:nth-child(2) h1 {
+	text-align: right;
+}
+	
+.article div {
+	position: absolute;
+	z-index: 2;
+	bottom: 3em;
+	background-color: rgba(255,255,255,0.8);
+	padding: 10px;
+	font-family: helvetica;
+	font-size: 13px;
+
+}
+.article img {
+	width: 100%;
+	float: left;
+	z-index: 1;
+}
+
+.article:after {
+	content: '';
+	display: block;
+	clear: both;
+}
+.news.simply-empty:after { 
+	text-align: center;
+	content: "Loading...";
+	display: block;
+	position: absolute;
+	top: 50px;
+	left: 50%;
+	margin-left: -120px;
+	width: 200px;
+	padding: 20px;
+	background-color: #f8f8f8;
+	font-family: helvetica;
+	border: 1px solid #888;
+	border-radius: 20px;
+	box-shadow: 2px 2px 5px 0px #333;
+}
