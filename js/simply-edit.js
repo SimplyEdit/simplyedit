@@ -530,11 +530,19 @@
 			}
 		},
 		field : {
+			extraTypes : {},
+			registerType : function(fieldType, getter, setter, editmode) {
+				editor.field.extraTypes[fieldType] = {
+					get : getter,
+					set : setter,
+					editable : editmode
+				};
+			},
 			set : function(field, data) {
 				var attr;
-				switch (field.tagName) {
-					case "IMG":
-					case "IFRAME":
+				switch (field.tagName.toLowerCase()) {
+					case "img":
+					case "iframe":
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
@@ -542,12 +550,12 @@
 							field.setAttribute(attr, data[attr]);
 						}
 					break;
-					case "META":
+					case "meta":
 						for (attr in data) {
 							field.setAttribute(attr, data[attr]);
 						}
 					break;
-					case "A":
+					case "a":
 						for (attr in data) {
 							if (attr == "innerHTML") {
 								field.innerHTML = data[attr];
@@ -557,6 +565,13 @@
 						}
 					break;
 					default:
+						if (
+							editor.field.extraTypes[field.tagName.toLowerCase()] && 
+							typeof editor.field.extraTypes[field.tagName.toLowerCase()].set === "function"
+						) {
+							return editor.field.extraTypes[field.tagName.toLowerCase()].set(field, data);
+						}
+
 						field.innerHTML = data;
 					break;
 				}
@@ -566,21 +581,27 @@
 				var attributes = {};
 				var allowedAttributes = {};
 
-				switch (field.tagName) {
-					case "IMG": 
+				switch (field.tagName.toLowerCase()) {
+					case "img": 
 						allowedAttributes = ["src", "class", "alt", "title"];
 					break;
-					case "A":
+					case "a":
 						allowedAttributes = ["href", "class", "alt", "title"];
 						attributes.innerHTML = field.innerHTML;
 					break;
-					case "META":
+					case "meta":
 						allowedAttributes = ["content"];
 					break;
-					case "IFRAME":
+					case "iframe":
 						allowedAttributes = ["src"];
 					break;
 					default:
+						if (
+							editor.field.extraTypes[field.tagName.toLowerCase()] &&
+							typeof editor.field.extraTypes[field.tagName.toLowerCase()].get === "function"
+						) {
+							return editor.field.extraTypes[field.tagName.toLowerCase()].get(field);
+						}
 						return field.innerHTML;
 				}
 				for (attr in allowedAttributes) {
@@ -590,6 +611,35 @@
 					}
 				}
 				return attributes;
+			},
+			editable : function(field) {
+				switch (field.tagName.toLowerCase()) {
+					case "iframe":
+					case "meta":
+					case "title":
+						field.contentEditable = true;
+					break;
+					case "img":
+						field.setAttribute("data-simply-selectable", true);
+					break;
+					case "i":
+						field.setAttribute("data-simply-selectable", true);
+					break;
+					default:
+						if (
+							editor.field.extraTypes[field.tagName.toLowerCase()] && 
+							typeof editor.field.extraTypes[field.tagName.toLowerCase()].editable === "function"
+						) {
+							return editor.field.extraTypes[field.tagName.toLowerCase()].editable(field);
+						}
+
+						field.hopeContent = document.createElement("textarea");
+						field.hopeMarkup = document.createElement("textarea");
+						field.hopeRenderedSource = document.createElement("DIV");
+						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
+						field.hopeEditor.field = field;
+					break;
+				}
 			}
 		},
 		loadBaseStyles : function() {
@@ -757,40 +807,7 @@
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
 				for (i=0; i<dataFields.length; i++) {
-				//	dataFields[i].contentEditable = true;
-					switch (dataFields[i].tagName.toLowerCase()) {
-						case "iframe":
-						case "meta":
-						case "title":
-							dataFields[i].contentEditable = true;
-						break;
-						case "i":
-							dataFields[i].setAttribute("data-simply-selectable", true);
-						break;
-						default:
-							dataFields[i].hopeContent = document.createElement("textarea");
-							dataFields[i].hopeMarkup = document.createElement("textarea");
-							dataFields[i].hopeRenderedSource = document.createElement("DIV");
-							dataFields[i].hopeEditor = hope.editor.create( dataFields[i].hopeContent, dataFields[i].hopeMarkup, dataFields[i], dataFields[i].hopeRenderedSource );
-							dataFields[i].hopeEditor.field = dataFields[i];
-
-							var parseTimer = false;
-					
-/*							var nodeInserted = function(evt) {
-								console.log(evt);
-
-								dataFields[i].removeEventListener("DOMNodeInserted", nodeInserted);
-								console.log('parsing');
-								dataFields[i].hopeEditor.parseHTML();
-								console.log('parsed');
-								window.setTimeout(function() {
-								//	dataFields[i].addEventListener("DOMNodeInserted", nodeInserted);
-								}, 10);
-							};
-							dataFields[i].addEventListener("DOMNodeInserted", nodeInserted);
-*/
-						break;
-					}
+					editor.field.editable(dataFields[i]);
 
 					// FIXME: Add support to keep fields that point to the same field within the same path in sync here;
 				}
