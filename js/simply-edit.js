@@ -112,6 +112,17 @@
 						counter++;
 					}
 					list.setAttribute("data-simply-stashed", 1);
+
+					if (list.getAttribute("data-simply-data")) {
+						var listData = data[dataPath][dataName];
+						// FIXME: Feed the subdata to the save;
+
+						// FIXME: add other attributes as well.
+						data[dataPath][dataName] = {
+							"data-simply-feed" : list.getAttribute("data-simply-feed")
+						};
+					}
+
 				};
 
 				var addData = function(field) {
@@ -264,13 +275,30 @@
 				init : function(data, target) {
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-simply-list]");
+
+					var applyDataSource = function(list, dataSource) {
+						if (editor.dataSources[dataSource] && typeof editor.dataSources[dataSource].load === "function") {
+							editor.dataSources[dataSource].load(list, function(result) {
+								editor.data.list.applyTemplates(list, result);
+							});
+						} else if (editor.dataSources[dataSource] && editor.dataSources[dataSource].load) {
+							editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+						} else {
+							window.setTimeout(function() {applyDataSource(list, dataSource);}, 500);
+						}
+					};
+
 					for (var i=0; i<dataLists.length; i++) {
 						dataLists[i].innerHTML = dataLists[i].innerHTML; // reset innerHTML to make sure templates are recognized;
 
 						editor.data.list.parseTemplates(dataLists[i]);
 						dataName = dataLists[i].getAttribute("data-simply-list");
 						dataPath = dataLists[i].getAttribute("data-simply-path") ? dataLists[i].getAttribute("data-simply-path") : location.pathname;
-						if (data[dataPath] && data[dataPath][dataName]) {
+
+						var dataSource = dataLists[i].getAttribute("data-simply-data");
+						if (dataSource !== null) {
+							applyDataSource(dataLists[i], dataSource);
+						} else if (data[dataPath] && data[dataPath][dataName]) {
 							editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
 						}
 
@@ -354,7 +382,22 @@
 						var handleLists = function(elm) {
 							editor.data.list.parseTemplates(elm);
 							dataName = elm.getAttribute("data-simply-list");
-							if (listData[j][dataName]) {
+
+							var dataSource = elm.getAttribute("data-simply-data");
+							if (dataSource !== null) {
+								var applyDataSource = function(list, dataSource) {
+									if (editor.dataSources[dataSource] && typeof editor.dataSources[dataSource].load === "function") {
+										editor.dataSources[dataSource].load(list, function(result) {
+											editor.data.list.applyTemplates(list, result);
+										});
+									} else if (editor.dataSources[dataSource] && editor.dataSources[dataSource].load) {
+										editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+									} else {
+										window.setTimeout(function() {applyDataSource(list, dataSource);}, 500);
+									}
+								};
+								applyDataSource(elm, dataSource);
+							} else if (listData[j][dataName]) {
 								editor.data.list.applyTemplates(elm, listData[j][dataName]);
 							}
 
@@ -393,6 +436,10 @@
 							handleLists(clone);
 						}
 					};
+
+					if (listData['data-simply-feed']) {
+						list.setAttribute("data-simply-feed", listData['data-simply-feed']);
+					}
 
 					for (j=0; j<listData.length; j++) {
 						var requestedTemplate = listData[j]["data-simply-template"];
@@ -1469,6 +1516,8 @@
 	editor.toolbars = {};
 	editor.contextFilters = {};
 	editor.plugins = {};
+	editor.dataSources = {};
+
 	editor.loadToolbar = function(url) {
 		if (!editor.toolbar || (typeof muze === "undefined")) {
 			// Main toolbar code isn't loaded yet;
@@ -1489,6 +1538,13 @@
 		if (toolbar.init) {
 			toolbar.init(editor.settings[toolbar.name]);
 		}
+	};
+
+	editor.addDataSource = function(name, load, save) {
+		editor.dataSources[name] = {
+			load : load,
+			save : save
+		};
 	};
 
 	editor.addContextFilter = function(name, filter) {
