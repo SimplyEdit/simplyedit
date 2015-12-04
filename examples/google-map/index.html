@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simply edit</title>
+	<meta name="description" content="Simply edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta charset="utf-8"> 
+</head>
+<body>
+	<google-map data-simply-field="map" latitude=52 longitude=6 zoom=10>Hello world!</google-map>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze" 
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+	></script>
+	<script>
+		(function() {
+			var allowedAttributes = ["latitude", "longitude", "zoom"];
+			
+			var googleMapGetter = function(field) {
+				var attr;
+				var attributes = {};
+				
+				for (attr in allowedAttributes) {
+					attr = allowedAttributes[attr];
+					if (field.getAttribute(attr)) {
+						attributes[attr] = field.getAttribute(attr);
+					}
+				}
+				return attributes;
+			};
+
+			var googleMapSetter = function(field, data) {
+				var attr;
+				for (attr in data) {
+					if (allowedAttributes.indexOf(attr) !== -1) {
+						field.setAttribute(attr, data[attr]);
+					}
+				}
+			};
+
+			var googleMapEditable = function(field) {
+				field.setAttribute("data-simply-selectable", true);
+			};
+
+			editor.field.registerType("google-map", googleMapGetter, googleMapSetter, googleMapEditable);
+			editor.loadToolbar("google-map.toolbar.html");
+		}());
+	</script>
+</body>
+</html>
