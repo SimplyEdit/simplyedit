@@ -555,7 +555,9 @@
 		init : function(config) {
 			document.createElement("template");
 			if (config.toolbars) {
-				editor.editmode.toolbars = config.toolbars;
+				for (i=0; i<config.toolbars.length; i++) {
+					editor.editmode.toolbars.push(config.toolbars[i]);
+				}
 			}
 			editor.loadBaseStyles();
 
@@ -564,7 +566,61 @@
 			editor.data.load();
 		},
 		editmode : {
-			toolbars : null,
+			toolbars : [],
+			loadToolbarList : function(toolbarList) {
+				var toolbarsContainer = document.querySelector("#simply-editor");
+
+				var url = toolbarList.shift();
+				var i;
+				var http = new XMLHttpRequest();
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4) {
+						if (http.status == 200) {
+							var toolbars = document.createElement("TEMPLATE");
+							toolbars.innerHTML = http.responseText;
+
+							if (!("content" in toolbars)) {
+								var fragment = document.createDocumentFragment();
+								while (toolbars.children.length) {
+									fragment.appendChild(toolbars.children[0]);
+								}
+								toolbars.content = fragment;
+							}
+							var toolbarNode = document.importNode(toolbars.content, true);
+							if (editor.brokenImport) {
+								editor.importScripts = true;
+							}
+							if (editor.importScripts) {
+								var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
+								for (i=0; i<scriptTags.length; i++) {
+									var newNode = document.createElement("SCRIPT");
+									if (scriptTags[i].src) {
+										newNode.src = scriptTags[i].src;
+									}
+									if (scriptTags[i].innerHTML) {
+										newNode.innerHTML = scriptTags[i].innerHTML;
+									}
+									document.head.appendChild(newNode);
+								}
+							}
+
+							var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
+							for (i=0; i<newToolbars.length; i++) {
+								editor.toolbar.init(newToolbars[i]);
+							}
+							toolbarsContainer.appendChild(toolbarNode);
+						}
+						if (toolbarList.length) {
+							editor.editmode.loadToolbarList(toolbarList);
+						}
+					}
+				};
+				http.send();
+			},
 			init : function() {
 				var toolbarsContainer = document.createElement("DIV");
 				toolbarsContainer.id = "simply-editor";
@@ -577,61 +633,7 @@
 						return;
 					}
 
-					var loadToolbarList = function(toolbarList) {
-						var url = toolbarList.shift();
-						var i;
-						var http = new XMLHttpRequest();
-						if (editor.profile == "dev") {
-							url += "?t=" + (new Date().getTime());
-						}
-						http.open("GET", url, true);
-						http.onreadystatechange = function() {//Call a function when the state changes.
-							if(http.readyState == 4) {
-								if (http.status == 200) {
-									var toolbars = document.createElement("TEMPLATE");
-									toolbars.innerHTML = http.responseText;
-
-									if (!("content" in toolbars)) {
-										var fragment = document.createDocumentFragment();
-										while (toolbars.children.length) {
-											fragment.appendChild(toolbars.children[0]);
-										}
-										toolbars.content = fragment;
-									}
-									var toolbarNode = document.importNode(toolbars.content, true);
-									if (editor.brokenImport) {
-										editor.importScripts = true;
-									}
-									if (editor.importScripts) {
-										var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
-										for (i=0; i<scriptTags.length; i++) {
-											var newNode = document.createElement("SCRIPT");
-											if (scriptTags[i].src) {
-												newNode.src = scriptTags[i].src;
-											}
-											if (scriptTags[i].innerHTML) {
-												newNode.innerHTML = scriptTags[i].innerHTML;
-											}
-											document.head.appendChild(newNode);
-										}
-									}
-
-									var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
-									for (i=0; i<newToolbars.length; i++) {
-										editor.toolbar.init(newToolbars[i]);
-									}
-									toolbarsContainer.appendChild(toolbarNode);
-								}
-								if (toolbarList.length) {
-									loadToolbarList(toolbarList);
-								}
-							}
-						};
-						http.send();
-					};
-
-					loadToolbarList(editor.editmode.toolbars.slice()); // slice to copy the toolbars;
-
+					editor.editmode.loadToolbarList(editor.editmode.toolbars.slice()); // slice to copy the toolbars;
 					editor.editmode.toolbarMonitor();
 				};
 
@@ -1467,6 +1469,14 @@
 	editor.toolbars = {};
 	editor.contextFilters = {};
 	editor.plugins = {};
+	editor.loadToolbar = function(url) {
+		if (!editor.toolbar || (typeof muze === "undefined")) {
+			// Main toolbar code isn't loaded yet;
+			editor.editmode.toolbars.push(url);
+		} else {
+			editor.editmode.loadToolbarList([url]);
+		}
+	};
 
 	editor.addToolbar = function(toolbar) {
 		if (toolbar.filter) {
