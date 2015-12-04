@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script>
+	var editor = {
+		storage : {
+			url : "http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/frop/frup/"
+		}
+	};
+
+	var store = {
+		save : function(data, callback) {
+			var http = new XMLHttpRequest();
+			var url = editor.storage.url + "data.json";
+
+			http.open("PUT", url, true);
+			//Send the proper header information along with the request
+			http.setRequestHeader("Content-type", "application/json");
+
+			http.onreadystatechange = function() {//Call a function when the state changes.
+				if(http.readyState == 4 && http.status == 200) {
+					if (typeof callback == "function") {
+						callback();
+					}
+				}
+			};
+			http.send(data);
+		},
+		delete : function(callback) {
+			var http = new XMLHttpRequest();
+			var url = editor.storage.url + "data.json";
+
+			http.open("DELETE", url, true);
+			//Send the proper header information along with the request
+
+			http.onreadystatechange = function() {//Call a function when the state changes.
+				if(http.readyState == 4 && http.status == 200) {
+					if (typeof callback == "function") {
+						callback();
+					}
+				}
+			};
+			http.send();
+		},
+		load : function(callback) {
+			var http = new XMLHttpRequest();
+			var url = editor.storage.url + "data.json";
+			url += "?t=" + (new Date().getTime());
+
+			http.open("GET", url, true);
+			http.onreadystatechange = function() {//Call a function when the state changes.
+				if(http.readyState == 4 && http.status == 200) {
+					if (typeof callback == "function") {
+						callback(http.responseText);
+					}
+				}
+			};
+			http.send();
+		}
+	};
+
+
+</script>
+</head>
+<body>
+
+</body>
+</html>
