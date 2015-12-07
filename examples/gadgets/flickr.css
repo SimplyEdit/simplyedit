@@ -1,0 +1,30 @@
+.photoGrid .item {
+	float: left;
+	margin: 2px;
+}
+.photoGrid .item img {
+	width: 100%;
+	max-width: 100%;
+	max-height: 100%;
+}
+.photoGrid.simply-empty:after { 
+	text-align: center;
+	content: "Loading...";
+	display: block;
+	position: absolute;
+	top: 50px;
+	left: 50%;
+	margin-left: -120px;
+	width: 200px;
+	padding: 20px;
+	background-color: #f8f8f8;
+	font-family: helvetica;
+	border: 1px solid #888;
+	border-radius: 20px;
+	box-shadow: 2px 2px 5px 0px #333;
+}
+.photoGrid:after {
+	content: "";
+	display: block;
+	clear: both;
+}

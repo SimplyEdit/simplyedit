@@ -497,3 +497,34 @@ QUnit.module("github storage");
 		assert.equal(repoInfo.repoPath, "data.json");
 		assert.equal(repoInfo.repoUser, "ylebre");
 	});
+
+QUnit.module("custom field types");
+	QUnit.test("custom getter", function(assert) {
+		var stubGetter = function() {return "foo";};
+		editor.field.registerType("google-map", stubGetter, null, null);
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<google-map>frop</google-map>";
+		var fieldData = editor.field.get(target.querySelector("google-map"));
+		console.log(fieldData);
+
+		assert.equal(editor.field.get(target.querySelector("google-map")), "foo");
+	});
+
+	QUnit.test("custom setter", function(assert) {
+		var stubGetter = function() {return "foo";};
+		var stubSetter = function(field, data) {
+			for (var i in data) {
+				field.setAttribute(i, data[i]);
+			}
+		};
+
+		editor.field.registerType("google-map", stubGetter, stubSetter, null);
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<google-map data-simply-field='map'>frop</google-map>";
+		editor.field.set(target.querySelector("google-map"), {latitude: 52, longitude: 6, zoom: 10});
+
+		
+		assert.equal(target.querySelector("google-map").getAttribute("latitude"), 52);
+		assert.equal(target.querySelector("google-map").getAttribute("longitude"), 6);
+		assert.equal(target.querySelector("google-map").getAttribute("zoom"), 10);
+	});

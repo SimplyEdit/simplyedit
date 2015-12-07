@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simple edit</title>
+	<meta name="description" content="Simple edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta name="page-template" content="index.html" data-simply-field="data-simply-page-template">
+	<meta charset="utf-8"> 
+	<style type="text/css">
+		img.shadow {
+			box-shadow: 4px 4px 8px 0px rgba(0,0,0,0.75);
+		}
+	</style>
+</head>
+<body>
+	<h1 data-simply-field="title" data-simply-content="text">Thing goes here</h1>
+	<div data-simply-field="page content">Other things go here</div>
+	<img src="/simply-edit/imgs/muze.png" data-simply-field="image">
+	<nav>
+		Menu goes here!
+		<ul data-simply-list="menu" data-simply-path="/simply-edit/" data-simply-sortable>
+			<template>
+				<li>
+					<a href="/simply-edit/" data-simply-field="item">Menu item</a>
+				</li>
+			</template>
+		</ul>
+	</nav>
+	<img src="/simply-edit/imgs/muze.png">
+
+	<script>
+		var textSettings = {
+			'block' : [
+				{tag : 'h1', name : 'Heading 1'},
+				{tag : 'h2', name : 'Heading 2'},
+				{tag : 'p', name : 'Paragraph'},
+			],
+			'inline' : [
+				{tag : 'strong', name : 'Bold', icon : 'fa-bold'},
+				{tag : 'em', name : 'Italic', icon : 'fa-italic'},
+				{tag : 'code', name : 'Code', icon : 'fa-code'}
+			],
+			'class' : [
+				[
+					{class : 'highlight', name : 'Highlight', icon : 'fa-sun-o'},
+					{class : 'lowlight', name : 'Lowlight', icon : 'fa-moon-o'}
+				],
+				[
+					{class : 'red', name : 'Red', icon : 'fa-paint-brush'},
+					{class : 'green', name : 'Green', icon : 'fa-paint-brush'},
+					{class : 'blue', name : 'Blue', icon : 'fa-paint-brush'},
+				]
+			]
+		};
+
+		var templateSettings = {
+			'templates' : [
+				{name : "Hoofdpagina", template : "index.html"},
+				{name : "RSS", template : "rss.html"}
+			]
+		};
+
+		var imageSettings = {
+			'images' : [
+				{name : "Klein", value : "$1/view.thumb.jpg"},
+				{name : "Middel", value : "$1/view.medium.jpg"},
+				{name : "Groot", value : "$1/view.large.jpg"}
+			],
+			'class' : [
+				[
+					{class : 'shadow', name : 'Shadow', icon : 'fa-moon-o'}
+				]
+			]
+		};
+		var myCustomSettings = {
+			'simply-text-cursor': textSettings,
+			'simply-text-selection' : textSettings,
+			'pageTemplates' : templateSettings,
+			'simply-image' : imageSettings
+		};
+
+
+	</script>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze"
+		data-simply-images="images"
+		data-simply-settings="myCustomSettings"
+	></script>
+</body>
+</html>

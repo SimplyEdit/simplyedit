@@ -223,6 +223,7 @@
 			-ms-transition: opacity 0.2s ease-in-out;
 			-o-transition: opacity 0.2s ease-in-out;
 			transition: opacity 0.2s ease-in-out;
+			left: -10000px; /* position off screen initially */
 		}
 		.tagStack li {
 			padding-right: 5px;
@@ -383,17 +384,6 @@
 			width: 100%;
 		}
 
-		input[type="number"] {
-			width: 40px;
-		}
-		.simply-slideshow-properties input,
-		.simply-gallery-properties input,
-		.simply-table-width input,
-		.simply-table-height input,
-		.simply-cell-width input,
-		.simply-cell-height input {
-			width: 40px;
-		}
 		li.simply-seperator label:before {
 			display: block;
 			position: absolute;
@@ -713,4 +703,38 @@ body.simply-plain [data-simply-field]:before {
 	font-family: arial;
 	font-weight: normal;
 	font-style: normal;
+}
+
+.simply-gadget {
+	position: relative;
+}
+.simply-gadget *[data-simply-list]:before {
+	display: none;
+}
+.simply-gadget > *:before,
+.simply-gadget *[data-simply-list]:before {
+	display: block;
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	opacity: 0 !important;
+	border:0;
+	margin: 0;
+}
+
+.simply-gadget *[data-simply-field] {
+	outline: 0;
+}
+.simply-gadget *[data-simply-list-item]:before {
+	display: none;
+}
+.simply-gadget *[data-simply-field]:hover {
+	outline: 0;
+}
+.simply-gadget[data-simply-selectable] {
+	outline: 2px dashed rgba(128,128,128,0.3);
 }

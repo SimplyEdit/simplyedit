@@ -1,0 +1,54 @@
+	<section id="simply-gallery" class="simply-section">
+		<h1>RSS Toolbar</h1>
+		<div class="simply-toolbar">
+			<ul class="simply-buttons">
+				<li><button data-simply-section="simply-gallery-properties" class="simply-expands"><i class="fa fa-photo"></i>Gallery feed</button></li>
+			</ul>
+			<div class="simply-toolbar-section simply-gallery-properties">
+				<div><label>Feed URL</label><input type="text" data-simply-action="simply-gallery-feed"></div>
+			</div>
+		</div>
+	</section>
+	<script type="text/javascript">
+		editor.addToolbar({
+			"name" : "simply-gallery",
+			"filter" : {
+				"selector" : "[data-simply-data='gallery']",
+				"parent" : {
+					"selector" : "*"
+				}
+			},
+			"update" : function(toolbar) {
+				var sel = vdSelectionState.get();
+				var target = vdSelection.getNode(sel);
+
+				vdSelectionState.currentSelection = sel;
+				vdSelectionState.currentNode = target;
+
+				var feedUrl = target.getAttribute('data-simply-feed');
+				simply.widgets.properties.set(toolbar.querySelector("input"), feedUrl);
+			},
+			"init" : function() {
+			},
+			"actions" : {
+				"simply-gallery-feed" : function(value) {
+					if (vdSelectionState.currentNode) {
+						if (value) {
+							var target = vdSelectionState.currentNode;
+							target.setAttribute("data-simply-feed", value);
+							target.style.opacity = 0.5;
+							target.classList.add("simply-empty");
+							editor.dataSources["gallery"].load(
+								target,
+								function(result) {
+									target.style.opacity = 1;
+									target.innerHTML = '';
+									editor.data.list.applyTemplates(target, result)
+								}
+							);
+						}
+					}
+				}
+			}
+		});
+	</script>
