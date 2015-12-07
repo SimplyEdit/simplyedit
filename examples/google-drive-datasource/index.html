@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simply edit, Google sheets datasource</title>
+	<meta name="description" content="Simply edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta name="page-template" content="index.html" data-simply-field="data-simply-page-template">
+	<meta charset="utf-8"> 
+	<style type="text/css">
+		.employee {
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			width: 300px;
+			margin: 10px;
+			display: inline-block;
+			vertical-align: top;
+
+		}
+		h1 {
+			background-color: #f8f8f8;
+			margin: 0;
+			padding: 5px 5px;
+			font-family: helvetica;
+			border-bottom: 1px solid #ddd;
+			font-size: 20px;
+		}
+		p {
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<a href="https://docs.google.com/spreadsheets/d/1dYVIuLWSRHcBh4K3hkzFQOp6wXZ2DIUcvPyLqa025Ic/edit?usp=sharing">Edit datasource on Google drive</a>
+
+
+	<div data-simply-list="names" data-simply-data="namesList">
+		<template>
+			<div class="employee">
+				<h1>
+					<span data-simply-field="first name">Name</span>
+					<span data-simply-field="surname">Surname</span>
+				</h1>
+				<p data-simply-field="position">Position</p>
+			</div>
+		</template>
+	</div>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze" 
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+	></script>
+	<script>
+		var namesList;
+		var http = new XMLHttpRequest();
+		var url = "https://crossorigin.me/https://docs.google.com/spreadsheets/d/1dYVIuLWSRHcBh4K3hkzFQOp6wXZ2DIUcvPyLqa025Ic/pub?output=tsv";
+
+		http.open("GET", url, true);
+		http.onreadystatechange = function() {//Call a function when the state changes.
+			if(http.readyState == 4) {
+				if (http.status == 200) {
+					var data = http.responseText;
+
+					var rows = data.split("\r\n");
+					var items = [];
+
+					var names = rows[0].split("\t");
+
+					for (var i=1; i<rows.length; i++) {
+						var row = rows[i].split("\t");
+						var item = {};
+						
+						for (j=0; j<names.length; j++){
+							item[names[j].toString()] = row[j];
+						}
+
+						items.push(item);
+					}
+					editor.addDataSource("namesList", items);
+				}
+			}
+		};
+		http.send();
+	</script>
+</body>
+</html>
+</body>
+</html>

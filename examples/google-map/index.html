@@ -7,9 +7,35 @@
 	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
 	<meta name="author" content="" data-simply-field="meta author">
 	<meta charset="utf-8"> 
+	<!-- Polyfill Web Components support for older browsers -->
+	<script src="/polymer/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+	<!-- Import element -->
+	<link rel="import" href="/polymer/bower_components/google-map/google-map.html">
+	<link rel="import" href="/polymer/bower_components/google-map/google-map-poly.html">
+	<style>
+		google-map {
+			height: 200px;
+			width: 300px;
+		}
+	</style>
 </head>
 <body>
-	<google-map data-simply-field="map" latitude=52 longitude=6 zoom=10>Hello world!</google-map>
+	<h1>Just a map:</h1>
+	<google-map data-simply-field="map" latitude=52 longitude=6 zoom=10>
+	</google-map>
+	<h1>Map with a marker:</h1>
+	<google-map data-simply-field="map2" latitude=52 longitude=6 zoom=10 fit-to-markers="true">
+		<google-map-marker data-simply-field="marker" latitude="52" longitude="6" title="Title"></google-map-marker>
+	</google-map>
+	<h1>Map with a polygon:</h1>
+	<google-map data-simply-field="map3" latitude="52" longitude="6">
+		<google-map-poly data-simply-field="poly" closed fill-color="red" fill-opacity=".25" stroke-weight="1">
+			<google-map-point latitude="52" longitude="6"></google-map-point>
+			<google-map-point latitude="52.2" longitude="6.1"></google-map-point>
+			<google-map-point latitude="52" longitude="6.2"></google-map-point>
+		</google-map-poly>
+	</google-map>
 	<script src="/simply-edit/js/simply-edit.js" 
 		data-api-key="muze" 
 		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
@@ -25,8 +51,9 @@
 				
 				for (attr in allowedAttributes) {
 					attr = allowedAttributes[attr];
-					if (field.getAttribute(attr)) {
-						attributes[attr] = field.getAttribute(attr);
+
+					if (field[attr]) {
+						attributes[attr] = field[attr];
 					}
 				}
 				return attributes;
@@ -47,6 +74,103 @@
 
 			editor.field.registerType("google-map", googleMapGetter, googleMapSetter, googleMapEditable);
 			editor.loadToolbar("google-map.toolbar.html");
+		})();
+
+		(function() {
+			var allowedAttributes = ["latitude", "longitude", "title"];
+			
+			var googleMapMarkerGetter = function(field) {
+				var attr;
+				var attributes = {};
+				
+				for (attr in allowedAttributes) {
+					attr = allowedAttributes[attr];
+					if (field[attr]) {
+						attributes[attr] = field[attr];
+					}
+				}
+				return attributes;
+			};
+
+			var googleMapMarkerSetter = function(field, data) {
+				var attr;
+				for (attr in data) {
+					if (allowedAttributes.indexOf(attr) !== -1) {
+						field.setAttribute(attr, data[attr]);
+						field.attr = data[attr];
+					}
+				}
+			};
+
+			var googleMapMarkerEditable = function(field) {
+				field.setAttribute("data-simply-selectable", true);
+				field.setAttribute("draggable", true);
+				field.setAttribute("click-events", true);
+				field.setAttribute("mouse-events", true);
+				field.setAttribute("notify", true);
+
+				field.addEventListener("google-map-marker-click", function(evt) {
+					editor.context.toolbar.hide = true;
+					window.setTimeout(function() {
+						editor.context.toolbar.hide = false;
+						muze.event.fire(field, "click"); // Allows data-simply-selectable to work;
+					}, 1);
+				}, true);
+			};
+
+			editor.field.registerType("google-map-marker", googleMapMarkerGetter, googleMapMarkerSetter, googleMapMarkerEditable);
+			editor.loadToolbar("google-map-marker.toolbar.html");
+		}());
+
+		(function() {
+			var allowedAttributes = ["fill-color", "fill-opacity"];
+			
+			var googleMapPolyGetter = function(field) {
+				var attr;
+				var attributes = {};
+				
+				for (attr in allowedAttributes) {
+					attr = allowedAttributes[attr];
+					if (field[attr]) {
+						attributes[attr] = field[attr];
+					}
+				}
+
+				var mapPoints = field.poly.getPath();
+				var points = [];
+
+				mapPoints.forEach(function(latLng) {
+					points.push({
+						"lat" : latLng.lat(),
+						"lng" : latLng.lng()
+					});
+				});
+
+				attributes["points"] = points;
+				return attributes;
+			};
+
+			var googleMapPolySetter = function(field, data) {
+				var attr;
+				for (attr in data) {
+					if (allowedAttributes.indexOf(attr) !== -1) {
+						field.setAttribute(attr, data[attr]);
+						field.attr = data[attr];
+					}
+					if (attr == "points") { 
+						points = data[attr];
+						field.poly.setPath(points);
+
+					}
+				}
+			};
+
+			var googleMapPolyEditable = function(field) {
+				field.setAttribute("data-simply-selectable", true);
+				field.setAttribute("editable", true);
+			};
+
+			editor.field.registerType("google-map-poly", googleMapPolyGetter, googleMapPolySetter, googleMapPolyEditable);
 		}());
 	</script>
 </body>

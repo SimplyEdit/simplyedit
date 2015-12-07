@@ -1,0 +1,80 @@
+<section id="simply-googlemap-marker" class="simply-section">
+	<h1>HTML Google map toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-googlemap-marker-properties" class="simply-expands"><i class="fa fa-map-marker"></i>Marker coordinates</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-googlemap-marker-properties">
+			<div><label>Latitude</label><input class="latitude" type="number" data-simply-action="simply-googlemap-marker-coordinates"></div>
+			<div><label>Longitude</label><input class="longitude" type="number" data-simply-action="simply-googlemap-marker-coordinates"></div>
+			<div><label>Title</label><input class="title" type="text" data-simply-action="simply-googlemap-marker-coordinates"></div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+	function stepsize(zoom) {
+		/* http://gis.stackexchange.com/questions/7430/what-ratio-scales-do-google-maps-zoom-levels-correspond-to */
+		var zooms = {
+			20 : 1128.497220,
+			19 : 2256.994440,
+			18 : 4513.988880,
+			17 : 9027.977761,
+			16 : 18055.955520,
+			15 : 36111.911040,
+			14 : 72223.822090,
+			13 : 144447.644200,
+			12 : 288895.288400,
+			11 : 577790.576700,
+			10 : 1155581.153000,
+			9  : 2311162.307000,
+			8  : 4622324.614000,
+			7  : 9244649.227000,
+			6  : 18489298.450000,
+			5  : 36978596.910000,
+			4  : 73957193.820000,
+			3  : 147914387.600000,
+			2  : 295828775.300000,
+			1  : 591657550.500000
+		};
+
+		return (zooms[zoom]/30000000);
+	}
+
+	editor.addToolbar({
+		"name" : "simply-googlemap-marker",
+		"filter" : {
+			"selector" : "google-map-marker",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var marker = vdSelection.getNode(sel);
+
+			vdSelectionState.currentSelection = sel;
+			vdSelectionState.currentNode = marker;
+
+			simply.widgets.properties.set(toolbar.querySelector("input.latitude"), marker.latitude);
+			simply.widgets.properties.set(toolbar.querySelector("input.longitude"), marker.longitude);
+			simply.widgets.properties.set(toolbar.querySelector("input.title"), marker.title);
+			toolbar.querySelector("input.latitude").setAttribute('step', stepsize(marker.map.zoom));
+			toolbar.querySelector("input.longitude").setAttribute('step', stepsize(marker.map.zoom));
+		},
+		"init" : function() {
+		},
+		"actions" : {
+			"simply-googlemap-marker-coordinates" : function() {
+				var toolbar = document.querySelector("#simply-googlemap-marker");
+				var sel = vdSelectionState.get();
+				var marker = vdSelection.getNode(sel);
+				marker.setAttribute("latitude", simply.widgets.properties.get(document.querySelector("#simply-googlemap-marker input.latitude")));
+				marker.setAttribute("longitude", simply.widgets.properties.get(document.querySelector("#simply-googlemap-marker input.longitude")));
+				marker.setAttribute("title", simply.widgets.properties.get(document.querySelector("#simply-googlemap-marker input.title")));
+
+				toolbar.querySelector("input.latitude").setAttribute('step', stepsize(marker.map.zoom));
+				toolbar.querySelector("input.longitude").setAttribute('step', stepsize(marker.map.zoom));
+			}
+		}
+	});
+</script>
