@@ -35,6 +35,7 @@
 			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
 			var loadQuail = function() {
+				alert("load");
 				if (typeof jQuery !== "undefined") {
 					var quailScript = document.createElement("SCRIPT");
 					quailScript.src = "http://quailjs.org/dist/quail.jquery.min.js";
@@ -42,6 +43,7 @@
 				} else {
 					jQueryScript = document.createElement("SCRIPT");
 					jQueryScript.src = "https://code.jquery.com/jquery-1.11.3.min.js"
+					document.head.appendChild(jQueryScript);
 					window.setTimeout(loadQuail, 500);
 				}
 			};
