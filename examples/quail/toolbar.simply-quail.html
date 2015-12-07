@@ -42,6 +42,7 @@
 				} else {
 					jQueryScript = document.createElement("SCRIPT");
 					jQueryScript.src = "https://code.jquery.com/jquery-1.11.3.min.js"
+					document.head.appendChild(jQueryScript);
 					window.setTimeout(loadQuail, 500);
 				}
 			};

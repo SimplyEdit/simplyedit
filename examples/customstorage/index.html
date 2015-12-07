@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simple edit</title>
+	<meta name="description" content="Simple edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta name="page-template" content="index.html" data-simply-field="data-simply-page-template">
+	<meta charset="utf-8"> 
+	<style type="text/css">
+		img.shadow {
+			box-shadow: 4px 4px 8px 0px rgba(0,0,0,0.75);
+		}
+	</style>
+</head>
+<body>
+	<h1 data-simply-field="title" data-simply-content="text">Thing goes here</h1>
+	<div data-simply-field="page content">Other things go here</div>
+	<img src="/simply-edit/imgs/muze.png" data-simply-field="image">
+	<nav>
+		Menu goes here!
+		<ul data-simply-list="menu" data-simply-path="/simply-edit/" data-simply-sortable>
+			<template>
+				<li>
+					<a href="/simply-edit/" data-simply-field="item">Menu item</a>
+				</li>
+			</template>
+		</ul>
+	</nav>
+	<img src="/simply-edit/imgs/muze.png">
+
+	<script>
+		var myCustomStorage = {
+			init : function(endpoint) {
+				this.endpoint = endpoint;
+			},
+			save : function(data, callback) {
+				localStorage.simplyData = data;
+				callback();
+			},
+			load : function(callback) {
+				if (!localStorage.simplyData) {
+					localStorage.simplyData = "{}";
+				}
+				callback(localStorage.simplyData);
+			},
+			connect : function() {
+				return true;
+			},
+			disconnect : function() {
+				return true;
+			},
+			list : function(url, callback) {
+				var result = {
+					folders : [
+						{
+							url : "http://endpoint.com/folder1/",
+							name : "Folder 1"
+						},
+						{
+							url : "http://endpoint.com/folder2/",
+							name : "Folder 2"
+						}
+					],
+					files : [
+						{
+							url : "http://endpoint.com/myfile.txt",
+							name : "myfile.txt"
+						},
+						{
+							url : "http://endpoint.com/myfile2.txt",
+							name : "myfile2.txt"	
+						},
+						{
+							url : "http://endpoint.com/myfile3.txt",
+							name : "myfile3.txt"
+						},
+						{
+							url : "http://endpoint.com/image1.png",
+							name : "image1.png"
+						},
+						{
+							url : "http://endpoint.com/image2.png",
+							name : "image2.png"
+						}
+					],
+					images : [
+						{
+							url : "http://endpoint.com/image1.png",
+							name : "image1.png"
+						},
+						{
+							url : "http://endpoint.com/image2.png",
+							name : "image2.png"
+						}
+					]
+				};
+				callback(result);
+			}
+		};
+	</script>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze"
+		data-simply-images="images"
+		data-simply-storage="myCustomStorage"
+	></script>
+</body>
+</html>

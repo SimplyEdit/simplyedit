@@ -1,0 +1,81 @@
+<section id="simply-googlemap" class="simply-section">
+	<h1>HTML Google map toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-googlemap-properties" class="simply-expands"><i class="fa fa-map"></i>Map coordinates</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-googlemap-properties">
+			<div><label>Latitude</label><input class="latitude" step="0.05" type="number" data-simply-action="simply-googlemap-coordinates"></div>
+			<div><label>Longitude</label><input class="longitude" step="0.05" type="number" data-simply-action="simply-googlemap-coordinates"></div>
+			<div><label>Zoom</label><input class="zoom" type="number" data-simply-action="simply-googlemap-coordinates"></div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+	function stepsize(zoom) {
+		/* http://gis.stackexchange.com/questions/7430/what-ratio-scales-do-google-maps-zoom-levels-correspond-to */
+		var zooms = {
+			20 : 1128.497220,
+			19 : 2256.994440,
+			18 : 4513.988880,
+			17 : 9027.977761,
+			16 : 18055.955520,
+			15 : 36111.911040,
+			14 : 72223.822090,
+			13 : 144447.644200,
+			12 : 288895.288400,
+			11 : 577790.576700,
+			10 : 1155581.153000,
+			9  : 2311162.307000,
+			8  : 4622324.614000,
+			7  : 9244649.227000,
+			6  : 18489298.450000,
+			5  : 36978596.910000,
+			4  : 73957193.820000,
+			3  : 147914387.600000,
+			2  : 295828775.300000,
+			1  : 591657550.500000
+		};
+
+		return (zooms[zoom]/30000000);
+	}
+
+	editor.addToolbar({
+		"name" : "simply-googlemap",
+		"filter" : {
+			"selector" : "google-map",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var map = vdSelection.getNode(sel);
+
+			vdSelectionState.currentSelection = sel;
+			vdSelectionState.currentNode = map;
+
+			simply.widgets.properties.set(toolbar.querySelector("input.latitude"), map.latitude);
+			simply.widgets.properties.set(toolbar.querySelector("input.longitude"), map.longitude);
+			simply.widgets.properties.set(toolbar.querySelector("input.zoom"), map.zoom);
+
+			toolbar.querySelector("input.latitude").setAttribute('step', stepsize(map.zoom));
+			toolbar.querySelector("input.longitude").setAttribute('step', stepsize(map.zoom));
+		},
+		"init" : function() {
+		},
+		"actions" : {
+			"simply-googlemap-coordinates" : function() {
+				var sel = vdSelectionState.get();
+				var map = vdSelection.getNode(sel);
+				map.setAttribute("latitude", simply.widgets.properties.get(document.querySelector("#simply-googlemap input.latitude")));
+				map.setAttribute("longitude", simply.widgets.properties.get(document.querySelector("#simply-googlemap input.longitude")));
+				map.setAttribute("zoom", simply.widgets.properties.get(document.querySelector("#simply-googlemap input.zoom")));
+
+				var toolbar = document.getElementById("simply-googlemap");
+				toolbar.querySelector("input.latitude").setAttribute('step', stepsize(map.zoom));
+				toolbar.querySelector("input.longitude").setAttribute('step', stepsize(map.zoom));
+			}
+		}
+	});
+</script>

@@ -5376,8 +5376,11 @@ simply.widgets.properties = ( function() {
 							value = values[i].getAttribute("data-value");
 						}
 						break;
-					default :
+					case null :
 						value=input.innerHTML;
+						break;
+					default :
+						value=input.value;
 						break;
 				}
 				return value;
@@ -5457,6 +5460,7 @@ simply.widgets.properties = ( function() {
 						}
 						break;
 					default :
+						input.value = value;
 						break;
 				}
 			}		

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simple edit</title>
+	<meta name="description" content="Simple edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta name="page-template" content="index.html" data-simply-field="data-simply-page-template">
+	<meta charset="utf-8"> 
+	<style type="text/css">
+		ul {
+			list-style: none;
+			padding: 0px;
+			margin: 0px;
+		}
+		li {
+			display: inline-block;
+		}
+		li img {
+			height: 200px;
+		}
+		ul:empty:after {
+			text-align: center;
+			content: "Loading...";
+			display: block;
+			position: absolute;
+			top: 50px;
+			left: 50%;
+			margin-left: -120px;
+			width: 200px;
+			padding: 20px;
+			background-color: #f8f8f8;
+			font-family: helvetica;
+			border: 1px solid #888;
+			border-radius: 20px;
+			box-shadow: 2px 2px 5px 0px #333;
+		}
+	</style>
+</head>
+<body>
+	<ul data-simply-list="gallery" data-simply-data="galleryList"><template>
+			<li>
+				<a href="#" data-simply-field="link"><img data-simply-field="image"></a>
+			</li>
+		</template></ul>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze" 
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+	></script>
+	<script>
+		var galleryList;
+		editor.storage.list( "http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/", 
+			function(result) {
+				myGalleryList = [];
+				for (var i=0; i<result.images.length; i++) {
+					result.images[i].src = result.images[i].url;
+					myGalleryList.push({
+						'image' : result.images[i],
+						'link' : {
+							href : result.images[i].url
+						}
+					});
+				}
+				editor.addDataSource("galleryList", myGalleryList);
+			}
+		);
+	</script>
+</body>
+</html>

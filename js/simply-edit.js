@@ -111,6 +111,21 @@
 						counter++;
 					}
 					list.setAttribute("data-simply-stashed", 1);
+
+					if (list.getAttribute("data-simply-data")) {
+						var listData = data[dataPath][dataName];
+						if (editor.dataSources[list.getAttribute("data-simply-data")]) {
+							editor.dataSources[list.getAttribute("data-simply-data")].stash = data[dataPath][dataName];
+						}
+
+						// FIXME: Feed the subdata to the save;
+
+						// FIXME: add other attributes as well.
+						data[dataPath][dataName] = {
+							"data-simply-feed" : list.getAttribute("data-simply-feed")
+						};
+					}
+
 				};
 
 				var addData = function(field) {
@@ -216,6 +231,11 @@
 							}
 						}
 					});
+					for (var source in editor.dataSources) {
+						if (editor.dataSources[source].save) {
+							editor.dataSources[source].save(editor.dataSources[source].stash);
+						}
+					}
 				} 
 			},
 			load : function() {
@@ -263,13 +283,36 @@
 				init : function(data, target) {
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-simply-list]");
+
+					var applyDataSource = function(list, dataSource) {
+						if (editor.dataSources[dataSource] && typeof editor.dataSources[dataSource].load === "function") {
+							editor.dataSources[dataSource].load(list, function(result) {
+								editor.data.list.applyTemplates(list, result);
+								if (typeof hope !== "undefined") {
+									editor.editmode.editable(list);
+								}
+							});
+						} else if (editor.dataSources[dataSource] && editor.dataSources[dataSource].load) {
+							editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+							if (typeof hope !== "undefined") {
+								editor.editmode.editable(list);
+							}
+						} else {
+							window.setTimeout(function() {applyDataSource(list, dataSource);}, 500);
+						}
+					};
+
 					for (var i=0; i<dataLists.length; i++) {
 						dataLists[i].innerHTML = dataLists[i].innerHTML; // reset innerHTML to make sure templates are recognized;
 
 						editor.data.list.parseTemplates(dataLists[i]);
 						dataName = dataLists[i].getAttribute("data-simply-list");
 						dataPath = dataLists[i].getAttribute("data-simply-path") ? dataLists[i].getAttribute("data-simply-path") : location.pathname;
-						if (data[dataPath] && data[dataPath][dataName]) {
+
+						var dataSource = dataLists[i].getAttribute("data-simply-data");
+						if (dataSource !== null) {
+							applyDataSource(dataLists[i], dataSource);
+						} else if (data[dataPath] && data[dataPath][dataName]) {
 							editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
 						}
 
@@ -353,7 +396,22 @@
 						var handleLists = function(elm) {
 							editor.data.list.parseTemplates(elm);
 							dataName = elm.getAttribute("data-simply-list");
-							if (listData[j][dataName]) {
+
+							var dataSource = elm.getAttribute("data-simply-data");
+							if (dataSource !== null) {
+								var applyDataSource = function(list, dataSource) {
+									if (editor.dataSources[dataSource] && typeof editor.dataSources[dataSource].load === "function") {
+										editor.dataSources[dataSource].load(list, function(result) {
+											editor.data.list.applyTemplates(list, result);
+										});
+									} else if (editor.dataSources[dataSource] && editor.dataSources[dataSource].load) {
+										editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+									} else {
+										window.setTimeout(function() {applyDataSource(list, dataSource);}, 500);
+									}
+								};
+								applyDataSource(elm, dataSource);
+							} else if (listData[j][dataName]) {
 								editor.data.list.applyTemplates(elm, listData[j][dataName]);
 							}
 
@@ -392,6 +450,10 @@
 							handleLists(clone);
 						}
 					};
+
+					if (listData['data-simply-feed']) {
+						list.setAttribute("data-simply-feed", listData['data-simply-feed']);
+					}
 
 					for (j=0; j<listData.length; j++) {
 						var requestedTemplate = listData[j]["data-simply-template"];
@@ -482,11 +544,19 @@
 			}
 		},
 		field : {
+			extraTypes : {},
+			registerType : function(fieldType, getter, setter, editmode) {
+				editor.field.extraTypes[fieldType] = {
+					get : getter,
+					set : setter,
+					editable : editmode
+				};
+			},
 			set : function(field, data) {
 				var attr;
-				switch (field.tagName) {
-					case "IMG":
-					case "IFRAME":
+				switch (field.tagName.toLowerCase()) {
+					case "img":
+					case "iframe":
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
@@ -494,12 +564,12 @@
 							field.setAttribute(attr, data[attr]);
 						}
 					break;
-					case "META":
+					case "meta":
 						for (attr in data) {
 							field.setAttribute(attr, data[attr]);
 						}
 					break;
-					case "A":
+					case "a":
 						for (attr in data) {
 							if (attr == "innerHTML") {
 								field.innerHTML = data[attr];
@@ -509,6 +579,13 @@
 						}
 					break;
 					default:
+						if (
+							editor.field.extraTypes[field.tagName.toLowerCase()] && 
+							typeof editor.field.extraTypes[field.tagName.toLowerCase()].set === "function"
+						) {
+							return editor.field.extraTypes[field.tagName.toLowerCase()].set(field, data);
+						}
+
 						field.innerHTML = data;
 					break;
 				}
@@ -518,21 +595,27 @@
 				var attributes = {};
 				var allowedAttributes = {};
 
-				switch (field.tagName) {
-					case "IMG": 
+				switch (field.tagName.toLowerCase()) {
+					case "img": 
 						allowedAttributes = ["src", "class", "alt", "title"];
 					break;
-					case "A":
+					case "a":
 						allowedAttributes = ["href", "class", "alt", "title"];
 						attributes.innerHTML = field.innerHTML;
 					break;
-					case "META":
+					case "meta":
 						allowedAttributes = ["content"];
 					break;
-					case "IFRAME":
+					case "iframe":
 						allowedAttributes = ["src"];
 					break;
 					default:
+						if (
+							editor.field.extraTypes[field.tagName.toLowerCase()] &&
+							typeof editor.field.extraTypes[field.tagName.toLowerCase()].get === "function"
+						) {
+							return editor.field.extraTypes[field.tagName.toLowerCase()].get(field);
+						}
 						return field.innerHTML;
 				}
 				for (attr in allowedAttributes) {
@@ -542,6 +625,35 @@
 					}
 				}
 				return attributes;
+			},
+			editable : function(field) {
+				switch (field.tagName.toLowerCase()) {
+					case "iframe":
+					case "meta":
+					case "title":
+						field.contentEditable = true;
+					break;
+					case "img":
+						field.setAttribute("data-simply-selectable", true);
+					break;
+					case "i":
+						field.setAttribute("data-simply-selectable", true);
+					break;
+					default:
+						if (
+							editor.field.extraTypes[field.tagName.toLowerCase()] && 
+							typeof editor.field.extraTypes[field.tagName.toLowerCase()].editable === "function"
+						) {
+							return editor.field.extraTypes[field.tagName.toLowerCase()].editable(field);
+						}
+
+						field.hopeContent = document.createElement("textarea");
+						field.hopeMarkup = document.createElement("textarea");
+						field.hopeRenderedSource = document.createElement("DIV");
+						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
+						field.hopeEditor.field = field;
+					break;
+				}
 			}
 		},
 		loadBaseStyles : function() {
@@ -554,7 +666,9 @@
 		init : function(config) {
 			document.createElement("template");
 			if (config.toolbars) {
-				editor.editmode.toolbars = config.toolbars;
+				for (i=0; i<config.toolbars.length; i++) {
+					editor.editmode.toolbars.push(config.toolbars[i]);
+				}
 			}
 			editor.loadBaseStyles();
 
@@ -563,7 +677,61 @@
 			editor.data.load();
 		},
 		editmode : {
-			toolbars : null,
+			toolbars : [],
+			loadToolbarList : function(toolbarList) {
+				var toolbarsContainer = document.querySelector("#simply-editor");
+
+				var url = toolbarList.shift();
+				var i;
+				var http = new XMLHttpRequest();
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4) {
+						if (http.status == 200) {
+							var toolbars = document.createElement("TEMPLATE");
+							toolbars.innerHTML = http.responseText;
+
+							if (!("content" in toolbars)) {
+								var fragment = document.createDocumentFragment();
+								while (toolbars.children.length) {
+									fragment.appendChild(toolbars.children[0]);
+								}
+								toolbars.content = fragment;
+							}
+							var toolbarNode = document.importNode(toolbars.content, true);
+							if (editor.brokenImport) {
+								editor.importScripts = true;
+							}
+							if (editor.importScripts) {
+								var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
+								for (i=0; i<scriptTags.length; i++) {
+									var newNode = document.createElement("SCRIPT");
+									if (scriptTags[i].src) {
+										newNode.src = scriptTags[i].src;
+									}
+									if (scriptTags[i].innerHTML) {
+										newNode.innerHTML = scriptTags[i].innerHTML;
+									}
+									document.head.appendChild(newNode);
+								}
+							}
+
+							var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
+							for (i=0; i<newToolbars.length; i++) {
+								editor.toolbar.init(newToolbars[i]);
+							}
+							toolbarsContainer.appendChild(toolbarNode);
+						}
+						if (toolbarList.length) {
+							editor.editmode.loadToolbarList(toolbarList);
+						}
+					}
+				};
+				http.send();
+			},
 			init : function() {
 				var toolbarsContainer = document.createElement("DIV");
 				toolbarsContainer.id = "simply-editor";
@@ -576,61 +744,7 @@
 						return;
 					}
 
-					var loadToolbarList = function(toolbarList) {
-						var url = toolbarList.shift();
-						var i;
-						var http = new XMLHttpRequest();
-						if (editor.profile == "dev") {
-							url += "?t=" + (new Date().getTime());
-						}
-						http.open("GET", url, true);
-						http.onreadystatechange = function() {//Call a function when the state changes.
-							if(http.readyState == 4) {
-								if (http.status == 200) {
-									var toolbars = document.createElement("TEMPLATE");
-									toolbars.innerHTML = http.responseText;
-
-									if (!("content" in toolbars)) {
-										var fragment = document.createDocumentFragment();
-										while (toolbars.children.length) {
-											fragment.appendChild(toolbars.children[0]);
-										}
-										toolbars.content = fragment;
-									}
-									var toolbarNode = document.importNode(toolbars.content, true);
-									if (editor.brokenImport) {
-										editor.importScripts = true;
-									}
-									if (editor.importScripts) {
-										var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
-										for (i=0; i<scriptTags.length; i++) {
-											var newNode = document.createElement("SCRIPT");
-											if (scriptTags[i].src) {
-												newNode.src = scriptTags[i].src;
-											}
-											if (scriptTags[i].innerHTML) {
-												newNode.innerHTML = scriptTags[i].innerHTML;
-											}
-											document.head.appendChild(newNode);
-										}
-									}
-
-									var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
-									for (i=0; i<newToolbars.length; i++) {
-										editor.toolbar.init(newToolbars[i]);
-									}
-									toolbarsContainer.appendChild(toolbarNode);
-								}
-								if (toolbarList.length) {
-									loadToolbarList(toolbarList);
-								}
-							}
-						};
-						http.send();
-					};
-
-					loadToolbarList(editor.editmode.toolbars.slice()); // slice to copy the toolbars;
-
+					editor.editmode.loadToolbarList(editor.editmode.toolbars.slice()); // slice to copy the toolbars;
 					editor.editmode.toolbarMonitor();
 				};
 
@@ -707,40 +821,7 @@
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
 				for (i=0; i<dataFields.length; i++) {
-				//	dataFields[i].contentEditable = true;
-					switch (dataFields[i].tagName.toLowerCase()) {
-						case "iframe":
-						case "meta":
-						case "title":
-							dataFields[i].contentEditable = true;
-						break;
-						case "i":
-							dataFields[i].setAttribute("data-simply-selectable", true);
-						break;
-						default:
-							dataFields[i].hopeContent = document.createElement("textarea");
-							dataFields[i].hopeMarkup = document.createElement("textarea");
-							dataFields[i].hopeRenderedSource = document.createElement("DIV");
-							dataFields[i].hopeEditor = hope.editor.create( dataFields[i].hopeContent, dataFields[i].hopeMarkup, dataFields[i], dataFields[i].hopeRenderedSource );
-							dataFields[i].hopeEditor.field = dataFields[i];
-
-							var parseTimer = false;
-					
-/*							var nodeInserted = function(evt) {
-								console.log(evt);
-
-								dataFields[i].removeEventListener("DOMNodeInserted", nodeInserted);
-								console.log('parsing');
-								dataFields[i].hopeEditor.parseHTML();
-								console.log('parsed');
-								window.setTimeout(function() {
-								//	dataFields[i].addEventListener("DOMNodeInserted", nodeInserted);
-								}, 10);
-							};
-							dataFields[i].addEventListener("DOMNodeInserted", nodeInserted);
-*/
-						break;
-					}
+					editor.field.editable(dataFields[i]);
 
 					// FIXME: Add support to keep fields that point to the same field within the same path in sync here;
 				}
@@ -1194,7 +1275,7 @@
 					return callback({message : "Could not store."});
 				};
 
-				this.repo.write(this.repoBranch, this.dataFile, data, "Commit message", saveCallback);
+				this.repo.write(this.repoBranch, this.dataFile, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
@@ -1466,6 +1547,16 @@
 	editor.toolbars = {};
 	editor.contextFilters = {};
 	editor.plugins = {};
+	editor.dataSources = {};
+
+	editor.loadToolbar = function(url) {
+		if (!editor.toolbar || (typeof muze === "undefined")) {
+			// Main toolbar code isn't loaded yet;
+			editor.editmode.toolbars.push(url);
+		} else {
+			editor.editmode.loadToolbarList([url]);
+		}
+	};
 
 	editor.addToolbar = function(toolbar) {
 		if (toolbar.filter) {
@@ -1478,6 +1569,13 @@
 		if (toolbar.init) {
 			toolbar.init(editor.settings[toolbar.name]);
 		}
+	};
+
+	editor.addDataSource = function(name, load, save) {
+		editor.dataSources[name] = {
+			load : load,
+			save : save
+		};
 	};
 
 	editor.addContextFilter = function(name, filter) {
