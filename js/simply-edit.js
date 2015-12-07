@@ -115,6 +115,10 @@
 
 					if (list.getAttribute("data-simply-data")) {
 						var listData = data[dataPath][dataName];
+						if (editor.dataSources[list.getAttribute("data-simply-data")]) {
+							editor.dataSources[list.getAttribute("data-simply-data")].stash = data[dataPath][dataName];
+						}
+
 						// FIXME: Feed the subdata to the save;
 
 						// FIXME: add other attributes as well.
@@ -228,6 +232,11 @@
 							}
 						}
 					});
+					for (var source in editor.dataSources) {
+						if (editor.dataSources[source].save) {
+							editor.dataSources[source].save(editor.dataSources[source].stash);
+						}
+					}
 				} 
 			},
 			load : function() {
@@ -280,9 +289,15 @@
 						if (editor.dataSources[dataSource] && typeof editor.dataSources[dataSource].load === "function") {
 							editor.dataSources[dataSource].load(list, function(result) {
 								editor.data.list.applyTemplates(list, result);
+								if (typeof hope !== "undefined") {
+									editor.editmode.editable(list);
+								}
 							});
 						} else if (editor.dataSources[dataSource] && editor.dataSources[dataSource].load) {
 							editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+							if (typeof hope !== "undefined") {
+								editor.editmode.editable(list);
+							}
 						} else {
 							window.setTimeout(function() {applyDataSource(list, dataSource);}, 500);
 						}
