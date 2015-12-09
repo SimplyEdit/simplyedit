@@ -1,0 +1,99 @@
+
+*** Modified files in JOE when it aborted on Tue Dec  8 23:21:23 2015
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+		@media (max-width: 481px) {
+			.article.large {
+				position: relative;
+				height: 100%;
+				width: 100%;
+				display: inline-block;
+				vertical-align: top;
+				box-sizing: border-box;
+				border: 5px solid transparent;
+			}
+			.article.small {
+				position: relative;
+				height: 50%;
+				width: 50%;
+				display: inline-block;
+				vertical-align: top;
+				border: 5px solid transparent;
+				box-sizing: border-box;
+			}
+		}
+
+		@media (min-width: 481px) {
+			.article.large {
+				position: relative;
+				height: 50%;
+				width: 50%;
+				display: inline-block;
+				vertical-align: top;
+				box-sizing: border-box;
+				border: 5px solid transparent;
+			}
+			.article.small {
+				position: relative;
+				height: 33.3333%;
+				width: 33.3333%;
+				display: inline-block;
+				vertical-align: top;
+				border: 5px solid transparent;
+				box-sizing: border-box;
+			}
+		}
+		@media (min-width: 768px) {
+			.article.large {
+				position: relative;
+				height: 50%;
+				width: 50%;
+				display: inline-block;
+				vertical-align: top;
+				box-sizing: border-box;
+				border: 5px solid transparent;
+			}
+		}
+
+*** File '(Unnamed)'
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
+index.html
