@@ -55,74 +55,94 @@
 		editor.loadToolbar("toolbar.simply-gallery.html");
 	</script>
 	<script>
-		editor.addDataSource("rss", function(list, callback) {
-			var url = list.getAttribute("data-simply-feed");
-			var max = 2;
-			var http = new XMLHttpRequest();
+		editor.addDataSource("rss", {
+			load : function(list, callback) {
+				var url = list.getAttribute("data-simply-feed");
+				var max = 2;
+				var http = new XMLHttpRequest();
 
-			http.open("GET", url, true);
-			http.onreadystatechange = function() {//Call a function when the state changes.
-				if(http.readyState == 4) {
-					if (http.status == 200) {
-						var parser = new DOMParser();
-						var xmlDoc = parser.parseFromString(http.responseText, "text/xml");
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4) {
+						if (http.status == 200) {
+							var parser = new DOMParser();
+							var xmlDoc = parser.parseFromString(http.responseText, "text/xml");
 
-						var items = xmlDoc.querySelectorAll("item");
-						var result = [];
-						var unescape = function(text) {
-		 					text = text.replace(/&amp;/g, "&");
-		 					text = text.replace(/&gt;/g, ">");
-		 					text = text.replace(/&lt;/g, "<");
-							return text;
-						};	
+							var items = xmlDoc.querySelectorAll("item");
+							var result = [];
+							var unescape = function(text) {
+			 					text = text.replace(/&amp;/g, "&");
+			 					text = text.replace(/&gt;/g, ">");
+			 					text = text.replace(/&lt;/g, "<");
+								return text;
+							};	
 
-						for (var i=0; i<items.length && (max ? (i < max) : true); i++) {
-							result.push({
-								title : unescape(items[i].querySelector("title").innerHTML),
-								description : unescape(items[i].querySelector("description").innerHTML),
-								image : items[i].querySelector("enclosure").getAttribute("url"),
-								url : {
-									href : items[i].querySelector("link").innerHTML.replace("&amp;", "&")
-								},
-								"data-simply-template" : ((i < 2) ? "large" : "small" )
-							});
+							for (var i=0; i<items.length && (max ? (i < max) : true); i++) {
+								result.push({
+									title : unescape(items[i].querySelector("title").innerHTML),
+									description : unescape(items[i].querySelector("description").innerHTML),
+									image : items[i].querySelector("enclosure").getAttribute("url"),
+									url : {
+										href : items[i].querySelector("link").innerHTML.replace("&amp;", "&")
+									},
+									"data-simply-template" : ((i < 2) ? "large" : "small" )
+								});
+							}
+							callback(result);
 						}
-						callback(result);
 					}
+				};
+				http.send();
+			},
+			get : function(list) {
+				return {
+					"data-simply-feed" : list.getAttribute("data-simply-feed")
 				}
-			};
-			http.send();
+			},
+			set : function(list, data) {
+				list.setAttribute("data-simply-feed", data["data-simply-feed"]);
+			}
 		});
-		editor.addDataSource("gallery", function(list, callback) {
-			var url = list.getAttribute("data-simply-feed");
-			var max = 8;
+		editor.addDataSource("gallery", {
+			load : function(list, callback) {
+				var url = list.getAttribute("data-simply-feed");
+				var max = 8;
 
-			var http = new XMLHttpRequest();
-			var jsonFlickrFeed = function(data) {
-				var items = data.items;
-				for (var i=0; i<items.length && (max ? (i < max) : true); i++) {
-					items[i].url = {
-						href : items[i].link
-					};
-					items[i].image = items[i].media.m;
-				}
-				callback(items);
-				window.setTimeout(function() {
-					$(list).photoGrid({
-						rowHeight: "200"
-		   			});
-				}, 800);
-			};
-					
-			http.open("GET", url, true);
-			http.onreadystatechange = function() {//Call a function when the state changes.
-				if(http.readyState == 4) {
-					if (http.status == 200) {
-						eval(http.responseText);
+				var http = new XMLHttpRequest();
+				var jsonFlickrFeed = function(data) {
+					var items = data.items;
+					for (var i=0; i<items.length && (max ? (i < max) : true); i++) {
+						items[i].url = {
+							href : items[i].link
+						};
+						items[i].image = items[i].media.m;
 					}
+					callback(items);
+					window.setTimeout(function() {
+						$(list).photoGrid({
+							rowHeight: "200"
+			   			});
+					}, 800);
+				};
+						
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4) {
+						if (http.status == 200) {
+							eval(http.responseText);
+						}
+					}
+				};
+				http.send();
+			},
+			get : function(list) {
+				return {
+					"data-simply-feed" : list.getAttribute("data-simply-feed")
 				}
-			};
-			http.send();
+			},
+			set : function(list, data) {
+				list.setAttribute("data-simply-feed", data["data-simply-feed"]);
+			}
 		});
 	</script>
 </body>

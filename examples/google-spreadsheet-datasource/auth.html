@@ -93,7 +93,10 @@
 					if (http.status == 200) {
 						var data = http.responseText;
 						var items = JSON.parse(data);
-						editor.addDataSource("namesList", items, saveList);
+						editor.addDataSource("namesList", {
+							load : items,
+							save : saveList
+						});
 					}
 				}
 			};

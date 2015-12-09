@@ -113,20 +113,25 @@
 					}
 					list.setAttribute("data-simply-stashed", 1);
 
-					if (list.getAttribute("data-simply-data")) {
-						var listData = data[dataPath][dataName];
-						if (editor.dataSources[list.getAttribute("data-simply-data")]) {
-							editor.dataSources[list.getAttribute("data-simply-data")].stash = data[dataPath][dataName];
+					var dataSource = list.getAttribute("data-simply-data");
+					if (dataSource) {
+						if (editor.dataSources[dataSource]) {
+							if (!editor.dataSources[dataSource].stash) {
+								editor.dataSources[dataSource].stash = [];
+							}
+
+							editor.dataSources[dataSource].stash.push({
+								list : list,
+								dataPath : dataPath,
+								dataName : dataName,
+								data : data[dataPath][dataName]
+							});
+
+							if (typeof editor.dataSources[dataSource].get === "function") {
+								data[dataPath][dataName] = editor.dataSources[dataSource].get(list);
+							}
 						}
-
-						// FIXME: Feed the subdata to the save;
-
-						// FIXME: add other attributes as well.
-						data[dataPath][dataName] = {
-							"data-simply-feed" : list.getAttribute("data-simply-feed")
-						};
 					}
-
 				};
 
 				var addData = function(field) {
@@ -180,7 +185,7 @@
 				var data = {};
 				var dataName, dataPath, dataFields;
 				var i, j, k, subKey;
-
+				var dataSource;
 				if (localStorage.data) {
 					data = JSON.parse(localStorage.data);
 				}
@@ -190,9 +195,21 @@
 					stashedFields[i].removeAttribute("data-simply-stashed");
 				}
 
+				for (dataSource in editor.dataSources) {
+					if (editor.dataSources[dataSource].stash) {
+						delete editor.dataSources[dataSource].stash;
+					}
+				}
+
 				var newData = editor.data.get(document);
+				
+				for (dataSource in editor.dataSources) {
+					if (typeof editor.dataSources[dataSource].merge === "function") {
+						newData = editor.dataSources[dataSource].merge(newData);
+					}
+				}
+				
 				data = editor.data.merge(data, newData);
-	
 				localStorage.data = editor.data.stringify(data);
 			},
 			stringify : function(data) {
@@ -234,7 +251,9 @@
 					});
 					for (var source in editor.dataSources) {
 						if (editor.dataSources[source].save) {
-							editor.dataSources[source].save(editor.dataSources[source].stash);
+							for (var i=0; i<editor.dataSources[source].stash.length; i++) {
+								editor.dataSources[source].save(editor.dataSources[source].stash[i]);
+							}
 						}
 					}
 				} 
@@ -285,21 +304,27 @@
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-simply-list]");
 
-					var applyDataSource = function(list, dataSource) {
-						if (editor.dataSources[dataSource] && typeof editor.dataSources[dataSource].load === "function") {
-							editor.dataSources[dataSource].load(list, function(result) {
-								editor.data.list.applyTemplates(list, result);
+
+					var applyDataSource = function(list, dataSource, listData) {
+						if (editor.dataSources[dataSource]) {
+							if (typeof editor.dataSources[dataSource].set === "function") {
+								editor.dataSources[dataSource].set(list, listData);
+							}
+							if (typeof editor.dataSources[dataSource].load === "function") {
+								editor.dataSources[dataSource].load(list, function(result) {
+									editor.data.list.applyTemplates(list, result);
+									if (typeof hope !== "undefined") {
+										editor.editmode.editable(list);
+									}
+								});
+							} else if (editor.dataSources[dataSource].load) {
+								editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
 								if (typeof hope !== "undefined") {
 									editor.editmode.editable(list);
 								}
-							});
-						} else if (editor.dataSources[dataSource] && editor.dataSources[dataSource].load) {
-							editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
-							if (typeof hope !== "undefined") {
-								editor.editmode.editable(list);
 							}
 						} else {
-							window.setTimeout(function() {applyDataSource(list, dataSource);}, 500);
+							window.setTimeout(function() {applyDataSource(list, dataSource, listData);}, 500);
 						}
 					};
 
@@ -312,7 +337,12 @@
 
 						var dataSource = dataLists[i].getAttribute("data-simply-data");
 						if (dataSource !== null) {
-							applyDataSource(dataLists[i], dataSource);
+							var listData = {};
+							if (data && data[dataPath] && data[dataPath][dataName]) {
+								listData = data[dataPath][dataName];
+							}
+				
+							applyDataSource(dataLists[i], dataSource, listData);
 						} else if (data[dataPath] && data[dataPath][dataName]) {
 							editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
 						}
@@ -400,18 +430,30 @@
 
 							var dataSource = elm.getAttribute("data-simply-data");
 							if (dataSource !== null) {
-								var applyDataSource = function(list, dataSource) {
-									if (editor.dataSources[dataSource] && typeof editor.dataSources[dataSource].load === "function") {
-										editor.dataSources[dataSource].load(list, function(result) {
-											editor.data.list.applyTemplates(list, result);
-										});
-									} else if (editor.dataSources[dataSource] && editor.dataSources[dataSource].load) {
-										editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+								var applyDataSource = function(list, dataSource, listData) {
+									if (editor.dataSources[dataSource]) {
+										if (typeof editor.dataSources[dataSource].set === "function") {
+											editor.dataSources[dataSource].set(list, listData);
+										}
+										if (typeof editor.dataSources[dataSource].load === "function") {
+											editor.dataSources[dataSource].load(list, function(result) {
+												editor.data.list.applyTemplates(list, result);
+												if (typeof hope !== "undefined") {
+													editor.editmode.editable(list);
+												}
+											});
+										} else if (editor.dataSources[dataSource].load) {
+											editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+											if (typeof hope !== "undefined") {
+												editor.editmode.editable(list);
+											}
+										}
 									} else {
-										window.setTimeout(function() {applyDataSource(list, dataSource);}, 500);
+										window.setTimeout(function() {applyDataSource(list, dataSource, listData);}, 500);
 									}
 								};
-								applyDataSource(elm, dataSource);
+
+								applyDataSource(elm, dataSource, listData[j][dataName]);
 							} else if (listData[j][dataName]) {
 								editor.data.list.applyTemplates(elm, listData[j][dataName]);
 							}
@@ -451,10 +493,6 @@
 							handleLists(clone);
 						}
 					};
-
-					if (listData['data-simply-feed']) {
-						list.setAttribute("data-simply-feed", listData['data-simply-feed']);
-					}
 
 					for (j=0; j<listData.length; j++) {
 						var requestedTemplate = listData[j]["data-simply-template"];
@@ -1572,11 +1610,8 @@
 		}
 	};
 
-	editor.addDataSource = function(name, load, save) {
-		editor.dataSources[name] = {
-			load : load,
-			save : save
-		};
+	editor.addDataSource = function(name, datasource) {
+		editor.dataSources[name] = datasource;
 	};
 
 	editor.addContextFilter = function(name, filter) {

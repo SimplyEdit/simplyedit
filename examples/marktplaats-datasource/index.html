@@ -33,12 +33,17 @@
 			border: 1px solid #ccc;
 			border-radius: 5px;
 			padding: 5px;
-			margin: 10px;
+			margin: 1%;
+			font-size: 13px;
+			width: 48%;
+			box-sizing: border-box;
+			display: inline-block;
+			vertical-align: top;
 		}
 		.article h1 {
 			font-family: tahoma;
 			margin: 0px;
-			font-size: 20px;
+			font-size: 17px;
 			margin-bottom: 10px;
 		}
 
@@ -71,6 +76,14 @@
                         border-radius: 20px;
                         box-shadow: 2px 2px 5px 0px #333;
                 }
+		.article .link {
+			text-align: right;
+		}
+		@media (max-width: 768px) {
+			.article {
+				width: 98%;
+			}
+		}
 		@media (max-width: 480px) {
 			.article .image {
 				width: 100%;
@@ -89,8 +102,8 @@
 				<span class="prijs" data-simply-field="prijs">prijs</span><br>
 				<!-- span data-simply-field="datum">datum</span><br><br -->
 				<br><span data-simply-field="description">prijs</span><br>
-				<br>&raquo; <a href="#" data-simply-field="url">Bekijk op marktplaats</a>
 			</div>
+			<div class="link">&raquo; <a href="#" data-simply-field="url">Bekijk op marktplaats</a></div>
 		</div></template>
 	</div>
 	<script src="/simply-edit/js/simply-edit.js" 
@@ -129,7 +142,9 @@
 							"data-simply-template" : ((i < 2) ? "large" : "small" )
 						});
 					}
-					editor.addDataSource("newsList", result);
+					editor.addDataSource("newsList", {
+						load : result
+					});
 				}
 			}
 		};

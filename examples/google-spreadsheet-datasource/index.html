@@ -55,13 +55,12 @@
 		var http = new XMLHttpRequest();
 
 		var url = "https://script.google.com/macros/s/AKfycbzxP_JLw8JXOFbuHOWZcnL-6hcMW5kvZyFNcUINwey9XrnkAWpnLqCe/exec";
-		var saveList = function(data) {
+		var saveList = function(stash) {
 			var saveKey = prompt("HALT! What is the magic password!?");
-
 			var savehttp = new XMLHttpRequest();
 			savehttp.open("POST", url, true);
 			savehttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			savehttp.send("data=" + JSON.stringify(data) + "&key=" + escape(saveKey));
+			savehttp.send("data=" + JSON.stringify(stash.data) + "&key=" + escape(saveKey));
 		};
 
 		http.open("GET", url, true);
@@ -71,7 +70,10 @@
 				if (http.status == 200) {
 					var data = http.responseText;
 					var items = JSON.parse(data);
-					editor.addDataSource("namesList", items, saveList);
+					editor.addDataSource("namesList", {
+						load : items, 
+						save : saveList
+					});
 				}
 			}
 		};
