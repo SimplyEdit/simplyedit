@@ -300,33 +300,32 @@
 						}
 					}
 				},
+				applyDataSource : function (list, dataSource, listData) {
+					if (editor.dataSources[dataSource]) {
+						if (typeof editor.dataSources[dataSource].set === "function") {
+							editor.dataSources[dataSource].set(list, listData);
+						}
+						if (typeof editor.dataSources[dataSource].load === "function") {
+							editor.dataSources[dataSource].load(list, function(result) {
+								editor.data.list.applyTemplates(list, result);
+								if (typeof hope !== "undefined") {
+									editor.editmode.editable(list);
+								}
+							});
+						} else if (editor.dataSources[dataSource].load) {
+							editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+							if (typeof hope !== "undefined") {
+								editor.editmode.editable(list);
+							}
+						}
+					} else {
+						window.setTimeout(function() {editor.data.list.applyDataSource(list, dataSource, listData);}, 500);
+					}
+				},
 				init : function(data, target) {
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-simply-list]");
 
-
-					var applyDataSource = function(list, dataSource, listData) {
-						if (editor.dataSources[dataSource]) {
-							if (typeof editor.dataSources[dataSource].set === "function") {
-								editor.dataSources[dataSource].set(list, listData);
-							}
-							if (typeof editor.dataSources[dataSource].load === "function") {
-								editor.dataSources[dataSource].load(list, function(result) {
-									editor.data.list.applyTemplates(list, result);
-									if (typeof hope !== "undefined") {
-										editor.editmode.editable(list);
-									}
-								});
-							} else if (editor.dataSources[dataSource].load) {
-								editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
-								if (typeof hope !== "undefined") {
-									editor.editmode.editable(list);
-								}
-							}
-						} else {
-							window.setTimeout(function() {applyDataSource(list, dataSource, listData);}, 500);
-						}
-					};
 
 					for (var i=0; i<dataLists.length; i++) {
 						dataLists[i].innerHTML = dataLists[i].innerHTML; // reset innerHTML to make sure templates are recognized;
@@ -342,7 +341,7 @@
 								listData = data[dataPath][dataName];
 							}
 				
-							applyDataSource(dataLists[i], dataSource, listData);
+							editor.data.list.applyDataSource(dataLists[i], dataSource, listData);
 						} else if (data[dataPath] && data[dataPath][dataName]) {
 							editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
 						}
@@ -430,30 +429,7 @@
 
 							var dataSource = elm.getAttribute("data-simply-data");
 							if (dataSource !== null) {
-								var applyDataSource = function(list, dataSource, listData) {
-									if (editor.dataSources[dataSource]) {
-										if (typeof editor.dataSources[dataSource].set === "function") {
-											editor.dataSources[dataSource].set(list, listData);
-										}
-										if (typeof editor.dataSources[dataSource].load === "function") {
-											editor.dataSources[dataSource].load(list, function(result) {
-												editor.data.list.applyTemplates(list, result);
-												if (typeof hope !== "undefined") {
-													editor.editmode.editable(list);
-												}
-											});
-										} else if (editor.dataSources[dataSource].load) {
-											editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
-											if (typeof hope !== "undefined") {
-												editor.editmode.editable(list);
-											}
-										}
-									} else {
-										window.setTimeout(function() {applyDataSource(list, dataSource, listData);}, 500);
-									}
-								};
-
-								applyDataSource(elm, dataSource, listData[j][dataName]);
+								editor.data.list.applyDataSource(elm, dataSource, listData[j][dataName]);
 							} else if (listData[j][dataName]) {
 								editor.data.list.applyTemplates(elm, listData[j][dataName]);
 							}
