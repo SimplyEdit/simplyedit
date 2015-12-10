@@ -53,6 +53,33 @@
 		</div>
 	</div>
 </section>
+
+<section id="simply-image-field" class="simply-section">
+	<h1>HTML Image Toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
+			<li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
+			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
+			<li><button data-simply-section="simply-code" data-simply-action="simply-edit-source"><i class="fa fa-code"></i>Code</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-image-style">
+			<div>
+				<label>Format</label><select id="vdImageType" data-simply-action=simply-image-type">
+					<option value="">Original</option>
+				</select>
+			</div>
+		</div>
+		<div class="simply-toolbar-section simply-image-class">
+		</div>
+		<div class="simply-toolbar-section simply-image-properties">
+			<div><label>URL</label><input type="text" id="vdImageSrc" data-simply-action="simply-image-src"></div>
+			<div><label>Alt</label><input type="text" id="vdImageAlt" data-simply-action="simply-image-alt"></div>
+			<div><label>Title</label><input type="text" id="vdImageTitle" data-simply-action="simply-image-title"></div>
+		</div>
+	</div>
+</section>
+
 <script type="text/javascript">
 	var currentImage;
 	var currentLink;
@@ -413,6 +440,122 @@
 				hopeEditor.fragment = hopeEditor.fragment.apply(range, 'img src="' + imageSrc + '"');
 				hopeEditor.update();
 				editor.plugins.image.reselect();
+			}
+		}
+	});
+
+	editor.addToolbar({
+		"name" : "simply-image-field",
+		"filter" : {
+			"selector" : "IMG[data-simply-field]",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var image = vdSelection.getNode(sel);
+
+			hopeEditor = {
+				field : image,
+				parseHTML : function(){},
+				fragment : {
+					has : function() {
+						return false;
+					}
+				}
+			};
+
+			var annotation = false;
+
+			var type=image.getAttribute('data-simply-image-type');
+			if (!type || type=='undefined') {
+				// type='Origineel'; // FIXME: gewoon de eerste in de lijst selecteren?
+				type = document.querySelectorAll("#vdImageType option")[0].value;
+			}
+			simply.widgets.properties.set('vdImageType',type);
+
+			var alt=image.getAttribute('alt');
+			simply.widgets.properties.set('vdImageAlt',alt);
+
+			if (toolbar.querySelector(".simply-toolbar-section.simply-image-class ul")) {
+				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
+			} else {
+				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "none";
+			}
+
+			var imageClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio], .simply-image-class [data-type=simply-buttongroup-radio]");
+			if (imageClasses) {
+				var tempNode;
+				if (annotation) {
+					tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					tempNode = hopeEditor.field;
+				}
+
+				for (var i=0; i<imageClasses.length; i++) {
+					var buttons = imageClasses[i].querySelectorAll("[data-value]");
+					simply.widgets.properties.set(imageClasses[i], "none");
+					for (var j=0; j<buttons.length; j++) {
+						if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
+							simply.widgets.properties.set(imageClasses[i], buttons[j].getAttribute("data-value"));
+						}
+					}
+				}
+			}
+
+			var title=image.getAttribute('title');
+			simply.widgets.properties.set('vdImageTitle', title);
+
+			var src=image.getAttribute('src');
+			if (src == editor.plugins.image.placeholder()) {
+				src = "";
+			}
+			simply.widgets.properties.set('vdImageSrc', src);
+
+			// Set the parent icon for alignment as well;
+			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
+			if (!currentIcon || (currentIcon.parentNode.getAttribute("data-value") == "none")) {
+				currentIcon = document.querySelector("div.simply-image-align button i");
+			}
+			if (currentIcon) {
+				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+				for (var i=0; i<icons.length; i++) {
+					icons[i].className = currentIcon.className;
+				}
+			}
+		},
+		"init" : function(config) {
+			var toolbar = document.querySelector("#" + this.name);
+			if (typeof config === "object" && toolbar) {
+				// Init block classes
+				if (config.class) {
+					var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-image-class');
+					if (classSection) {
+						if (config.class.length) {
+							classSection.innerHTML = '';
+							for (var i=0; i<config.class.length; i++) {
+								if (config.class[i].length) {
+									var classList = config.class[i].slice();
+									classList.push({class: "none", name: "Default", icon: "fa-times"});
+									var list = document.createElement("UL");
+									list.setAttribute("data-type", "simply-buttongroup-radio");
+									for (var j=0; j<classList.length; j++) {
+										var item = document.createElement("li");
+										var button = document.createElement("button");
+										button.setAttribute("data-value", classList[j].class);
+										button.setAttribute("data-simply-action", "simply-image-class");
+										button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+										item.appendChild(button);
+										list.appendChild(item);
+									}
+
+									classSection.appendChild(list);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	});

@@ -165,15 +165,18 @@
 		},
 		init : function() {
 			if (editor.plugins.imageBrowse.path) {
-				var target = document.querySelector("#simply-image .simply-toolbar .simply-buttons");
+				var target = document.querySelectorAll("#simply-image .simply-toolbar .simply-buttons, #simply-image-field .simply-toolbar .simply-buttons");
 				if (target) {
-					var button = document.createElement("LI");
-					button.innerHTML = '<button data-simply-action="simply-image-browse"><i class="fa fa-folder"></i>Browse</button>';
-					target.appendChild(button);
+					var i;
+					for (i=0; i<target.length; i++) {
+						var button = document.createElement("LI");
+						button.innerHTML = '<button data-simply-action="simply-image-browse"><i class="fa fa-folder"></i>Browse</button>';
+						target[i].appendChild(button);
+					}
 
 					target = document.querySelectorAll('[data-simply-action="simply-image-src"]');
 					if (target) {
-						for (var i=0; i<target.length; i++) {
+						for (i=0; i<target.length; i++) {
 							var button = document.createElement("div");
 							button.innerHTML = '<button data-simply-action="simply-image-browse"><i class="fa fa-folder"></i></button>';
 							target[i].parentNode.querySelector("label").appendChild(button.firstChild);
