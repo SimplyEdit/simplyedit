@@ -136,16 +136,25 @@
 					}
 				}
 
-				var mapPoints = field.poly.getPath();
 				var points = [];
+				try {
+					var mapPoints = field.poly.getPath();
 
-				mapPoints.forEach(function(latLng) {
-					points.push({
-						"lat" : latLng.lat(),
-						"lng" : latLng.lng()
+					mapPoints.forEach(function(latLng) {
+						points.push({
+							"lat" : latLng.lat(),
+							"lng" : latLng.lng()
+						});
 					});
-				});
-
+				} catch(e) {
+					var mapPoints = field.querySelector("google-map-point");
+					mapPoints.forEach(function(point) {
+						points.push({
+							"lat" : point.getAttribute("latitude"),
+							"lng" : point.getAttribute("longitude")
+						});
+					});
+				}
 				attributes["points"] = points;
 				return attributes;
 			};
@@ -159,8 +168,18 @@
 					}
 					if (attr == "points") { 
 						points = data[attr];
-						field.poly.setPath(points);
-
+						try {
+							field.poly.setPath(points);
+						} catch (e) {
+							field.innerHTML = '';
+							for (var i=0; i<points.length; i++) {
+								var point = document.createElement("google-map-point");
+								point.setAttribute("latitude", points[i].lat);
+								point.setAttribute("longitude", points[i].lng);
+								field.appendChild(point);
+							}
+							console.log("Sorry, polygon is not supported by this browser.");
+						}
 					}
 				}
 			};

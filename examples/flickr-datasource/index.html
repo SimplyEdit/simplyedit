@@ -59,7 +59,9 @@
 				};
 				items[i].image = items[i].media.m;
 			}
-			editor.addDataSource("galleryList", items);
+			editor.addDataSource("galleryList", {
+				load : items
+			});
 
 			window.setTimeout(function() {
 				$('.photoGrid').photoGrid({
