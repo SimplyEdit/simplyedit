@@ -188,8 +188,6 @@
 					var items = xmlDoc.querySelectorAll("item");
 					var result = [];
 					for (var i=0; i<items.length; i++) {
-						console.log(items[i].querySelector("description"));
-						console.log(decodeURIComponent(items[i].querySelector("description")));
 						result.push({
 							title : items[i].querySelector("title").innerHTML.replace("&amp;", "&"),
 							description : items[i].querySelector("description").innerHTML.replace("&amp;", "&"),
@@ -200,7 +198,10 @@
 							"data-simply-template" : ((i < 2) ? "large" : "small" )
 						});
 					}
-					editor.addDataSource("newsList", result);
+
+					editor.addDataSource("newsList", {
+						load : result
+					});
 				}
 			}
 		};

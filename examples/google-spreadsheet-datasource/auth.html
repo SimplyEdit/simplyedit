@@ -51,16 +51,15 @@
 	></script>
 	
 	<script>
-		var apiKey = "AIzaSyAcGMaci1xCWn1jwduNvanf6_Gb00uOx1k";
-		var clientId = "665669890586"; // -n3bcskc1kec75qftelrc24pjhg9i9hk9.apps.googleusercontent.com";
-		var scopes = "https://spreadsheets.google.com/feeds https://docs.google.com/feeds https://www.googleapis.com/auth/drive.scripts";
-
+		var apiKey = "1FVDHU7fDju__tZ5dEdf1xhok6NzbD2AgeOHw-gSKRMM";
+		var clientId = "665669890586-n3bcskc1kec75qftelrc24pjhg9i9hk9.apps.googleusercontent.com";
+		var scopes = "https://spreadsheets.google.com/feeds https://www.googleapis.com/auth/drive.scripts";
 		var handleClientLoad = function() {
 			gapi.client.setApiKey(apiKey);
 			window.setTimeout(checkAuth,1);
 		};
 		var checkAuth = function() {
-			gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
+			gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
 		};
 	</script>
 	<script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
@@ -72,25 +71,32 @@
 		var saveList = function(data) {
 			gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, function(result) {
 				var oauthToken = gapi.auth.getToken();
+				var myUrl = url + '?access_token=' + encodeURIComponent(oauthToken.access_token);
 
 				var savehttp = new XMLHttpRequest();
-				savehttp.open("POST", url, true);
-				savehttp.setRequestHeader('Authorization', 'Bearer ' + oauthToken.access_token);
+				savehttp.open("POST", myUrl, true);
 				savehttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				savehttp.send("data=" + JSON.stringify(data));
 			});
 		};
 
 		var handleAuthResult = function() {
-			http.open("GET", url, true);
-			http.setRequestHeader('Authorization', 'Bearer ' + oauthToken.access_token);
+			var oauthToken = gapi.auth.getToken();
+			
+			var myUrl = url + '?access_token=' + encodeURIComponent(oauthToken.access_token);
+			console.log(myUrl);
+			http.open("GET", myUrl, true);
+			// http.setRequestHeader('Authorization', 'Bearer ' + oauthToken.access_token);
 
 			http.onreadystatechange = function() {//Call a function when the state changes.
 				if(http.readyState == 4) {
 					if (http.status == 200) {
 						var data = http.responseText;
 						var items = JSON.parse(data);
-						editor.addDataSource("namesList", items, saveList);
+						editor.addDataSource("namesList", {
+							load : items,
+							save : saveList
+						});
 					}
 				}
 			};

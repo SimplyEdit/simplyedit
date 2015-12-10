@@ -63,7 +63,9 @@
 						}
 					});
 				}
-				editor.addDataSource("galleryList", myGalleryList);
+				editor.addDataSource("galleryList", {
+					load : myGalleryList
+				});
 			}
 		);
 	</script>
