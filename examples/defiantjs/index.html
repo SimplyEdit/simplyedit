@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simply edit - Defiant JS</title>
+	<meta name="description" content="Simple edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta charset="utf-8"> 
+	<style type="text/css">
+		img {
+			width: 300px;
+		}
+	</style>
+	<script src="defiant.min.js"></script>
+</head>
+<body>
+	<form class="search" action="" method="GET">
+		<div class="field">
+			<input type="text" placeholder="Search for..." name="search">
+			<input type="submit" value="Go!">
+		</div>
+	</form>
+	<ul data-simply-list="results">
+		<template>
+			<li>
+				<h1 data-simply-field="title"></h1>
+				<div data-simply-field="snippit"></div>
+				<a href="#" data-simply-field="link"></a>
+			</li>
+		</template>
+	</ul>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze" 
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+	></script>
+	<script>
+		var search = function(keyword) {
+			var xpath = "//*[contains(*, '" + keyword + "')]";
+			subxpath = '//*[contains(., "' + keyword + '")]';
+
+			var result = [];
+			// search in editor.currentData;
+			for (path in editor.currentData) {
+				var searchResult = JSON.search(editor.currentData[path], subxpath);
+				if (searchResult.length) {
+					result.push({
+						link : {
+							href : path,
+							innerHTML : path
+						},
+						title : path,
+						snippit : searchResult[searchResult.length-1].innerHTML ? searchResult[searchResult.length-1].innerHTML : searchResult[searchResult.length-1]
+					});
+				}
+			}
+			
+			return result;
+		}
+
+		document.querySelector("form.search input").addEventListener("input", function(evt) {
+			var list = document.querySelector("UL");
+			list.innerHTML = '';
+
+			if (this.value.length > 2) {
+				var result = search(this.value);
+				editor.data.list.applyTemplates(list, result);
+			}
+		});
+
+		document.querySelector("form.search").addEventListener("submit", function(evt) {
+			evt.preventDefault();
+			var result = search(this.querySelector("input[name='search']").value);
+			var list = document.querySelector("UL");
+			list.innerHTML = '';
+			editor.data.list.applyTemplates(list, result);
+		});
+	</script>
+</body>
+</html>
