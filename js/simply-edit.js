@@ -273,7 +273,7 @@
 								editor.editmode.init();
 								var checkHope = function() {
 									if (typeof hope !== "undefined") {
-										editor.editmode.editable(document);
+										editor.editmode.makeEditable(document);
 									} else {
 										window.setTimeout(checkHope, 100);
 									}
@@ -309,13 +309,13 @@
 							editor.dataSources[dataSource].load(list, function(result) {
 								editor.data.list.applyTemplates(list, result);
 								if (typeof hope !== "undefined") {
-									editor.editmode.editable(list);
+									editor.editmode.makeEditable(list);
 								}
 							});
 						} else if (editor.dataSources[dataSource].load) {
 							editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
 							if (typeof hope !== "undefined") {
-								editor.editmode.editable(list);
+								editor.editmode.makeEditable(list);
 							}
 						}
 					} else {
@@ -559,116 +559,140 @@
 			}
 		},
 		field : {
-			extraTypes : {},
-			registerType : function(fieldType, getter, setter, editmode) {
-				editor.field.extraTypes[fieldType] = {
-					get : getter,
-					set : setter,
-					editable : editmode
-				};
-			},
-			set : function(field, data) {
-				var attr;
-				switch (field.tagName.toLowerCase()) {
-					case "img":
-					case "iframe":
+			fieldTypes : {
+				"img" : {
+					get : function(field) {
+						return editor.field.defaultGetter(field, ["src", "class", "alt", "title"]);
+					},
+					set : function(field, data) {
+						if (typeof data == "string") {
+								data = {"src" : data};
+						}
+						return editor.field.defaultSetter(field, data);
+					},
+					makeEditable : function(field) {
+						field.setAttribute("data-simply-selectable", true);
+					}
+				},
+				"iframe" : {
+					get : function(field) {
+						return editor.field.defaultGetter(field, ["src"]);
+					},
+					set : function(field, data) {
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
-						for (attr in data) {
-							field.setAttribute(attr, data[attr]);
-						}
-					break;
-					case "meta":
-						for (attr in data) {
-							field.setAttribute(attr, data[attr]);
-						}
-					break;
-					case "a":
-						for (attr in data) {
-							if (attr == "innerHTML") {
-								field.innerHTML = data[attr];
-							} else {
-								field.setAttribute(attr, data[attr]);
-							}
-						}
-					break;
-					default:
-						if (
-							editor.field.extraTypes[field.tagName.toLowerCase()] && 
-							typeof editor.field.extraTypes[field.tagName.toLowerCase()].set === "function"
-						) {
-							return editor.field.extraTypes[field.tagName.toLowerCase()].set(field, data);
-						}
-
-						field.innerHTML = data;
-					break;
+						return editor.field.defaultSetter(field, data);
+					},
+					makeEditable : function(field) {
+						field.contentEditable = true;
+					}
+				},
+				"meta" : {
+					get : function(field) {
+						return editor.field.defaultGetter(field, ["content"]);
+					},
+					set : function(field, data) {
+						return editor.field.defaultSetter(field, data);
+					},
+					makeEditable : function(field) {
+						field.contentEditable = true;
+					}
+				},
+				"a" : {
+					get : function(field) {
+						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML"]);
+					},
+					set : function(field, data) {
+						return editor.field.defaultSetter(field, data);
+					},
+					makeEditable : function(field) {
+						field.contentEditable = true;
+					}
+				},
+				"i.fa" : {
+					makeEditable : function(field) {
+						field.setAttribute("data-simply-selectable", true);
+					}
+				},
+				"title" : {
+					makeEditable : function(field) {
+						field.contentEditable = true;
+					}
 				}
 			},
-			get : function(field) {
-				var attr;
-				var attributes = {};
-				var allowedAttributes = {};
-
-				switch (field.tagName.toLowerCase()) {
-					case "img": 
-						allowedAttributes = ["src", "class", "alt", "title"];
-					break;
-					case "a":
-						allowedAttributes = ["href", "class", "alt", "title"];
+			matches : function(el, selector) {
+				var p = Element.prototype;
+				var f = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || function(s) {
+					return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
+				};
+				return f.call(el, selector);
+			},
+			defaultGetter : function(field, attributes) {
+				for (var attr in attributes) {
+					attr = attributes[attr];
+					if (attr == "innerHTML") {
 						attributes.innerHTML = field.innerHTML;
-					break;
-					case "meta":
-						allowedAttributes = ["content"];
-					break;
-					case "iframe":
-						allowedAttributes = ["src"];
-					break;
-					default:
-						if (
-							editor.field.extraTypes[field.tagName.toLowerCase()] &&
-							typeof editor.field.extraTypes[field.tagName.toLowerCase()].get === "function"
-						) {
-							return editor.field.extraTypes[field.tagName.toLowerCase()].get(field);
+					} else {
+						if (field.getAttribute(attr)) {
+							attributes[attr] = field.getAttribute(attr);
 						}
-						return field.innerHTML;
-				}
-				for (attr in allowedAttributes) {
-					attr = allowedAttributes[attr];
-					if (field.getAttribute(attr)) {
-						attributes[attr] = field.getAttribute(attr);
 					}
 				}
 				return attributes;
 			},
-			editable : function(field) {
-				switch (field.tagName.toLowerCase()) {
-					case "iframe":
-					case "meta":
-					case "title":
-						field.contentEditable = true;
-					break;
-					case "img":
-						field.setAttribute("data-simply-selectable", true);
-					break;
-					case "i":
-						field.setAttribute("data-simply-selectable", true);
-					break;
-					default:
-						if (
-							editor.field.extraTypes[field.tagName.toLowerCase()] && 
-							typeof editor.field.extraTypes[field.tagName.toLowerCase()].editable === "function"
-						) {
-							return editor.field.extraTypes[field.tagName.toLowerCase()].editable(field);
-						}
-
-						field.hopeContent = document.createElement("textarea");
-						field.hopeMarkup = document.createElement("textarea");
-						field.hopeRenderedSource = document.createElement("DIV");
-						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
-						field.hopeEditor.field = field;
-					break;
+			defaultSetter : function(field, data) {
+				for (var attr in data) {
+					if (attr == "innerHTML") {
+						field.innerHTML = data[attr];
+					} else {
+						field.setAttribute(attr, data[attr]);
+					}
 				}
+			},
+			registerType : function(fieldType, getter, setter, editmode) {
+				editor.field.fieldTypes[fieldType] = {
+					get : getter,
+					set : setter,
+					makeEditable : editmode
+				};
+			},
+			set : function(field, data) {
+				for (var i in editor.field.fieldTypes) {
+					if (editor.field.matches(field, i)) {
+						if (typeof editor.field.fieldTypes[i].set === "function") {
+							return editor.field.fieldTypes[i].set(field, data);
+						}
+					}
+				}
+
+				field.innerHTML = data;
+			},
+			get : function(field) {
+				for (var i in editor.field.fieldTypes) {
+					if (editor.field.matches(field, i)) {
+						if (typeof editor.field.fieldTypes[i].get === "function") {
+							return editor.field.fieldTypes[i].get(field);
+						}
+					}
+				}
+
+				return field.innerHTML;
+			},
+			makeEditable : function(field) {
+				for (var i in editor.field.fieldTypes) {
+					if (editor.field.matches(field, i)) {
+						if (typeof editor.field.fieldTypes[i].makeEditable === "function") {
+							return editor.field.fieldTypes[i].makeEditable(field);
+						}
+					}
+				}
+
+				field.hopeContent = document.createElement("textarea");
+				field.hopeMarkup = document.createElement("textarea");
+				field.hopeRenderedSource = document.createElement("DIV");
+				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
+				field.hopeEditor.field = field;
 			}
 		},
 		loadBaseStyles : function() {
@@ -830,13 +854,13 @@
 				loadToolbars();
 
 			},
-			editable : function(target) {
+			makeEditable : function(target) {
 				var i;
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
 				for (i=0; i<dataFields.length; i++) {
-					editor.field.editable(dataFields[i]);
+					editor.field.makeEditable(dataFields[i]);
 
 					// FIXME: Add support to keep fields that point to the same field within the same path in sync here;
 				}

@@ -116,6 +116,20 @@ QUnit.module("hope editor behaviour");
 		assert.equal(testContent.innerHTML, "<ul><li><strong>test1</strong></li><li>test2</li></ul>", "innerHTML did not change");
 	});
 
+	QUnit.test("footer HTML element works", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<footer>Hello world</footer>";
+		testContent.hopeEditor.parseHTML();
+		assert.equal(testContent.innerHTML, "<footer>Hello world</footer>", "innerHTML did not change");
+	});
+
+	QUnit.test("unknown elements works", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<gobblefoo>Hello <gobblebar>world</gobblebar></gobblefoo>";
+		testContent.hopeEditor.parseHTML();
+		assert.equal(testContent.innerHTML, "<gobblefoo>Hello <gobblebar>world</gobblebar></gobblefoo>", "innerHTML did not change");
+	});
+
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");

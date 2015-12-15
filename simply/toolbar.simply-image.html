@@ -13,7 +13,7 @@
 		</ul>
 		<div class="simply-toolbar-section simply-image-style">
 			<div>
-				<label>Format</label><select id="vdImageType" data-simply-action=simply-image-type">
+				<label>Format</label><select class="simply-image-type" data-simply-action="simply-image-type">
 					<option value="">Original</option>
 				</select>
 			</div>
@@ -34,14 +34,14 @@
 			</ul>
 		</div>
 		<div class="simply-toolbar-section simply-image-properties">
-			<div><label>URL</label><input type="text" id="vdImageSrc" data-simply-action="simply-image-src"></div>
-			<div><label>Alt</label><input type="text" id="vdImageAlt" data-simply-action="simply-image-alt"></div>
-			<div><label>Title</label><input type="text" id="vdImageTitle" data-simply-action="simply-image-title"></div>
+			<div><label>URL</label><input type="text" class="simply-image-src" data-simply-action="simply-image-src"></div>
+			<div><label>Alt</label><input type="text" class="simply-image-alt" data-simply-action="simply-image-alt"></div>
+			<div><label>Title</label><input type="text" class="simply-image-title" data-simply-action="simply-image-title"></div>
 		</div>
 		<div class="simply-toolbar-section simply-hyperlink">
-			<div><label>URL</label><input type="text" id="vdHyperlinkHref" data-simply-action="simply-hyperlink-href"></div>
-			<div><label>Title</label><input type="text" id="vdHyperlinkTitle" data-simply-action="simply-hyperlink-title"></div>
-			<div><label>Name</label><input type="text" id="vdHyperlinkName" data-simply-action="simply-hyperlink-name"></div>
+			<div><label>URL</label><input type="text" class="simply-hyperlink-href" data-simply-action="simply-hyperlink-href"></div>
+			<div><label>Title</label><input type="text" class="simply-hyperlink-title" data-simply-action="simply-hyperlink-title"></div>
+			<div><label>Name</label><input type="text" class="simply-hyperlink-name" data-simply-action="simply-hyperlink-name"></div>
 			<div><button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button></div>
 		</div>
 		<div class="simply-toolbar-section simply-clipboard">
@@ -64,7 +64,7 @@
 		</ul>
 		<div class="simply-toolbar-section simply-image-style">
 			<div>
-				<label>Format</label><select id="vdImageType" data-simply-action=simply-image-type">
+				<label>Format</label><select class="simply-image-type" data-simply-action="simply-image-type">
 					<option value="">Original</option>
 				</select>
 			</div>
@@ -72,9 +72,9 @@
 		<div class="simply-toolbar-section simply-image-class">
 		</div>
 		<div class="simply-toolbar-section simply-image-properties">
-			<div><label>URL</label><input type="text" id="vdImageSrc" data-simply-action="simply-image-src"></div>
-			<div><label>Alt</label><input type="text" id="vdImageAlt" data-simply-action="simply-image-alt"></div>
-			<div><label>Title</label><input type="text" id="vdImageTitle" data-simply-action="simply-image-title"></div>
+			<div><label>URL</label><input type="text" class="simply-image-src" data-simply-action="simply-image-src"></div>
+			<div><label>Alt</label><input type="text" class="simply-image-alt" data-simply-action="simply-image-alt"></div>
+			<div><label>Title</label><input type="text" class="simply-image-title" data-simply-action="simply-image-title"></div>
 		</div>
 	</div>
 </section>
@@ -154,12 +154,12 @@
 			var type=image.getAttribute('data-simply-image-type');
 			if (!type || type=='undefined') {
 				// type='Origineel'; // FIXME: gewoon de eerste in de lijst selecteren?
-				type = document.querySelectorAll("#vdImageType option")[0].value;
+				type = toolbar.querySelectorAll(".simply-image-type option")[0].value;
 			}
-			simply.widgets.properties.set('vdImageType',type);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image-type'),type);
 
 			var alt=image.getAttribute('alt');
-			simply.widgets.properties.set('vdImageAlt',alt);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image.alt'),alt);
 
 			if (toolbar.querySelector(".simply-toolbar-section.simply-image-class ul")) {
 				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
@@ -188,13 +188,13 @@
 			}
 
 			var title=image.getAttribute('title');
-			simply.widgets.properties.set('vdImageTitle', title);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image-title'), title);
 
 			var src=image.getAttribute('src');
 			if (src == editor.plugins.image.placeholder()) {
 				src = "";
 			}
-			simply.widgets.properties.set('vdImageSrc', src);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image-src'), src);
 
 			var hyperlink = hopeEditor.fragment.has(range, "a");
 
@@ -203,13 +203,13 @@
 				toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
 				var linkNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
 				var hyperlinkHref = linkNode.getAttribute('href');
-				simply.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), hyperlinkHref);
+				simply.widgets.properties.set(toolbar.querySelector(".simply-hyperlink-href"), hyperlinkHref);
 
 				var hyperlinkTitle = linkNode.getAttribute('title');
-				simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), hyperlinkTitle);
+				simply.widgets.properties.set(toolbar.querySelector('.simply-hyperlink-title'), hyperlinkTitle);
 
 				var hyperlinkName = linkNode.getAttribute('name');
-				simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), hyperlinkName);
+				simply.widgets.properties.set(toolbar.querySelector('.simply-hyperlink-name'), hyperlinkName);
 				
 				var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
 				if (linkNode.getAttribute("rel") && linkNode.getAttribute("rel").match(/nofollow/)) {
@@ -218,9 +218,9 @@
 					hyperlinkNofollow.classList.remove("simply-selected");
 				}
 			} else {
-				simply.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), '');
-				simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), '');
-				simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), '');
+				simply.widgets.properties.set(toolbar.querySelector(".simply-hyperlink-href"), '');
+				simply.widgets.properties.set(toolbar.querySelector('.simply-hyperlink-title'), '');
+				simply.widgets.properties.set(toolbar.querySelector('.simply-hyperlink-name'), '');
 				
 				var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
 				if (hyperlinkNofollow) {
@@ -276,7 +276,7 @@
 			vdSetImage = function() {
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
-				var type=vdGetProperty('vdImageType');
+				var type=simply.widgets.properties.get(toolbar.querySelector(".simply-image-type"));
 
 				if (annotation) {
 					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
@@ -406,6 +406,8 @@
 				}
 			},
 			"simply-image-src" : function(value) {
+				value = value.replace(/\\/g, "/");
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
@@ -470,12 +472,12 @@
 			var type=image.getAttribute('data-simply-image-type');
 			if (!type || type=='undefined') {
 				// type='Origineel'; // FIXME: gewoon de eerste in de lijst selecteren?
-				type = document.querySelectorAll("#vdImageType option")[0].value;
+				type = toolbar.querySelectorAll(".simply-image-type option")[0].value;
 			}
-			simply.widgets.properties.set('vdImageType',type);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image-type'),type);
 
 			var alt=image.getAttribute('alt');
-			simply.widgets.properties.set('vdImageAlt',alt);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image-alt'),alt);
 
 			if (toolbar.querySelector(".simply-toolbar-section.simply-image-class ul")) {
 				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
@@ -504,13 +506,13 @@
 			}
 
 			var title=image.getAttribute('title');
-			simply.widgets.properties.set('vdImageTitle', title);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image-title'), title);
 
 			var src=image.getAttribute('src');
 			if (src == editor.plugins.image.placeholder()) {
 				src = "";
 			}
-			simply.widgets.properties.set('vdImageSrc', src);
+			simply.widgets.properties.set(toolbar.querySelector('.simply-image-src'), src);
 
 			// Set the parent icon for alignment as well;
 			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");

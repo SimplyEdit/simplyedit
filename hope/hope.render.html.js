@@ -77,7 +77,7 @@ hope.register( 'hope.render.html', function() {
 			'dd' : [ 'dl' ]
 		},
 		// which html elements to allow as the top level, default is only block elements
-		'toplevel' : nestingSets.block + nestingSets.inline // [ 'li', 'img', 'span', 'strong', 'em', 'code' ]
+		'toplevel' : nestingSets.block.concat(nestingSets.inline) // [ 'li', 'img', 'span', 'strong', 'em', 'code' ]
 	};
 
 	this.getTag = function( markup ) {
@@ -150,6 +150,18 @@ hope.register( 'hope.render.html', function() {
 */
 		do {
 			annotationTag = this.getTag( annotation.tag );
+
+			// Treat unknown types as a div.
+			if (typeof this.rules.nesting[ annotationTag ] === "undefined") {
+				this.rules.nesting[ annotationTag ] = this.rules.nesting["div"];
+				for (i in this.rules.nesting) {
+					this.rules.nesting[i].push(annotationTag);
+				}
+			}
+			if (this.rules.toplevel.indexOf( annotationTag ) == -1) {
+				this.rules.toplevel.push(annotationTag); // allow it as a toplevel element;
+			}
+
 			if ( 
 				( !lastAnnotationTag && this.rules.toplevel.indexOf( annotationTag ) == -1 ) || 
 				( lastAnnotationTag && ( !this.rules.nesting[ annotationTag ] || 
@@ -164,6 +176,7 @@ hope.register( 'hope.render.html', function() {
 			}
 			annotation = unfilteredStack.pop();
 		} while ( annotation );
+
 
 		if ( skippedAnnotation.length ) {
 			// now try to find a spot for any annotation from the skippedAnnotation set
