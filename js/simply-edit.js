@@ -610,6 +610,11 @@
 						field.contentEditable = true;
 					}
 				},
+				"i.fa" : {
+					makeEditable : function(field) {
+						field.setAttribute("data-simply-selectable", true);
+					}
+				},
 				"title" : {
 					makeEditable : function(field) {
 						field.contentEditable = true;
