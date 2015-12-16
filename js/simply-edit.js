@@ -628,17 +628,18 @@
 				return f.call(el, selector);
 			},
 			defaultGetter : function(field, attributes) {
-				for (var attr in attributes) {
-					attr = attributes[attr];
+				var result = {};
+				for (var i=0; i<attributes.length; i++) {
+					attr = attributes[i];
 					if (attr == "innerHTML") {
-						attributes.innerHTML = field.innerHTML;
+						result.innerHTML = field.innerHTML;
 					} else {
 						if (field.getAttribute(attr)) {
-							attributes[attr] = field.getAttribute(attr);
+							result[attr] = field.getAttribute(attr);
 						}
 					}
 				}
-				return attributes;
+				return result;
 			},
 			defaultSetter : function(field, data) {
 				for (var attr in data) {
