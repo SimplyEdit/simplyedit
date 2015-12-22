@@ -1069,8 +1069,6 @@
 				return "github";
 			} else if (endpoint.indexOf("github.com") !== -1) {
 				return "github";
-			} else if (endpoint.indexOf("neocities.org") !== -1) {
-				return "neocities";
 			}
 			return "default";
 		},
@@ -1139,69 +1137,6 @@
 			},
 			connect : function() {
 				return true;
-			},
-			disconnect : function() {
-				delete editor.storage.key;
-				delete localStorage.storageKey;
-			}
-		},
-		neocities : {
-			init : function(endpoint) {
-				if (endpoint === null) {
-					endpoint = location.origin + "/";
-				}
-				this.url = endpoint;
-				this.endpoint = endpoint;
-			},
-			save : function(data, callback) {
-				var http = new XMLHttpRequest();
-				var url = "https://neocities.org/api/upload";
-				var params = "data.json=" + encodeURIComponent(data);
-
-				http.open("POST", url, true);
-				//Send the proper header information along with the request
-				http.withCredentials = true;
-				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=utf-8");
-				http.setRequestHeader("Authorization", "Basic " + editor.storage.key);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback();
-					}
-				};
-				http.send(params);
-			},
-			load : function(callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data.json";
-				if (editor.profile == "dev") {
-					url += "?t=" + (new Date().getTime());
-				}
-
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback(http.responseText);
-					}
-				};
-				http.send();
-			},
-			validateKey : function() {
-				return true;
-			},
-			connect : function() {
-				if (!editor.storage.key) {
-					editor.storage.key = localStorage.storageKey;
-				}
-				if (!editor.storage.key) {
-					editor.storage.key = prompt("Please enter your authentication key");
-				}
-
-				if (editor.storage.validateKey(editor.storage.key)) {
-					localStorage.storageKey = editor.storage.key;
-					return true;
-				} else {
-					return editor.storage.connect();
-				}
 			},
 			disconnect : function() {
 				delete editor.storage.key;
