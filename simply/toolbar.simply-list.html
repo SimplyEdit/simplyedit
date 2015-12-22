@@ -198,5 +198,11 @@
 			addButton.classList.remove("simply-selected");
 			toolbar.querySelector("div.simply-list-templates").classList.remove("simply-selected");
 		}
-	});	
+	});
+	editor.addContextFilter(
+		"simply-list-and-item", {
+			"selector" : "[data-simply-list][data-simply-list-item]",
+			"context" : "simply-list"
+		}
+	);
 </script>
