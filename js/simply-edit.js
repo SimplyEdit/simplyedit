@@ -607,7 +607,11 @@
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
-						field.contentEditable = true;
+						field.hopeContent = document.createElement("textarea");
+						field.hopeMarkup = document.createElement("textarea");
+						field.hopeRenderedSource = document.createElement("DIV");
+						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
+						field.hopeEditor.field = field;
 					}
 				},
 				"i.fa" : {
