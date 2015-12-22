@@ -398,6 +398,28 @@ window['Slip'] = (function(){
 					// Chrome's compositor doesn't sort 2D layers
 					this.container.style.webkitTransformStyle = 'preserve-3d';
 				}
+				this.container.origTransform = this.container.style[transformPrefix];
+				this.container.origTransformOrigin = this.container.style[transformPrefix + "Origin"];
+				this.container.origTransition = this.container.style[transitionPrefix];
+
+				var containerRects = this.container.getBoundingClientRect();
+				if (
+					(window.innerHeight < containerRects.height) ||
+					(window.innerWidth < containerRects.width)
+				) {
+					this.container.scale = Math.min(
+						(window.innerHeight-100)/containerRects.height,
+						(window.innerWidth)/containerRects.width
+					);
+
+					this.container.style[transitionPrefix] = "transform .3s ease-in-out";
+					this.container.style[transformPrefix + "Origin"] = (this.startPosition.x - containerRects.left) + "px " + (this.startPosition.y - containerRects.top) + "px";
+					this.container.style[transformPrefix] = "scale(" + this.container.scale + ")";
+					document.addEventListener("focus", function(evt) {
+						evt.stopPropagation();
+						evt.target.blur();
+					}, true);
+				}
 
 				function setPosition() {
 					/*jshint validthis:true */
@@ -535,6 +557,13 @@ window['Slip'] = (function(){
 						if (compositorDoesNotOrderLayers) {
 							this.container.style.webkitTransformStyle = '';
 						}
+						this.container.style[transformPrefix] = this.container.origTransform;
+						var targetContainer = this.container;
+
+						window.setTimeout(function() {
+							targetContainer.style[transitionPrefix] = targetContainer.origTransition;
+						}, 500);
+						this.container.style[transformPrefix + "Origin"] = this.container.origTransformOrigin;
 
 						this.target.node.className = this.target.node.className.replace(/(?:^| )slip-reordering/,'');
 						this.target.node.style[userSelectPrefix] = '';
@@ -724,7 +753,7 @@ window['Slip'] = (function(){
 
 			this.startAtPosition({
 				x: e.touches[0].clientX,
-				y: e.touches[0].clientY - window.scrollY,
+				y: e.touches[0].clientY,
 				time: e.timeStamp,
 			});
 		},
@@ -805,7 +834,7 @@ window['Slip'] = (function(){
 		onTouchMove: function(e) {
 			this.updatePosition(e, {
 				x: e.touches[0].clientX,
-				y: e.touches[0].clientY - window.scrollY,
+				y: e.touches[0].clientY,
 				time: e.timeStamp,
 			});
 
@@ -833,16 +862,25 @@ window['Slip'] = (function(){
 		},
 
 		getTotalMovement: function() {
+			var scale = this.container.scale;
+			if (typeof scale === "undefined") {
+				scale = 1;
+			}
+
 			return {
-				x:this.latestPosition.x - this.startPosition.x,
-				y:this.latestPosition.y - this.startPosition.y,
+				x:(this.latestPosition.x - this.startPosition.x)/scale,
+				y:(this.latestPosition.y - this.startPosition.y)/scale,
 			};
 		},
 
 		getAbsoluteMovement: function() {
+			var scale = this.container.scale;
+			if (typeof scale === "undefined") {
+				scale = 1;
+			}
 			return {
-				x: Math.abs(this.latestPosition.x - this.startPosition.x),
-				y: Math.abs(this.latestPosition.y - this.startPosition.y),
+				x: Math.abs(this.latestPosition.x - this.startPosition.x)/scale,
+				y: Math.abs(this.latestPosition.y - this.startPosition.y)/scale,
 				time:this.latestPosition.time - this.startPosition.time,
 			};
 		},
