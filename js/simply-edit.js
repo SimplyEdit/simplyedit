@@ -824,7 +824,7 @@
 				};
 
 				// Add slip.js for sortable items;
-				addScript(editor.baseURL + "simply/slip.js");
+				addScript(editor.baseURL + "simply/slip.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : ""));
 
 				// Add hope
 				addScript(editor.baseURL + "hope/hope.packed.js");
