@@ -412,7 +412,7 @@ window['Slip'] = (function(){
 						(window.innerWidth)/containerRects.width
 					);
 
-					this.container.style[transitionPrefix] = "transform .3s ease-in-out";
+					this.container.style[transitionPrefix] = transformProperty + " .3s ease-in-out";
 					this.container.style[transformPrefix + "Origin"] = (this.startPosition.x - containerRects.left) + "px " + (this.startPosition.y - containerRects.top) + "px";
 					this.container.style[transformPrefix] = "scale(" + this.container.scale + ")";
 					document.addEventListener("focus", function(evt) {
