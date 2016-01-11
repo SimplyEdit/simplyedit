@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simple edit</title>
+	<meta name="description" content="Simple edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta name="page-template" content="index.html" data-simply-field="data-simply-page-template">
+	<meta charset="utf-8"> 
+</head>
+<body>
+	<h1 data-simply-field="title" data-simply-content="text">Thing goes here</h1>
+	<div data-simply-field="page content">Other things go here</div>
+	<img src="/simply-edit/imgs/muze.png" data-simply-field="image">
+	<nav>
+		Menu goes here!
+		<ul data-simply-list="menu" data-simply-path="/simply-edit/" data-simply-sortable>
+			<template>
+				<li>
+					<a href="/simply-edit/" data-simply-field="item">Menu item</a>
+				</li>
+			</template>
+		</ul>
+	</nav>
+	<img src="/simply-edit/imgs/muze.png">
+	<script>
+		var neocitiesStorage = {
+		neocities : {
+			init : function(endpoint) {
+				if (endpoint === null) {
+					endpoint = location.origin + "/";
+				}
+				this.url = endpoint;
+				this.endpoint = endpoint;
+			},
+			save : function(data, callback) {
+				var http = new XMLHttpRequest();
+				var url = "https://neocities.org/api/upload";
+				var params = "data.json=" + encodeURIComponent(data);
+
+				http.open("POST", url, true);
+				//Send the proper header information along with the request
+				http.withCredentials = true;
+				http.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=utf-8");
+				http.setRequestHeader("Authorization", "Basic " + editor.storage.key);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback();
+					}
+				};
+				http.send(params);
+			},
+			load : function(callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "data.json";
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
+
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback(http.responseText);
+					}
+				};
+				http.send();
+			},
+			validateKey : function() {
+				return true;
+			},
+			connect : function() {
+				if (!editor.storage.key) {
+					editor.storage.key = localStorage.storageKey;
+				}
+				if (!editor.storage.key) {
+					editor.storage.key = prompt("Please enter your authentication key");
+				}
+
+				if (editor.storage.validateKey(editor.storage.key)) {
+					localStorage.storageKey = editor.storage.key;
+					return true;
+				} else {
+					return editor.storage.connect();
+				}
+			},
+			disconnect : function() {
+				delete editor.storage.key;
+				delete localStorage.storageKey;
+			}
+		};
+	</script>
+	<script src="/simply-edit/js/simply-edit.js" 
+		data-api-key="muze"
+		data-simply-images="images"
+		data-simply-storage="neocitiesStorage"
+		data-simply-endpoint="https://simply-edit.neocities.org/"
+	></script>
+</body>
+</html>
