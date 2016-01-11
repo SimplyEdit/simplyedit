@@ -1877,7 +1877,6 @@ hope.register( 'hope.fragment.annotations', function() {
 
 		hope.events.listen(this.editor.refs.output, 'keyup', updateRange);
 		hope.events.listen(this.editor.refs.output, 'mouseup', updateRange);
-		hope.events.listen(this.editor.refs.output, 'mousedown', updateRange, true);
 	}
 
 	hopeEditorSelection.prototype.updateRange = function (start, end) {

@@ -38,7 +38,7 @@
 					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
 					vdSelectionState.remove(sel);
 				});
-				removeTouchSelectionEvent = muze.event.attach(document, "touchstart", function() {
+				removeTouchSelectionEvent = muze.event.attach(document, "touchstart", function(evt) {
 					var target = muze.event.target(evt);
 					// Keep the selection when the click is within a toolbar;
 					if (editor.node.hasToolbarParent(target)) {
