@@ -72,6 +72,10 @@
 			-moz-box-shadow: 0px 0px 4px #CCC;
 			box-shadow: 0px 0px 4px #CCC;
 			z-index: 1000;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ie-user-select: none;
+			user-select: none;
 		}
 		.simply-toolbar::after, .simply-toolbar > ul::after, .simply-toolbar-section > ul::after {
 			content: "";
