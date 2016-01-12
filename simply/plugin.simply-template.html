@@ -163,15 +163,15 @@
 					option.innerHTML = config['templates'][i].name;
 					templateSelect.appendChild(option);
 				}
+				editor.addAction("simply-page-template", function(el) {
+					el.classList.toggle("simply-selected");
+				});
+
+				editor.addAction("simply-template", editor.plugins.pageTemplate.dialog.open);
+				editor.addAction("simply-template-apply", editor.plugins.pageTemplate.apply);
 			}
 		}
 	};
 
-	editor.addAction("simply-page-template", function(el) {
-		el.classList.toggle("simply-selected");
-	});
-
-	editor.addAction("simply-template", editor.plugins.pageTemplate.dialog.open);
-	editor.addAction("simply-template-apply", editor.plugins.pageTemplate.apply);
 	editor.plugins.pageTemplate.init(editor.settings['pageTemplates']);
 </script>
