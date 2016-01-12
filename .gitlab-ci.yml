@@ -8,11 +8,7 @@ before_script:
   - ( php -S 0.0.0.0:80  & )
   - ( cd /tmp/simply-test-store ; bash server.sh )
 
-stages:
-  - test
-
 job1:
-  stage: test
   script:
      - phantomjs tests/runner.js http://localhost/tests/data-display/index.html
      - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
