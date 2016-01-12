@@ -61,33 +61,17 @@ page.onError = function(msg, trace) {
 };
 
 page.open(url, function (status) {
-	//Page is loaded!
-	var testsDone = function() {
-		console.log("checking if tests are done");
-		var result = page.evaluate(function() {
-			if (document.querySelector("#qunit-testresult")) {
-				return true;
-			}
-		});
-
-		if (result) {
-			var passed = page.evaluate(function() {
-				return document.querySelectorAll("#qunit-banner.qunit-pass");
-			});
-
-			if (passed.length === 0) {
-				var status = page.evaluate(function() {
-					return document.querySelector("#qunit-testresult").innerText;
-				});
-				console.log(status);
-			} else {
-				console.log("OK");
-			}
-			phantom.exit();
-		} else {
-			setTimeout(testsDone, 200);
-		}
-	};
-	testsDone();
+        if (status !== 'success') {
+            console.error('Unable to access network: ' + status);
+            phantom.exit(1);
+        } else {
+            // Cannot do this verification with the 'DOMContentLoaded' handler because it
+            // will be too late to attach it if a page does not have any script tags.
+            var qunitMissing = page.evaluate(function() { return (typeof QUnit === 'undefined' || !QUnit); });
+            if (qunitMissing) {
+                console.error('The `QUnit` object is not present on this page.');
+                phantom.exit(1);
+            }
+        }
 });
 
