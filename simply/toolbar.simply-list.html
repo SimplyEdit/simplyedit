@@ -40,7 +40,7 @@
 						template = Object.keys(targetObjectList.templates)[0];
 					}
 
-					editor.plugins.list.insertTemplate(targetObjectList, template);
+					editor.plugins.list.insertTemplate(targetObjectList, template, targetNode);
 				}
 			},
 			delete : function() {
@@ -68,7 +68,7 @@
 				editor.plugins.list.insertTemplate(targetObjectList, template);
 			}
 		},
-		insertTemplate : function(list, templateName) {
+		insertTemplate : function(list, templateName, targetNode) {
 			var template = list.templates[templateName];
 
 			if (template) {
@@ -94,13 +94,14 @@
 
 				var listItems = list.querySelectorAll(":scope > [data-simply-list-item]");
 
-				if (listItems.length) {
+				if ( targetNode ) {
+					list.insertBefore(newNode.firstElementChild, targetNode.nextElementSibling);
+				} else if (listItems.length) {
 					list.insertBefore(newNode.firstElementChild, listItems[listItems.length-1].nextSibling);
 				} else {
 					list.insertBefore(newNode.firstElementChild, list.firstElementChild);
 				}
 				list.classList.remove("simply-empty");
-				list.appendChild(newNode);
 			}
 		}
 	};
