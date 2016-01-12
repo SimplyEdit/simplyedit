@@ -9,7 +9,7 @@ before_script:
   - ls -la
   - pwd
   - whoami
-  - cd /tmp/simply-test-store ; bash server.sh
+  - ( cd /tmp/simply-test-store ; bash server.sh )
 
 stages:
   - test
