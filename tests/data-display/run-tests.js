@@ -3,7 +3,7 @@ var url = 'http://localhost/tests/data-display/';
 page.open(url, function (status) {
 	//Page is loaded!
 	var testsDone = function() {
-		// console.log("checking if tests are done");
+		console.log("checking if tests are done");
 		var result = page.evaluate(function() {
 			if (document.querySelector("#qunit-testresult")) {
 				return true;
