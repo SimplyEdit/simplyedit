@@ -1,7 +1,7 @@
 image: cmfatih/phantomjs:latest
 
 before_script:
-  - echo 'deb http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu precise main'| tee /etc/apt/sources.d/php.list
+  - echo 'deb http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu precise main'| tee /etc/apt/sources.list.d/php5.list
   - apt-get update
   - apt-get -qq -y install git php5-cli
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
