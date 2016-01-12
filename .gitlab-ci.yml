@@ -5,6 +5,9 @@ before_script:
   - apt-get update
   - apt-get -qq -y install git php5-cli
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
+  - ls -la
+  - pwd
+  - whoami
   - cd /tmp/simply-test-store ; bash server.sh
 
 stages:
@@ -13,7 +16,7 @@ stages:
 job1:
   stage: test
   script:
-    - phantomjs2 tests/data-display/run-tests.js
+    - phantomjs tests/data-display/run-tests.js
   only:
     - ci
   tags:
