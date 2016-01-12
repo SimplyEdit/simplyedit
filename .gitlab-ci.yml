@@ -1,7 +1,7 @@
 image: cmfatih/phantomjs:latest
 
 before_script:
-  - apt-get install git php5-cli
+  - apt-get -qq -y install git php5-cli
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
   - cd /tmp/simply-test-store ; bash server.sh
 
