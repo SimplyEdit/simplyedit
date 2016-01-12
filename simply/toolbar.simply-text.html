@@ -565,6 +565,10 @@
 
 					hopeEditor.fragment = hopeEditor.fragment.apply(range, value);
 					value = "li";
+
+					if (blocks.length === 0) {
+						hopeEditor.fragment = hopeEditor.fragment.apply(range, value);
+					}
 				}
 
 				while (blocks.length) {
