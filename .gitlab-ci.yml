@@ -4,10 +4,8 @@ before_script:
   - apt-get update
   - apt-get -qq -y install git php5-cli
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
+  - ( php -S 0.0.0.0:80  & )
   - ( cd /tmp/simply-test-store ; bash server.sh )
-  - ls -la
-  - pwd
-  - whoami
 
 stages:
   - test
