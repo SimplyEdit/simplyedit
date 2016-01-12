@@ -461,7 +461,8 @@ console output.
                         result = message.data;
                         failed = !result || result.failed;
 
-                        console.error('Phantom done:' + failed);
+                        console.log('Phantom message:' + message);
+                        console.log('Phantom done:' + failed);
                         phantom.exit(failed ? errorcode : 0);
                     }
                 }
