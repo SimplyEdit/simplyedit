@@ -458,10 +458,9 @@ console output.
                     }
 
                     if (msgs[1] === 'done') {
-                        result = message.data;
+                        result = message.details;
                         failed = !result || result.failed;
 
-                        console.log('Phantom message:' + JSON.stringify(message, null, 2));
                         console.log('Phantom done:' + failed);
                         phantom.exit(failed ? errorcode : 0);
                     }
