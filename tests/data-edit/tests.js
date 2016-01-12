@@ -11,7 +11,7 @@ var checkEditor = function() {
 		QUnit.start();
 	} else {
 		console.log('waiting for editor');
-		console.log(JSON.stringfy(editor.plugins,null,2));
+		console.log(JSON.stringify(editor.plugins,null,2));
 		window.setTimeout(checkEditor, 300);
 	}
 };
