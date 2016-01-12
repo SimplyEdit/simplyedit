@@ -2,7 +2,7 @@ image: muze/phantomjs:v4
 
 before_script:
   - apt-get update
-  - apt-get -qq -y install 
+  - apt-get -qq -y install git
   - npm -g install jslint
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
   - ( php -S 0.0.0.0:80  & )
@@ -10,8 +10,8 @@ before_script:
 
 job1:
   script:
-     - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
      - phantomjs tests/runner.js http://localhost/tests/data-display/index.html
+     - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
   only:
     - ci
   tags:
