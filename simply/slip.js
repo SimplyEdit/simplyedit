@@ -415,10 +415,7 @@ window['Slip'] = (function(){
 					this.container.style[transitionPrefix] = transformProperty + " .3s ease-in-out";
 					this.container.style[transformPrefix + "Origin"] = (this.startPosition.x - containerRects.left) + "px " + (this.startPosition.y - containerRects.top) + "px";
 					this.container.style[transformPrefix] = "scale(" + this.container.scale + ")";
-					document.addEventListener("focus", function(evt) {
-						evt.stopPropagation();
-						evt.target.blur();
-					}, true);
+					document.addEventListener("focus", this.preventFocus, true);
 				}
 
 				function setPosition() {
@@ -723,6 +720,10 @@ window['Slip'] = (function(){
 			e.preventDefault();
 			return false;
 		},
+		preventFocus : function(e) {
+			e.stopPropagation();
+			e.target.blur();
+		},
 		onMouseDown: function(e) {
 			if (this.usingTouch || e.button != 0 || !this.setTarget(e)) return;
 
@@ -850,7 +851,7 @@ window['Slip'] = (function(){
 			}
 
 			document.removeEventListener("dragstart", this.preventDragStart);
-
+			document.removeEventListener("focus", this.preventFocus, true);
 		},
 
 		onTouchEnd: function(e) {
@@ -859,6 +860,7 @@ window['Slip'] = (function(){
 			} else if (this.state.onEnd && false === this.state.onEnd.call(this)) {
 				e.preventDefault();
 			}
+			document.removeEventListener("focus", this.preventFocus, true);
 		},
 
 		getTotalMovement: function() {
