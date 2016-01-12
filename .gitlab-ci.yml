@@ -14,7 +14,5 @@ job1:
   stage: test
   script:
     - phantomjs tests/data-display/run-tests.js
-  only:
-    - ci
   tags:
     - docker
