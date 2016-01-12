@@ -11,8 +11,7 @@
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
 	var editor = {
-		baseURL : "http://yvo.muze.nl/simply-edit/",
-//	        baseURL : "http://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
+        baseURL : "https://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
