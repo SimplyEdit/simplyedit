@@ -422,6 +422,29 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, '<ul><li><strong>Hello</strong></li><li><strong>wor</strong>ld</li></ul>');
 	});
 
+	QUnit.test("converting to unnumbered list adds list item", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello world</p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("p"), 1,4);
+		editor.actions['simply-text-blockstyle']('ul');
+
+		assert.equal(testContent.innerHTML, "<p>H</p><ul><li>ello</li></ul><p> world</p>");
+	});
+
+	QUnit.test("converting to unnumbered list adds list item", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 1,4);
+		editor.actions['simply-text-blockstyle']('ul');
+
+		assert.equal(testContent.innerHTML, "H<ul><li>ello</li></ul> world");
+	});
+
+
 QUnit.module("text hyperlinks");
 	QUnit.test("text hyperlink", function(assert) {
 		var testContent = document.querySelector("#testContent");
