@@ -60,7 +60,7 @@ QUnit.module("editor field set");
 
 		editor.field.set(field, data);
 
-		assert.equal(field.getAttribute("contnt"), data.content, "meta content is set correctly");
+		assert.equal(field.getAttribute("content"), data.content, "meta content is set correctly");
 		assert.equal(field.getAttribute("test"), data.test, "meta test attribute is set correctly");
 	});
 
