@@ -5,6 +5,7 @@
 				<button data-simply-action="simply-main-collapse" id="simply-logo">
 				</button>
 			</li>
+			<li class="simply-seperator"></li>
 			<li>
 				<button data-simply-action="simply-save">
 					<i class="fa fa-save"></i>Save
@@ -121,3 +122,14 @@
 -->
 
 </section>
+<script type="text/javascript">
+	editor.addToolbar({
+		init: function() {
+			console.log('main toolbar init');
+			var img = document.createElement('img');
+			img.src = editor.baseURL + 'graphics/simply-edit-centered.svg';
+			img.alt = 'SimplyEdit';
+			document.getElementById('simply-logo').appendChild(img);
+		}
+	});
+</script>
