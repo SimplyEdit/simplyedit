@@ -150,12 +150,13 @@
 					field.setAttribute("data-simply-stashed", 1);
 				};
 
+				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
+					addListData(target);
+				}
+
 				dataLists = target.querySelectorAll("[data-simply-list]");
 				for (i=0; i<dataLists.length; i++) {
 					addListData(dataLists[i]);
-				}
-				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
-					addListData(target);
 				}
 
 				dataFields = target.querySelectorAll("[data-simply-field]");
