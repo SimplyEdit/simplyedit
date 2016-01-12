@@ -15,7 +15,7 @@ stages:
 job1:
   stage: test
   script:
-    - phantomjs2 tests/data-display/run-tests.js
+    - phantomjs tests/data-display/run-tests.js
   only:
     - ci
   tags:
