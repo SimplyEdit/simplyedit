@@ -13,7 +13,8 @@ stages:
 job1:
   stage: test
   script:
-     - phantomjs tests/runner,js http://localhost/tests/data-display/index.html
+     - phantomjs tests/runner.js http://localhost/tests/data-display/index.html
+     - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
   only:
     - ci
   tags:
