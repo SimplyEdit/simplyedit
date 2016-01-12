@@ -446,6 +446,7 @@ console output.
 
         if (message) {
             if (message.name === 'Window.error') {
+                console.error('Window.error');
                 phantom.exit(1);
             } else {
                 var msgs = message.name.split(".");
@@ -460,6 +461,7 @@ console output.
                         result = message.data;
                         failed = !result || result.failed;
 
+                        console.error('Phantom done:' + failed);
                         phantom.exit(failed ? errorcode : 0);
                     }
                 }
