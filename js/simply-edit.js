@@ -16,7 +16,7 @@
 		scriptURL.href = scriptEl.src;
 		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
 		return scriptURL.protocol + '//' + scriptURL.host + scriptURL.pathname;
-	}
+	};
 
 	var editor = {
         baseURL : getBaseURL(),
