@@ -2,16 +2,21 @@ image: muze/phantomjs:v4
 
 before_script:
   - apt-get update
-  - apt-get -qq --no-install-recommends -y install git
+  - apt-get -qq --no-install-recommends -y install git nodejs-legacy
   - npm -g install jshint
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
   - ( php -S 0.0.0.0:80  & )
   - ( cd /tmp/simply-test-store ; bash server.sh )
 
-job1:
+unittest:
   script:
      - phantomjs tests/runner.js http://localhost/tests/data-display/index.html
      - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
+  tags:
+    - docker
+
+syntaxtest:
+  script:
      - jshint $(find js simply  -name \*.js)
   tags:
     - docker
