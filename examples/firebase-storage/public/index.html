@@ -1,0 +1,262 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title data-simply-field="meta title">Simple edit</title>
+	<meta name="description" content="Simple edit testpage description" data-simply-field="meta description">
+	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
+	<meta name="author" content="" data-simply-field="meta author">
+	<meta name="page-template" content="index.html" data-simply-field="data-simply-page-template">
+	<meta charset="utf-8"> 
+</head>
+<body>
+	<h1 data-simply-field="title" data-simply-content="text">Thing goes here</h1>
+	<div data-simply-field="page content">Other things go here</div>
+	<img src="/simply-edit/imgs/muze.png" data-simply-field="image">
+	<nav>
+		Menu goes here!
+		<ul data-simply-list="menu" data-simply-path="/simply-edit/" data-simply-sortable>
+			<template>
+				<li>
+					<a href="/simply-edit/" data-simply-field="item">Menu item</a>
+				</li>
+			</template>
+		</ul>
+	</nav>
+	<img src="/simply-edit/imgs/muze.png">
+	<script>
+		var firebaseStorage = {
+			init : function(endpoint) {
+				this.url = endpoint;
+			},
+			save : function(data, callback) {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "data.json?auth=" + editor.storage.key;
+
+				http.open("PUT", url, true);
+				//Send the proper header information along with the request
+				http.setRequestHeader("Content-type", "application/json");
+				http.setRequestHeader("charset", "UTF-8");
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						callback();
+					}
+				};
+				var data = JSON.parse(data);
+
+				var escapedData = {};
+
+				for (i in data) {
+					escapedData[i.replace(/\//g, ":")] = data[i];
+				}
+				http.send(JSON.stringify(escapedData));
+			},
+			load : function(callback) {
+				var http = new XMLHttpRequest();
+
+				var url = editor.storage.url + "data.json";
+				if (editor.profile == "dev") {
+					url += "?t=" + (new Date().getTime());
+				}
+				http.open("GET", url, true);
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						if (http.responseText == '""') {
+							return callback("{}");
+						}
+						var data = JSON.parse(http.responseText);
+						var result = {};
+						for (i in data) {
+							result[i.replace(/:/g, "/")] = data[i];
+						}
+
+						callback(JSON.stringify(result));
+					} else if (http.readyState == 4 && http.status == 404) {
+                                                callback("{}");
+					}
+				};
+				http.send();
+			},
+			connect : function() {
+				if (!editor.storage.key) {
+					editor.storage.key = localStorage.storageKey;
+				}
+				if (!editor.storage.key) {
+					editor.storage.key = prompt("Please enter your private key");
+				}
+
+				if (editor.storage.validateKey(editor.storage.key)) {
+					localStorage.storageKey = editor.storage.key;
+					return true;
+				} else {
+					delete editor.storage.key;
+					delete localStorage.storageKey;
+
+					return editor.storage.connect();
+				}
+			},
+			validateKey : function(key) {
+				return true;
+
+				if (!key) {
+					return false;
+				}
+
+				var http = new XMLHttpRequest();
+				var apiurl = editor.storage.validateurl + "?private_token=" + key;
+				http.open("GET", apiurl, false);
+				http.send();
+				if (http.status == 200) {
+					return true;
+				}
+				
+				return false;
+			},
+			disconnect : function() {
+				delete editor.storage.key;
+				delete localStorage.storageKey;
+			},
+			sitemap : function() {
+				var output = {
+					children : {},
+					name : 'Sitemap'
+				};
+				for (var i in editor.currentData) {
+					var chain = i.split("/");
+					chain.shift();
+					var lastItem = chain.pop();
+					if (lastItem !== "") {
+						chain.push(lastItem);
+					} else {
+						var item = chain.pop();
+						if (typeof item === "undefined") {
+							item = '';
+						}
+						chain.push(item + "/");
+					}
+					
+					var currentNode = output.children;
+					var prevNode;
+					for (var j = 0; j < chain.length; j++) {
+						var wantedNode = chain[j];
+						var lastNode = currentNode;
+						for (var k in currentNode) {
+							if (currentNode[k].name == wantedNode) {
+								currentNode = currentNode[k].children;
+								break;
+							}
+						}
+						// If we couldn't find an item in this list of children
+						// that has the right name, create one:
+						if (lastNode == currentNode) {
+							currentNode[wantedNode] = {
+								name : wantedNode,
+								children : {}
+							};
+							currentNode = currentNode[wantedNode].children;
+						}
+					}
+				}
+				return output;
+			},
+			listSitemap : function(url, callback) {
+				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+					var subpath = url.replace(editor.storage.endpoint + "data.json", "");
+					var sitemap = editor.storage.sitemap();
+					var result = {
+						folders : [],
+						files : []
+					};
+					if (subpath !== "") {
+						var pathicles = subpath.split("/");
+						pathicles.shift();
+						for (var i=0; i<pathicles.length; i++) {
+							sitemap = sitemap.children[pathicles[i]];
+						}
+						result.folders.push({
+							url : url.replace(/\/[^\/]+$/, ''),
+							name : 'Parent'
+						});
+					} else {
+						result.folders.push({
+							url : url.replace(/\/[^\/]+$/, '/'),
+							name : 'Parent'
+						});
+					}
+
+					for (var j in sitemap.children) {
+						if (Object.keys(sitemap.children[j].children).length) {
+							result.folders.push({
+								url : url + "/" + j,
+								name : j
+							});
+						} else {
+							result.files.push({
+								url : url + "/" + j,
+								name : j
+							});
+						}
+					}
+
+					return callback(result);
+				}
+			},
+			list : function(url, callback) {
+				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+					return this.listSitemap(url, callback);
+				}
+				
+				var http = new XMLHttpRequest();
+				var apiurl = editor.storage.apiurl + "/repository/tree" + "?private_token=" + editor.storage.key;
+
+				http.open("GET", apiurl, true);
+				//Send the proper header information along with the request
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 200) {
+						var data = JSON.parse(http.responseText);
+						var result = {
+							images : [],
+							folders : [],
+							files : []
+						};
+						
+						for (var i=0; i<data.length; i++) {
+							if (data[i].type == "tree") {
+								result.folders.push({
+									url : url + data[i].path,
+									name : data[i].name
+								});
+							} else if (data[i].type == "blob") {
+								var fileData = {
+									url : url + data[i].name,
+									src : url + data[i].name,
+									name : data[i].name 
+								};
+								if (url === editor.storage.endpoint && data[i].name === "data.json") {
+									fileData.name = "My pages";
+									result.folders.push(fileData);
+								} else {
+									result.files.push(fileData);
+									if (fileData.url.match(/(jpg|gif|png|bmp|tif|svg)$/)) {
+										result.images.push(fileData);
+									}
+								}
+							}
+						}
+
+						callback(result);
+					}
+				};
+				http.send();
+			}
+		};
+	</script>
+	<script src="https://beta.simplyedit.io/0/simply-edit.js" 
+		data-simply-endpoint="https://glowing-torch-7750.firebaseio.com/"
+		data-simply-storage="firebaseStorage"
+		data-api-key="juicy-vacation-2567"
+	></script>
+</body>
+</html>

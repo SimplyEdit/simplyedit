@@ -1,0 +1,206 @@
+<section id="simply-video" class="simply-section">
+	<h1>HTML Google map toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-video-sources" class="simply-expands"><i class="fa fa-film"></i>Sources</button></li>
+			<li><button data-simply-section="simply-video-tracks" class="simply-expands"><i class="fa fa-comments-o"></i>Tracks</button></li>
+			<li><button data-simply-section="simply-video-cue" class="simply-expands"><i class="fa fa-commenting-o"></i>Subtitle</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-video-sources">
+			<div><label>MP4</label><input class='mp4' data-simply-action="simply-video-sources"></div>
+			<div><label>WebM</label><input class='webm' data-simply-action="simply-video-sources"></div>
+		</div>
+		<div class="simply-toolbar-section simply-video-tracks">
+			<div><label>English</label><input class='track-en' data-simply-action="simply-video-tracks"></div>
+			<div><label>Deutsh</label><input class='track-de' data-simply-action="simply-video-tracks"></div>
+			<div><label>Español</label><input class='track-es' data-simply-action="simply-video-tracks"></div>
+		</div>
+		<div class="simply-toolbar-section simply-video-cue">
+			<div><label>Cue</label><textarea class="cue" data-simply-action="simply-video-cue"></textarea></div>
+			<div><label>Start</label><input type="number" step="0.1" class="cue-start" data-simply-action="simply-video-cue"></div>
+			<div><label>End</label><input type="number" step="0.1" class="cue-end" data-simply-action="simply-video-cue"></div>
+			<button data-simply-action="simply-cue-prev"><i class="fa fa-chevron-left"></i>Prev</button>
+			<button data-simply-action="simply-cue-next"><i class="fa fa-chevron-right"></i>Next</button>
+			<button data-simply-action="simply-cue-add"><i class="fa fa-plus"></i>Add</button>
+		</div>
+	</div>
+</section>
+<style type="text/css">
+	#simply-video textarea {
+		vertical-align: middle;
+		display: inline-block;
+		height: 3.3em;
+		width: 300px;
+	}
+	#simply-video input[disabled] {
+		background-color: #eee;
+	}
+
+</style>
+<script type="text/javascript">
+	var getCurrentTrack = function(video) {
+		for (var i=0; i<video.textTracks.length; i++) {
+			if (video.textTracks[i].mode == "showing") {
+				return video.textTracks[i];
+			}
+		}
+		return false;
+	};
+
+	var getActiveCue = function(video) {
+		var track = getCurrentTrack(video);
+		if (track && track.activeCues) {
+			var activeCue = track.activeCues[0];
+			if (activeCue) {
+				return activeCue;
+			}
+		}
+		return false;
+	};
+
+	var getCueIndex = function(cue) {
+		var track = cue.track;
+		for (var i=0; i<track.cues.length; i++) {
+			if (track.cues[i] == cue) {
+				return i;
+			}
+		}
+	};
+
+	editor.addToolbar({
+		"name" : "simply-video",
+		"filter" : {
+			"selector" : "video",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var video = vdSelection.getNode(sel);
+
+			video.pause();
+
+			vdSelectionState.currentSelection = sel;
+			vdSelectionState.currentNode = video;
+
+			if (getCurrentTrack(video)) {
+				toolbar.querySelector("[data-simply-section='simply-video-cue']").parentNode.style.display = "block";
+			} else {
+				toolbar.querySelector("[data-simply-section='simply-video-cue']").parentNode.style.display = "none";
+			}
+			
+			var activeCue = getActiveCue(video);
+			if (activeCue) {
+				toolbar.querySelector("textarea.cue").removeAttribute("disabled");
+				toolbar.querySelector("input.cue-start").removeAttribute("disabled");
+				toolbar.querySelector("input.cue-end").removeAttribute("disabled");
+
+				var cueText = activeCue.text;
+				simply.widgets.properties.set(toolbar.querySelector("textarea.cue"), cueText);
+				simply.widgets.properties.set(toolbar.querySelector("input.cue-start"), activeCue.startTime);
+				simply.widgets.properties.set(toolbar.querySelector("input.cue-end"), activeCue.endTime);
+			} else {
+				simply.widgets.properties.set(toolbar.querySelector("textarea.cue"), "");
+				simply.widgets.properties.set(toolbar.querySelector("input.cue-start"), "");
+				simply.widgets.properties.set(toolbar.querySelector("input.cue-end"), "");
+				toolbar.querySelector("textarea.cue").setAttribute("disabled", true);
+				toolbar.querySelector("input.cue-start").setAttribute("disabled", true);
+				toolbar.querySelector("input.cue-end").setAttribute("disabled", true);
+			}
+
+			if (video.querySelector("source[type='video/mp4']")) {
+				simply.widgets.properties.set(toolbar.querySelector("input.mp4"), video.querySelector("source[type='video/mp4']").getAttribute("src"));
+			} else {
+				simply.widgets.properties.set(toolbar.querySelector("input.mp4"), '');
+			}
+
+			if (video.querySelector("source[type='video/webm']")) {
+				simply.widgets.properties.set(toolbar.querySelector("input.webm"), video.querySelector("source[type='video/webm']").getAttribute("src"));
+			} else {
+				simply.widgets.properties.set(toolbar.querySelector("input.webm"), '');
+			}
+
+			var langs = ["en", "de", "es"];
+			for (var i=0; i<langs.length; i++) {
+				if (video.querySelector("track[srclang='" + langs[i] + "']")) {
+					simply.widgets.properties.set(toolbar.querySelector("input.track-" + langs[i]), video.querySelector("track[srclang='" + langs[i] + "']").getAttribute("src"));
+				} else {
+					simply.widgets.properties.set(toolbar.querySelector("input.track-" + langs[i]), '');
+				}
+			}
+
+		},
+		"init" : function() {
+			document.querySelector("#simply-video input.cue-start").addEventListener("focus", function(evt) {
+				var video = vdSelectionState.currentNode;
+				video.currentTime = this.value;				
+			});
+			document.querySelector("#simply-video input.cue-end").addEventListener("focus", function(evt) {
+				var video = vdSelectionState.currentNode;
+				video.currentTime = this.value;				
+			});
+		},
+		"actions" : {
+			"simply-video-cue" : function() {
+				var video = vdSelectionState.currentNode;
+
+				var activeCue = getActiveCue(video);
+				if (activeCue) {
+					var cueText = simply.widgets.properties.get(document.querySelector("#simply-video textarea.cue"));
+					var cueStart = simply.widgets.properties.get(document.querySelector("#simply-video input.cue-start"));
+					var cueEnd = simply.widgets.properties.get(document.querySelector("#simply-video input.cue-end"));
+
+					activeCue.text = cueText;
+					if (cueStart != activeCue.startTime) {
+						activeCue.startTime = cueStart;
+						video.currentTime = cueStart;
+					} else if (cueEnd != activeCue.endTime) {
+						activeCue.endTime = cueEnd;
+						video.currentTime = cueEnd;
+					} else {
+						var currentTime = video.currentTime;
+						video.currentTime = 0;
+						video.currentTime = currentTime;
+					}
+				}
+			},
+			"simply-cue-next" : function() {
+				var video = vdSelectionState.currentNode;
+				var activeCue = getActiveCue(video);
+				if (activeCue) {
+					var track = activeCue.track;
+					var nextId = getCueIndex(activeCue) + 1;
+					var nextCue = track.cues[nextId];
+					console.log(nextId);
+					
+					if (nextCue) {
+						video.currentTime = nextCue.startTime;
+					}
+				}
+			},
+			"simply-cue-add" : function() {
+				var video = vdSelectionState.currentNode;
+				var track = getCurrentTrack(video);
+				var startTime = Math.round(video.currentTime*10)/10;
+				var endTime = startTime + 1;
+				var message = "...";
+				var newCue = new VTTCue(startTime, endTime, message);
+				track.addCue(newCue);
+				video.currentTime = startTime;
+			},
+			"simply-cue-prev" : function() {
+				var video = vdSelectionState.currentNode;
+				var activeCue = getActiveCue(video);
+				if (activeCue) {
+					var track = activeCue.track;
+					var prevId = getCueIndex(activeCue) - 1;
+					var prevCue = track.cues[prevId];
+					if (prevCue) {
+						video.currentTime = prevCue.startTime;
+					}
+				}
+			}
+		}
+	});
+</script>
