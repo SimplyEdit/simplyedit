@@ -2,16 +2,15 @@ QUnit.config.autostart = false;
 QUnit.config.reorder = false;
 
 localStorage.storageKey = "demo";
-editor.storage.key = "demo";
 
 document.location.hash = "#simply-edit";
 
 var checkEditor = function() {
-	if (editor && editor.plugins && editor.plugins.text) {
+	if (typeof editor != "undefined" && editor && editor.plugins && editor.plugins.text) {
+		editor.storage.key = "demo";
 		QUnit.start();
 	} else {
 		console.log('waiting for editor');
-		console.log(JSON.stringify(editor.plugins,null,2));
 		window.setTimeout(checkEditor, 300);
 	}
 };
