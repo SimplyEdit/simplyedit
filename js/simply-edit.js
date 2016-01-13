@@ -19,7 +19,7 @@
 	}
 
 	var editor = {
-        baseURL : getBaseURL(),
+		baseURL : getBaseURL(),
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
