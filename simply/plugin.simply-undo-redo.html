@@ -51,6 +51,7 @@
 						items[i].parentNode.removeChild(items[i]);
 					}
 					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
+					editor.editmode.makeEditable(undoStep.target);
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
 				}
@@ -71,6 +72,7 @@
 						items[i].parentNode.removeChild(items[i]);
 					}
 					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
+					editor.editmode.makeEditable(undoStep.target);
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
 				}

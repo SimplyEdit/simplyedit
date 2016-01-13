@@ -11,7 +11,7 @@
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
 	var editor = {
-        baseURL : "https://se-cdn.muze.nl/" + apiKey + "/simply-edit/",
+		baseURL : "https://beta.simply-edit.io/0/" + apiKey + "/simply-edit/",
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -149,12 +149,13 @@
 					field.setAttribute("data-simply-stashed", 1);
 				};
 
+				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
+					addListData(target);
+				}
+
 				dataLists = target.querySelectorAll("[data-simply-list]");
 				for (i=0; i<dataLists.length; i++) {
 					addListData(dataLists[i]);
-				}
-				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
-					addListData(target);
 				}
 
 				dataFields = target.querySelectorAll("[data-simply-field]");
@@ -1619,12 +1620,10 @@
 			editor.baseURL + "simply/plugin.simply-meta.html",
 			editor.baseURL + "simply/plugin.simply-htmlsource.html",
 			editor.baseURL + "simply/plugin.simply-symbol.html",
-			editor.baseURL + "simply/plugin.simply-plain.html",
-			editor.baseURL + "simply/plugin.simply-dropbox.html",
 			editor.baseURL + "simply/plugin.simply-paste.html",
 			editor.baseURL + "simply/plugin.simply-undo-redo.html",
 			editor.baseURL + "simply/plugin.simply-keyboard.html"
 		],
-		profile : 'dev'
+		profile : 'beta'
 	});
 }());
