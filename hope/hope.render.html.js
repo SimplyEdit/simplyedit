@@ -1,6 +1,5 @@
 hope.register( 'hope.render.html', function() {
 
-
 	var nestingSets = {
 		'inline'	: [ 'tt', 'u', 'strike', 'em', 'strong', 'dfn', 'code', 'samp', 'kbd', 'var', 'cite', 'abbr', 'acronym', 'sub', 'sup', 'q', 'span', 'bdo', 'a', 'object', 'img', 'bd', 'br', 'i' ],
 		'block'		: [ 'address', 'dir', 'menu', 'hr', 'li', 'table', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'ul', 'ol', 'dl', 'div', 'blockquote', 'iframe' ]
@@ -93,6 +92,9 @@ hope.register( 'hope.render.html', function() {
 		if ( !annotationSet.length ) {
 			return [];
 		}
+		
+		var rules = this.rules;
+
 		annotationSet.sort( function( a, b ) {
 			if ( a.range.start < b.range.start ) {
 				return -1;
@@ -102,6 +104,18 @@ hope.register( 'hope.render.html', function() {
 				return -1;
 			} else if ( a.range.end < b.range.end ) {
 				return 1;
+			}
+
+			// if comparing ul/ol and li on the same range, ul/ol goes first;
+			if (rules.obligParent[a.tag.split(/ /)[0]]) {
+				if (rules.obligParent[a.tag.split(/ /)[0]].indexOf(b.tag.split(/ /)[0]) != -1) {
+					return 1;
+				}
+			}
+			if (rules.obligParent[b.tag.split(/ /)[0]]) {
+				if (rules.obligParent[b.tag.split(/ /)[0]].indexOf(a.tag.split(/ /)[0]) != -1) {
+					return -1;
+				}
 			}
 
 			// block elementen komen voor andere elementen

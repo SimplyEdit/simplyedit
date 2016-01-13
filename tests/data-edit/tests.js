@@ -262,8 +262,6 @@ QUnit.module("editor text cursor");
 		testContent.innerHTML = '<h2><a name="title">Hello world</a></h2>';
 		testContent.hopeEditor.parseHTML();
 
-		console.log(testContent.innerHTML);
-
 		setCaretPosition(testContent.querySelector("a"), 2, 0);
 		editor.actions['simply-text-blockstyle']('h1');
 		assert.equal(testContent.innerHTML, '<h1><a name="title">Hello world</a></h1>');
@@ -429,7 +427,6 @@ QUnit.module("editor text selection");
 
 		setCaretPosition(testContent.querySelector("p"), 1,4);
 		editor.actions['simply-text-blockstyle']('ul');
-
 		assert.equal(testContent.innerHTML, "<p>H</p><ul><li>ello</li></ul><p> world</p>");
 	});
 
@@ -440,7 +437,6 @@ QUnit.module("editor text selection");
 
 		setCaretPosition(testContent, 1,4);
 		editor.actions['simply-text-blockstyle']('ul');
-
 		assert.equal(testContent.innerHTML, "H<ul><li>ello</li></ul> world");
 	});
 
