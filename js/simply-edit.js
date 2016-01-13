@@ -1372,8 +1372,8 @@
 					if(http.readyState == 4 && http.status == 200) {
 						callback(http.responseText);
 					} else if (http.readyState == 4 && http.status == 404) {
-                                                callback("{}");
-                                        }
+						callback("{}");
+					}
 				};
 				http.send();
 			},
