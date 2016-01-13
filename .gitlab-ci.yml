@@ -2,7 +2,7 @@ image: muze/phantomjs:v4
 
 before_script:
   - apt-get update
-  - apt-get -qq -y install git
+  - apt-get -qq --no-install-recommends -y install git
   - npm -g install jslint
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
   - ( php -S 0.0.0.0:80  & )
