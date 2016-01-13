@@ -16,6 +16,7 @@ unittest:
     - docker
 
 syntaxtest:
+  allow_failure: true
   script:
      - jshint $(find js simply  -name \*.js)
   tags:
