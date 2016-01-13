@@ -10,6 +10,8 @@ var checkEditor = function() {
 	if (editor && editor.plugins && editor.plugins.text) {
 		QUnit.start();
 	} else {
+		console.log('waiting for editor');
+		console.log(JSON.stringify(editor.plugins,null,2));
 		window.setTimeout(checkEditor, 300);
 	}
 };

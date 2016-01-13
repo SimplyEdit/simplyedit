@@ -1,18 +1,18 @@
-image: muze/phantomjs:latest
+image: muze/phantomjs:v4
 
 before_script:
   - apt-get update
-  - apt-get -qq -y install git php5-cli
+  - apt-get -qq -y install git
+  - npm -g install jslint
   - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
   - ( php -S 0.0.0.0:80  & )
   - ( cd /tmp/simply-test-store ; bash server.sh )
 
-stages:
-  - test
-
 job1:
-  stage: test
   script:
-    - phantomjs tests/data-display/run-tests.js
+     - phantomjs tests/runner.js http://localhost/tests/data-display/index.html
+     - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
+  only:
+    - ci
   tags:
     - docker
