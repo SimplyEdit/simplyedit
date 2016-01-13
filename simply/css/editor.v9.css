@@ -56,6 +56,20 @@
 		#simply-editor {
 			font-family: arial;
 		}
+		#simply-logo {
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ie-user-select: none;
+			user-select: none;
+		}
+		#simply-logo img {
+			display: inline-block;
+			position: absolute;
+			top: 16px;
+			left: 1px;
+			z-index: 10;
+			width: 95%;
+		}
 		.simply-toolbar {
 			font-family: arial;
 			font-size: 11px;
