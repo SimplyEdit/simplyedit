@@ -13,7 +13,5 @@ job1:
      - phantomjs tests/runner.js http://localhost/tests/data-display/index.html
      - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
      - jshint $(find js simply  -name \*.js)
-  only:
-    - ci
   tags:
     - docker
