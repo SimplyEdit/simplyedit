@@ -62,16 +62,13 @@
 			-ie-user-select: none;
 			user-select: none;
 		}
-		#simply-logo > span {
-			top: -6px;
-		}
 		#simply-logo img {
 			display: inline-block;
 			position: absolute;
-			top: 28px;
-			left: 5px;
+			top: 16px;
+			left: 1px;
 			z-index: 10;
-			width: 80%;
+			width: 95%;
 		}
 		.simply-toolbar {
 			font-family: arial;
