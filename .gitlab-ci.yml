@@ -10,14 +10,13 @@ before_script:
 
 unittest:
   script:
-     - phantomjs tests/runner.js http://localhost/tests/data-display/index.html
-     - phantomjs tests/runner.js http://localhost/tests/data-edit/index.html
+     - phantomjs tests/runner.js http://localhost/tests/data-display/ci.html
+     - phantomjs tests/runner.js http://localhost/tests/data-edit/ci.html
   tags:
     - docker
 
 syntaxtest:
-  allow_failure: true
   script:
-     - jshint $(find js simply  -name \*.js)
+    - jshint $(find js simply  -name \*.js | grep -v -E '^(simply/slip.js|simply/scripts.js)$')
   tags:
     - docker
