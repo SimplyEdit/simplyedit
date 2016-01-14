@@ -16,8 +16,7 @@ unittest:
     - docker
 
 syntaxtest:
-  allow_failure: true
   script:
-     - jshint $(find js simply  -name \*.js)
+    - jshint $(find js simply  -name \*.js | grep -v -E '^(simply/slip.js|simply/scripts.js)$')
   tags:
     - docker
