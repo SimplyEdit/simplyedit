@@ -17,7 +17,6 @@
 		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
 		return scriptURL.protocol + '//' + scriptURL.host + scriptURL.pathname;
 	};
-
 	var editor = {
 	        baseURL : getBaseURL(),
 		data : {
@@ -1381,8 +1380,8 @@
 					if(http.readyState == 4 && http.status == 200) {
 						callback(http.responseText);
 					} else if (http.readyState == 4 && http.status == 404) {
-                                                callback("{}");
-                                        }
+						callback("{}");
+					}
 				};
 				http.send();
 			},
