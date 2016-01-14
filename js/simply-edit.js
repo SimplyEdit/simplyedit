@@ -877,9 +877,39 @@
 					// FIXME: Add support to keep fields that point to the same field within the same path in sync here;
 				}
 
+				document.body.addEventListener("dragover", function(evt) {
+					evt.preventDefault();
+				});
+				document.body.addEventListener("drop", function(evt) {
+					if (evt.dataTransfer.files.length) {
+						console.log("received " + evt.dataTransfer.files.length + " files");
+					}
+					var target = evt.target;
+					if (target.tagName.toLowerCase() == "img" && target.getAttribute("data-simply-field")) {
+						console.log("image drop");
+						return;
+
+						var imageData = event.dataTransfer.getData("text/html");
+
+						var container = document.createElement("DIV");
+						container.innerHTML = imageData;
+						var image = container.querySelector("img");
+						if (image && image.getAttribute("src")) {
+							target.src = image.getAttribute("src");
+						}
+					}
+
+					evt.preventDefault();
+				});
+
+				var listDropHandler = function(evt) {
+					console.log("list drop");
+				};
+
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				for (i=0; i<dataLists.length; i++) {
 					dataLists[i].setAttribute("data-simply-selectable", true);
+					dataLists[i].addEventListener("drop", listDropHandler, true);
 				}
 
 				var handleDblClick = function(evt) {
@@ -932,30 +962,6 @@
 						handleClick(event);
 					}
 				});
-
-				var images = target.querySelectorAll("img[data-simply-field]");
-				var imageDrop = function(event) {
-					var imageData = event.dataTransfer.getData("text/html");
-
-					var container = document.createElement("DIV");
-					container.innerHTML = imageData;
-					
-					var image = container.querySelector("img");
-
-					if (image && image.getAttribute("src")) {
-						this.src = image.getAttribute("src");
-					}
-					if (event.stopPropagation) {
-						event.stopPropagation(); // stops the browser from redirecting.
-					}
-					event.preventDefault();
-				};
-
-				for (i=0; i<images.length; i++) {
-					images[i].addEventListener("drop", imageDrop);
-					images[i].contentEditable = true; // needs to be true for drop event?
-					images[i].setAttribute("data-simply-selectable", true);
-				}
 
 				// FIXME: Have a way to now init plugins as well;
 				editor.editmode.sortable(target);
