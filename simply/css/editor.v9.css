@@ -57,6 +57,7 @@
 			font-family: arial;
 		}
 		#simply-logo {
+			width: 60px;
 			-webkit-user-select: none;
 			-moz-user-select: none;
 			-ie-user-select: none;
@@ -66,9 +67,9 @@
 			display: inline-block;
 			position: absolute;
 			top: 16px;
-			left: 1px;
+			left: 5px;
 			z-index: 10;
-			width: 95%;
+			width: 50px;
 		}
 		.simply-toolbar {
 			font-family: arial;
