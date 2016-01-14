@@ -888,7 +888,9 @@
 					if (target.tagName.toLowerCase() == "img" && target.getAttribute("data-simply-field")) {
 						console.log("image drop");
 						return;
-
+						/*
+							removed for now, reinstate when the storage layer knows how to store images
+						
 						var imageData = event.dataTransfer.getData("text/html");
 
 						var container = document.createElement("DIV");
@@ -897,6 +899,7 @@
 						if (image && image.getAttribute("src")) {
 							target.src = image.getAttribute("src");
 						}
+						*/
 					}
 
 					evt.preventDefault();
