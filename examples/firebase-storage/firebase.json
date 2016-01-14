@@ -1,0 +1,9 @@
+{
+  "firebase": "simply-edit",
+  "public": "public",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**"
+  ]
+}

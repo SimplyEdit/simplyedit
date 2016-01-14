@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en-IE">
+<head>
+	<meta charset="utf-8" />
+	<title>Styled Video Player with Subtitles - Mozilla</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="styles.css" />
+	<!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv-printshiv.min.js" type="text/javascript"></script><![endif]-->
+</head>
+<body>
+	<h1 data-simply-field="title">Sintel</h1>
+	<figure id="videoContainer" data-fullscreen="false">
+		<video id="video" controls preload="metadata" data-simply-field="video">
+			<source src="sintel-short.mp4" type="video/mp4">
+			<source src="sintel-short.webm" type="video/webm">
+			<track label="English" kind="subtitles" srclang="en" src="sintel-en.vtt">
+			<track label="Deutsch" kind="subtitles" srclang="de" src="sintel-de.vtt">
+			<track label="Español" kind="subtitles" srclang="es" src="sintel-es.vtt">
+			<track label="Nederlands" kind="subtitles" srclang="nl" data-simply-track="nl">
+		</video>
+		<div id="video-controls" class="controls" data-state="hidden">
+			<button id="playpause" type="button" data-state="play">Play/Pause</button>
+			<button id="stop" type="button" data-state="stop">Stop</button>
+			<div class="progress">
+				<progress id="progress" value="0" min="0">
+					<span id="progress-bar"></span>
+				</progress>
+			</div>
+			<button id="mute" type="button" data-state="mute">Mute/Unmute</button>
+			<button id="volinc" type="button" data-state="volup">Vol+</button>
+			<button id="voldec" type="button" data-state="voldown">Vol-</button>
+			<button id="fs" type="button" data-state="go-fullscreen">Fullscreen</button>
+			<button id="subtitles" type="button" data-state="subtitles">CC</button>
+		</div>
+		<figcaption>
+			&copy; copyright Blender Foundation | <a href="http://www.sintel.org">www.sintel.org</a>
+		</figcaption>
+	</figure>
+	<script src="video-player.js"></script>
+	<script src="/simply-edit/js/simply-edit.js"
+		data-api-key="muze" data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+	></script>
+	<script>
+		(function() {
+			var videoGetter = function(field) {
+				console.log(field);
+
+				var attr;
+				var attributes = {
+					sources : [],
+					tracks : []
+				};
+				
+				var sources = field.querySelectorAll("source");
+				for (var i=0; i<sources.length; i++) {
+					attributes.sources.push({
+						src : sources[i].getAttribute("src"),
+						type : sources[i].getAttribute("type")
+					});
+				}
+
+				var tracks = field.querySelectorAll("track");
+				for (var i=0; i<tracks.length; i++) {
+					if (tracks[i].getAttribute("data-simply-track")) {
+						var cueList;
+						for (var j=0; j<field.textTracks.length; j++) {
+							if (
+								field.textTracks[j].kind == tracks[i].getAttribute("kind") &&
+								field.textTracks[j].language == tracks[i].getAttribute("srclang")
+							) {
+								cueList = field.textTracks[j].cues;	
+								break;
+							}
+						}
+						if (cueList) {
+							var cues = [];
+							for (var k=0; k<cueList.length; k++) {
+								cues.push({
+									startTime : cueList[k].startTime,
+									endTime : cueList[k].endTime,
+									message : cueList[k].text
+								});
+							}
+						}
+						attributes.tracks.push({
+							label : field.textTracks[j].label,
+							kind : field.textTracks[j].kind,
+							srclang : field.textTracks[j].language,
+							cues : cues
+						});
+					} else {
+						attributes.tracks.push({
+							label : tracks[i].getAttribute("label"),
+							kind : tracks[i].getAttribute("kind"),
+							srclang : tracks[i].getAttribute("srclang"),
+							src : tracks[i].getAttribute("src")
+						});
+					}
+				}
+
+				return attributes;
+			};
+
+			var videoSetter = function(field, data) {
+				field.innerHTML = '';
+				for (var i=0; i<data.sources.length; i++) {
+					var source = document.createElement("source");
+					source.setAttribute("src", data.sources[i].src);
+					source.setAttribute("type", data.sources[i].type);
+					field.appendChild(source);
+				};
+
+				for (var i=0; i<data.tracks.length; i++) {
+					var track = document.createElement("track");
+					track.setAttribute("label", data.tracks[i].label);
+					track.setAttribute("srclang", data.tracks[i].srclang);
+					track.setAttribute("kind", data.tracks[i].kind);
+
+					if (data.tracks[i].src) {
+						track.setAttribute("src", data.tracks[i].src);
+					}
+
+					field.appendChild(track);
+					field.textTracks[field.textTracks.length-1].mode = "hidden";
+
+					if (data.tracks[i].cues) {
+						track.setAttribute("data-simply-track", data.tracks[i].srclang);
+						for (var j=0; j<data.tracks[i].cues.length; j++) {
+							console.log(data.tracks[i].cues[j].message);
+
+							field.textTracks[field.textTracks.length-1].addCue(
+								new VTTCue(
+									data.tracks[i].cues[j].startTime,
+									data.tracks[i].cues[j].endTime,
+									data.tracks[i].cues[j].message
+								)
+							);
+						}
+					}
+				};
+			};
+
+			var videoEditable = function(field) {
+				field.setAttribute("data-simply-selectable", true);
+			};
+
+			editor.field.registerType("video", videoGetter, videoSetter, videoEditable);
+			editor.loadToolbar("video.toolbar.html");
+		})();
+	</script>
+</body>
+</html>
