@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Gesture to start editmode</title>
+</head>
+<body>
+	<h1 data-simply-field="title">Simply edit, start editing with the Konami code!</h1>
+	<script src="/simply-edit/js/simply-edit.js"
+		data-api-key="muze" data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+	></script>
+	<script src="konami2.js"></script>
+	<script>
+		var editMode = new Konami(function() {
+			document.location.hash = "simply-edit";
+		});
+	</script>
+</body>
+</html>
