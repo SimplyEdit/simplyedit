@@ -12,18 +12,6 @@
 
 var Konami = function (callback) {
 	var konami = {
-		addEvent: function (obj, type, fn, ref_obj) {
-			if (obj.addEventListener)
-				obj.addEventListener(type, fn, false);
-			else if (obj.attachEvent) {
-				// IE
-				obj["e" + type + fn] = fn;
-				obj[type + fn] = function () {
-					obj["e" + type + fn](window.event, ref_obj);
-				};
-				obj.attachEvent("on" + type, obj[type + fn]);
-			}
-		},
 		load: function (link) {
 			this.iphone.load(link);
 		},
@@ -36,46 +24,59 @@ var Konami = function (callback) {
 			stop_x: 0,
 			stop_y: 0,
 			tap: false,
-			capture: false,
+			double: false,
 			orig_keys: "",
-			keys: ["DOWN", "HORIZONTAL"],
+			keys: [
+				["DOUBLEDOWN", "DOUBLELEFT"],
+				["DOUBLEDOWN", "DOUBLERIGHT"],
+				["DOWN", "DOWN", "LEFT", "LEFT"],
+				["DOWN", "DOWN", "RIGHT", "RIGHT"],
+			],
 			code: function (link) {
 				konami.code(link);
 			},
 			load: function (link) {
 				this.orig_keys = this.keys;
-				konami.addEvent(document, "touchmove", function (e) {
-					if (e.touches.length == 2 && konami.iphone.capture === true) {
-						var touch = e.touches[1];
-						konami.iphone.stop_x = touch.pageX;
-						konami.iphone.stop_y = touch.pageY;
-						konami.iphone.tap = false;
-						konami.iphone.capture = false;
-						konami.iphone.check_direction();
+				document.addEventListener("touchmove", function (evt) {
+					if (evt.touches.length == 2) {
+						touch = evt.touches[1];
+						konami.iphone.double = true;
+					} else if (evt.touches.length == 1) {
+						touch = evt.touches[0];
+						konami.iphone.double = false;
 					}
+					konami.iphone.stop_x = touch.pageX;
+					konami.iphone.stop_y = touch.pageY;
+					konami.iphone.tap = false;
 				});
-				konami.addEvent(document, "touchend", function (evt) {
-					if (konami.iphone.tap === true) konami.iphone.check_direction(link);
+				document.addEventListener("touchend", function (evt) {
+					konami.iphone.check_direction();
 				}, false);
-				konami.addEvent(document, "touchstart", function (evt) {
+				document.addEventListener("touchcancel", function (evt) {
+					konami.iphone.check_direction();
+				}, false);
+				document.addEventListener("touchstart", function (evt) {
 					konami.iphone.start_x = evt.changedTouches[0].pageX;
 					konami.iphone.start_y = evt.changedTouches[0].pageY;
 					konami.iphone.tap = true;
-					konami.iphone.capture = true;
 				});
 			},
 			check_direction: function (link) {
 				x_magnitude = Math.abs(this.start_x - this.stop_x);
 				y_magnitude = Math.abs(this.start_y - this.stop_y);
-				// x = ((this.start_x - this.stop_x) < 0) ? "RIGHT" : "LEFT";
-				x = ((this.start_x - this.stop_x) < 0) ? "HORIZONTAL" : "HORIZONTAL";
+				x = ((this.start_x - this.stop_x) < 0) ? "RIGHT" : "LEFT";
 				y = ((this.start_y - this.stop_y) < 0) ? "DOWN" : "UP";
 				result = (x_magnitude > y_magnitude) ? x : y;
 				result = (this.tap === true) ? "TAP" : result;
-				if (result == this.keys[0]) this.keys = this.keys.slice(1, this.keys.length);
-				if (this.keys.length === 0) {
-					this.keys = this.orig_keys;
-					this.code(link);
+				if (this.double) {
+					result = "DOUBLE" + result;
+				}
+				for (var i=0; i<this.keys.length; i++) {
+					if (result == this.keys[i][0]) this.keys[i] = this.keys[i].slice(1, this.keys[i].length);
+					if (this.keys[i].length === 0) {
+						this.keys = this.orig_keys;
+						this.code(link);
+					}
 				}
 			}
 		}
@@ -83,7 +84,8 @@ var Konami = function (callback) {
 
 	if (typeof callback === "string") {
 		konami.load(callback);
-	} else if (typeof callback === "function") {
+	}
+	if (typeof callback === "function") {
 		konami.code = callback;
 		konami.load();
 	}
