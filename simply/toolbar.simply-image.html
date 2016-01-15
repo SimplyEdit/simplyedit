@@ -42,7 +42,11 @@
 			<div><label>URL</label><input type="text" class="simply-hyperlink-href" data-simply-action="simply-hyperlink-href"></div>
 			<div><label>Title</label><input type="text" class="simply-hyperlink-title" data-simply-action="simply-hyperlink-title"></div>
 			<div><label>Name</label><input type="text" class="simply-hyperlink-name" data-simply-action="simply-hyperlink-name"></div>
-			<div><button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button></div>
+			<div>
+				<button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button>
+				<button class="simply-hyperlink-newwindow" data-simply-action="simply-hyperlink-newwindow"><i class="fa fa-external-link"></i>New window</button>
+				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
+			</div>
 		</div>
 		<div class="simply-toolbar-section simply-clipboard">
 			<ul>
@@ -217,6 +221,20 @@
 				} else {
 					hyperlinkNofollow.classList.remove("simply-selected");
 				}
+
+				var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+				if (hyperlinkUnlink) {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
+				}
+
+				var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
+				if (hyperlinkTargetBlank) {
+					if (tempNode.getAttribute("target") && tempNode.getAttribute("target").match(/_blank/)) {
+						hyperlinkTargetBlank.classList.add("simply-selected");
+					} else {
+						hyperlinkTargetBlank.classList.remove("simply-selected");
+					}
+				}
 			} else {
 				simply.widgets.properties.set(toolbar.querySelector(".simply-hyperlink-href"), '');
 				simply.widgets.properties.set(toolbar.querySelector('.simply-hyperlink-title'), '');
@@ -225,6 +243,16 @@
 				var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
 				if (hyperlinkNofollow) {
 					hyperlinkNofollow.classList.remove("simply-selected");
+				}
+
+				var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+				if (hyperlinkUnlink) {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "none";
+				}
+
+				var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
+				if (hyperlinkTargetBlank) {
+					hyperlinkTargetBlank.classList.remove("simply-selected");
 				}
 			}
 

@@ -100,6 +100,7 @@
 			<div><label>Name</label><input type="text" id="vdHyperlinkName" data-simply-action="simply-hyperlink-name"></div>
 			<div>
 				<button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-hand-stop-o"></i>Nofollow</button>
+				<button class="simply-hyperlink-newwindow" data-simply-action="simply-hyperlink-newwindow"><i class="fa fa-external-link"></i>New window</button>
 				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
 			</div>
 		</div>
@@ -288,6 +289,15 @@
 				}
 			}
 
+			var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
+			if (hyperlinkTargetBlank) {
+				if (tempNode.getAttribute("target") && tempNode.getAttribute("target").match(/_blank/)) {
+					hyperlinkTargetBlank.classList.add("simply-selected");
+				} else {
+					hyperlinkTargetBlank.classList.remove("simply-selected");
+				}
+			}
+
 			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
 			if (hyperlinkUnlink) {
 				toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
@@ -305,6 +315,11 @@
 			var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
 			if (hyperlinkNofollow) {
 				hyperlinkNofollow.classList.remove("simply-selected");
+			}
+
+			var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
+			if (hyperlinkTargetBlank) {
+				hyperlinkTargetBlank.classList.remove("simply-selected");
 			}
 		}
 
@@ -700,6 +715,39 @@
 						button.classList.remove("simply-selected");
 					} else {
 						tempNode.setAttribute("rel", "nofollow");
+						button.classList.add("simply-selected");
+					}
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
+				}
+				hopeEditor.update();
+			},
+			"simply-hyperlink-newwindow" : function(button) {
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					if (hopeEditor.field.getAttribute("target") == "_blank") {
+						hopeEditor.field.removeAttribute("target");
+						button.classList.remove("simply-selected");
+					} else {
+						hopeEditor.field.setAttribute("target", "_blank");
+						button.classList.add("simply-selected");
+					}
+					return;
+				}
+
+				var range = hopeEditor.currentRange;
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+
+				if (!hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a target="_blank"');
+				} else {
+					var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+
+					if (tempNode.getAttribute("target") == "_blank") {
+						tempNode.removeAttribute("target");
+						button.classList.remove("simply-selected");
+					} else {
+						tempNode.setAttribute("target", "_blank");
 						button.classList.add("simply-selected");
 					}
 					var newValue = editor.plugins.hope.annotation.implode(tempNode);
