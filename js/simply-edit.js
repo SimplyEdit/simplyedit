@@ -962,7 +962,9 @@
 
 				target.addEventListener("click", function(event) {
 					if (event.target.tagName.toLowerCase() === "a") {
-						handleClick(event);
+						if (editor.node.hasSimplyParent(event.target) || editor.node.isSimplyParent(event.target)) {
+							handleClick(event);
+						}
 					}
 				});
 
