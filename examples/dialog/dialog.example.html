@@ -1,0 +1,110 @@
+<section id="simply-example" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button class="simply-expands simply-selected" data-simply-section="simply-example1"><i class="fa fa-clone fa-flip-horizontal"></i>Tab 1</li>
+			<li><button class="simply-expands" data-simply-section="simply-example2"><i class="fa fa-clone fa-flip-horizontal"></i>Tab 2</li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-example1 simply-selected">
+			<div class="field">
+				<label for="simply-example-title">Page title</label>
+				<input type="text" id="simply-example-title">
+			</div>
+			<div class="field">
+				<label for="simply-example-description">Page description</label>
+				<input type="text" id="simply-example-description">
+			</div>
+			<div class="field">
+				<label for="simply-example-author">Author</label>
+				<input type="text" id="simply-example-author">
+			</div>
+		</div>
+		<div class="simply-toolbar-section simply-example2">
+			<h1>Example 2</h1>
+			<p>This is just a tab with plain HTML.</p>
+			<button data-simply-action="simply-example-action">Action!</button>
+		</div>
+	</div>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-right'><button data-simply-action="simply-example-apply"><i class="fa fa-check"></i>Apply</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#simply-example .simply-toolbar-section ul {
+		background: transparent;
+	}
+	#simply-example .simply-exampledata button:not(.simply-selected) {
+		background: white;
+	}
+
+	#simply-example .simply-toolbar-section {
+		background: #eee;
+		padding: 10px 5px;
+	}
+	#simply-example .simply-example1 .simply-buttons {
+		margin-top: 0px;
+		margin-left: -3px;
+		display: inline-block;
+	}
+	#simply-example .simply-example1 .simply-buttons li {
+		margin-right: 5px;
+		list-style: none;
+	}
+	#simply-example .simply-example1 .field {
+		margin-bottom: 10px;
+		padding-left: 120px;
+		margin-right: 20px;
+	}
+	#simply-example .simply-example1 .field label {
+		margin-left: -120px;
+		display: inline-block;
+		width: 95px;
+		vertical-align: top;
+		margin-top: 12px;
+	}
+	#simply-example .simply-example1 input {
+		width: 100%;
+	}
+</style>
+<script>
+	editor.plugins.example = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-example'), editor.plugins.example.dialog.update);
+			},
+			update : function() {
+				var title = "Example title";
+				var description = "Example description";
+				var author = "Example author";
+
+				simply.widgets.properties.set("simply-example-title", title);
+				simply.widgets.properties.set("simply-example-description", description);
+				simply.widgets.properties.set("simply-example-author", author);
+			}
+		},
+		apply : function() {
+			alert("Apply all the data!");
+			editor.plugins.dialog.close();
+		},
+		init : function(config) {
+			// Add a button to open the dialog to the main toolbar;
+			var listItem = document.createElement("li");
+			var button = document.createElement("button");
+			button.dataset.simplyAction = "simply-example";
+			button.innerHTML = '<i class="fa fa-diamond"></i>Dialog example';
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+
+			// Add the action for the main toolbar button
+			editor.addAction("simply-example", editor.plugins.example.dialog.open);
+
+			// Add the action for the apply button in the dialog.
+			editor.addAction("simply-example-apply", editor.plugins.example.apply);
+		}
+	};
+
+	editor.plugins.example.init(editor.settings['example']);
+</script>

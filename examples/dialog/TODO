@@ -1,0 +1,2 @@
+- dialog should open with the first tab selected the first time;
+- dialog tabs should not allow closing;
