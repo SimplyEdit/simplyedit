@@ -633,7 +633,8 @@
 
 
 @media (max-width: 481px) {
-	.simply-dialog {
+	.simply-dialog, 
+	.simply-dialog.simply-modal {
 		top: 0px;
 		bottom: 0px;
 		left: 0px;
