@@ -1,4 +1,4 @@
-<section id="simply-image-browse" class="simply-dialog">
+<section id="simply-image-browse" class="simply-dialog simply-modal">
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li><button data-simply-action="simply-image-browse-filter-same-size"><i class="fa fa-filter"></i>Same size only</button></li>
@@ -10,38 +10,6 @@
 	</div>
 </section>
 <style type="text/css">
-	#simply-image-browse {
-		top: 50%;
-		height: 400px;
-		max-height: 80%;
-		margin-top: -200px;
-		left: 50%;
-		margin-left: -235px;
-		background-color: #EEE;
-		padding-top: 61px;
-		box-sizing: border-box;
-	}
-	#simply-image-browse.fullscreen {
-		top: 0px;
-		bottom: 0px;
-		left: 0px;
-		right: 0px;
-		max-width: 100%;
-		max-height: 100%;
-		height: auto;
-		width: auto;
-		margin-left: 0px;
-		margin-top: 0px;
-	}
-	#simply-image-browse .simply-dialog-body {
-		overflow-y: scroll;
-		padding: 0px;
-		width: 470px;
-		padding-left: 2px;
-	}
-	#simply-image-browse.fullscreen .simply-dialog-body {
-		width: 100%;
-	}
 	#simply-image-browse .simply-dialog-body button {
 		border: 1px solid #eee;
 		background-color: white;
@@ -76,24 +44,6 @@
 	}
 
 	@media (max-width: 481px) {
-		#simply-image-browse {
-			top: 0px;
-			bottom: 0px;
-			left: 0px;
-			right: 0px;
-			max-width: 100%;
-			max-height: 100%;
-			height: auto;
-			width: auto;
-			margin-left: 0px;
-			margin-top: 0px;
-		}
-		#simply-image-browse [data-simply-action="simply-image-browse-fullscreen"] {
-			display: none;
-		}
-		#simply-image-browse .simply-dialog-body {
-			max-width: 100%;
-		}
 		#simply-image-browse .simply-dialog-body button {
 			width: 50%;
 		}
@@ -113,18 +63,6 @@
 
 				vdSelectionState.save(editor.plugins.imageBrowse.currentSel);
 				editor.plugins.dialog.open(document.getElementById('simply-image-browse'), editor.plugins.imageBrowse.dialog.update);
-			},
-			fullscreen : function() {
-				var fullscreen = document.querySelector("[data-simply-action=simply-image-browse-fullscreen]");
-				if (document.getElementById('simply-image-browse').classList.contains("fullscreen")) {
-					fullscreen.classList.remove("simply-selected");
-					document.getElementById('simply-image-browse').classList.remove("fullscreen");
-					document.body.classList.remove("simply-overflow-hidden");
-				} else {
-					fullscreen.classList.add("simply-selected");
-					document.getElementById('simply-image-browse').classList.add("fullscreen");
-					document.body.classList.add("simply-overflow-hidden");
-				}
 			},
 			loadImages : function(url) {
 				var targetList = document.querySelector("#simply-image-browse .simply-dialog-body");

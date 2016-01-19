@@ -212,6 +212,10 @@
 		var field = editor.node.getEditableField();
 
 		hopeEditor = field.hopeEditor;
+		if (!hopeEditor) {
+			return;
+		}
+
 		hopeEditor.selection.updateRange();
 
 		var range = hopeEditor.selection.getRange();

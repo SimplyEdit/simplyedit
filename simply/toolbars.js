@@ -180,16 +180,28 @@
 		hasSimplyParent : function(checkParent) {
 			var parent = checkParent;
 			while (parent && parent.parentNode) {
-				if (parent.parentNode.getAttribute && parent.parentNode.getAttribute("data-simply-field")) {
-					return true;
-				}
-				if (parent.parentNode.getAttribute && parent.parentNode.getAttribute("data-simply-list")) {
+				if (editor.node.isSimplyParent(parent.parentNode)) {
 					return true;
 				}
 				parent = parent.parentNode;
 			}
 			return false;
 		},
+		isSimplyParent : function(elm) {
+			if (elm.getAttribute) {
+				if (elm.getAttribute("data-simply-field")) {
+					return true;
+				}
+				if (elm.getAttribute("data-simply-list")) {
+					return true;
+				}
+				if (elm.getAttribute("data-simply-selectable")) {
+					return true;
+				}
+			}
+			return false;
+		},
+
 		hasToolbarParent : function(checkParent) {
 			var parent = checkParent;
 			while (parent && parent.parentNode) {
