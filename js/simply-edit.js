@@ -752,29 +752,29 @@
 								}
 								toolbars.content = fragment;
 							}
-							var toolbarNode = document.importNode(toolbars.content, true);
-							if (editor.brokenImport) {
-								editor.importScripts = true;
-							}
-							if (editor.importScripts) {
-								var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
-								for (i=0; i<scriptTags.length; i++) {
-									var newNode = document.createElement("SCRIPT");
-									if (scriptTags[i].src) {
-										newNode.src = scriptTags[i].src;
-									}
-									if (scriptTags[i].innerHTML) {
-										newNode.innerHTML = scriptTags[i].innerHTML;
-									}
-									document.head.appendChild(newNode);
-								}
+							var scriptTags = toolbars.content.querySelectorAll("SCRIPT");
+							for (i=0; i<scriptTags.length; i++) {
+								scriptTags[i].parentNode.removeChild(scriptTags[i]);
 							}
 
+							var toolbarNode = document.importNode(toolbars.content, true);
 							var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
+							toolbarsContainer.appendChild(toolbarNode);
+
+							for (i=0; i<scriptTags.length; i++) {
+								var newNode = document.createElement("SCRIPT");
+								if (scriptTags[i].src) {
+									newNode.src = scriptTags[i].src;
+								}
+								if (scriptTags[i].innerHTML) {
+									newNode.innerHTML = scriptTags[i].innerHTML;
+								}
+								document.head.appendChild(newNode);
+							}
+
 							for (i=0; i<newToolbars.length; i++) {
 								editor.toolbar.init(newToolbars[i]);
 							}
-							toolbarsContainer.appendChild(toolbarNode);
 						}
 						if (toolbarList.length) {
 							editor.editmode.loadToolbarList(toolbarList);
