@@ -1339,7 +1339,7 @@
 									result.folders.push(fileData);
 								} else {
 									result.files.push(fileData);
-									if (fileData.url.match(/(jpg|gif|png|bmp|tif|svg)$/)) {
+									if (fileData.url.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
 										result.images.push(fileData);
 									}
 								}
@@ -1520,7 +1520,7 @@
 								result.folders.push({url : targetUrl, name: "My pages"});
 							} else {
 								result.files.push({url : targetUrl});
-								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/)) {
+								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
 									result.images.push({url : targetUrl});
 								}
 							}
