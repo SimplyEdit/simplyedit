@@ -42,9 +42,10 @@
 		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
 		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
 	></script>
+
 	<script>
 		var http = new XMLHttpRequest();
-		var url = "http://crossorigin.me/http://www.rss-widget.nl/opensearch.php?s=30&ui=14863699";
+		var url = "http://crossorigin.me/https://www.markxman.com/mp2rss.php?url=http%3A%2F%2Fwww.marktplaats.nl%2Fverkopers%2F8242671.html&top=on&bez=on";
 
 		http.open("GET", url, true);
 		http.onreadystatechange = function() {//Call a function when the state changes.
@@ -55,16 +56,20 @@
 
 					var items = xmlDoc.querySelectorAll("item");
 					var result = [];
+
 					for (var i=0; i<items.length; i++) {
 						var desc = items[i].querySelector("description").childNodes[0].nodeValue;
-						var descInfo = desc.split(" - ");
+						desc = desc.replace("/><b>", "/><br/><b>");
+						desc = desc.replace(/<br\/><br\/>/g, "<br/>");
+						var descInfo = desc.split("<br/>");
 
 						result.push({
 							title : items[i].querySelector("title").innerHTML.replace("&amp;", "&").replace(/^Aangeboden: /, ''),
 							image : descInfo[0],
-							prijs : descInfo[1],
-							datum : descInfo[2],
-							description : descInfo[3],
+							locatie : descInfo[1],
+							prijs : descInfo[2],
+							datum : descInfo[3],
+							description : descInfo[4],
 							url : {
 								href : items[i].querySelector("link").innerHTML.replace("&amp;", "&")
 							},
@@ -77,7 +82,6 @@
 				
 					var initSwiper = function() {
 						if (document.querySelector(".swiper-wrapper.simply-empty")) {
-							console.log('hier');
 							window.setTimeout(initSwiper, 100);
 							return;
 						}

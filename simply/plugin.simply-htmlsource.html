@@ -1,51 +1,28 @@
-<section id="simply-htmlsource" class="simply-dialog">
+<section id="simply-htmlsource" class="simply-dialog simply-modal">
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li><button data-simply-action="simply-htmlsource-selectall"><i class="fa fa-quote-right"></i>Select field</button></li>
-			<li><button data-simply-action="simply-htmlsource-editable"><i class="fa fa-lock"></i>Lock source</button></li>
+			<!-- li><button data-simply-action="simply-htmlsource-editable"><i class="fa fa-lock"></i>Lock source</button></li -->
 			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
 			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
 		</ul>
 	</div>
 	<div class="simply-dialog-body">
-		<div class="vdYellowAlert" id="vdInsertHTMLWarning" style="display: none;">
-			Warning: editable source and javascript do not mix.
-		</div>
-		<textarea id="vdInsertHTMLSource"></textarea>
+		<textarea id="insertHTMLSource"></textarea>
 	</div>
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
+			<li class="simply-warning" id="insertHTMLWarning" style="display: none;">
+				<i class='fa fa-warning'></i> Warning: editable source and javascript do not mix.
+			</li>
 			<li class='simply-right'><button data-simply-action="simply-htmlsource-insert"><i class="fa fa-check"></i>Insert</button></li>
 		</ul>
 	</div>
 </section>
 <style type="text/css">
-	#simply-htmlsource {
-		top: 50%;
-		height: 400px;
-		max-height: 80%;
-		margin-top: -200px;
-
-		left: 50%;
-		width: 480px;
-		margin-left: -240px;
-	}
 	#simply-htmlsource .simply-dialog-body {
-		background-color: #eee;
+		overflow-y: hidden;
 	}
-	#simply-htmlsource.fullscreen {
-		top: 0px;
-		bottom: 0px;
-		left: 0px;
-		right: 0px;
-		max-width: 100%;
-		max-height: 100%;
-		height: auto;
-		width: auto;
-		margin-left: 0px;
-		margin-top: 0px;
-	}
-
 	#simply-htmlsource textarea {
 		width: 100%;
 		height: 100%;
@@ -53,30 +30,12 @@
 		background-color: white;
 		box-sizing: border-box;
 	}
-	#vdInsertHTMLWarning {
-		background-color: #FFFFCC;
-		border: 1px solid black;
-		padding: 2px;
-		clear: both;
-		height: 32px;
+	#insertHTMLWarning {
+		height: 60px;
+		line-height: 60px;
 		overflow: hidden;
-	}
-	@media (max-width: 481px) {
-		#simply-htmlsource {
-			top: 0px;
-			bottom: 0px;
-			left: 0px;
-			right: 0px;
-			max-width: 100%;
-			max-height: 100%;
-			height: auto;
-			width: auto;
-			margin-left: 0px;
-			margin-top: 0px;
-		}
-		#simply-htmlsource [data-simply-action="simply-htmlsource-fullscreen"] {
-			display: none;
-		}
+		font-size: 14px;
+		margin-left: 5px;
 	}
 </style>
 <script>
@@ -117,17 +76,19 @@
 		dialog : {
 			setSource : function() {
 				var source = editor.plugins.htmlsource.get();
-				document.getElementById('vdInsertHTMLSource').value = source;
+				document.getElementById('insertHTMLSource').value = source;
 
 				var span = editor.plugins.htmlsource.getSourceSpan();
 
 				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
-				if (span) {
-					button.classList.add("simply-selected");
-				} else {
-					button.classList.remove("simply-selected");
+				if (button) {
+					if (span) {
+						button.classList.add("simply-selected");
+					} else {
+						button.classList.remove("simply-selected");
+					}
+					document.getElementById('insertHTMLSource').select();
 				}
-				document.getElementById('vdInsertHTMLSource').select();
 
 				var fullscreen = document.querySelector("[data-simply-action=simply-dialog-fullscreen]");
 				if (document.getElementById('simply-htmlsource').classList.contains("fullscreen")) {
@@ -150,19 +111,9 @@
 			setWarning : function() {
 				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
-					document.getElementById('vdInsertHTMLWarning').style.display='none';
+					document.getElementById('insertHTMLWarning').style.display='none';
 				} else {
-					document.getElementById('vdInsertHTMLWarning').style.display='block';
-				}
-			},
-			fullscreen : function() {
-				var fullscreen = document.querySelector("[data-simply-action=simply-htmlsource-fullscreen]");
-				if (document.getElementById('simply-htmlsource').classList.contains("fullscreen")) {
-					fullscreen.classList.remove("simply-selected");
-					document.getElementById('simply-htmlsource').classList.remove("fullscreen");
-				} else {
-					fullscreen.classList.add("simply-selected");
-					document.getElementById('simply-htmlsource').classList.add("fullscreen");
+					document.getElementById('insertHTMLWarning').style.display='block';
 				}
 			}
 		},
@@ -172,11 +123,11 @@
 			return d.innerHTML;
 		},
 		insert : function() {
-			var source = document.getElementById('vdInsertHTMLSource').value;
+			var source = document.getElementById('insertHTMLSource').value;
 			var tidySource = editor.plugins.htmlsource.tidy(source);
 			if (tidySource != source) {
 				if (confirm("The HTML content does not seem valid and cannot be inserted. Correct it automatically?")) {
-					document.getElementById('vdInsertHTMLSource').value = tidySource;
+					document.getElementById('insertHTMLSource').value = tidySource;
 				}
 				return;
 			}
