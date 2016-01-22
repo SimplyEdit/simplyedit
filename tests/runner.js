@@ -393,41 +393,47 @@ console output.
 
     function setupCallbacks() {
         window.document.addEventListener('DOMContentLoaded', function() {
-            // Setup Error Handling
-            var qunit_error = window.onerror;
-            window.onerror = function ( error, filePath, linerNr ) {
-                qunit_error(error, filePath, linerNr);
-                if (typeof window.callPhantom === 'function') {
-                    window.callPhantom({
-                        'name': 'Window.error',
-                        'error': error,
-                        'filePath': filePath,
-                        'linerNr': linerNr
-                    });
+            var callbacksDone = false ;
+            return function() {
+                if(!callbacksDone) {
+                    // Setup Error Handling
+                    var qunit_error = window.onerror;
+                    window.onerror = function ( error, filePath, linerNr ) {
+                        qunit_error(error, filePath, linerNr);
+                        if (typeof window.callPhantom === 'function') {
+                            window.callPhantom({
+                                'name': 'Window.error',
+                                'error': error,
+                                'filePath': filePath,
+                                'linerNr': linerNr
+                            });
+                        }
+                    };
+
+                    var callback = function(name) {
+                        return function(details) {
+                            if (typeof window.callPhantom === 'function') {
+                                window.callPhantom({
+                                    'name': 'QUnit.' + name,
+                                    'details': details
+                                });
+                            }
+                        };
+                    };
+
+                    var i, callbacks = [
+                        'begin', 'done', 'log',
+                        'moduleStart', 'moduleDone',
+                        'testStart', 'testDone'
+                    ];
+                    for (i=0; i<callbacks.length;i+=1) {
+                        QUnit[callbacks[i]](callback(callbacks[i]));
+                    }
+                    callbacksDone = true;
                 }
             };
 
-            var callback = function(name) {
-                return function(details) {
-                    if (typeof window.callPhantom === 'function') {
-                        window.callPhantom({
-                            'name': 'QUnit.' + name,
-                            'details': details
-                        });
-                    }
-                };
-            };
-
-            var i, callbacks = [
-                'begin', 'done', 'log',
-                'moduleStart', 'moduleDone',
-                'testStart', 'testDone'
-            ];
-            for (i=0; i<callbacks.length;i+=1) {
-                QUnit[callbacks[i]](callback(callbacks[i]));
-            }
-
-        }, false);
+        }(), false);
     }
 
 
