@@ -446,7 +446,10 @@ console output.
 
         if (message) {
             if (message.name === 'Window.error') {
-                console.error('Window.error');
+                console.log('Window.error');
+                console.log('Error:'  + message.error);
+                console.log('file:'   + message.filePath);
+                console.log('linenr:' + message.lineNr);
                 phantom.exit(1);
             } else {
                 var msgs = message.name.split(".");
