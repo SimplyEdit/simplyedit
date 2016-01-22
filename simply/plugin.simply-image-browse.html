@@ -212,7 +212,7 @@
 				}
 			}
 
-			if (typeof editor.storage.file.save === "function") {
+			if (editor.storage.file && typeof editor.storage.file.save === "function") {
 				document.querySelector("#simply-image-browse").addEventListener("drop", function(evt) {
 					evt.preventDefault();
 					editor.plugins.imageBrowse.handleFiles(evt.dataTransfer.files);
@@ -225,7 +225,7 @@
 				uploadButton.parentNode.parentNode.removeChild(uploadButton.parentNode);
 			}
 
-			if (typeof editor.storage.file.delete === "function") {
+			if (editor.storage.file && typeof editor.storage.file.delete === "function") {
 			} else {
 				var deleteButton = document.querySelector('[data-simply-action="simply-image-browse-delete"]');
 				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);
