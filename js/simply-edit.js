@@ -1006,8 +1006,11 @@
 				return false;
 			},
 			stop : function() {
-				editor.storage.disconnect();
-				document.location.href = document.location.href.split("#")[0];
+				editor.storage.disconnect(
+					function() {
+						document.location.href = document.location.href.split("#")[0];
+					}
+				);
 			},
 			toolbarMonitor : function() {
 				var target = document.querySelector('#simply-main-toolbar');
@@ -1124,7 +1127,7 @@
 				this.list = storage.default.list;
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
-
+				this.disconnect = storage.default.disconnect;
 				this.endpoint = endpoint;
 
 				editor.responsiveImages.sizes = {
@@ -1197,10 +1200,6 @@
 			},
 			connect : function() {
 				return true;
-			},
-			disconnect : function() {
-				delete editor.storage.key;
-				delete localStorage.storageKey;
 			}
 		},
 		github : {
@@ -1295,9 +1294,10 @@
 					return editor.storage.connect();
 				}
 			},
-			disconnect : function() {
+			disconnect : function(callback) {
 				delete this.repo;
 				delete localStorage.storageKey;
+				callback();
 			},
 			validateKey : function(key) {
 				return true;
@@ -1441,9 +1441,21 @@
 			connect : function() {
 				return true;
 			},
-			disconnect : function() {
+			disconnect : function(callback) {
 				delete editor.storage.key;
 				delete localStorage.storageKey;
+
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "logout";
+				http.open("OPTIONS", url, true, "logout", (new Date()).getTime().toString());
+				http.setRequestHeader("Authorization", "Basic ABCDEF");
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 401) {
+						callback();
+					}
+				};
+				http.send();
 			},
 			sitemap : function() {
 				var output = {
