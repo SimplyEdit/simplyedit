@@ -880,39 +880,10 @@
 				document.body.addEventListener("dragover", function(evt) {
 					evt.preventDefault();
 				});
-				document.body.addEventListener("drop", function(evt) {
-					if (evt.dataTransfer.files.length) {
-						console.log("received " + evt.dataTransfer.files.length + " files");
-					}
-					var target = evt.target;
-					if (target.tagName.toLowerCase() == "img" && target.getAttribute("data-simply-field")) {
-						console.log("image drop");
-						return;
-						/*
-							removed for now, reinstate when the storage layer knows how to store images
-						
-						var imageData = event.dataTransfer.getData("text/html");
-
-						var container = document.createElement("DIV");
-						container.innerHTML = imageData;
-						var image = container.querySelector("img");
-						if (image && image.getAttribute("src")) {
-							target.src = image.getAttribute("src");
-						}
-						*/
-					}
-
-					evt.preventDefault();
-				});
-
-				var listDropHandler = function(evt) {
-					console.log("list drop");
-				};
 
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				for (i=0; i<dataLists.length; i++) {
 					dataLists[i].setAttribute("data-simply-selectable", true);
-					dataLists[i].addEventListener("drop", listDropHandler, true);
 				}
 
 				var handleDblClick = function(evt) {
@@ -1054,7 +1025,6 @@
 						style.id = "simply-body-top";
 						document.head.appendChild(style);
 					}
-
 					if (document.getElementById("simply-main-toolbar")) {
 						var toolbarHeight = document.getElementById("simply-main-toolbar").offsetHeight;
 						style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
