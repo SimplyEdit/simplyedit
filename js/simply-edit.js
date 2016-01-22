@@ -1042,6 +1042,38 @@
 
 				window.setTimeout(setBodyTop, 100);
 			}
+		},
+		responsiveImages : {
+			sizes : {},
+			init : function(target) {
+				var images = target.querySelectorAll("img[data-simply-src]");
+
+				var width = window.innerWidth;
+
+				for (var i=0; i<images.length; i++) {
+					imageSrc = images[i].getAttribute("data-simply-src");
+					var srcSet = [];
+					for (var size in editor.responsiveImages.sizes) {
+						srcSet.push(imageSrc + editor.responsiveImages.sizes[size] + " " + size);
+					}
+
+					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / width));
+					if (sizeRatio > 0) {
+						images[i].setAttribute("sizes", sizeRatio + "vw");
+					}
+					images[i].setAttribute("srcset", srcSet.join(", "));
+					images[i].setAttribute("src", imageSrc);
+				}
+			},
+			resizeHandler : function() {
+				var images = document.querySelectorAll("img[data-simply-src][sizes]");
+				for (var i=0; i<images.length; i++) {
+					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / window.innerWidth));
+					if (sizeRatio > 0) {
+						images[i].setAttribute("sizes", sizeRatio + "vw");
+					}
+				}
+			}
 		}
 	};
 
@@ -1094,20 +1126,60 @@
 				this.listSitemap = storage.default.listSitemap;
 
 				this.endpoint = endpoint;
+
+				editor.responsiveImages.sizes = {
+					"1200w" : "?size=1200",
+					"800w" : "?size=800",
+					"640w" : "?size=640",
+					"480w" : "?size=480",
+					"320w" : "?size=320",
+					"160w" : "?size=160",
+					"80w" : "?size=80"
+				};
+			},
+			file : {
+				save : function(path, data, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("PUT", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+					http.upload.onprogress = function (event) {
+						if (event.lengthComputable) {
+							var complete = (event.loaded / event.total * 100 | 0);
+							var progress = document.querySelector("progress[data-simply-progress='" + path + "']");
+							if (progress) {
+								progress.value = progress.innerHTML = complete;
+							}
+						}
+					};
+
+					http.send(data);
+				},
+				delete : function(path, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("DELETE", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+
+					http.send();
+				}
 			},
 			save : function(data, callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data.json";
-
-				http.open("PUT", url, true);
-				http.withCredentials = true;
-
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback();
-					}
-				};
-				http.send(data);
+				return editor.storage.file.save("data.json", data, callback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();

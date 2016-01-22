@@ -2,6 +2,8 @@
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li><button data-simply-action="simply-image-browse-filter-same-size"><i class="fa fa-filter"></i>Same size only</button></li>
+			<li><button data-simply-action="simply-image-browse-upload"><i class="fa fa-upload"></i>Upload</button><input type="file" multiple accept="image/*"></li>
+			<li><button data-simply-action="simply-image-browse-delete"><i class="fa fa-trash"></i>Delete</button></li>
 			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
 			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
 		</ul>
@@ -23,6 +25,9 @@
 		display: inline-block;
 		vertical-align: top;
 	}
+	#simply-image-browse input[type="file"] {
+		display: none;
+	}
 	#simply-image-browse .simply-dialog-body button:before {
 		display: block;
 		content: '';
@@ -41,8 +46,51 @@
 	#simply-image-browse .simply-dialog-body button img {
 		max-width: 100%;
 		max-height: 100%;
+		width: 149px;
 	}
 
+	#simply-image-browse .simply-dialog-body button progress {
+		width: 100%;
+		height: 10px;
+	}
+
+	#simply-image-browse .simply-dialog-body button i.select {
+		position: absolute;
+		top: 0;
+		right: 0px;
+		display: inline-block;
+		text-align: right;
+		width: 40px;
+	}
+
+	#simply-image-browse .simply-dialog-body button i.select:before {
+		width: 16px;
+		display: inline-block;
+		font-size: 20px;
+		border-left: 1px solid #ddd;
+		padding: 10px;
+		border-bottom: 1px solid #ddd;
+		color: #ddd;
+		border-bottom-left-radius: 15px;
+		z-index: 1;
+		background-color: rgba(255,255,255,0.3);
+		vertical-align: top;
+	}
+
+	#simply-image-browse .simply-dialog-body.simply-selecting button i.select {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		bottom: 0px;
+		right: 0px;
+		width: auto;
+	}
+
+	#simply-image-browse .simply-dialog-body button.simply-selected i.select:before {
+		border-color: #999;
+		color: #16B916;
+		background-color: rgba(255,255,255,0.8);
+	}
 	@media (max-width: 481px) {
 		#simply-image-browse .simply-dialog-body button {
 			width: 50%;
@@ -66,11 +114,12 @@
 			},
 			loadImages : function(url) {
 				var targetList = document.querySelector("#simply-image-browse .simply-dialog-body");
+				var parser = document.createElement("A");
+				parser.href = url;
 				if (editor.plugins.imageBrowse.currentJail === null) {
-					var parser = document.createElement("A");
-					parser.href = url;
 					editor.plugins.imageBrowse.currentJail = parser.href;
 				}
+				editor.plugins.imageBrowse.currentPath = parser.href;
 
 				editor.storage.list(url, function(imageData) {
 					var i;
@@ -78,27 +127,64 @@
 					var newHtml = '';
 					for (i=0; i<imageData.folders.length; i++) {
 						if (imageData.folders[i].url.indexOf(editor.plugins.imageBrowse.currentJail) === 0) {
-							newHtml += "<button data-simply-action='simply-image-browse-directory' data-value='" + imageData.folders[i].url + "'><i class='fa fa-folder'></i>" + imageData.folders[i].name + "</button>";
+							newHtml += "<button data-simply-action='simply-image-browse-directory' data-value='" + imageData.folders[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + imageData.folders[i].name + "</button>";
 						}
 					}
 					for (i=0; i<imageData.images.length; i++) {
-						if (imageData.images[i].url.indexOf(editor.plugins.imageBrowse.currentJail) === 0) {
+//						if (imageData.images[i].url.indexOf(editor.plugins.imageBrowse.currentJail) === 0) {
 							var src = imageData.images[i].url;
 							if (typeof imageData.images[i].src !== "undefined") {
 								src = imageData.images[i].src;
 							}
 
-							newHtml += "<button data-simply-action='simply-image-browse-insert'><img src='" + src + "'></button>";
-						}
+							newHtml += "<button data-simply-action='simply-image-browse-insert'><i class='select fa fa-check'></i><img data-simply-src='" + src + "'></button>";
+//						}
 					}
 					targetList.innerHTML = newHtml;
 					targetList.scrollTop = 0;
+					editor.responsiveImages.init(targetList);
 					document.querySelector("#simply-image-browse [data-simply-action=simply-image-browse-filter-same-size]").classList.remove("simply-selected");
+
+					var selectors = targetList.querySelectorAll("i.select");
+					for (i=0; i<selectors.length; i++) {
+						selectors[i].addEventListener("click", function(evt) {
+							this.parentNode.classList.toggle("simply-selected");
+							evt.preventDefault();
+							evt.stopPropagation();
+							editor.plugins.imageBrowse.dialog.updateToolbar();
+						});
+					}
+					new Slip(targetList);
 				});
 			},
 			update : function() {
 				// var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
 				editor.plugins.imageBrowse.dialog.loadImages(editor.plugins.imageBrowse.path);
+			},
+			updateToolbar : function() {
+				window.setTimeout(function() {
+					var targetList = document.querySelectorAll("#simply-image-browse .simply-dialog-body .simply-selected");
+					var uploadButton = document.querySelector("#simply-image-browse li [data-simply-action='simply-image-browse-upload']");
+					var deleteButton = document.querySelector("#simply-image-browse li [data-simply-action='simply-image-browse-delete']");
+
+					if (targetList.length === 0) {
+						document.querySelector("#simply-image-browse .simply-dialog-body").classList.remove("simply-selecting");
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "block";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "none";
+						}
+					} else {
+						document.querySelector("#simply-image-browse .simply-dialog-body").classList.add("simply-selecting");
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "block";
+						}
+					}
+				}, 50);
 			}
 		},
 		init : function() {
@@ -124,6 +210,77 @@
 					window.setTimeout(editor.plugins.imageBrowse.init, 200);
 				}
 			}
+
+			if (typeof editor.storage.file.save === "function") {
+				document.querySelector("#simply-image-browse").addEventListener("drop", function(evt) {
+					evt.preventDefault();
+					editor.plugins.imageBrowse.handleFiles(evt.dataTransfer.files);
+				});
+				document.querySelector("#simply-image-browse input[type='file']").addEventListener("change", function(evt) {
+					editor.plugins.imageBrowse.handleFiles(this.files);
+				});
+			} else {
+				var uploadButton = document.querySelector('[data-simply-action="simply-image-browse-upload"]');
+				uploadButton.parentNode.parentNode.removeChild(uploadButton.parentNode);
+			}
+
+			if (typeof editor.storage.file.delete === "function") {
+			} else {
+				var deleteButton = document.querySelector('[data-simply-action="simply-image-browse-delete"]');
+				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);
+			}
+
+			document.querySelector("#simply-image-browse").addEventListener("DOMNodeInserted", editor.plugins.imageBrowse.dialog.updateToolbar);
+			document.querySelector("#simply-image-browse").addEventListener("DOMNodeRemoved",editor.plugins.imageBrowse.dialog.updateToolbar);
+
+			var targetList = document.querySelector("#simply-image-browse .simply-dialog-body");
+			targetList.addEventListener("slip:beforereorder", function(evt) {
+				var targetButton = evt.target;
+				if (targetButton.tagName.toLowerCase() == "i") {
+					targetButton = targetButton.parentNode;
+				}
+				targetButton.classList.toggle("simply-selected");
+				editor.plugins.imageBrowse.dialog.updateToolbar();
+
+				targetButton.addEventListener("click", editor.plugins.imageBrowse.cancelClick, true);
+				targetButton.addEventListener("mouseup", function(evt) {
+					var currentButton = this;
+					window.setTimeout(function() {
+						currentButton.removeEventListener("click", editor.plugins.imageBrowse.cancelClick, true);
+					}, 50);
+				});
+				evt.preventDefault();
+				evt.stopPropagation();
+			});
+		},
+		cancelClick : function(evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+		},
+
+		handleFiles : function(files) {
+			if (files.length) {
+				for (var i=0; i<files.length; i++) {
+					var subpath = editor.plugins.imageBrowse.currentPath.replace(editor.storage.endpoint, "");
+					var targetList = document.querySelector("#simply-image-browse .simply-dialog-body");
+
+					var newButton = document.createElement("BUTTON");
+					newButton.setAttribute("data-simply-action", "simply-image-uploading");
+					newButton.innerHTML = "Uploading<br><progress value=0 max=100></progress><br>" + files[i].name;
+					targetList.appendChild(newButton);
+					newButton.querySelector("progress").setAttribute("data-simply-progress", subpath + files[i].name);
+
+					var url = editor.plugins.imageBrowse.currentPath + files[i].name.replace(/[^A-Za-z0-9_\.-]/, "-");
+
+					(function(targetButton, url) {
+						editor.storage.file.save(subpath + files[i].name, files[i], function() {
+							targetButton.innerHTML = "<i class='select fa fa-check'></i><img data-simply-src='" + url + "'>";
+							targetButton.setAttribute("data-simply-action", "simply-image-browse-insert");
+							editor.responsiveImages.init(targetButton);
+						});
+					}(newButton, url));
+				}
+			}
 		}
 	};
 
@@ -138,6 +295,31 @@
 		//parent.setAttribute("src", el.querySelector("img").getAttribute("src"));
 		editor.plugins.dialog.close();
 	});
+	editor.addAction("simply-image-browse-upload", function(el) {
+		var target = el.parentNode.querySelector("input");
+		muze.event.fire(target, "click");
+	});
+	editor.addAction("simply-image-browse-delete", function(el) {
+		var targetList = document.querySelectorAll("#simply-image-browse .simply-dialog-body .simply-selected");
+
+		for (var i=0; i<targetList.length; i++) {
+			if (targetList[i].querySelector("img")) {
+				var subpath = targetList[i].querySelector("img").getAttribute("src").replace(editor.storage.endpoint, "");
+				(function(targetButton) {
+					editor.storage.file.delete(subpath, function() {
+						targetButton.parentNode.removeChild(targetButton);
+					});
+				}(targetList[i]));
+			} else {
+				
+			}
+		};
+	});
+
+	editor.addAction("simply-image-handle-upload", function(el) {
+		editor.plugins.imageBrowse.handleFiles(el.files);
+	});
+
 	editor.addAction("simply-image-browse-filter-same-size", function(el) {
 		var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
 		var currentWidth = parent.naturalWidth;
