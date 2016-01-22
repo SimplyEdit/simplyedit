@@ -1,0 +1,178 @@
+<section id="simply-about" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-left simply-expands'><button data-simply-section="simply-about-body" class="simply-selected"><i class="fa fa-info"></i>About</button></li>
+			<li class='simply-left simply-expands'><button data-simply-section="simply-key"><i class="fa fa-key"></i>Your Key</button></li>
+			<li class='simply-left'><button data-simply-action="simply-help"><i class="fa fa-question"></i>Help</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Close</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div id="simply-key" class="simply-key simply-toolbar-section simply-dialog-body">
+			<div id="simply-about-header">
+				<img src="https://simplyedit.io/graphics/logo.svg" alt="SimplyEdit" class="simply-logo">
+			</div>
+			<div id="simply-about-key-info">
+				<div id="simply-about-key"><span class="simply-label">Your key</span><span class="simply-info">serious-business-1234</span></div>
+				<div id="simply-about-key-domains"><span class="simply-label">Valid for</span><span class="simply-info">example.com, staging.example.com</span></div>
+			</div>
+			<div id="simply-about-footer">
+				<p>SimplyEdit is a product by <button class="simply-about-muze" data-simply-action="simply-about-muze">Muze</button>, &copy; 2016, <button class="simply-about-muze" data-simply-action="simply-about-license">all rights reserved.</button></p>
+			</div>
+		</div>
+		<div id="simply-about-body" class="simply-about-body simply-toolbar-section simply-dialog-body simply-selected">
+			<div id="simply-about-header">
+				<img src="https://simplyedit.io/graphics/logo.svg" alt="SimplyEdit" class="simply-logo">
+				<div id="simply-about-version">Version beta-rc3</div>
+			</div>
+			<div id="simply-about-info">
+				<div id="simply-about-key-valid" style="display: none">Your trial key expires in 12 days.</div>
+				<div id="simply-about-key-upgrade" style="display: none">Version 1.0 is available.</div>
+				<button id="simply-buy-button" data-simply-action="simply-about-buy" style="display: none">Buy now</button>
+			</div>
+			<div id="simply-about-footer">
+				<p>SimplyEdit is a product by <button class="simply-about-muze" data-simply-action="simply-about-muze">Muze</button>, &copy; 2016, <button class="simply-about-muze" data-simply-action="simply-about-license">all rights reserved.</button></p>
+			</div>
+		</div>
+	</div>
+</section>
+<style type="text/css">
+	#simply-about .simply-toolbar-section {
+		font-size: 16px;
+		overflow: hidden;
+		line-height: 25px;
+	}
+	#simply-about .simply-toolbar-section > div {
+		padding: 0;
+	}
+	#simply-about .simply-toolbar-section button:focus {
+		border: 0 !important;
+	}
+	#simply-about .simply-toolbar-section button {
+		border: 1px solid #eee;
+		background-color: white;
+		height: 50px;
+		width: 50px;
+		font-family: inherit;
+		font-size: 20px;
+	}
+	#simply-about .simply-toolbar-section button.simply-about-muze {
+		font-size: 1em;
+		display: inline;
+		color: #888;
+		padding: 0;
+		background-color: transparent;
+		border: 0;
+		height: auto;
+		width: auto;
+		box-shadow: 0 0 0;
+	}
+	#simply-about button.simply-about-muze:hover {
+		text-decoration: underline;
+	}
+	#simply-about .simply-toolbar-section button {
+		width: auto;
+		font-size: 1em;
+		color: #333;
+		height: auto;
+		padding: 5px;
+		border-radius: 3px;
+		box-shadow: 2px 2px 3px #666;
+	}
+	#simply-about img.simply-logo {
+		display: block;
+	}
+	#simply-about-header {
+		width: 50%;
+		max-width: 400px;
+		text-align: center;
+		margin: 20px auto 10px auto;
+	}
+	#simply-about-footer {
+		position: absolute;
+		bottom: 0;
+		font-size: 0.8em;
+		color: #888;
+		text-align: center;
+		width: 100%;
+	}
+	#simply-about-info {
+		margin-top: 20px;
+		padding: 0 20px;
+	}
+	#simply-about-upgrade {
+		visibility: hidden;
+	}
+	#simply-about-info,
+	#simply-about-key-valid {
+		text-align: center;
+	}
+	#simply-about .simply-label {
+		display: block;
+	}
+	#simply-about .simply-info {
+		display: block;
+		padding: 5px;
+		border-radius: 3px;
+		background-color: white;
+	}
+	#simply-about-key-info {
+		margin: 0 20px;
+	}
+	#simply-about-key {
+		margin-bottom: 10px;
+	}
+</style>
+<script>
+	editor.plugins.about = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-about'));
+				// fetch key info
+				var result = muze.load('https://api.simplyedit.io/0/keys/'+editor.apiKey)
+				.onload(function(result) {
+					var info = JSON.parse(result);
+					var keyEl = document.querySelector('#simply-about-key .simply-info');
+					var hostsEl = document.querySelector('#simply-about-key-domains .simply-info');
+					keyEl.innerHTML = info['key'];
+					hostsEl.innerHTML = info['hosts'].join(', ');
+					document.getElementById('simply-about-version').innerHTML = 'Version '+editor.version;
+					var majorVersion = parseInt(editor.version.split('.')[0]);
+					var latestVersion = parseInt(info['latest-version'].split('.')[0]);
+					if ( info['expire'] ) {
+						var ExpireDate = new Date(info['expire']*1000);
+						var now = new Date();
+						var diff= ExpireDate.getTime() - now.getTime();
+						if ( diff < 0 ) {
+							validEl.innerHTML = 'Your trial key has expired.';
+							validEl.style.display = 'block';
+							document.getElementById('simply-buy-button').style.display = 'block';
+						} else {
+							var diffDays = Math.floor( diff / ( 1000 * 3600 * 24 ) );
+							var validEl = document.getElementById('simply-about-key-valid');
+							validEl.innerHTML = 'Your trial key expires in '+diffDays+' days.';
+							validEl.style.display = 'block';
+							document.getElementById('simply-buy-button').style.display = 'inline-block';
+						}
+					} else if ( majorVersion < latestVersion ) {
+						// upgrade possible
+						document.getElementById('simply-about-key-upgrade').innerHTML = 'Version '+info['latest-version']+' is available now';
+						document.getElementById('simply-about-key-upgrade').style.display = 'block';
+						document.getElementById('simply-buy-button').style.display = 'inline-block';
+					} else {
+						document.getElementById('simply-about-key-upgrade').innerHTML = 'This is the latest version.';
+						document.getElementById('simply-about-key-upgrade').style.display = 'block';
+						
+					}
+
+					console.log('hiero');
+				});
+			}
+		}
+	};
+
+	editor.addAction("simply-about", editor.plugins.about.dialog.open);
+	editor.addAction("simply-help", function() {
+		window.open('https://simplyedit.io/help.html');
+	});
+	editor.addAction("simply-about-key", function() {})
+</script>
