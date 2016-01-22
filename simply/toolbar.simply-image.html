@@ -42,7 +42,11 @@
 			<div><label>URL</label><input type="text" class="simply-hyperlink-href" data-simply-action="simply-hyperlink-href"></div>
 			<div><label>Title</label><input type="text" class="simply-hyperlink-title" data-simply-action="simply-hyperlink-title"></div>
 			<div><label>Name</label><input type="text" class="simply-hyperlink-name" data-simply-action="simply-hyperlink-name"></div>
-			<div><button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button></div>
+			<div>
+				<button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button>
+				<button class="simply-hyperlink-newwindow" data-simply-action="simply-hyperlink-newwindow"><i class="fa fa-external-link"></i>New window</button>
+				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
+			</div>
 		</div>
 		<div class="simply-toolbar-section simply-clipboard">
 			<ul>
@@ -217,6 +221,20 @@
 				} else {
 					hyperlinkNofollow.classList.remove("simply-selected");
 				}
+
+				var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+				if (hyperlinkUnlink) {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
+				}
+
+				var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
+				if (hyperlinkTargetBlank) {
+					if (tempNode.getAttribute("target") && tempNode.getAttribute("target").match(/_blank/)) {
+						hyperlinkTargetBlank.classList.add("simply-selected");
+					} else {
+						hyperlinkTargetBlank.classList.remove("simply-selected");
+					}
+				}
 			} else {
 				simply.widgets.properties.set(toolbar.querySelector(".simply-hyperlink-href"), '');
 				simply.widgets.properties.set(toolbar.querySelector('.simply-hyperlink-title'), '');
@@ -225,6 +243,16 @@
 				var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
 				if (hyperlinkNofollow) {
 					hyperlinkNofollow.classList.remove("simply-selected");
+				}
+
+				var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+				if (hyperlinkUnlink) {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "none";
+				}
+
+				var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
+				if (hyperlinkTargetBlank) {
+					hyperlinkTargetBlank.classList.remove("simply-selected");
 				}
 			}
 
@@ -245,27 +273,26 @@
 			if (typeof config === "object" && toolbar) {
 				// Init block classes
 				if (config.class) {
-					var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-image-class');
-					if (classSection) {
+					var classSections = document.querySelectorAll('div.simply-toolbar-section.simply-image-class');
+					for (var i=0; i<classSections.length; i++) {
 						if (config.class.length) {
-							classSection.innerHTML = '';
-							for (var i=0; i<config.class.length; i++) {
-								if (config.class[i].length) {
-									var classList = config.class[i].slice();
+							classSections[i].innerHTML = '';
+							for (var j=0; j<config.class.length; j++) {
+								if (config.class[j].length) {
+									var classList = config.class[j].slice();
 									classList.push({class: "none", name: "Default", icon: "fa-times"});
 									var list = document.createElement("UL");
 									list.setAttribute("data-type", "simply-buttongroup-radio");
-									for (var j=0; j<classList.length; j++) {
+									for (var k=0; k<classList.length; k++) {
 										var item = document.createElement("li");
 										var button = document.createElement("button");
-										button.setAttribute("data-value", classList[j].class);
+										button.setAttribute("data-value", classList[k].class);
 										button.setAttribute("data-simply-action", "simply-image-class");
-										button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+										button.innerHTML = "<i class='fa " + classList[k].icon + "'></i>" + classList[k].name;
 										item.appendChild(button);
 										list.appendChild(item);
 									}
-
-									classSection.appendChild(list);
+									classSections[i].appendChild(list);
 								}
 							}
 						}
@@ -337,6 +364,7 @@
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					}
 					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, newValue);
+					hopeEditor.update();
 				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
 					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
 					for (var i=0; i<buttons.length; i++) {
@@ -346,8 +374,6 @@
 						hopeEditor.field.classList.add(el.getAttribute("data-value"));
 					}
 				}
-
-				hopeEditor.update();
 			},
 			"simply-image-type" : function() {
 				vdSetImage();

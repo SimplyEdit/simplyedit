@@ -1,4 +1,4 @@
-<section id="simply-file-browse" class="simply-dialog">
+<section id="simply-file-browse" class="simply-dialog simply-modal">
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
 			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
@@ -9,38 +9,6 @@
 	</div>
 </section>
 <style type="text/css">
-	#simply-file-browse {
-		top: 50%;
-		height: 400px;
-		max-height: 80%;
-		margin-top: -200px;
-		left: 50%;
-		margin-left: -235px;
-		background-color: #EEE;
-		padding-top: 61px;
-		box-sizing: border-box;
-	}
-	#simply-file-browse.fullscreen {
-		top: 0px;
-		bottom: 0px;
-		left: 0px;
-		right: 0px;
-		max-width: 100%;
-		max-height: 100%;
-		height: auto;
-		width: auto;
-		margin-left: 0px;
-		margin-top: 0px;
-	}
-	#simply-file-browse .simply-dialog-body {
-		overflow-y: scroll;
-		padding: 0px;
-		width: 470px;
-		padding-left: 2px;
-	}
-	#simply-file-browse.fullscreen .simply-dialog-body {
-		width: 100%;
-	}
 	#simply-file-browse .simply-dialog-body button {
 		border: 1px solid #eee;
 		background-color: white;
@@ -75,24 +43,6 @@
 	}
 
 	@media (max-width: 481px) {
-		#simply-file-browse {
-			top: 0px;
-			bottom: 0px;
-			left: 0px;
-			right: 0px;
-			max-width: 100%;
-			max-height: 100%;
-			height: auto;
-			width: auto;
-			margin-left: 0px;
-			margin-top: 0px;
-		}
-		#simply-file-browse [data-simply-action="simply-file-browse-fullscreen"] {
-			display: none;
-		}
-		#simply-file-browse .simply-dialog-body {
-			max-width: 100%;
-		}
 		#simply-file-browse .simply-dialog-body button {
 			width: 50%;
 		}
@@ -112,18 +62,6 @@
 
 				vdSelectionState.save(editor.plugins.fileBrowse.currentSel);
 				editor.plugins.dialog.open(document.getElementById('simply-file-browse'), editor.plugins.fileBrowse.dialog.update);
-			},
-			fullscreen : function() {
-				var fullscreen = document.querySelector("[data-simply-action=simply-file-browse-fullscreen]");
-				if (document.getElementById('simply-file-browse').classList.contains("fullscreen")) {
-					fullscreen.classList.remove("simply-selected");
-					document.getElementById('simply-file-browse').classList.remove("fullscreen");
-					document.body.classList.remove("simply-overflow-hidden");
-				} else {
-					fullscreen.classList.add("simply-selected");
-					document.getElementById('simply-file-browse').classList.add("fullscreen");
-					document.body.classList.add("simply-overflow-hidden");
-				}
 			},
 			loadFiles : function(url) {
 				var targetList = document.querySelector("#simply-file-browse .simply-dialog-body");
