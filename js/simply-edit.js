@@ -15,7 +15,11 @@
 		var scriptURL = document.createElement('a');
 		scriptURL.href = scriptEl.src;
 		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
-		return scriptURL.protocol + '//' + scriptURL.host + scriptURL.pathname;
+		var host = scriptURL.host;
+		if ( host.substr(-1) != '/' ) {
+			host += '/';
+		}
+		return scriptURL.protocol + '//' + host + scriptURL.pathname;
 	};
 	var editor = {
 		version: '0.3.0',
