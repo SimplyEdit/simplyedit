@@ -27,41 +27,43 @@
 			if (el.getAttribute("disabled")) {
 				return true;
 			}
-			if ( !section ) {
-				var sections = toolbar.querySelectorAll('.simply-toolbar-section.simply-selected, .simply-toolbar-status');
-				for ( i=0, l=sections.length; i<l; i++ ) {
-					sections[i].className = sections[i].className.replace(/\bsimply-selected\b/,'');
-				}
-				selectedSectionButtons = toolbar.querySelectorAll('ul.simply-buttons button.simply-selected');
-				for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
-					selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bsimply-selected\b/,'');
-				}
-				if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
-					el.className += ' simply-selected';
-					var rel = el.dataset.simplySection;
-					if ( rel ) {
-						var target = toolbar.querySelector('.simply-toolbar-section.' + rel );
-						if ( target ) {
-							target.className += ' simply-selected';
-							var focusTarget = target.querySelector("input,button,select");
-							if (focusTarget) {
-								focusTarget.focus();
+			if ( toolbar ) {
+				if ( !section ) {
+					var sections = toolbar.querySelectorAll('.simply-toolbar-section.simply-selected, .simply-toolbar-status');
+					for ( i=0, l=sections.length; i<l; i++ ) {
+						sections[i].className = sections[i].className.replace(/\bsimply-selected\b/,'');
+					}
+					selectedSectionButtons = toolbar.querySelectorAll('ul.simply-buttons button.simply-selected');
+					for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
+						selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bsimply-selected\b/,'');
+					}
+					if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
+						el.className += ' simply-selected';
+						var rel = el.dataset.simplySection;
+						if ( rel ) {
+							var target = toolbar.querySelector('.simply-toolbar-section.' + rel );
+							if ( target ) {
+								target.className += ' simply-selected';
+								var focusTarget = target.querySelector("input,button,select");
+								if (focusTarget) {
+									focusTarget.focus();
+								}
 							}
+						}
+					} else {
+						var status = toolbar.querySelectorAll('.simply-toolbar-status')[0];
+						if ( status ) {
+							status.className += ' simply-selected';
 						}
 					}
 				} else {
-					var status = toolbar.querySelectorAll('.simply-toolbar-status')[0];
-					if ( status ) {
-						status.className += ' simply-selected';
+					selectedSectionButtons = section.querySelectorAll('.simply-selected');
+					for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
+						selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bsimply-selected\b/,'');
 					}
-				}
-			} else {
-				selectedSectionButtons = section.querySelectorAll('.simply-selected');
-				for ( i=0, l=selectedSectionButtons.length; i<l; i++ ) {
-					selectedSectionButtons[i].className = selectedSectionButtons[i].className.replace(/\bsimply-selected\b/,'');
-				}
-				if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
-					el.className += ' simply-selected';
+					if ( !selectedSectionButtons[0] || el != selectedSectionButtons[0] ) {
+						el.className += ' simply-selected';
+					}
 				}
 			}
 		},

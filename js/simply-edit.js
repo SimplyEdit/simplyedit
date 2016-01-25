@@ -18,7 +18,9 @@
 		return scriptURL.protocol + '//' + scriptURL.host + scriptURL.pathname;
 	};
 	var editor = {
-	        baseURL : getBaseURL(),
+		version: '0.3.0',
+		apiKey : apiKey,
+        baseURL : getBaseURL(),
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -1640,7 +1642,8 @@
 			editor.baseURL + "simply/plugin.simply-symbol.html",
 			editor.baseURL + "simply/plugin.simply-paste.html",
 			editor.baseURL + "simply/plugin.simply-undo-redo.html",
-			editor.baseURL + "simply/plugin.simply-keyboard.html"
+			editor.baseURL + "simply/plugin.simply-keyboard.html",
+			editor.baseURL + "simply/plugin.simply-about.html"
 		],
 		profile : 'beta'
 	});
