@@ -10,17 +10,19 @@
 	}
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
-	var getBaseURL = function() {
-		var scriptEl = (typeof document.currentScript != 'undefined' ? document.currentScript : document.getElementById('SimplyEditScript'));
+	var scriptEl = (typeof document.currentScript != 'undefined' ? document.currentScript : document.getElementById('SimplyEditScript'));
+
+	var getBaseURL = function(url) {
 		var scriptURL = document.createElement('a');
-		scriptURL.href = scriptEl.src;
+		scriptURL.href = url;
 		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
-		return scriptURL.href; //protocol + '//' + host + scriptURL.pathname;
+		return scriptURL.href;
 	};
+
 	var editor = {
 		version: '0.3.0',
 		apiKey : apiKey,
-        baseURL : getBaseURL(),
+        baseURL : getBaseURL(scriptEl.src),
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
