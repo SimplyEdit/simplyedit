@@ -69,7 +69,7 @@
 			top: 16px;
 			left: 5px;
 			z-index: 10;
-			width: 50px;
+			max-width: 50px; /* IE doesn't seem to like width on svg images */
 		}
 		.simply-toolbar {
 			font-family: arial;
