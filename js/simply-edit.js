@@ -10,15 +10,19 @@
 	}
 	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
 	
-	var getBaseURL = function() {
-		var scriptEl = (typeof document.currentScript != 'undefined' ? document.currentScript : document.getElementById('SimplyEditScript'));
+	var scriptEl = (typeof document.currentScript != 'undefined' ? document.currentScript : document.getElementById('SimplyEditScript'));
+
+	var getBaseURL = function(url) {
 		var scriptURL = document.createElement('a');
-		scriptURL.href = scriptEl.src;
+		scriptURL.href = url;
 		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
-		return scriptURL.protocol + '//' + scriptURL.host + scriptURL.pathname;
+		return scriptURL.href;
 	};
+
 	var editor = {
-	        baseURL : getBaseURL(),
+		version: '0.3.0',
+		apiKey : apiKey,
+        baseURL : getBaseURL(scriptEl.src),
 		data : {
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
@@ -619,6 +623,11 @@
 						field.hopeRenderedSource = document.createElement("DIV");
 						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 						field.hopeEditor.field = field;
+						field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+							window.setTimeout(function() {
+								this.hopeEditor.needsUpdate = true;
+							}, 300);
+						});
 					}
 				},
 				"i.fa" : {
@@ -705,6 +714,11 @@
 				field.hopeRenderedSource = document.createElement("DIV");
 				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 				field.hopeEditor.field = field;
+				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+					window.setTimeout(function() {
+						this.hopeEditor.needsUpdate = true;
+					}, 300);
+				});
 			}
 		},
 		loadBaseStyles : function() {
@@ -880,39 +894,10 @@
 				document.body.addEventListener("dragover", function(evt) {
 					evt.preventDefault();
 				});
-				document.body.addEventListener("drop", function(evt) {
-					if (evt.dataTransfer.files.length) {
-						console.log("received " + evt.dataTransfer.files.length + " files");
-					}
-					var target = evt.target;
-					if (target.tagName.toLowerCase() == "img" && target.getAttribute("data-simply-field")) {
-						console.log("image drop");
-						return;
-						/*
-							removed for now, reinstate when the storage layer knows how to store images
-						
-						var imageData = event.dataTransfer.getData("text/html");
-
-						var container = document.createElement("DIV");
-						container.innerHTML = imageData;
-						var image = container.querySelector("img");
-						if (image && image.getAttribute("src")) {
-							target.src = image.getAttribute("src");
-						}
-						*/
-					}
-
-					evt.preventDefault();
-				});
-
-				var listDropHandler = function(evt) {
-					console.log("list drop");
-				};
 
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				for (i=0; i<dataLists.length; i++) {
 					dataLists[i].setAttribute("data-simply-selectable", true);
-					dataLists[i].addEventListener("drop", listDropHandler, true);
 				}
 
 				var handleDblClick = function(evt) {
@@ -1035,8 +1020,11 @@
 				return false;
 			},
 			stop : function() {
-				editor.storage.disconnect();
-				document.location.href = document.location.href.split("#")[0];
+				editor.storage.disconnect(
+					function() {
+						document.location.href = document.location.href.split("#")[0];
+					}
+				);
 			},
 			toolbarMonitor : function() {
 				var target = document.querySelector('#simply-main-toolbar');
@@ -1054,7 +1042,6 @@
 						style.id = "simply-body-top";
 						document.head.appendChild(style);
 					}
-
 					if (document.getElementById("simply-main-toolbar")) {
 						var toolbarHeight = document.getElementById("simply-main-toolbar").offsetHeight;
 						style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
@@ -1071,6 +1058,38 @@
 				observer.observe(target, config);
 
 				window.setTimeout(setBodyTop, 100);
+			}
+		},
+		responsiveImages : {
+			sizes : {},
+			init : function(target) {
+				var images = target.querySelectorAll("img[data-simply-src]");
+
+				var width = window.innerWidth;
+
+				for (var i=0; i<images.length; i++) {
+					imageSrc = images[i].getAttribute("data-simply-src");
+					var srcSet = [];
+					for (var size in editor.responsiveImages.sizes) {
+						srcSet.push(imageSrc + editor.responsiveImages.sizes[size] + " " + size);
+					}
+
+					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / width));
+					if (sizeRatio > 0) {
+						images[i].setAttribute("sizes", sizeRatio + "vw");
+					}
+					images[i].setAttribute("srcset", srcSet.join(", "));
+					images[i].setAttribute("src", imageSrc);
+				}
+			},
+			resizeHandler : function() {
+				var images = document.querySelectorAll("img[data-simply-src][sizes]");
+				for (var i=0; i<images.length; i++) {
+					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / window.innerWidth));
+					if (sizeRatio > 0) {
+						images[i].setAttribute("sizes", sizeRatio + "vw");
+					}
+				}
 			}
 		}
 	};
@@ -1122,22 +1141,62 @@
 				this.list = storage.default.list;
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
-
+				this.disconnect = storage.default.disconnect;
 				this.endpoint = endpoint;
+
+				editor.responsiveImages.sizes = {
+					"1200w" : "?size=1200",
+					"800w" : "?size=800",
+					"640w" : "?size=640",
+					"480w" : "?size=480",
+					"320w" : "?size=320",
+					"160w" : "?size=160",
+					"80w" : "?size=80"
+				};
+			},
+			file : {
+				save : function(path, data, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("PUT", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+					http.upload.onprogress = function (event) {
+						if (event.lengthComputable) {
+							var complete = (event.loaded / event.total * 100 | 0);
+							var progress = document.querySelector("progress[data-simply-progress='" + path + "']");
+							if (progress) {
+								progress.value = progress.innerHTML = complete;
+							}
+						}
+					};
+
+					http.send(data);
+				},
+				delete : function(path, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("DELETE", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+
+					http.send();
+				}
 			},
 			save : function(data, callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data.json";
-
-				http.open("PUT", url, true);
-				http.withCredentials = true;
-
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback();
-					}
-				};
-				http.send(data);
+				return editor.storage.file.save("data.json", data, callback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
@@ -1155,10 +1214,6 @@
 			},
 			connect : function() {
 				return true;
-			},
-			disconnect : function() {
-				delete editor.storage.key;
-				delete localStorage.storageKey;
 			}
 		},
 		github : {
@@ -1253,9 +1308,10 @@
 					return editor.storage.connect();
 				}
 			},
-			disconnect : function() {
+			disconnect : function(callback) {
 				delete this.repo;
 				delete localStorage.storageKey;
+				callback();
 			},
 			validateKey : function(key) {
 				return true;
@@ -1399,9 +1455,21 @@
 			connect : function() {
 				return true;
 			},
-			disconnect : function() {
+			disconnect : function(callback) {
 				delete editor.storage.key;
 				delete localStorage.storageKey;
+
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "logout";
+				http.open("OPTIONS", url, true, "logout", (new Date()).getTime().toString());
+				http.setRequestHeader("Authorization", "Basic ABCDEF");
+
+				http.onreadystatechange = function() {//Call a function when the state changes.
+					if(http.readyState == 4 && http.status == 401) {
+						callback();
+					}
+				};
+				http.send();
 			},
 			sitemap : function() {
 				var output = {
@@ -1640,7 +1708,8 @@
 			editor.baseURL + "simply/plugin.simply-symbol.html",
 			editor.baseURL + "simply/plugin.simply-paste.html",
 			editor.baseURL + "simply/plugin.simply-undo-redo.html",
-			editor.baseURL + "simply/plugin.simply-keyboard.html"
+			editor.baseURL + "simply/plugin.simply-keyboard.html",
+			editor.baseURL + "simply/plugin.simply-about.html"
 		],
 		profile : 'beta'
 	});

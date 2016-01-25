@@ -709,7 +709,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		if ( !position ) {
 			position = 1;
 		}
-		range = hope.range.create(position-1, position);
+		range = hope.range.create(position, position);
 		var matches = [];
 		for ( var i=0, l=this.list.length; i<l; i++ ) {
 			if ( this.list[i].range.overlaps( range ) ) {

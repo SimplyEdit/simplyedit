@@ -69,7 +69,7 @@
 			top: 16px;
 			left: 5px;
 			z-index: 10;
-			width: 50px;
+			max-width: 50px; /* IE doesn't seem to like width on svg images */
 		}
 		.simply-toolbar {
 			font-family: arial;
@@ -128,7 +128,6 @@
 			margin-right: 4px;
 		}
 		.simply-toolbar li {
-			xdisplay: inline-block;
 			position: relative;
 			float: left;
 		}
@@ -439,9 +438,6 @@
 		.simply-clipboard {
 			display: none;
 		}
-		.simply-context-html {
-			xdisplay: none;
-		}
 		#editorPane, #vdMetaDataSlide {
 			-webkit-overflow-scrolling: touch !important;
 		}
@@ -670,9 +666,9 @@
 .simply-dialog.simply-modal .simply-dialog-body {
 	overflow-y: scroll;
 	position: absolute;
-	top: 66px;
+	top: 60px;
 	bottom: 0px;
-	padding: 5px;
+	padding: 11px 5px;
 	width: 100%;
 	box-sizing: border-box;
 }
@@ -683,7 +679,7 @@
 	bottom: 0px;
 }
 .simply-dialog-body:nth-child(2):nth-last-child(2) {
-	bottom: 66px;
+	bottom: 60px;
 }
 
 .simply-dialog .simply-toolbar:first-child {
