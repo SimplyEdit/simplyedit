@@ -707,11 +707,12 @@
 			}
 			var field = editor.node.getEditableField();
 			hopeEditor = field.hopeEditor;
+			editor.context.fixSelection();
 			if ((typeof hopeEditor !== "undefined") && hopeEditor.needsUpdate) {
+				hopeEditor.selection.updateRange();
 				hopeEditor.parseHTML();
 				hopeEditor.needsUpdate = false;
 			}
-			editor.context.fixSelection();
 			editor.context.show();
 			vdHtmlContextStack = editor.context.getTagStack();
 
@@ -884,9 +885,6 @@
 			}
 		});
 		muze.event.attach( document, 'keyup', function(evt) {
-			if (evt && evt.type == "keyup" && evt.target && evt.target.hopeEditor) {
-				evt.target.hopeEditor.needsUpdate = true;
-			}
 			editor.context.update();
 		});
 		muze.event.attach( document, 'mouseup', function() {
