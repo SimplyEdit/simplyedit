@@ -40,6 +40,7 @@
 		},
 		undo : function() {
 			editor.plugins.undoRedo.undoing = true;
+			editor.context.toolbar.hide = true;
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo - 1];
 			if (typeof undoStep !== "undefined") {
 				if (!undoStep.target.undoSaved) {
@@ -64,6 +65,7 @@
 		},
 		redo : function() {
 			editor.plugins.undoRedo.undoing = true;
+			editor.context.toolbar.hide = true;
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo + 1];
 			if (typeof undoStep !== "undefined") {
 				if (undoStep.target.getAttribute("data-simply-list")) {
