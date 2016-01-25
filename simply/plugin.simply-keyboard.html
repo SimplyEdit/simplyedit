@@ -9,8 +9,13 @@
 				event.preventDefault();
 			}
 		} else if (key == 27) { // ESC
-			editor.context.toolbar.hide = true;
-			editor.context.update();
+			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-close']");
+			if (target) {
+				muze.event.fire(target, "click");
+			} else {
+				editor.context.toolbar.hide = true;
+				editor.context.update();
+			}
 			event.preventDefault();
 		} else if (key == 73 && event.ctrlKey) { // Ctrl-I
 			if (typeof editor.actions["simply-text-italic"] === "function") {
@@ -31,6 +36,15 @@
 				event.preventDefault();
 			}
 		} else if (key == 32 && event.ctrlKey) { // Ctrl-space
+			var activeDialog = document.querySelector(".simply-dialog.active");
+			if (activeDialog) {
+				var firstButton = activeDialog.querySelector("button");
+				if (firstButton) {
+					firstButton.focus();
+				}
+				return;
+			}
+
 			editor.context.toolbar.hide = false;
 			editor.context.update();
 			var activeToolbar = document.querySelector(".simply-section.active");
@@ -132,6 +146,12 @@
 				}
 			} else {
 				editor.context.toolbar.hide = true;
+			}
+		} else if (key == 13 && event.altKey) {
+			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-fullscreen']");
+			if (target) {
+				muze.event.fire(target, "click");
+				event.preventDefault();
 			}
 		} else {
 			var target = this.querySelector('.simply-section.active :focus');

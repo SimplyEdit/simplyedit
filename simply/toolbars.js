@@ -100,7 +100,6 @@
 		},
 		init : function(toolbar) {
 			toolbar.addEventListener("click", function(evt) {
-				evt.preventDefault();
 				var el = evt.target;
 				while (el != this && el.tagName.toLowerCase() != "button") {
 					el = el.parentNode;
@@ -127,6 +126,9 @@
 
 					evt.target.blur();
 					editor.toolbar.handleButton(el);
+
+					evt.preventDefault();
+
 				}
 			});
 

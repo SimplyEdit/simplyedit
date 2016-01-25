@@ -128,7 +128,6 @@
 			margin-right: 4px;
 		}
 		.simply-toolbar li {
-			xdisplay: inline-block;
 			position: relative;
 			float: left;
 		}
@@ -439,9 +438,6 @@
 		.simply-clipboard {
 			display: none;
 		}
-		.simply-context-html {
-			xdisplay: none;
-		}
 		#editorPane, #vdMetaDataSlide {
 			-webkit-overflow-scrolling: touch !important;
 		}
@@ -672,7 +668,7 @@
 	position: absolute;
 	top: 60px;
 	bottom: 0px;
-	padding: 5px;
+	padding: 11px 5px;
 	width: 100%;
 	box-sizing: border-box;
 }
