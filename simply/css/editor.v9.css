@@ -670,7 +670,7 @@
 .simply-dialog.simply-modal .simply-dialog-body {
 	overflow-y: scroll;
 	position: absolute;
-	top: 66px;
+	top: 60px;
 	bottom: 0px;
 	padding: 5px;
 	width: 100%;
@@ -683,7 +683,7 @@
 	bottom: 0px;
 }
 .simply-dialog-body:nth-child(2):nth-last-child(2) {
-	bottom: 66px;
+	bottom: 60px;
 }
 
 .simply-dialog .simply-toolbar:first-child {

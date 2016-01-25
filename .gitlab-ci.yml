@@ -1,4 +1,4 @@
-image: muze/phantomjs:v4
+image: muze/phantomjs:latest
 
 before_script:
   - apt-get update
