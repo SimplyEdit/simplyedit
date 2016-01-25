@@ -621,6 +621,11 @@
 						field.hopeRenderedSource = document.createElement("DIV");
 						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 						field.hopeEditor.field = field;
+						field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+							window.setTimeout(function() {
+								this.hopeEditor.needsUpdate = true;
+							}, 300);
+						});
 					}
 				},
 				"i.fa" : {
@@ -707,6 +712,11 @@
 				field.hopeRenderedSource = document.createElement("DIV");
 				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 				field.hopeEditor.field = field;
+				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+					window.setTimeout(function() {
+						this.hopeEditor.needsUpdate = true;
+					}, 300);
+				});
 			}
 		},
 		loadBaseStyles : function() {

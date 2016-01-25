@@ -708,6 +708,11 @@
 			var field = editor.node.getEditableField();
 			hopeEditor = field.hopeEditor;
 			editor.context.fixSelection();
+			if ((typeof hopeEditor !== "undefined") && hopeEditor.needsUpdate) {
+				hopeEditor.selection.updateRange();
+				hopeEditor.parseHTML();
+				hopeEditor.needsUpdate = false;
+			}
 			editor.context.show();
 			vdHtmlContextStack = editor.context.getTagStack();
 
@@ -879,7 +884,9 @@
 				editor.context.update();
 			}
 		});
-		muze.event.attach( document, 'keyup', editor.context.update );
+		muze.event.attach( document, 'keyup', function(evt) {
+			editor.context.update();
+		});
 		muze.event.attach( document, 'mouseup', function() {
 			editor.context.toolbar.hide = false;
 			editor.context.update();

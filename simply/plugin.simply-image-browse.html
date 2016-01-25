@@ -155,7 +155,7 @@
 							editor.plugins.imageBrowse.dialog.updateToolbar();
 						});
 					}
-					new Slip(targetList);
+					new Slip(targetList); // slip is used for the tap-hold timing;
 				});
 			},
 			update : function() {
@@ -226,6 +226,7 @@
 			}
 
 			if (editor.storage.file && typeof editor.storage.file.delete === "function") {
+				// Do nothing;
 			} else {
 				var deleteButton = document.querySelector('[data-simply-action="simply-image-browse-delete"]');
 				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);

@@ -397,7 +397,7 @@ QUnit.module("editor text selection");
 
 	QUnit.test("block style over multiple blocks", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = "<p>Hello</p>world<p>Is it big out there?</p>";
+		testContent.innerHTML = "<p>Hello</p>world<p>Is it still big out there?</p>";
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2);
@@ -405,7 +405,7 @@ QUnit.module("editor text selection");
 
 		editor.actions['simply-text-blockstyle']('h1');
 
-		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> big out there?</p>');
+		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> still big out there?</p>');
 	});
 
 	QUnit.test("strong within multiple list items", function(assert) {
