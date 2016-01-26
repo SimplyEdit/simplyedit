@@ -579,8 +579,8 @@
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
-						data['data-simply-src'] = data['src'];
-						delete(data['src']);
+						data['data-simply-src'] = data.src;
+						delete(data.src);
 						editor.field.defaultSetter(field, data);
 						editor.responsiveImages.initImage(field);
 					},
