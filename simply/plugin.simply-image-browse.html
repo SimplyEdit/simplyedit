@@ -266,6 +266,9 @@
 			} else {
 				var uploadButton = document.querySelector('[data-simply-action="simply-image-browse-upload"]');
 				uploadButton.parentNode.parentNode.removeChild(uploadButton.parentNode);
+
+				var addButton = document.querySelector('[data-simply-action="simply-image-browse-add-folder"]');
+				addButton.parentNode.parentNode.removeChild(addButton.parentNode);
 			}
 
 			if (editor.storage.file && typeof editor.storage.file.delete === "function") {
@@ -411,9 +414,13 @@
 			this.value = this.value.replace(/[^A-Za-z0-9_\.-]/g, '');
 		});
 
-		addInput.addEventListener("keypress", function(evt) {
+		addInput.addEventListener("keydown", function(evt) {
 			if (evt.keyCode == 13) { // enter
 				muze.event.fire(addSubmit, "click");
+				evt.stopPropagation();
+			} else if (evt.keyCode == 27) { // ESC
+				muze.event.fire(addCancel, "click");
+				evt.stopPropagation();
 			}
 		});
 
