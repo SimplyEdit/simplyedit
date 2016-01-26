@@ -5333,11 +5333,12 @@ simply.widgets.properties = ( function() {
 			}
 
 			if (input) {
+				var inputType = input.type;
 				if (!input.type && input.getAttribute("data-type")) {
-					input.type = input.getAttribute("data-type");
+					inputType = input.getAttribute("data-type");
 				}
 
-				switch (input.type) {
+				switch (inputType) {
 					case 'checkbox' :
 						if (input.checked) {
 							value=input.value;
@@ -5399,11 +5400,12 @@ simply.widgets.properties = ( function() {
 				input = id;
 			}
 			if (input) {
+				var inputType = input.type;
 				if (!input.type && input.getAttribute("data-type")) {
-					input.type = input.getAttribute("data-type");
+					inputType = input.getAttribute("data-type");
 				}
 				self.enable(id);
-				switch (input.type) {
+				switch (inputType) {
 					case 'checkbox' :
 						if (input.value==value) {
 							input.checked=true;
