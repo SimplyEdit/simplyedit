@@ -2,7 +2,6 @@
 	<h1>HTML Image Toolbar</h1>
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
-			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
 			<li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
 			<li><button data-simply-section="simply-image-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-clipboard" class="simply-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
@@ -11,13 +10,6 @@
 			<li><button data-simply-section="simply-code" data-simply-action="simply-edit-source"><i class="fa fa-code"></i>Code</button></li>
 			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
 		</ul>
-		<div class="simply-toolbar-section simply-image-style">
-			<div>
-				<label>Format</label><select class="simply-image-type" data-simply-action="simply-image-type">
-					<option value="">Original</option>
-				</select>
-			</div>
-		</div>
 		<div class="simply-toolbar-section simply-image-class">
 		</div>
 		<div class="simply-toolbar-section simply-image-align">
@@ -62,17 +54,9 @@
 	<h1>HTML Image Toolbar</h1>
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
-			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
 			<li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
 			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
 		</ul>
-		<div class="simply-toolbar-section simply-image-style">
-			<div>
-				<label>Format</label><select class="simply-image-type" data-simply-action="simply-image-type">
-					<option value="">Original</option>
-				</select>
-			</div>
-		</div>
 		<div class="simply-toolbar-section simply-image-class">
 		</div>
 		<div class="simply-toolbar-section simply-image-properties">
@@ -127,7 +111,7 @@
 
 				sel.removeAllRanges();
 				sel.addRange(range);
-				vdSelection.selectNode(image);
+				return image;
 			} else {
 				sel.removeAllRanges();
 			}
@@ -155,12 +139,6 @@
 
 			var annotation = hopeEditor.fragment.has(range, "img");
 			
-			var type=image.getAttribute('data-simply-image-type');
-			if (!type || type=='undefined') {
-				// type='Origineel'; // FIXME: gewoon de eerste in de lijst selecteren?
-				type = toolbar.querySelectorAll(".simply-image-type option")[0].value;
-			}
-			simply.widgets.properties.set(toolbar.querySelector('.simply-image-type'),type);
 
 			var alt=image.getAttribute('alt');
 			simply.widgets.properties.set(toolbar.querySelector('.simply-image.alt'),alt);
@@ -300,35 +278,6 @@
 				}
 			}
 
-			vdSetImage = function() {
-				var range = hopeEditor.currentRange;
-				var annotation = hopeEditor.fragment.has(range, "img");
-				var type=simply.widgets.properties.get(toolbar.querySelector(".simply-image-type"));
-
-				if (annotation) {
-					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
-
-					if (type) {
-						tempNode.setAttribute('data-simply-image-type',type);
-					} else {
-						tempNode.removeAttribute('data-simply-image-type');
-					}
-
-					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
-					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
-					hopeEditor.update();
-					editor.plugins.image.reselect();
-					vdStoreUndo();
-				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
-					if (type) {
-						hopeEditor.field.setAttribute('data-simply-image-type',type);
-					} else {
-						hopeEditor.field.removeAttribute('data-simply-image-type');
-					}
-				}
-			};
-
-
 			// Disable user zoom, because it will zoom extremely weird when you select an image on android devices;
 			var viewportMeta = document.head.querySelector("meta[name=viewport]");
 			if (!viewportMeta) {
@@ -365,6 +314,10 @@
 					}
 					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, newValue);
 					hopeEditor.update();
+					var imageNode = editor.plugins.image.reselect();
+					if (imageNode) {
+						editor.responsiveImages.initImage(imageNode);
+					}
 				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
 					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
 					for (var i=0; i<buttons.length; i++) {
@@ -373,10 +326,8 @@
 					if (el.getAttribute("data-value") !== "none") {
 						hopeEditor.field.classList.add(el.getAttribute("data-value"));
 					}
+					editor.responsiveImages.initImage(hopeEditor.field);
 				}
-			},
-			"simply-image-type" : function() {
-				vdSetImage();
 			},
 			"simply-image-delete" : function() {
 				var range = hopeEditor.currentRange;
@@ -436,23 +387,28 @@
 
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
+
 				if (annotation) {
 					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
 					if (value) {
-						tempNode.setAttribute("src", value);
+						tempNode.setAttribute("data-simply-src", value);
 					} else {
-						tempNode.setAttribute("src", editor.plugins.image.placeholder());
+						tempNode.setAttribute("data-simply-src", editor.plugins.image.placeholder());
 					}
 					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
 					hopeEditor.update();
-					editor.plugins.image.reselect();
+					var imageNode = editor.plugins.image.reselect();
+					if (imageNode) {
+						editor.responsiveImages.initImage(imageNode);
+					}
 				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
 					if (value) {
-						hopeEditor.field.setAttribute("src", value);
+						hopeEditor.field.setAttribute("data-simply-src", value);
 					} else {
-						hopeEditor.field.setAttribute("src", editor.plugins.image.placeholder());
+						hopeEditor.field.setAttribute("data-simply-src", editor.plugins.image.placeholder());
 					}
+					editor.responsiveImages.initImage(hopeEditor.field);
 				}
 			},
 			"simply-insert-image" : function() {
@@ -494,13 +450,6 @@
 			};
 
 			var annotation = false;
-
-			var type=image.getAttribute('data-simply-image-type');
-			if (!type || type=='undefined') {
-				// type='Origineel'; // FIXME: gewoon de eerste in de lijst selecteren?
-				type = toolbar.querySelectorAll(".simply-image-type option")[0].value;
-			}
-			simply.widgets.properties.set(toolbar.querySelector('.simply-image-type'),type);
 
 			var alt=image.getAttribute('alt');
 			simply.widgets.properties.set(toolbar.querySelector('.simply-image-alt'),alt);

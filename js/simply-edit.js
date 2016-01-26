@@ -577,9 +577,12 @@
 					},
 					set : function(field, data) {
 						if (typeof data == "string") {
-								data = {"src" : data};
+							data = {"src" : data};
 						}
-						return editor.field.defaultSetter(field, data);
+						data['data-simply-src'] = data['src'];
+						delete(data['src']);
+						editor.field.defaultSetter(field, data);
+						editor.responsiveImages.initImage(field);
 					},
 					makeEditable : function(field) {
 						field.setAttribute("data-simply-selectable", true);
@@ -679,6 +682,7 @@
 				};
 			},
 			set : function(field, data) {
+				window.setTimeout(editor.responsiveImages.resizeHandler, 100); // let responsive images resize after setting data;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].set === "function") {
@@ -1065,22 +1069,37 @@
 			init : function(target) {
 				var images = target.querySelectorAll("img[data-simply-src]");
 
+				for (var i=0; i<images.length; i++) {
+					editor.responsiveImages.initImage(images[i]);
+				}
+			},
+			initImage : function(imgEl) {
 				var width = window.innerWidth;
 
-				for (var i=0; i<images.length; i++) {
-					imageSrc = images[i].getAttribute("data-simply-src");
-					var srcSet = [];
+				imageSrc = imgEl.getAttribute("data-simply-src");
+				if (!imageSrc) {
+					return;
+				}
+
+				var srcSet = [];
+				var imagesPath = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
+				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
 					for (var size in editor.responsiveImages.sizes) {
 						srcSet.push(imageSrc + editor.responsiveImages.sizes[size] + " " + size);
 					}
-
-					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / width));
-					if (sizeRatio > 0) {
-						images[i].setAttribute("sizes", sizeRatio + "vw");
-					}
-					images[i].setAttribute("srcset", srcSet.join(", "));
-					images[i].setAttribute("src", imageSrc);
 				}
+
+				imgEl.removeAttribute("srcset");
+				imgEl.removeAttribute("sizes");
+				imgEl.removeAttribute("src");
+
+				var sizeRatio = parseInt(Math.ceil(100 * imgEl.width / width));
+
+				if (sizeRatio > 0) {
+					imgEl.setAttribute("sizes", sizeRatio + "vw");
+				}
+				imgEl.setAttribute("srcset", srcSet.join(", "));
+				imgEl.setAttribute("src", imageSrc);
 			},
 			resizeHandler : function() {
 				var images = document.querySelectorAll("img[data-simply-src][sizes]");
@@ -1144,15 +1163,18 @@
 				this.disconnect = storage.default.disconnect;
 				this.endpoint = endpoint;
 
-				editor.responsiveImages.sizes = {
-					"1200w" : "?size=1200",
-					"800w" : "?size=800",
-					"640w" : "?size=640",
-					"480w" : "?size=480",
-					"320w" : "?size=320",
-					"160w" : "?size=160",
-					"80w" : "?size=80"
-				};
+				if (editor.responsiveImages) {
+					editor.responsiveImages.sizes = {
+						"1200w" : "?size=1200",
+						"800w" : "?size=800",
+						"640w" : "?size=640",
+						"480w" : "?size=480",
+						"320w" : "?size=320",
+						"160w" : "?size=160",
+						"80w" : "?size=80"
+					};
+					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+				}
 			},
 			file : {
 				save : function(path, data, callback) {
