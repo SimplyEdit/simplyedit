@@ -1609,7 +1609,7 @@
 							if (targetUrl === editor.storage.endpoint + "data.json") {
 								result.folders.push({url : targetUrl, name: "My pages"});
 							} else {
-								result.files.push({url : targetUrl});
+								result.files.push({url : targetUrl, name : images[i].innerHTML});
 								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
 									result.images.push({url : targetUrl});
 								}
