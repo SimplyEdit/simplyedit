@@ -628,7 +628,7 @@
 						field.hopeEditor.field = field;
 						field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 							window.setTimeout(function() {
-								this.hopeEditor.needsUpdate = true;
+								field.hopeEditor.needsUpdate = true;
 							}, 300);
 						});
 					}
@@ -720,7 +720,7 @@
 				field.hopeEditor.field = field;
 				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 					window.setTimeout(function() {
-						this.hopeEditor.needsUpdate = true;
+						field.hopeEditor.needsUpdate = true;
 					}, 300);
 				});
 			}
@@ -1024,11 +1024,17 @@
 				return false;
 			},
 			stop : function() {
-				editor.storage.disconnect(
-					function() {
-						document.location.href = document.location.href.split("#")[0];
+				if (editor.editmode.isDirty()) {
+					var message = "You have made changes to this page, if you log out these changes will not be saved. Log out?";
+					if (confirm(message)) {
+						editor.editmode.isDirty = function() { return false; };
+						editor.storage.disconnect(
+							function() {
+								document.location.href = document.location.href.split("#")[0];
+							}
+						);
 					}
-				);
+				}
 			},
 			toolbarMonitor : function() {
 				var target = document.querySelector('#simply-main-toolbar');
@@ -1483,7 +1489,7 @@
 
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "logout";
-				http.open("OPTIONS", url, true, "logout", (new Date()).getTime().toString());
+				http.open("GET", url, true, "logout", (new Date()).getTime().toString());
 				http.setRequestHeader("Authorization", "Basic ABCDEF");
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
