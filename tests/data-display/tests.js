@@ -14,13 +14,14 @@ QUnit.module("editor field set");
 
 	QUnit.test("field set image data", function(assert) {
 		var field = document.createElement("IMG");
+		var src = "http://www.muze.nl/logo.gif";
 		var data = {
-			src : "http://www.muze.nl/logo.gif",
+			src : src,
 			test : "test"
 		};
 
 		editor.field.set(field, data);
-		assert.equal(field.getAttribute("src"), data.src, "image src is set correctly");
+		assert.equal(field.getAttribute("src"), src, "image src is set correctly");
 		assert.equal(field.getAttribute("test"), data.test, "image test attribute is set correctly");
 	});
 
@@ -77,8 +78,9 @@ QUnit.module("editor field get");
 
 	QUnit.test("field get img data", function(assert) {
 		var field = document.createElement("IMG");
+		var src = "http://www.muze.nl/logo.gif";
 		var data = {
-			src : "http://www.muze.nl/logo.gif",
+			src : src,
 			title : "Title",
 			alt : "Alt",
 			"class" : "class test"
@@ -87,7 +89,7 @@ QUnit.module("editor field get");
 		var result = editor.field.get(field);
 
 		assert.ok(result, "got result");
-		assert.equal(result.src, data.src, "result is same as inserted data");
+		assert.equal(result.src, src, "result is same as inserted data");
 		assert.equal(result.title, data.title, "result is same as inserted data");
 		assert.equal(result.alt, data.alt, "result is same as inserted data");
 		assert.equal(result["class"], data["class"], "result is same as inserted data");
@@ -95,15 +97,17 @@ QUnit.module("editor field get");
 
 	QUnit.test("field get img data", function(assert) {
 		var field = document.createElement("IMG");
+		var src = "http://www.muze.nl/logo.gif";
+
 		var data = {
-			src : "http://www.muze.nl/logo.gif",
+			src : src,
 			other : "other"
 		};
 		editor.field.set(field, data);
 		var result = editor.field.get(field);
 
 		assert.ok(result, "got result");
-		assert.equal(result.src, data.src, "src is same as inserted data");
+		assert.equal(result.src, src, "src is same as inserted data");
 		assert.notOk(result.other, "other data should not be returned");
 	});
 
@@ -505,7 +509,6 @@ QUnit.module("custom field types");
 		var target = document.querySelector("#testContent");
 		target.innerHTML = "<google-map>frop</google-map>";
 		var fieldData = editor.field.get(target.querySelector("google-map"));
-		console.log(fieldData);
 
 		assert.equal(editor.field.get(target.querySelector("google-map")), "foo");
 	});

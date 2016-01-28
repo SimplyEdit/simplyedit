@@ -577,9 +577,12 @@
 					},
 					set : function(field, data) {
 						if (typeof data == "string") {
-								data = {"src" : data};
+							data = {"src" : data};
 						}
-						return editor.field.defaultSetter(field, data);
+						data['data-simply-src'] = data.src;
+						delete(data.src);
+						editor.field.defaultSetter(field, data);
+						editor.responsiveImages.initImage(field);
 					},
 					makeEditable : function(field) {
 						field.setAttribute("data-simply-selectable", true);
@@ -625,7 +628,7 @@
 						field.hopeEditor.field = field;
 						field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 							window.setTimeout(function() {
-								this.hopeEditor.needsUpdate = true;
+								field.hopeEditor.needsUpdate = true;
 							}, 300);
 						});
 					}
@@ -679,6 +682,7 @@
 				};
 			},
 			set : function(field, data) {
+				window.setTimeout(editor.responsiveImages.resizeHandler, 100); // let responsive images resize after setting data;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].set === "function") {
@@ -716,7 +720,7 @@
 				field.hopeEditor.field = field;
 				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 					window.setTimeout(function() {
-						this.hopeEditor.needsUpdate = true;
+						field.hopeEditor.needsUpdate = true;
 					}, 300);
 				});
 			}
@@ -912,22 +916,7 @@
 						}
 							
 						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[evt.target.pathname] == "undefined")) {
-							history.pushState(null, null, evt.target.href + "#simply-edit");
-					
-							document.body.innerHTML = editor.data.originalBody.innerHTML;
-							editor.data.load();
-							var openTemplateDialog = function() {
-								if (editor.actions['simply-template']) {
-									if (!document.getElementById("simply-template")) {
-										window.setTimeout(openTemplateDialog, 200);
-										return;
-									}
-									editor.actions['simply-template']();
-								} else {
-									alert("This page does not exist yet. Save it to create it!");
-								}
-							};
-							openTemplateDialog();
+							editor.storage.page.save(evt.target.href);
 							evt.preventDefault();
 						} else {
 							// FIXME: check for dirty fields and stash/save the changes
@@ -1020,11 +1009,23 @@
 				return false;
 			},
 			stop : function() {
-				editor.storage.disconnect(
-					function() {
-						document.location.href = document.location.href.split("#")[0];
+				if (editor.editmode.isDirty()) {
+					var message = "You have made changes to this page, if you log out these changes will not be saved. Log out?";
+					if (confirm(message)) {
+						editor.editmode.isDirty = function() { return false; };
+						editor.storage.disconnect(
+							function() {
+								document.location.href = document.location.href.split("#")[0];
+							}
+						);
 					}
-				);
+				} else {
+					editor.storage.disconnect(
+						function() {
+							document.location.href = document.location.href.split("#")[0];
+						}
+					);
+				}
 			},
 			toolbarMonitor : function() {
 				var target = document.querySelector('#simply-main-toolbar');
@@ -1065,22 +1066,37 @@
 			init : function(target) {
 				var images = target.querySelectorAll("img[data-simply-src]");
 
+				for (var i=0; i<images.length; i++) {
+					editor.responsiveImages.initImage(images[i]);
+				}
+			},
+			initImage : function(imgEl) {
 				var width = window.innerWidth;
 
-				for (var i=0; i<images.length; i++) {
-					imageSrc = images[i].getAttribute("data-simply-src");
-					var srcSet = [];
+				imageSrc = imgEl.getAttribute("data-simply-src");
+				if (!imageSrc) {
+					return;
+				}
+
+				var srcSet = [];
+				var imagesPath = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
+				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
 					for (var size in editor.responsiveImages.sizes) {
 						srcSet.push(imageSrc + editor.responsiveImages.sizes[size] + " " + size);
 					}
-
-					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / width));
-					if (sizeRatio > 0) {
-						images[i].setAttribute("sizes", sizeRatio + "vw");
-					}
-					images[i].setAttribute("srcset", srcSet.join(", "));
-					images[i].setAttribute("src", imageSrc);
 				}
+
+				imgEl.removeAttribute("srcset");
+				imgEl.removeAttribute("sizes");
+				imgEl.removeAttribute("src");
+
+				var sizeRatio = parseInt(Math.ceil(100 * imgEl.width / width));
+
+				if (sizeRatio > 0) {
+					imgEl.setAttribute("sizes", sizeRatio + "vw");
+				}
+				imgEl.setAttribute("srcset", srcSet.join(", "));
+				imgEl.setAttribute("src", imageSrc);
 			},
 			resizeHandler : function() {
 				var images = document.querySelectorAll("img[data-simply-src][sizes]");
@@ -1142,17 +1158,23 @@
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 				this.disconnect = storage.default.disconnect;
-				this.endpoint = endpoint;
+				this.page = storage.default.page;
 
-				editor.responsiveImages.sizes = {
-					"1200w" : "?size=1200",
-					"800w" : "?size=800",
-					"640w" : "?size=640",
-					"480w" : "?size=480",
-					"320w" : "?size=320",
-					"160w" : "?size=160",
-					"80w" : "?size=80"
-				};
+				this.endpoint = endpoint;
+				this.dataEndpoint = endpoint + "data.json";
+
+				if (editor.responsiveImages) {
+					editor.responsiveImages.sizes = {
+						"1200w" : "?size=1200",
+						"800w" : "?size=800",
+						"640w" : "?size=640",
+						"480w" : "?size=480",
+						"320w" : "?size=320",
+						"160w" : "?size=160",
+						"80w" : "?size=80"
+					};
+					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+				}
 			},
 			file : {
 				save : function(path, data, callback) {
@@ -1200,7 +1222,7 @@
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data.json";
+				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
 				}
@@ -1278,9 +1300,11 @@
 
 				this.endpoint = endpoint;
 				this.dataFile = "data.json";
+				thid.dataEndpoint = endpoint + "data.json";
 
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
+				this.page = storage.default.page;
 			},
 			connect : function() {
 				if (typeof Github === "undefined") {
@@ -1361,7 +1385,7 @@
 				});
 			},
 			list : function(url, callback) {
-				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
 					return this.listSitemap(url, callback);
 				}
 
@@ -1419,10 +1443,11 @@
 				}
 				this.url = endpoint;
 				this.endpoint = endpoint;
+				this.dataEndpoint = this.url + "data/data.json";
 			},
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data/data.json";
+				var url = editor.storage.dataEndpoint;
 
 				http.open("PUT", url, true);
 				//Send the proper header information along with the request
@@ -1438,7 +1463,7 @@
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data/data.json";
+				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
 				}
@@ -1461,7 +1486,7 @@
 
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "logout";
-				http.open("OPTIONS", url, true, "logout", (new Date()).getTime().toString());
+				http.open("GET", url, true, "logout", (new Date()).getTime().toString());
 				http.setRequestHeader("Authorization", "Basic ABCDEF");
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
@@ -1470,6 +1495,26 @@
 					}
 				};
 				http.send();
+			},
+			page : {
+				save : function(url) {
+					history.pushState(null, null, url + "#simply-edit");
+
+					document.body.innerHTML = editor.data.originalBody.innerHTML;
+					editor.data.load();
+					var openTemplateDialog = function() {
+						if (editor.actions['simply-template']) {
+							if (!document.getElementById("simply-template")) {
+								window.setTimeout(openTemplateDialog, 200);
+								return;
+							}
+							editor.actions['simply-template']();
+						} else {
+							alert("This page does not exist yet. Save it to create it!");
+						}
+					};
+					openTemplateDialog();
+				}
 			},
 			sitemap : function() {
 				var output = {
@@ -1515,8 +1560,8 @@
 				return output;
 			},
 			listSitemap : function(url, callback) {
-				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
-					var subpath = url.replace(editor.storage.endpoint + "data.json", "");
+				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
+					var subpath = url.replace(editor.storage.dataEndpoint, "");
 					var sitemap = editor.storage.sitemap();
 					var result = {
 						folders : [],
@@ -1526,7 +1571,12 @@
 						var pathicles = subpath.split("/");
 						pathicles.shift();
 						for (var i=0; i<pathicles.length; i++) {
-							sitemap = sitemap.children[pathicles[i]];
+							if (sitemap.children[pathicles[i]]) {
+								sitemap = sitemap.children[pathicles[i]];
+							} else {
+								sitemap = {};
+								break;
+							}
 						}
 						result.folders.push({
 							url : url.replace(/\/[^\/]+$/, ''),
@@ -1543,13 +1593,22 @@
 						if (Object.keys(sitemap.children[j].children).length) {
 							result.folders.push({
 								url : url + "/" + j,
-								name : j
+								name : j + "/"
 							});
 						} else {
-							result.files.push({
-								url : url + "/" + j,
-								name : j
-							});
+							if (j != "/") {
+								result.files.push({
+									url : url + "/" + j,
+									name : j.replace(/\/$/, '')
+								});
+
+								if (Object.keys(editor.currentData[(url + "/" + j).replace(editor.storage.dataEndpoint, "")]).length === 0) {
+									result.folders.push({
+										url : url + "/" + j.replace(/\/$/, ''),
+										name : j
+									});
+								}
+							}
 						}
 					}
 
@@ -1557,7 +1616,7 @@
 				}
 			},
 			list : function(url, callback) {
-				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
 					return this.listSitemap(url, callback);
 				}
 
@@ -1584,10 +1643,10 @@
 						if (href.substring(href.length-1, href.length) === "/") {
 							result.folders.push({url : targetUrl, name : images[i].innerHTML});
 						} else {
-							if (targetUrl === editor.storage.endpoint + "data.json") {
+							if (targetUrl === editor.storage.dataEndpoint) {
 								result.folders.push({url : targetUrl, name: "My pages"});
 							} else {
-								result.files.push({url : targetUrl});
+								result.files.push({url : targetUrl, name : images[i].innerHTML});
 								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
 									result.images.push({url : targetUrl});
 								}
