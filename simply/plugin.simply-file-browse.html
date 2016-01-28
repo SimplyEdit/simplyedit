@@ -188,7 +188,6 @@
 							editor.plugins.fileBrowse.dialog.updateToolbar();
 						});
 					}
-					new Slip(targetList); // slip is used for the tap-hold timing;
 				});
 			},
 			update : function() {
@@ -293,6 +292,7 @@
 			document.querySelector("#simply-file-browse").addEventListener("DOMNodeRemoved",editor.plugins.fileBrowse.dialog.updateToolbar);
 
 			var targetList = document.querySelector("#simply-file-browse .simply-dialog-body");
+			new Slip(targetList); // slip is used for the tap-hold timing;
 			targetList.addEventListener("slip:beforereorder", function(evt) {
 				var targetButton = evt.target;
 				if (targetButton.tagName.toLowerCase() == "i") {
@@ -383,20 +383,31 @@
 	editor.addAction("simply-file-browse-delete", function(el) {
 		var targetList = document.querySelectorAll("#simply-file-browse .simply-dialog-body .simply-selected");
 		var subpath;
-
-		if (confirm("Delete all selected folders and files?")) {
-			for (var i=0; i<targetList.length; i++) {
-				if (targetList[i].querySelector("img")) {
-					subpath = targetList[i].querySelector("img").getAttribute("src").replace(editor.storage.endpoint, "");
-				} else {
-					subpath = targetList[i].getAttribute("data-value").replace(editor.storage.endpoint, "");
-				}
-				(function(targetButton) {
-					editor.storage.file.delete(subpath, function() {
+		if (editor.plugins.fileBrowse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
+			if (confirm("Delete all selected pages? This action cannot be reversed and is final after you save.")) {
+				for (var i=0; i<targetList.length; i++) {
+					subpath = targetList[i].getAttribute("data-value").replace(editor.storage.dataEndpoint, "");
+					(function(targetButton) {
+						delete editor.currentData[subpath];
 						targetButton.parentNode.removeChild(targetButton);
-					});
-				}(targetList[i]));
-			};
+					}(targetList[i]));
+				}
+			}
+		} else {
+			if (confirm("Delete all selected folders and files?")) {
+				for (var i=0; i<targetList.length; i++) {
+					if (targetList[i].querySelector("img")) {
+						subpath = targetList[i].querySelector("img").getAttribute("src").replace(editor.storage.endpoint, "");
+					} else {
+						subpath = targetList[i].getAttribute("data-value").replace(editor.storage.endpoint, "");
+					}
+					(function(targetButton) {
+						editor.storage.file.delete(subpath, function() {
+							targetButton.parentNode.removeChild(targetButton);
+						});
+					}(targetList[i]));
+				};
+			}
 		}
 	});
 

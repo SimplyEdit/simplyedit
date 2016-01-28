@@ -191,7 +191,6 @@
 							editor.plugins.imageBrowse.dialog.updateToolbar();
 						});
 					}
-					new Slip(targetList); // slip is used for the tap-hold timing;
 				});
 			},
 			update : function() {
@@ -282,6 +281,7 @@
 			document.querySelector("#simply-image-browse").addEventListener("DOMNodeRemoved",editor.plugins.imageBrowse.dialog.updateToolbar);
 
 			var targetList = document.querySelector("#simply-image-browse .simply-dialog-body");
+			new Slip(targetList); // slip is used for the tap-hold timing;
 			targetList.addEventListener("slip:beforereorder", function(evt) {
 				var targetButton = evt.target;
 				if (targetButton.tagName.toLowerCase() == "i") {
