@@ -1019,6 +1019,12 @@
 							}
 						);
 					}
+				} else {
+					editor.storage.disconnect(
+						function() {
+							document.location.href = document.location.href.split("#")[0];
+						}
+					);
 				}
 			},
 			toolbarMonitor : function() {
