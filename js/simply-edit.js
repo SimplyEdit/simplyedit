@@ -916,22 +916,7 @@
 						}
 							
 						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[evt.target.pathname] == "undefined")) {
-							history.pushState(null, null, evt.target.href + "#simply-edit");
-					
-							document.body.innerHTML = editor.data.originalBody.innerHTML;
-							editor.data.load();
-							var openTemplateDialog = function() {
-								if (editor.actions['simply-template']) {
-									if (!document.getElementById("simply-template")) {
-										window.setTimeout(openTemplateDialog, 200);
-										return;
-									}
-									editor.actions['simply-template']();
-								} else {
-									alert("This page does not exist yet. Save it to create it!");
-								}
-							};
-							openTemplateDialog();
+							editor.storage.page.save(evt.target.href);
 							evt.preventDefault();
 						} else {
 							// FIXME: check for dirty fields and stash/save the changes
@@ -1167,7 +1152,10 @@
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 				this.disconnect = storage.default.disconnect;
+				this.page = storage.default.page;
+
 				this.endpoint = endpoint;
+				this.dataEndpoint = endpoint + "data.json";
 
 				if (editor.responsiveImages) {
 					editor.responsiveImages.sizes = {
@@ -1228,7 +1216,7 @@
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data.json";
+				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
 				}
@@ -1306,9 +1294,11 @@
 
 				this.endpoint = endpoint;
 				this.dataFile = "data.json";
+				thid.dataEndpoint = endpoint + "data.json";
 
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
+				this.page = storage.default.page;
 			},
 			connect : function() {
 				if (typeof Github === "undefined") {
@@ -1389,7 +1379,7 @@
 				});
 			},
 			list : function(url, callback) {
-				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
 					return this.listSitemap(url, callback);
 				}
 
@@ -1447,10 +1437,11 @@
 				}
 				this.url = endpoint;
 				this.endpoint = endpoint;
+				this.dataEndpoint = this.url + "data/data.json";
 			},
 			save : function(data, callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data/data.json";
+				var url = editor.storage.dataEndpoint;
 
 				http.open("PUT", url, true);
 				//Send the proper header information along with the request
@@ -1466,7 +1457,7 @@
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "data/data.json";
+				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
 				}
@@ -1498,6 +1489,26 @@
 					}
 				};
 				http.send();
+			},
+			page : {
+				save : function(url) {
+					history.pushState(null, null, url + "#simply-edit");
+
+					document.body.innerHTML = editor.data.originalBody.innerHTML;
+					editor.data.load();
+					var openTemplateDialog = function() {
+						if (editor.actions['simply-template']) {
+							if (!document.getElementById("simply-template")) {
+								window.setTimeout(openTemplateDialog, 200);
+								return;
+							}
+							editor.actions['simply-template']();
+						} else {
+							alert("This page does not exist yet. Save it to create it!");
+						}
+					};
+					openTemplateDialog();
+				}
 			},
 			sitemap : function() {
 				var output = {
@@ -1543,8 +1554,8 @@
 				return output;
 			},
 			listSitemap : function(url, callback) {
-				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
-					var subpath = url.replace(editor.storage.endpoint + "data.json", "");
+				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
+					var subpath = url.replace(editor.storage.dataEndpoint, "");
 					var sitemap = editor.storage.sitemap();
 					var result = {
 						folders : [],
@@ -1554,7 +1565,12 @@
 						var pathicles = subpath.split("/");
 						pathicles.shift();
 						for (var i=0; i<pathicles.length; i++) {
-							sitemap = sitemap.children[pathicles[i]];
+							if (sitemap.children[pathicles[i]]) {
+								sitemap = sitemap.children[pathicles[i]];
+							} else {
+								sitemap = {};
+								break;
+							}
 						}
 						result.folders.push({
 							url : url.replace(/\/[^\/]+$/, ''),
@@ -1571,13 +1587,22 @@
 						if (Object.keys(sitemap.children[j].children).length) {
 							result.folders.push({
 								url : url + "/" + j,
-								name : j
+								name : j + "/"
 							});
 						} else {
-							result.files.push({
-								url : url + "/" + j,
-								name : j
-							});
+							if (j != "/") {
+								result.files.push({
+									url : url + "/" + j,
+									name : j.replace(/\/$/, '')
+								});
+
+								if (Object.keys(editor.currentData[(url + "/" + j).replace(editor.storage.dataEndpoint, "")]).length === 0) {
+									result.folders.push({
+										url : url + "/" + j.replace(/\/$/, ''),
+										name : j
+									});
+								}
+							}
 						}
 					}
 
@@ -1585,7 +1610,7 @@
 				}
 			},
 			list : function(url, callback) {
-				if (url.indexOf(editor.storage.endpoint + "data.json") === 0) {
+				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
 					return this.listSitemap(url, callback);
 				}
 
@@ -1612,7 +1637,7 @@
 						if (href.substring(href.length-1, href.length) === "/") {
 							result.folders.push({url : targetUrl, name : images[i].innerHTML});
 						} else {
-							if (targetUrl === editor.storage.endpoint + "data.json") {
+							if (targetUrl === editor.storage.dataEndpoint) {
 								result.folders.push({url : targetUrl, name: "My pages"});
 							} else {
 								result.files.push({url : targetUrl, name : images[i].innerHTML});
