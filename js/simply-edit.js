@@ -1162,6 +1162,7 @@
 
 				this.endpoint = endpoint;
 				this.dataEndpoint = endpoint + "data.json";
+				this.file = storage.default.file;
 
 				if (editor.responsiveImages) {
 					editor.responsiveImages.sizes = {
@@ -1174,47 +1175,6 @@
 						"80w" : "?size=80"
 					};
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
-				}
-			},
-			file : {
-				save : function(path, data, callback) {
-					var http = new XMLHttpRequest();
-					var url = editor.storage.url + path;
-
-					http.open("PUT", url, true);
-					http.withCredentials = true;
-
-					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4 && http.status == 200) {
-							callback();
-						}
-					};
-					http.upload.onprogress = function (event) {
-						if (event.lengthComputable) {
-							var complete = (event.loaded / event.total * 100 | 0);
-							var progress = document.querySelector("progress[data-simply-progress='" + path + "']");
-							if (progress) {
-								progress.value = progress.innerHTML = complete;
-							}
-						}
-					};
-
-					http.send(data);
-				},
-				delete : function(path, callback) {
-					var http = new XMLHttpRequest();
-					var url = editor.storage.url + path;
-
-					http.open("DELETE", url, true);
-					http.withCredentials = true;
-
-					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4 && http.status == 200) {
-							callback();
-						}
-					};
-
-					http.send();
 				}
 			},
 			save : function(data, callback) {
@@ -1443,23 +1403,52 @@
 				}
 				this.url = endpoint;
 				this.endpoint = endpoint;
-				this.dataEndpoint = this.url + "data/data.json";
+				this.dataPath = "data/data.json";
+				this.dataEndpoint = this.url + this.dataPath;
+			},
+			file : {
+				save : function(path, data, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("PUT", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+					http.upload.onprogress = function (event) {
+						if (event.lengthComputable) {
+							var complete = (event.loaded / event.total * 100 | 0);
+							var progress = document.querySelector("progress[data-simply-progress='" + path + "']");
+							if (progress) {
+								progress.value = progress.innerHTML = complete;
+							}
+						}
+					};
+
+					http.send(data);
+				},
+				delete : function(path, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("DELETE", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+
+					http.send();
+				}
 			},
 			save : function(data, callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.dataEndpoint;
-
-				http.open("PUT", url, true);
-				//Send the proper header information along with the request
-				http.setRequestHeader("Content-type", "application/json");
-				http.setRequestHeader("charset", "UTF-8");
-
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback();
-					}
-				};
-				http.send(data);
+				return editor.storage.file.save(this.dataPath, data, callback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
