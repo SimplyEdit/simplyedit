@@ -1300,7 +1300,7 @@
 
 				this.endpoint = endpoint;
 				this.dataFile = "data.json";
-				thid.dataEndpoint = endpoint + "data.json";
+				this.dataEndpoint = endpoint + "data.json";
 
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
