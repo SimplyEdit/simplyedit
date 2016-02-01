@@ -282,11 +282,11 @@ hope.register( 'hope.editor', function() {
 	hopeEditor.prototype.showCursor = function() {
 		var range = this.selection.getRange();
 		var selection = this.getEditorRange(range.start, range.end);
-		if (document.querySelector('[data-hope-caret]')) {
+		var caretElm = document.querySelector('[data-hope-caret]');
+		if (caretElm) {
 			selection = document.createRange();
-			var target = document.querySelector('[data-hope-caret]');
-			selection.setStart(target, target.getAttribute('data-hope-caret'));
-			target.removeAttribute("data-hope-caret");
+			selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
+			caretElm.removeAttribute("data-hope-caret");
 		}
 		if (selection) {
 			var htmlSelection = window.getSelection();
