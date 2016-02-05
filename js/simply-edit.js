@@ -589,10 +589,12 @@
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
-						data['data-simply-src'] = data.src;
-						delete(data.src);
-						editor.field.defaultSetter(field, data);
-						editor.responsiveImages.initImage(field);
+						if (data) {
+							data['data-simply-src'] = data.src;
+							delete(data.src);
+							editor.field.defaultSetter(field, data);
+							editor.responsiveImages.initImage(field);
+						}
 					},
 					makeEditable : function(field) {
 						field.setAttribute("data-simply-selectable", true);
