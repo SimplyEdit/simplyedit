@@ -169,19 +169,7 @@
 					}
 					for (i=0; i<imageData.images.length; i++) {
 //						if (imageData.images[i].url.indexOf(editor.plugins.imageBrowse.currentJail) === 0) {
-							var src = imageData.images[i].url;
-							if (typeof imageData.images[i].src !== "undefined") {
-								src = imageData.images[i].src;
-							}
-
-							newHtml += "<button data-simply-action='simply-image-browse-insert'>";
-							newHtml += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
-							if (imageData.images[i].thumb) {
-								newHtml += " src='" + imageData.images[i].thumb + "'";
-							} else {
-								newHtml += " data-simply-src='" + src + "'";
-							}
-							newHtml += "></button>";
+							newHtml += editor.plugins.imageBrowse.getButtonHtml(imageData.images[i]);
 //						}
 					}
 					targetList.innerHTML = newHtml;
@@ -236,6 +224,25 @@
 					}
 				}, 50);
 			}
+		},
+		getButtonHtml : function(imageData) {
+			var src = imageData.url;
+			if (typeof imageData.src !== "undefined") {
+				src = imageData.src;
+			}
+
+			var result = "<button data-simply-action='simply-image-browse-insert'>";
+			result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
+			if (imageData.thumb) {
+				result += " src='" + imageData.thumb + "'";
+			} else {
+				result += " data-simply-src='" + src + "'";
+			}
+			if (imageData.id) {
+				result += " data-simply-id='" + imageData.id + "'";
+			}
+			result += "></button>";
+			return result;
 		},
 		init : function() {
 			if (editor.plugins.imageBrowse.path) {
@@ -328,8 +335,16 @@
 					var url = editor.plugins.imageBrowse.currentPath + files[i].name.replace(/[^A-Za-z0-9_\.-]/, "-");
 
 					(function(targetButton, url) {
-						editor.storage.file.save(subpath + files[i].name, files[i], function() {
-							targetButton.innerHTML = "<i class='select fa fa-check'></i><img data-simply-src='" + url + "'>";
+						editor.storage.file.save(subpath + files[i].name, files[i], function(image) {
+							if (typeof image === "undefined") {
+								image = {
+									src : url
+								}
+							};
+							var buttonHtml = editor.plugins.imageBrowse.getButtonHtml(image);
+							var tempNode = document.createElement("div");
+							tempNode.innerHTML = buttonHtml;
+							targetButton.innerHTML = tempNode.querySelector("button").innerHTML;
 							targetButton.setAttribute("data-simply-action", "simply-image-browse-insert");
 							editor.responsiveImages.init(targetButton);
 						});
