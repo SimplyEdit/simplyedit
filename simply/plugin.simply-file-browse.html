@@ -143,7 +143,7 @@
 		currentSel : null,
 		currentField : null,
 		currentJail : null,
-		path : editor.storage.endpoint ? editor.storage.endpoint : null,
+		path : null,
 		dialog : {
 			open : function() {
 				editor.plugins.fileBrowse.currentSel = vdSelectionState.get();
@@ -254,6 +254,8 @@
 			listItem.appendChild(button);
 			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
+			editor.plugins.fileBrowse.path = editor.storage.endpoint;
+
 			var target = document.querySelectorAll('[data-simply-action="simply-hyperlink-href"]');
 			if (target) {
 				for (var i=0; i<target.length; i++) {
@@ -349,7 +351,7 @@
 
 			window.setTimeout(function() {
 				var targetUrl = button.getAttribute("data-value");
-				if (targetUrl.indexOf(editor.storage.dataEndpoint) === 0) {
+				if (editor.storage.dataEndpoint && targetUrl.indexOf(editor.storage.dataEndpoint) === 0) {
 					targetUrl = targetUrl.replace(editor.storage.dataEndpoint, '');
 				}
 
@@ -364,13 +366,14 @@
 	editor.addAction("simply-file-browse-sitemap", function(el) {
 		editor.actions["simply-file-browse-insert"] = function(button) {
 			var target = button.getAttribute("data-value");
-
-			target = target.replace(editor.storage.dataEndpoint, "/");
+			if (editor.storage.dataEndpoint) {
+				target = target.replace(editor.storage.dataEndpoint, "/");
+			}
 			// FIXME: check for dirty fields and stash/save the changes
 			document.location.href = target + "#simply-edit";
 			editor.plugins.dialog.close();
 		};
-		editor.plugins.fileBrowse.path = editor.storage.dataEndpoint;
+		editor.plugins.fileBrowse.path = editor.storage.dataEndpoint ? editor.storage.dataEndpoint : editor.storage.endpoint;
 		editor.plugins.fileBrowse.dialog.open();
 	});
 	editor.addAction("simply-file-browse-directory", function(el) {
