@@ -1084,7 +1084,9 @@
 			}
 		},
 		responsiveImages : {
-			sizes : {},
+			sizes : function(src) {
+				return {};
+			},
 			init : function(target) {
 				var images = target.querySelectorAll("img[data-simply-src]");
 
@@ -1103,8 +1105,9 @@
 				var srcSet = [];
 				var imagesPath = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
 				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
-					for (var size in editor.responsiveImages.sizes) {
-						srcSet.push(imageSrc + editor.responsiveImages.sizes[size] + " " + size);
+					var sizes = editor.responsiveImages.sizes(imageSrc);
+					for (var size in sizes) {
+						srcSet.push(sizes[size] + " " + size);
 					}
 				}
 
@@ -1187,14 +1190,16 @@
 				this.file = storage.default.file;
 
 				if (editor.responsiveImages) {
-					editor.responsiveImages.sizes = {
-						"1200w" : "?size=1200",
-						"800w" : "?size=800",
-						"640w" : "?size=640",
-						"480w" : "?size=480",
-						"320w" : "?size=320",
-						"160w" : "?size=160",
-						"80w" : "?size=80"
+					editor.responsiveImages.sizes = function(src) {
+						return {
+							"1200w" : src + "?size=1200",
+							"800w" : src + "?size=800",
+							"640w" : src + "?size=640",
+							"480w" : src + "?size=480",
+							"320w" : src + "?size=320",
+							"160w" : src + "?size=160",
+							"80w" : src + "?size=80"
+						};
 					};
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
