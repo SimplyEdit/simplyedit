@@ -174,7 +174,14 @@
 								src = imageData.images[i].src;
 							}
 
-							newHtml += "<button data-simply-action='simply-image-browse-insert'><i class='select fa fa-check'></i><img data-simply-src='" + src + "'></button>";
+							newHtml += "<button data-simply-action='simply-image-browse-insert'>";
+							newHtml += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
+							if (imageData.images[i].thumb) {
+								newHtml += " src='" + imageData.images[i].thumb + "'";
+							} else {
+								newHtml += " data-simply-src='" + src + "'";
+							}
+							newHtml += "></button>";
 //						}
 					}
 					targetList.innerHTML = newHtml;
@@ -337,7 +344,7 @@
 		editor.plugins.imageBrowse.dialog.loadImages(el.dataset.value);
 	});
 	editor.addAction("simply-image-browse-insert", function(el) {
-		editor.actions["simply-image-src"](el.querySelector("img").getAttribute("src"));
+		editor.actions["simply-image-src"](el.querySelector("img").getAttribute("data-value"));
 
 		//var parent = vdSelection.getNode(editor.plugins.imageBrowse.currentSel);
 		//parent.setAttribute("src", el.querySelector("img").getAttribute("src"));
