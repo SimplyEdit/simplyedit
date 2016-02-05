@@ -693,36 +693,46 @@
 			},
 			set : function(field, data) {
 				window.setTimeout(editor.responsiveImages.resizeHandler, 100); // let responsive images resize after setting data;
+				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].set === "function") {
-							return editor.field.fieldTypes[i].set(field, data);
+							setter = editor.field.fieldTypes[i].set;
 						}
 					}
 				}
-
+				if (setter) {
+					return setter(field, data);
+				}
 				field.innerHTML = data;
 			},
 			get : function(field) {
+				var getter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].get === "function") {
-							return editor.field.fieldTypes[i].get(field);
+							getter = editor.field.fieldTypes[i].get;
 						}
 					}
 				}
 
+				if (getter) {
+					return getter(field);
+				}
 				return field.innerHTML;
 			},
 			makeEditable : function(field) {
+				var editable;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].makeEditable === "function") {
-							return editor.field.fieldTypes[i].makeEditable(field);
+							editable = editor.field.fieldTypes[i].makeEditable;
 						}
 					}
 				}
-
+				if (editable) {
+					return editable(field);
+				}
 				field.hopeContent = document.createElement("textarea");
 				field.hopeMarkup = document.createElement("textarea");
 				field.hopeRenderedSource = document.createElement("DIV");
