@@ -122,6 +122,10 @@
 			currentListItem = vdSelection.getNode(vdSelectionState.get());
 
 			currentList = currentListItem.parentNode;
+			while (currentList && !currentList.getAttribute('data-simply-list')) {
+				currentList = currentList.parentNode;
+			}
+
 			var listTemplates = toolbar.querySelector("div.simply-list-templates ul");
 			listTemplates.innerHTML = '';
 			for (var i=0; i<Object.keys(currentList.templates).length; i++) {
