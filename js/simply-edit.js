@@ -24,6 +24,16 @@
 		apiKey : apiKey,
         baseURL : getBaseURL(scriptEl.src),
 		data : {
+			getDataPath : function(field) {
+				var parent = field;
+				while (parent && parent.parentNode) {
+					if (parent.getAttribute("data-simply-path")) {
+						return parent.getAttribute("data-simply-path");
+					}
+					parent = parent.parentNode;
+				}
+				return location.pathname;
+			},
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
 					editor.data.originalBody = document.body.cloneNode(true);
@@ -33,7 +43,7 @@
 
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-simply-field");
-					var dataPath = dataFields[i].getAttribute("data-simply-path") ? dataFields[i].getAttribute("data-simply-path") : location.pathname;
+					var dataPath = editor.data.getDataPath(dataFields[i]);
 
 					if (data[dataPath] && data[dataPath][dataName]) {
 						editor.field.set(dataFields[i], data[dataPath][dataName]);
@@ -88,7 +98,7 @@
 						return;
 					}
 					dataName = list.getAttribute("data-simply-list");
-					dataPath = list.getAttribute("data-simply-path") ? list.getAttribute("data-simply-path") : location.pathname;
+					dataPath = editor.data.getDataPath(list);
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -150,7 +160,7 @@
 					}
 
 					dataName = field.getAttribute("data-simply-field");
-					dataPath = field.getAttribute("data-simply-path") ? field.getAttribute("data-simply-path") : location.pathname;
+					dataPath = editor.data.getDataPath(field);
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -343,7 +353,7 @@
 
 						editor.data.list.parseTemplates(dataLists[i]);
 						dataName = dataLists[i].getAttribute("data-simply-list");
-						dataPath = dataLists[i].getAttribute("data-simply-path") ? dataLists[i].getAttribute("data-simply-path") : location.pathname;
+						dataPath = editor.data.getDataPath(dataLists[i]);
 
 						var dataSource = dataLists[i].getAttribute("data-simply-data");
 						if (dataSource !== null) {
@@ -390,7 +400,7 @@
 				},
 				parseTemplates : function(list) {
 					var dataName = list.getAttribute("data-simply-list");
-					var dataPath = list.getAttribute("data-simply-path") ? list.getAttribute("data-simply-path") : location.pathname;
+					var dataPath = editor.data.getDataPath(list);
 
 //					var templates = list.querySelectorAll("template");
 					var templates = list.getElementsByTagName("template");

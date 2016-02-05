@@ -17,7 +17,7 @@
 
 				currentData = editor.data.get(target);
 				var dataName = target.getAttribute("data-simply-list");
-				var dataPath = target.getAttribute("data-simply-path") ? target.getAttribute("data-simply-path") : location.pathname;
+				var dataPath = editor.data.getDataPath(target);
 				currentData = currentData[dataPath][dataName];
 			} else {
 				currentData = editor.field.get(target);
