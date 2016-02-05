@@ -22,7 +22,7 @@
 	var editor = {
 		version: '0.3.0',
 		apiKey : apiKey,
-        baseURL : getBaseURL(scriptEl.src),
+		baseURL : getBaseURL(scriptEl.src),
 		data : {
 			getDataPath : function(field) {
 				var parent = field;
