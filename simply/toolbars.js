@@ -705,6 +705,10 @@
 			if (editor.context.touching) {
 				return;
 			}
+			if (document.querySelector(".simply-dialog.active")) {
+				return;
+			}
+
 			var field = editor.node.getEditableField();
 			hopeEditor = field.hopeEditor;
 			editor.context.fixSelection();

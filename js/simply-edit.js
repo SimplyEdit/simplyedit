@@ -22,8 +22,18 @@
 	var editor = {
 		version: '0.10',
 		apiKey : apiKey,
-        baseURL : getBaseURL(scriptEl.src),
+		baseURL : getBaseURL(scriptEl.src),
 		data : {
+			getDataPath : function(field) {
+				var parent = field;
+				while (parent && parent.parentNode) {
+					if (parent.getAttribute("data-simply-path")) {
+						return parent.getAttribute("data-simply-path");
+					}
+					parent = parent.parentNode;
+				}
+				return location.pathname;
+			},
 			apply : function(data, target) {
 				if (typeof editor.data.originalBody === "undefined") {
 					editor.data.originalBody = document.body.cloneNode(true);
@@ -33,7 +43,7 @@
 
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-simply-field");
-					var dataPath = dataFields[i].getAttribute("data-simply-path") ? dataFields[i].getAttribute("data-simply-path") : location.pathname;
+					var dataPath = editor.data.getDataPath(dataFields[i]);
 
 					if (data[dataPath] && data[dataPath][dataName]) {
 						editor.field.set(dataFields[i], data[dataPath][dataName]);
@@ -88,7 +98,7 @@
 						return;
 					}
 					dataName = list.getAttribute("data-simply-list");
-					dataPath = list.getAttribute("data-simply-path") ? list.getAttribute("data-simply-path") : location.pathname;
+					dataPath = editor.data.getDataPath(list);
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -150,7 +160,7 @@
 					}
 
 					dataName = field.getAttribute("data-simply-field");
-					dataPath = field.getAttribute("data-simply-path") ? field.getAttribute("data-simply-path") : location.pathname;
+					dataPath = editor.data.getDataPath(field);
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -343,7 +353,7 @@
 
 						editor.data.list.parseTemplates(dataLists[i]);
 						dataName = dataLists[i].getAttribute("data-simply-list");
-						dataPath = dataLists[i].getAttribute("data-simply-path") ? dataLists[i].getAttribute("data-simply-path") : location.pathname;
+						dataPath = editor.data.getDataPath(dataLists[i]);
 
 						var dataSource = dataLists[i].getAttribute("data-simply-data");
 						if (dataSource !== null) {
@@ -390,7 +400,7 @@
 				},
 				parseTemplates : function(list) {
 					var dataName = list.getAttribute("data-simply-list");
-					var dataPath = list.getAttribute("data-simply-path") ? list.getAttribute("data-simply-path") : location.pathname;
+					var dataPath = editor.data.getDataPath(list);
 
 //					var templates = list.querySelectorAll("template");
 					var templates = list.getElementsByTagName("template");
@@ -579,10 +589,12 @@
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
-						data['data-simply-src'] = data.src;
-						delete(data.src);
-						editor.field.defaultSetter(field, data);
-						editor.responsiveImages.initImage(field);
+						if (data) {
+							data['data-simply-src'] = data.src;
+							delete(data.src);
+							editor.field.defaultSetter(field, data);
+							editor.responsiveImages.initImage(field);
+						}
 					},
 					makeEditable : function(field) {
 						field.setAttribute("data-simply-selectable", true);
@@ -683,36 +695,46 @@
 			},
 			set : function(field, data) {
 				window.setTimeout(editor.responsiveImages.resizeHandler, 100); // let responsive images resize after setting data;
+				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].set === "function") {
-							return editor.field.fieldTypes[i].set(field, data);
+							setter = editor.field.fieldTypes[i].set;
 						}
 					}
 				}
-
+				if (setter) {
+					return setter(field, data);
+				}
 				field.innerHTML = data;
 			},
 			get : function(field) {
+				var getter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].get === "function") {
-							return editor.field.fieldTypes[i].get(field);
+							getter = editor.field.fieldTypes[i].get;
 						}
 					}
 				}
 
+				if (getter) {
+					return getter(field);
+				}
 				return field.innerHTML;
 			},
 			makeEditable : function(field) {
+				var editable;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
 						if (typeof editor.field.fieldTypes[i].makeEditable === "function") {
-							return editor.field.fieldTypes[i].makeEditable(field);
+							editable = editor.field.fieldTypes[i].makeEditable;
 						}
 					}
 				}
-
+				if (editable) {
+					return editable(field);
+				}
 				field.hopeContent = document.createElement("textarea");
 				field.hopeMarkup = document.createElement("textarea");
 				field.hopeRenderedSource = document.createElement("DIV");
@@ -1062,7 +1084,9 @@
 			}
 		},
 		responsiveImages : {
-			sizes : {},
+			sizes : function(src) {
+				return {};
+			},
 			init : function(target) {
 				var images = target.querySelectorAll("img[data-simply-src]");
 
@@ -1081,8 +1105,9 @@
 				var srcSet = [];
 				var imagesPath = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
 				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
-					for (var size in editor.responsiveImages.sizes) {
-						srcSet.push(imageSrc + editor.responsiveImages.sizes[size] + " " + size);
+					var sizes = editor.responsiveImages.sizes(imageSrc);
+					for (var size in sizes) {
+						srcSet.push(sizes[size] + " " + size);
 					}
 				}
 
@@ -1162,59 +1187,21 @@
 
 				this.endpoint = endpoint;
 				this.dataEndpoint = endpoint + "data.json";
+				this.file = storage.default.file;
 
 				if (editor.responsiveImages) {
-					editor.responsiveImages.sizes = {
-						"1200w" : "?size=1200",
-						"800w" : "?size=800",
-						"640w" : "?size=640",
-						"480w" : "?size=480",
-						"320w" : "?size=320",
-						"160w" : "?size=160",
-						"80w" : "?size=80"
+					editor.responsiveImages.sizes = function(src) {
+						return {
+							"1200w" : src + "?size=1200",
+							"800w" : src + "?size=800",
+							"640w" : src + "?size=640",
+							"480w" : src + "?size=480",
+							"320w" : src + "?size=320",
+							"160w" : src + "?size=160",
+							"80w" : src + "?size=80"
+						};
 					};
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
-				}
-			},
-			file : {
-				save : function(path, data, callback) {
-					var http = new XMLHttpRequest();
-					var url = editor.storage.url + path;
-
-					http.open("PUT", url, true);
-					http.withCredentials = true;
-
-					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4 && http.status == 200) {
-							callback();
-						}
-					};
-					http.upload.onprogress = function (event) {
-						if (event.lengthComputable) {
-							var complete = (event.loaded / event.total * 100 | 0);
-							var progress = document.querySelector("progress[data-simply-progress='" + path + "']");
-							if (progress) {
-								progress.value = progress.innerHTML = complete;
-							}
-						}
-					};
-
-					http.send(data);
-				},
-				delete : function(path, callback) {
-					var http = new XMLHttpRequest();
-					var url = editor.storage.url + path;
-
-					http.open("DELETE", url, true);
-					http.withCredentials = true;
-
-					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4 && http.status == 200) {
-							callback();
-						}
-					};
-
-					http.send();
 				}
 			},
 			save : function(data, callback) {
@@ -1443,23 +1430,52 @@
 				}
 				this.url = endpoint;
 				this.endpoint = endpoint;
-				this.dataEndpoint = this.url + "data/data.json";
+				this.dataPath = "data/data.json";
+				this.dataEndpoint = this.url + this.dataPath;
+			},
+			file : {
+				save : function(path, data, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("PUT", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+					http.upload.onprogress = function (event) {
+						if (event.lengthComputable) {
+							var complete = (event.loaded / event.total * 100 | 0);
+							var progress = document.querySelector("progress[data-simply-progress='" + path + "']");
+							if (progress) {
+								progress.value = progress.innerHTML = complete;
+							}
+						}
+					};
+
+					http.send(data);
+				},
+				delete : function(path, callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + path;
+
+					http.open("DELETE", url, true);
+					http.withCredentials = true;
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && http.status == 200) {
+							callback();
+						}
+					};
+
+					http.send();
+				}
 			},
 			save : function(data, callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.dataEndpoint;
-
-				http.open("PUT", url, true);
-				//Send the proper header information along with the request
-				http.setRequestHeader("Content-type", "application/json");
-				http.setRequestHeader("charset", "UTF-8");
-
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback();
-					}
-				};
-				http.send(data);
+				return editor.storage.file.save(this.dataPath, data, callback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
