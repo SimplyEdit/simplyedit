@@ -17,7 +17,7 @@
 
 				currentData = editor.data.get(target);
 				var dataName = target.getAttribute("data-simply-list");
-				var dataPath = target.getAttribute("data-simply-path") ? target.getAttribute("data-simply-path") : location.pathname;
+				var dataPath = editor.data.getDataPath(target);
 				currentData = currentData[dataPath][dataName];
 			} else {
 				currentData = editor.field.get(target);
@@ -47,12 +47,15 @@
 					editor.plugins.undoRedo.storeUndo(undoStep.target, true);
 				}
 				if (undoStep.target.getAttribute("data-simply-list")) {
+					var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
 					var items = undoStep.target.querySelectorAll("[data-simply-list-item]");
 					for (var i=0; i<items.length; i++) {
 						items[i].parentNode.removeChild(items[i]);
 					}
 					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
+
 					editor.editmode.makeEditable(undoStep.target);
+					document.body.scrollTop = currentScroll;
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
 				}
@@ -69,12 +72,14 @@
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo + 1];
 			if (typeof undoStep !== "undefined") {
 				if (undoStep.target.getAttribute("data-simply-list")) {
+					var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
 					var items = undoStep.target.querySelectorAll("[data-simply-list-item]");
 					for (var i=0; i<items.length; i++) {
 						items[i].parentNode.removeChild(items[i]);
 					}
 					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
 					editor.editmode.makeEditable(undoStep.target);
+					document.body.scrollTop = currentScroll;
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
 				}

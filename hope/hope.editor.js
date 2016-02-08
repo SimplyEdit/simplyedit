@@ -42,11 +42,22 @@ hope.register( 'hope.editor', function() {
 					textValue += node.text;
 					tagEnd = hopeTokenCounter;
 
+					var caret = -1;
+					var sel = window.getSelection();
+
+					if (sel.rangeCount) {
+						var range = sel.getRangeAt(0);
+						if (target.childNodes[i] == range.startContainer) {
+							caret = range.startOffset;
+						}
+					}
+
 					tags.push({
 						start : tagStart,
 						end : tagEnd,
 						tag : target.childNodes[i].tagName.toLowerCase(),
-						attrs : target.childNodes[i].attributes
+						attrs : target.childNodes[i].attributes,
+						caret : caret
 					});
 
 					for (var j=0; j<node.tags.length; j++) {
@@ -78,6 +89,9 @@ hope.register( 'hope.editor', function() {
 				for (j =0; j<tags[i].attrs.length; j++) {
 					result += " " + tags[i].attrs[j].name + "=\"" + tags[i].attrs[j].value + "\"";
 				}
+			}
+			if (tags[i].caret > -1) {
+				result += " data-hope-caret=\"" + tags[i].caret + "\"";
 			}
 			result += "\n";
 		}
@@ -268,6 +282,12 @@ hope.register( 'hope.editor', function() {
 	hopeEditor.prototype.showCursor = function() {
 		var range = this.selection.getRange();
 		var selection = this.getEditorRange(range.start, range.end);
+		var caretElm = document.querySelector('[data-hope-caret]');
+		if (caretElm) {
+			selection = document.createRange();
+			selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
+			caretElm.removeAttribute("data-hope-caret");
+		}
 		if (selection) {
 			var htmlSelection = window.getSelection();
 			htmlSelection.removeAllRanges();

@@ -4,6 +4,18 @@
 		var removeTouchSelectionEvent;
 	
 		var handleItemSelect = function(event) {
+			var deltaX = Math.abs(event.clientX - this.clickStart.x);
+			var deltaY = Math.abs(event.clientY - this.clickStart.y);
+			var deltaTime = Math.abs((new Date()).getTime() - this.clickStart.time);
+
+			if (deltaTime > 1000) { // if the click took more than one second, or...
+				return;
+			} else {
+				if (deltaX > 40 || deltaY > 40) { // the pointer moved a lot to get this click, it probably wasn't to select the item.
+					return;
+				}
+			}
+
 			var target = muze.event.target(event);
 			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
 				if (target.getAttribute("contenteditable")) {
@@ -60,7 +72,16 @@
 		var bindSelectables = function() {
 			var listItems = document.querySelectorAll("[data-simply-selectable]");
 			for (var i=0; i<listItems.length; i++) {
+				listItems[i].removeEventListener('click', handleItemSelect);
 				listItems[i].addEventListener('click', handleItemSelect);
+				listItems[i].addEventListener('mousedown', function(evt) {
+					var target = this;
+					target.clickStart = {
+						x : evt.clientX,
+						y : evt.clientY,
+						time : (new Date()).getTime()
+					};
+				});
 			}
 		}
 		

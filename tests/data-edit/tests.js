@@ -131,6 +131,14 @@ QUnit.module("hope editor behaviour");
 		assert.equal(testContent.innerHTML, "<gobblefoo>Hello <gobblebar>world</gobblebar></gobblefoo>", "innerHTML did not change");
 	});
 
+	QUnit.test("parseHTML leaves caret where it was", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "abcdef<p><br></p>";
+		setCaretPosition(testContent.querySelector("p"), 0, 0);
+		testContent.hopeEditor.parseHTML();
+		assert.equal(window.getSelection().baseNode, testContent.querySelector("p"));
+	});
+
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -287,7 +295,6 @@ QUnit.module("editor text cursor");
 		editor.actions['simply-text-blockstyle']('h1');
 		assert.equal(testContent.innerHTML, '<h1>Hello world</h1>');
 	});
-
 
 QUnit.module("editor text selection");
 	QUnit.test("text set bold", function(assert) {
