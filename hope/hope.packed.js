@@ -546,6 +546,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var removeRange = false;
 		var growRange = false;
 		var removeList = [];
+		var foundCaret = false;
 		if ( size < 0 ) {
 			removeRange = hope.range.create( position + size, position );
 		} else {
@@ -591,10 +592,32 @@ hope.register( 'hope.fragment.annotations', function() {
 				}
 			} else if (growRange) {
 				var range;
-				if ( list[i].range.start > position ) {
+				if ( list[i].range.start == position ) {
+					if (list[i].tag.indexOf("data-hope-caret") > -1) {
+						foundCaret = true;
+						range = list[i].range.grow( size );
+						list[i] = hope.annotation.create( range, list[i].tag );
+					} else {
+						if (foundCaret) {
+							range = list[i].range.move( size, position );
+							list[i] = hope.annotation.create( range, list[i].tag );
+						}
+					}
+				} else if (list[i].range.end == position ) {
+					if (list[i].tag.indexOf("data-hope-caret") > -1) {
+						foundCaret = true;
+						range = list[i].range.grow( size );
+						list[i] = hope.annotation.create( range, list[i].tag );
+					} else {
+						if (foundCaret) {
+							range = list[i].range.grow( size );
+							list[i] = hope.annotation.create( range, list[i].tag );
+						}
+					}
+				} else if ( list[i].range.start > position ) {
 					range = list[i].range.move( size, position );
 					list[i] = hope.annotation.create( range, list[i].tag );
-				} else if ( list[i].range.end >= position ) {
+				} else if ( list[i].range.end > position ) {
 					range = list[i].range.grow( size );
 					list[i] = hope.annotation.create( range, list[i].tag );
 				}
@@ -1517,7 +1540,11 @@ hope.register( 'hope.fragment.annotations', function() {
 
 					if (sel.rangeCount) {
 						var range = sel.getRangeAt(0);
-						if (target.childNodes[i] == range.startContainer) {
+						var startContainer = range.startContainer;
+						if (startContainer.nodeType == 3) {
+							startContainer = startContainer.parentNode;
+						}
+						if (target.childNodes[i] == startContainer) {
 							caret = range.startOffset;
 						}
 					}
@@ -1755,7 +1782,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		var caretElm = document.querySelector('[data-hope-caret]');
 		if (caretElm) {
 			selection = document.createRange();
-			selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
+			try {
+				selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
+			} catch (e) {
+				selection.setStart(caretElm.childNodes[0], caretElm.getAttribute('data-hope-caret'));
+			}
 			caretElm.removeAttribute("data-hope-caret");
 		}
 		if (selection) {

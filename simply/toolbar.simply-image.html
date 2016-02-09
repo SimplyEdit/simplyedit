@@ -100,7 +100,18 @@
 		},
 		reselect : function() {
 			var sel = window.getSelection();
-			var image = sel.baseNode.nextSibling;
+			var image = vdSelection.getNode(vdSelectionState.get());
+			if (image.nodeType == 1 && image.tagName.toLowerCase() == "img") {
+				var range = document.createRange();
+				range.setStartBefore(image);
+				range.setEndAfter(image);
+
+				sel.removeAllRanges();
+				sel.addRange(range);
+				return image;
+			}
+
+			image = sel.baseNode.nextSibling;
 			if (!image) {
 				image = sel.baseNode.parentNode.nextSibling;
 			}
