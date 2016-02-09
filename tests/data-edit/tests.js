@@ -139,25 +139,6 @@ QUnit.module("hope editor behaviour");
 		assert.equal(window.getSelection().baseNode, testContent.querySelector("p"));
 	});
 
-	QUnit.test("insert image at end of paragraph stays at caret location", function(assert) {
-		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = "<p>abcdef</p><p>world</p>";
-		setCaretPosition(testContent.querySelector("p"), 6, 0);
-		testContent.hopeEditor.parseHTML();
-		editor.actions["simply-insert-image"]();
-		
-		assert.equal(testContent.querySelector("img").parentNode.innerText, "abcdef");
-	});
-
-	QUnit.test("insert image at start of paragraph stays at caret location", function(assert) {
-		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = "<p>abcdef</p><p>world</p>";
-		setCaretPosition(testContent.querySelector("p + p"), 0, 0);
-		testContent.hopeEditor.parseHTML();
-		editor.actions["simply-insert-image"]();
-		
-		assert.equal(testContent.querySelector("img").parentNode.innerText, "world");
-	});
 
 	
 QUnit.module("editor context");
@@ -542,6 +523,57 @@ QUnit.module("text hyperlinks");
 	});
 
 
+QUnit.module("images");
+	QUnit.test("insert image at end of paragraph stays at caret location", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef</p><p>world</p>";
+		setCaretPosition(testContent.querySelector("p"), 6, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.actions["simply-insert-image"]();
+		
+		assert.equal(testContent.querySelector("img").parentNode.innerText, "abcdef");
+	});
+
+	QUnit.test("insert image at start of paragraph stays at caret location", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef</p><p>world</p>";
+		setCaretPosition(testContent.querySelector("p + p"), 0, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.actions["simply-insert-image"]();
+		
+		assert.equal(testContent.querySelector("img").parentNode.innerText, "world");
+	});
+
+	QUnit.test("select image works", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef</p><p>wo<a href='#'><img src='frop'></a>rld</p>";
+		testContent.hopeEditor.parseHTML();
+		muze.event.fire(testContent.querySelector("img"), "click");
+		
+		assert.equal(editor.context.get(), "simply-image");
+	});
+
+	QUnit.test("set image source for image within hyperlink works", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef</p><p><a href='#'><img src='frop'></a>rld</p>";
+		testContent.hopeEditor.parseHTML();
+		muze.event.fire(testContent.querySelector("img"), "click");
+		editor.context.update();
+		editor.actions["simply-image-src"]("HelloWorld");
+		
+		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+	});
+
+	QUnit.test("responsive image source gets set", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef</p><p><a href='#'><img src='frop'></a>rld</p>";
+		testContent.hopeEditor.parseHTML();
+		muze.event.fire(testContent.querySelector("img"), "click");
+		editor.context.update();
+		editor.actions["simply-image-src"]("HelloWorld");
+		
+		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
+	});
 
 QUnit.module("no context");
 	QUnit.test("remove selection at end of tests", function(assert) {
