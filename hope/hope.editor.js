@@ -47,7 +47,11 @@ hope.register( 'hope.editor', function() {
 
 					if (sel.rangeCount) {
 						var range = sel.getRangeAt(0);
-						if (target.childNodes[i] == range.startContainer) {
+						var startContainer = range.startContainer;
+						if (startContainer.nodeType == 3) {
+							startContainer = startContainer.parentNode;
+						}
+						if (target.childNodes[i] == startContainer) {
 							caret = range.startOffset;
 						}
 					}
@@ -285,7 +289,11 @@ hope.register( 'hope.editor', function() {
 		var caretElm = document.querySelector('[data-hope-caret]');
 		if (caretElm) {
 			selection = document.createRange();
-			selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
+			try {
+				selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
+			} catch (e) {
+				selection.setStart(caretElm.childNodes[0], caretElm.getAttribute('data-hope-caret'));
+			}
 			caretElm.removeAttribute("data-hope-caret");
 		}
 		if (selection) {

@@ -139,6 +139,27 @@ QUnit.module("hope editor behaviour");
 		assert.equal(window.getSelection().baseNode, testContent.querySelector("p"));
 	});
 
+	QUnit.test("insert image at end of paragraph stays at caret location", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef</p><p>world</p>";
+		setCaretPosition(testContent.querySelector("p"), 6, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.actions["simply-insert-image"]();
+		
+		assert.equal(testContent.querySelector("img").parentNode.innerText, "abcdef");
+	});
+
+	QUnit.test("insert image at start of paragraph stays at caret location", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef</p><p>world</p>";
+		setCaretPosition(testContent.querySelector("p + p"), 0, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.actions["simply-insert-image"]();
+		
+		assert.equal(testContent.querySelector("img").parentNode.innerText, "world");
+	});
+
+	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
 		var testContent = document.querySelector("#testContent");
