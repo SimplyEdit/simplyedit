@@ -114,7 +114,7 @@
 							if (action) {
 								editor.toolbar.beforeAction();
 								var result = action(el);
-								editor.context.show();
+								editor.context.update();
 								if (!result) {
 									return;
 								}
