@@ -744,7 +744,18 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeAnnotationList.prototype.has = function(range, tag) {
 		range = hope.range.create(range);
-		for ( var i=0,l=this.list.length; i<l; i++ ) {
+		// first check if we can find a perfect match;
+		var i,l;
+		for ( i=0,l=this.list.length; i<l; i++ ) {
+			if (
+				this.list[i].range.equals( range ) &&
+				this.list[i].has( tag )
+			) {
+				return this.list[i];
+			}
+		}
+		// if not, find one that overlaps and return the first match we find;
+		for ( i=0,l=this.list.length; i<l; i++ ) {
 			if (
 				this.list[i].range.overlaps( range ) && 
 				this.list[i].has( tag )
