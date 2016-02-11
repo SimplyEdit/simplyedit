@@ -639,9 +639,7 @@
 						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 						field.hopeEditor.field = field;
 						field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
-							window.setTimeout(function() {
-								field.hopeEditor.needsUpdate = true;
-							}, 300);
+							field.hopeEditor.needsUpdate = true;
 						});
 					}
 				},
@@ -741,9 +739,7 @@
 				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 				field.hopeEditor.field = field;
 				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
-					window.setTimeout(function() {
-						field.hopeEditor.needsUpdate = true;
-					}, 300);
+					field.hopeEditor.needsUpdate = true;
 				});
 			}
 		},

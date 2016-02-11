@@ -206,8 +206,6 @@ hope.register( 'hope.editor', function() {
 		this.refs.annotations.value = tagsToText(data.tags);
 		this.refs.text.value = data.text;
 		this.fragment = hope.fragment.create( this.refs.text.value, this.refs.annotations.value );
-		this.update();
-
 	};
 
 	hopeEditor.prototype.getEditorRange = function(start, end ) {

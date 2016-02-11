@@ -59,6 +59,7 @@
 					editor.field.set(undoStep.target, undoStep.data);
 					if (undoStep.target.hopeEditor) {
 						undoStep.target.hopeEditor.parseHTML();
+						undoStep.target.hopeEditor.update();
 					}
 				}
 				editor.plugins.undoRedo.currentUndo--;
@@ -86,6 +87,7 @@
 					editor.field.set(undoStep.target, undoStep.data);
 					if (undoStep.target.hopeEditor) {
 						undoStep.target.hopeEditor.parseHTML();
+						undoStep.target.hopeEditor.update();
 					}
 				}
 				editor.plugins.undoRedo.currentUndo++;

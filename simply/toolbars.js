@@ -714,7 +714,7 @@
 			editor.context.fixSelection();
 			if ((typeof hopeEditor !== "undefined") && hopeEditor.needsUpdate) {
 				hopeEditor.selection.updateRange();
-				hopeEditor.parseHTML();
+				hopeEditor.parseHTML(); // FIXME: This causes flickering in Firefox and random cursor movement;
 				hopeEditor.needsUpdate = false;
 			}
 			editor.context.show();
@@ -760,6 +760,7 @@
 			var hopeEditor = editor.plugins.dialog.currentField.hopeEditor;
 			if (hopeEditor) {
 				hopeEditor.parseHTML();
+				hopeEditor.update();
 				hopeEditor.selection.updateRange(hopeEditor.currentRange.start, hopeEditor.currentRange.end);
 				hopeEditor.showCursor();
 			}
