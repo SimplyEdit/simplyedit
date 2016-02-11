@@ -575,6 +575,45 @@ QUnit.module("images");
 		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 	});
 
+	QUnit.test("insert 2 images, get src in first image", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
+		testContent.hopeEditor.parseHTML();
+                muze.event.fire(testContent.querySelector("img"), "click");
+		editor.context.update();
+		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "a");
+	});
+
+	QUnit.test("insert 2 images, get src in second image", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
+		testContent.hopeEditor.parseHTML();
+                muze.event.fire(testContent.querySelector("img + img"), "click");
+		editor.context.update();
+		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "b");
+	});
+
+	QUnit.test("insert 2 images, set src in first image", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
+		testContent.hopeEditor.parseHTML();
+                muze.event.fire(testContent.querySelector("img"), "click");
+		editor.context.update();
+		editor.actions["simply-image-src"]("HelloWorld");
+		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+	});
+
+	QUnit.test("insert 2 images, set src in second image", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
+		testContent.hopeEditor.parseHTML();
+                muze.event.fire(testContent.querySelector("img + img"), "click");
+		editor.context.update();
+		editor.actions["simply-image-src"]("HelloWorld");
+		assert.equal(testContent.querySelector("img + img").getAttribute("data-simply-src"), "HelloWorld");
+	});
+
+
 QUnit.module("no context");
 	QUnit.test("remove selection at end of tests", function(assert) {
 		window.getSelection().removeAllRanges();
