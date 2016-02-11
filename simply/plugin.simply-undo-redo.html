@@ -53,11 +53,13 @@
 						items[i].parentNode.removeChild(items[i]);
 					}
 					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
-
 					editor.editmode.makeEditable(undoStep.target);
 					document.body.scrollTop = currentScroll;
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
+					if (undoStep.target.hopeEditor) {
+						undoStep.target.hopeEditor.parseHTML();
+					}
 				}
 				editor.plugins.undoRedo.currentUndo--;
 			}
@@ -82,6 +84,9 @@
 					document.body.scrollTop = currentScroll;
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
+					if (undoStep.target.hopeEditor) {
+						undoStep.target.hopeEditor.parseHTML();
+					}
 				}
 				editor.plugins.undoRedo.currentUndo++;
 			}
