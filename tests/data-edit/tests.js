@@ -354,6 +354,25 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, '<p>He<em>llo</em> world</p>', "Italic uses EM tag");
 	});
 	
+	QUnit.test("text set h1 in paragraph", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello world</p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("p"), 2, 3);
+		editor.actions['simply-text-blockstyle']('h1');
+		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><p> world</p>', "Selection blockstyle creates block");
+	});
+
+	QUnit.test("text set h1", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 2, 3);
+		editor.actions['simply-text-blockstyle']('h1');
+		assert.equal(testContent.innerHTML, 'He<h1>llo</h1> world', "Selection blockstyle creates block");
+	});
 
 	QUnit.test("text style init italic", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -450,6 +469,60 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, "H<ul><li>ello</li></ul> world");
 	});
 
+QUnit.module("custom text settings");
+	QUnit.test("settings without p don't break", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello world<p>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'h2', name: 'Test'}
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+	});
+
+/*
+	// FIXME: Decide if this is breaking 'by design';
+	QUnit.test("paragraph with class is found", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p class='test'>Hello world<p>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'p class="test"', name: 'Test'}
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		assert.equal(currentStyle, 'p class="test"', "text style is correctly updated");
+	});
+
+	QUnit.test("paragraph with more specific class is found", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p class='test'>Hello world<p>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'p', name: 'Paragraph'},
+				{tag: 'p class="test"', name: 'Test'}
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		assert.equal(currentStyle, 'p class="test"', "text style is correctly updated");
+	});
+*/
 
 QUnit.module("text hyperlinks");
 	QUnit.test("text hyperlink", function(assert) {
