@@ -53,11 +53,14 @@
 						items[i].parentNode.removeChild(items[i]);
 					}
 					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
-
 					editor.editmode.makeEditable(undoStep.target);
 					document.body.scrollTop = currentScroll;
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
+					if (undoStep.target.hopeEditor) {
+						undoStep.target.hopeEditor.parseHTML();
+						undoStep.target.hopeEditor.update();
+					}
 				}
 				editor.plugins.undoRedo.currentUndo--;
 			}
@@ -82,6 +85,10 @@
 					document.body.scrollTop = currentScroll;
 				} else {
 					editor.field.set(undoStep.target, undoStep.data);
+					if (undoStep.target.hopeEditor) {
+						undoStep.target.hopeEditor.parseHTML();
+						undoStep.target.hopeEditor.update();
+					}
 				}
 				editor.plugins.undoRedo.currentUndo++;
 			}
@@ -143,16 +150,27 @@
 			// FIXME: Add keyboard handlers;
 		},
 		update : function() {
+			var undoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
+			var redoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
+
 			if (editor.plugins.undoRedo.canUndo()) {
-				document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]").removeAttribute("disabled");
+				if (undoButton.getAttribute("disabled")) {
+					undoButton.removeAttribute("disabled");
+				}
 			} else {
-				document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]").setAttribute("disabled", true);
+				if (!undoButton.getAttribute("disabled")) {
+					undoButton.setAttribute("disabled", true);
+				}
 			}
 
 			if (editor.plugins.undoRedo.canRedo()) {
-				document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]").removeAttribute("disabled");
+				if (redoButton.getAttribute("disabled")) {
+					redoButton.removeAttribute("disabled");
+				}
 			} else {
-				document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]").setAttribute("disabled", true);
+				if (!redoButton.getAttribute("disabled")) {
+					redoButton.setAttribute("disabled", true);
+				}
 			}
 		},
 		actions : {

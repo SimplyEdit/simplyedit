@@ -42,22 +42,12 @@ hope.register( 'hope.editor', function() {
 					textValue += node.text;
 					tagEnd = hopeTokenCounter;
 
-					var caret = -1;
-					var sel = window.getSelection();
-
-					if (sel.rangeCount) {
-						var range = sel.getRangeAt(0);
-						if (target.childNodes[i] == range.startContainer) {
-							caret = range.startOffset;
-						}
-					}
-
 					tags.push({
 						start : tagStart,
 						end : tagEnd,
 						tag : target.childNodes[i].tagName.toLowerCase(),
 						attrs : target.childNodes[i].attributes,
-						caret : caret
+						caret : getCaretOffset(target.childNodes[i])
 					});
 
 					for (var j=0; j<node.tags.length; j++) {
@@ -77,6 +67,38 @@ hope.register( 'hope.editor', function() {
 			text : textValue,
 			tags : tags
 		};
+	}
+
+	function getCaretOffset(node) {
+		// find out the position of the cursor within this element;
+		var caret = -1;
+		var sel = window.getSelection();
+
+		if (sel.rangeCount) {
+			var range = sel.getRangeAt(0);
+			var startContainer = range.startContainer;
+			if (startContainer.nodeType == 3) {
+				startContainer = startContainer.parentNode;
+			}
+			if (node == startContainer) {
+				caret = range.startOffset;
+			}
+		}
+		return caret;
+	}
+
+	function setCaretOffset(node) {
+		// restore the cursor into this element; current offset should be in data-hope-caret
+		var selection = document.createRange();
+
+		// FIXME: this piece of code seems 'off', but seems to work; It should always restore the cursor position to where getCaretOffset found it.
+		try {
+			selection.setStart(node, node.getAttribute('data-hope-caret'));
+		} catch (e) {
+			selection.setStart(node.childNodes[0], node.getAttribute('data-hope-caret'));
+		}
+		node.removeAttribute("data-hope-caret");
+		return selection;
 	}
 
 	function tagsToText(tags) {
@@ -184,8 +206,6 @@ hope.register( 'hope.editor', function() {
 		this.refs.annotations.value = tagsToText(data.tags);
 		this.refs.text.value = data.text;
 		this.fragment = hope.fragment.create( this.refs.text.value, this.refs.annotations.value );
-		this.update();
-
 	};
 
 	hopeEditor.prototype.getEditorRange = function(start, end ) {
@@ -284,9 +304,7 @@ hope.register( 'hope.editor', function() {
 		var selection = this.getEditorRange(range.start, range.end);
 		var caretElm = document.querySelector('[data-hope-caret]');
 		if (caretElm) {
-			selection = document.createRange();
-			selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
-			caretElm.removeAttribute("data-hope-caret");
+			selection = setCaretOffset(caretElm);
 		}
 		if (selection) {
 			var htmlSelection = window.getSelection();

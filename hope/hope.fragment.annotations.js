@@ -78,6 +78,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var removeRange = false;
 		var growRange = false;
 		var removeList = [];
+		var foundCaret = false;
 		if ( size < 0 ) {
 			removeRange = hope.range.create( position + size, position );
 		} else {
@@ -123,10 +124,32 @@ hope.register( 'hope.fragment.annotations', function() {
 				}
 			} else if (growRange) {
 				var range;
-				if ( list[i].range.start > position ) {
+				if ( list[i].range.start == position ) {
+					if (list[i].tag.indexOf("data-hope-caret") > -1) {
+						foundCaret = true;
+						range = list[i].range.grow( size );
+						list[i] = hope.annotation.create( range, list[i].tag );
+					} else {
+						if (foundCaret) {
+							range = list[i].range.move( size, position );
+							list[i] = hope.annotation.create( range, list[i].tag );
+						}
+					}
+				} else if (list[i].range.end == position ) {
+					if (list[i].tag.indexOf("data-hope-caret") > -1) {
+						foundCaret = true;
+						range = list[i].range.grow( size );
+						list[i] = hope.annotation.create( range, list[i].tag );
+					} else {
+						if (foundCaret) {
+							range = list[i].range.grow( size );
+							list[i] = hope.annotation.create( range, list[i].tag );
+						}
+					}
+				} else if ( list[i].range.start > position ) {
 					range = list[i].range.move( size, position );
 					list[i] = hope.annotation.create( range, list[i].tag );
-				} else if ( list[i].range.end >= position ) {
+				} else if ( list[i].range.end > position ) {
 					range = list[i].range.grow( size );
 					list[i] = hope.annotation.create( range, list[i].tag );
 				}
@@ -253,7 +276,18 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeAnnotationList.prototype.has = function(range, tag) {
 		range = hope.range.create(range);
-		for ( var i=0,l=this.list.length; i<l; i++ ) {
+		// first check if we can find a perfect match;
+		var i,l;
+		for ( i=0,l=this.list.length; i<l; i++ ) {
+			if (
+				this.list[i].range.equals( range ) &&
+				this.list[i].has( tag )
+			) {
+				return this.list[i];
+			}
+		}
+		// if not, find one that overlaps and return the first match we find;
+		for ( i=0,l=this.list.length; i<l; i++ ) {
 			if (
 				this.list[i].range.overlaps( range ) && 
 				this.list[i].has( tag )

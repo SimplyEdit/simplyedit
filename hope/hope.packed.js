@@ -546,6 +546,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var removeRange = false;
 		var growRange = false;
 		var removeList = [];
+		var foundCaret = false;
 		if ( size < 0 ) {
 			removeRange = hope.range.create( position + size, position );
 		} else {
@@ -591,10 +592,32 @@ hope.register( 'hope.fragment.annotations', function() {
 				}
 			} else if (growRange) {
 				var range;
-				if ( list[i].range.start > position ) {
+				if ( list[i].range.start == position ) {
+					if (list[i].tag.indexOf("data-hope-caret") > -1) {
+						foundCaret = true;
+						range = list[i].range.grow( size );
+						list[i] = hope.annotation.create( range, list[i].tag );
+					} else {
+						if (foundCaret) {
+							range = list[i].range.move( size, position );
+							list[i] = hope.annotation.create( range, list[i].tag );
+						}
+					}
+				} else if (list[i].range.end == position ) {
+					if (list[i].tag.indexOf("data-hope-caret") > -1) {
+						foundCaret = true;
+						range = list[i].range.grow( size );
+						list[i] = hope.annotation.create( range, list[i].tag );
+					} else {
+						if (foundCaret) {
+							range = list[i].range.grow( size );
+							list[i] = hope.annotation.create( range, list[i].tag );
+						}
+					}
+				} else if ( list[i].range.start > position ) {
 					range = list[i].range.move( size, position );
 					list[i] = hope.annotation.create( range, list[i].tag );
-				} else if ( list[i].range.end >= position ) {
+				} else if ( list[i].range.end > position ) {
 					range = list[i].range.grow( size );
 					list[i] = hope.annotation.create( range, list[i].tag );
 				}
@@ -721,7 +744,18 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeAnnotationList.prototype.has = function(range, tag) {
 		range = hope.range.create(range);
-		for ( var i=0,l=this.list.length; i<l; i++ ) {
+		// first check if we can find a perfect match;
+		var i,l;
+		for ( i=0,l=this.list.length; i<l; i++ ) {
+			if (
+				this.list[i].range.equals( range ) &&
+				this.list[i].has( tag )
+			) {
+				return this.list[i];
+			}
+		}
+		// if not, find one that overlaps and return the first match we find;
+		for ( i=0,l=this.list.length; i<l; i++ ) {
 			if (
 				this.list[i].range.overlaps( range ) && 
 				this.list[i].has( tag )
@@ -1512,22 +1546,12 @@ hope.register( 'hope.fragment.annotations', function() {
 					textValue += node.text;
 					tagEnd = hopeTokenCounter;
 
-					var caret = -1;
-					var sel = window.getSelection();
-
-					if (sel.rangeCount) {
-						var range = sel.getRangeAt(0);
-						if (target.childNodes[i] == range.startContainer) {
-							caret = range.startOffset;
-						}
-					}
-
 					tags.push({
 						start : tagStart,
 						end : tagEnd,
 						tag : target.childNodes[i].tagName.toLowerCase(),
 						attrs : target.childNodes[i].attributes,
-						caret : caret
+						caret : getCaretOffset(target.childNodes[i])
 					});
 
 					for (var j=0; j<node.tags.length; j++) {
@@ -1547,6 +1571,38 @@ hope.register( 'hope.fragment.annotations', function() {
 			text : textValue,
 			tags : tags
 		};
+	}
+
+	function getCaretOffset(node) {
+		// find out the position of the cursor within this element;
+		var caret = -1;
+		var sel = window.getSelection();
+
+		if (sel.rangeCount) {
+			var range = sel.getRangeAt(0);
+			var startContainer = range.startContainer;
+			if (startContainer.nodeType == 3) {
+				startContainer = startContainer.parentNode;
+			}
+			if (node == startContainer) {
+				caret = range.startOffset;
+			}
+		}
+		return caret;
+	}
+
+	function setCaretOffset(node) {
+		// restore the cursor into this element; current offset should be in data-hope-caret
+		var selection = document.createRange();
+
+		// FIXME: this piece of code seems 'off', but seems to work; It should always restore the cursor position to where getCaretOffset found it.
+		try {
+			selection.setStart(node, node.getAttribute('data-hope-caret'));
+		} catch (e) {
+			selection.setStart(node.childNodes[0], node.getAttribute('data-hope-caret'));
+		}
+		node.removeAttribute("data-hope-caret");
+		return selection;
 	}
 
 	function tagsToText(tags) {
@@ -1654,8 +1710,6 @@ hope.register( 'hope.fragment.annotations', function() {
 		this.refs.annotations.value = tagsToText(data.tags);
 		this.refs.text.value = data.text;
 		this.fragment = hope.fragment.create( this.refs.text.value, this.refs.annotations.value );
-		this.update();
-
 	};
 
 	hopeEditor.prototype.getEditorRange = function(start, end ) {
@@ -1754,9 +1808,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var selection = this.getEditorRange(range.start, range.end);
 		var caretElm = document.querySelector('[data-hope-caret]');
 		if (caretElm) {
-			selection = document.createRange();
-			selection.setStart(caretElm, caretElm.getAttribute('data-hope-caret'));
-			caretElm.removeAttribute("data-hope-caret");
+			selection = setCaretOffset(caretElm);
 		}
 		if (selection) {
 			var htmlSelection = window.getSelection();
