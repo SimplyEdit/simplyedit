@@ -99,6 +99,8 @@
 			return editor.plugins.image.placeholderData;
 		},
 		reselect : function() {
+			hopeEditor.showCursor();
+			vdSelectionState.remove();
 			var sel = window.getSelection();
 			var image = vdSelection.getNode(vdSelectionState.get());
 			if (image.nodeType == 1 && image.tagName.toLowerCase() == "img") {
