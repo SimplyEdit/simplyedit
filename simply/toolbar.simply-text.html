@@ -617,6 +617,10 @@
 					}
 				}
 
+				if (blocks.length === 0) {
+					return editor.plugins.hope.annotation.apply(hopeEditor, value);
+				}
+
 				while (blocks.length) {
 					var block = blocks.shift();
 					var newRange;
@@ -640,8 +644,9 @@
 					if (nodeInfo) {
 						newValue += " " + nodeInfo;
 					}
-
-					hopeEditor.fragment = hopeEditor.fragment.apply(newRange, newValue);
+					if (value) {
+						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, newValue);
+					}
 				}
 
 				hopeEditor.update();
