@@ -139,6 +139,110 @@ QUnit.module("hope editor behaviour");
 		assert.equal(window.getSelection().baseNode, testContent.querySelector("p"));
 	});
 
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		<p>abcdef</p>		</div>		";
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.selection.updateRange();
+
+		assert.equal(testContent.hopeEditor.currentRange.start, 6);
+		assert.equal(testContent.hopeEditor.currentRange.end, 6);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
+		testContent.hopeEditor.parseHTML();
+		muze.event.fire(testContent.querySelector("img"), "click");
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 4);
+		assert.equal(testContent.hopeEditor.currentRange.end, 5);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		a	b<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 4);
+		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>abc<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 4);
+		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>ab<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 4);
+		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		//testContent.style.whiteSpace = "pre";
+		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 4);
+		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		//testContent.style.whiteSpace = "pre";
+		testContent.innerHTML = "  <div>  <img src='frop'>  </div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 4);
+		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		//testContent.style.whiteSpace = "pre";
+		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 1, 1);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 3);
+		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+	});
+
+
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		a<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 4);
+		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+	});
+
 
 	
 QUnit.module("editor context");
