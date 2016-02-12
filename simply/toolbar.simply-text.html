@@ -18,6 +18,7 @@
 					<option value="p">Paragraph</option>
 					<option value="ol">Numbered list</option>
 					<option value="ul">Unnumbered list</option>
+					<option value="">(none)</option>
 				</select></li>
 			</ul>
 			<ul class="simply-text-inline">
@@ -83,6 +84,7 @@
 					<option value="p">Paragraph</option>
 					<option value="ol">Numbered list</option>
 					<option value="ul">Unnumbered list</option>
+					<option value="">(none)</option>
 				</select></li>
 			</ul>
 			<ul class="simply-text-inline">
@@ -131,7 +133,6 @@
 	var initTextToolbar = function(config) {
 		var toolbar = document.querySelector("#" + this.name);
 		if (typeof config === "object" && toolbar) {
-
 			// Init blockstyles
 			if (config.block) {
 				var blockStyleSelect = toolbar.querySelector('select[data-simply-action=simply-text-blockstyle]');
@@ -144,6 +145,10 @@
 							option.innerHTML = config.block[i].name;
 							blockStyleSelect.appendChild(option);
 						}
+						option = document.createElement("option");
+						option.value = '';
+						option.innerHTML = '(none)';
+						blockStyleSelect.appendChild(option);
 					} else {
 						blockStyleSelect.style.display = "none";
 					}
@@ -250,15 +255,15 @@
 					if (annotation) {
 						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']").selected = true;
 					} else {
-						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
+						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 					}
 				}
 			} else {
-				toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
+				toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 			}
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "block";
 		} else {
-			toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
+			toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
 		}
 
