@@ -33,6 +33,19 @@ function setCaretPosition(elem, start, length) {
 	}
 	editor.context.update();
 }
+function selectImage(img) {
+	var range = document.createRange();
+	range.selectNode(img);
+
+	var sel = window.getSelection();
+	sel.removeAllRanges();
+	sel.addRange(range);
+	if (focus in img) {
+		img.focus();
+	}
+	editor.context.update();
+}
+
 function setSelectionEnd(elem, offset) {
 	var range = window.getSelection().getRangeAt(0);
 	range.setEnd(elem, offset);
@@ -135,8 +148,10 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "abcdef<p><br></p>";
 		setCaretPosition(testContent.querySelector("p"), 0, 0);
+		var node1 = window.getSelection().focusNode;
 		testContent.hopeEditor.parseHTML();
-		assert.equal(window.getSelection().baseNode, testContent.querySelector("p"));
+		var node2 = window.getSelection().focusNode;
+		assert.equal(node1, node2);
 	});
 
 	QUnit.test("offset calculation works for nested items", function(assert) {
@@ -154,7 +169,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
 		testContent.hopeEditor.parseHTML();
-		muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 		assert.equal(testContent.hopeEditor.currentRange.start, 4);
@@ -710,7 +725,7 @@ QUnit.module("images");
 		testContent.hopeEditor.parseHTML();
 		editor.actions["simply-insert-image"]();
 		
-		assert.equal(testContent.querySelector("img").parentNode.innerText, "abcdef");
+		assert.equal(testContent.querySelector("img").parentNode, testContent.querySelector("p"));
 	});
 
 	QUnit.test("insert image at start of paragraph stays at caret location", function(assert) {
@@ -720,15 +735,15 @@ QUnit.module("images");
 		testContent.hopeEditor.parseHTML();
 		editor.actions["simply-insert-image"]();
 		
-		assert.equal(testContent.querySelector("img").parentNode.innerText, "world");
+		assert.equal(testContent.querySelector("img").parentNode, testContent.querySelector("p + p"));
 	});
 
 	QUnit.test("select image works", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>abcdef</p><p>wo<a href='#'><img src='frop'></a>rld</p>";
 		testContent.hopeEditor.parseHTML();
-		muze.event.fire(testContent.querySelector("img"), "click");
-		
+		selectImage(testContent.querySelector("img"));
+
 		assert.equal(editor.context.get(), "simply-image");
 	});
 
@@ -736,7 +751,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>abcdef</p><p><a href='#'><img src='frop'></a>rld</p>";
 		testContent.hopeEditor.parseHTML();
-		muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		
@@ -747,7 +762,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>abcdef</p><p><a href='#'><img src='frop'></a>rld</p>";
 		testContent.hopeEditor.parseHTML();
-		muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		
@@ -758,7 +773,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "a");
 	});
@@ -767,7 +782,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img + img"), "click");
+		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "b");
 	});
@@ -776,7 +791,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
@@ -786,7 +801,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img + img"), "click");
+		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		assert.equal(testContent.querySelector("img + img").getAttribute("data-simply-src"), "HelloWorld");
