@@ -1,9 +1,9 @@
 hope.register( 'hope.editor.selection', function() {
-
 	function hopeEditorSelection(start, end, editor) {
 		this.start = start;
 		this.end = end;
 		this.editor = editor;
+
 		var self = this;
 
 		var updateRange = function() {
@@ -216,7 +216,14 @@ hope.register( 'hope.editor.selection', function() {
 		
 		node = this.getPrevTextNode(node);
 		while ( node ) {
-			offset += node.textContent.length;
+			if (this.editor.browserCountsWhitespace) {
+				offset += node.textContent.length;
+			} else {
+				if (node.textContent.trim().length !== 0) {
+					offset += node.textContent.length;
+				}
+			}
+
 			node = this.getPrevTextNode(node);
 		}
 		return offset;

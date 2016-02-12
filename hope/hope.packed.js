@@ -1507,6 +1507,20 @@ hope.register( 'hope.fragment.annotations', function() {
 
 } );hope.register( 'hope.editor', function() {
 	var hopeTokenCounter = 0;
+	var browserCountsWhitespace = (function() {
+		var div = document.createElement("DIV");
+		div.innerHTML = "		<div>		<span>abc</span>	</div>		";
+		document.body.appendChild(div);
+		var range = document.createRange();
+		range.setStart(div.querySelector("div"), 1);
+		var offset1 = range.startOffset;
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+		var newRange = sel.getRangeAt(0);
+		var offset2 = newRange.startOffset;
+		return offset1 == offset2;
+	}());
 
 	function unrender(target) {
 		var textValue = '';
@@ -1565,8 +1579,15 @@ hope.register( 'hope.fragment.annotations', function() {
 				var textContent = target.childNodes[i].nodeValue;
 				textContent = textContent.replace(/\u00AD+/g, "");
 
-				hopeTokenCounter += textContent.length;
-				textValue += textContent;
+				if (browserCountsWhitespace) {
+					hopeTokenCounter += textContent.length;
+					textValue += textContent;
+				} else {
+					if (textContent.trim().length) {
+						hopeTokenCounter += textContent.length;
+						textValue += textContent;
+					}
+				}
 			}
 		}
 
@@ -1641,6 +1662,8 @@ hope.register( 'hope.fragment.annotations', function() {
 			this.refs.output.innerHTML = this.refs.output.innerHTML.replace(/\/p>/g, "/p>");
 			this.parseHTML();
 		}
+
+		this.browserCountsWhitespace = browserCountsWhitespace;
 
 		var text = this.refs.text.value;
 		var annotations = this.refs.annotations.value;
@@ -1936,11 +1959,11 @@ hope.register( 'hope.fragment.annotations', function() {
 	};
 
 });hope.register( 'hope.editor.selection', function() {
-
 	function hopeEditorSelection(start, end, editor) {
 		this.start = start;
 		this.end = end;
 		this.editor = editor;
+
 		var self = this;
 
 		var updateRange = function() {
@@ -2153,7 +2176,14 @@ hope.register( 'hope.fragment.annotations', function() {
 		
 		node = this.getPrevTextNode(node);
 		while ( node ) {
-			offset += node.textContent.length;
+			if (this.editor.browserCountsWhitespace) {
+				offset += node.textContent.length;
+			} else {
+				if (node.textContent.trim().length != 0) {
+					offset += node.textContent.length;
+				}
+			}
+
 			node = this.getPrevTextNode(node);
 		}
 		return offset;

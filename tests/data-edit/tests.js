@@ -31,6 +31,7 @@ function setCaretPosition(elem, start, length) {
 	if (focus in elem) {
 		elem.focus();
 	}
+	var newRange = sel.getRangeAt(0);
 	editor.context.update();
 }
 function selectImage(img) {
@@ -161,8 +162,8 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.parseHTML();
 		testContent.hopeEditor.selection.updateRange();
 
-		assert.equal(testContent.hopeEditor.currentRange.start, 6);
-		assert.equal(testContent.hopeEditor.currentRange.end, 6);
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "p");
+		assert.equal(annotation.tag.split(" ")[0], 'p');
 	});
 
 	QUnit.test("offset calculation works for nested items", function(assert) {
@@ -172,8 +173,9 @@ QUnit.module("hope editor behaviour");
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 4);
-		assert.equal(testContent.hopeEditor.currentRange.end, 5);
+
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(annotation.tag.split(" ")[0], 'img');
 	});
 
 	QUnit.test("offset calculation works for nested items", function(assert) {
@@ -181,10 +183,12 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "		<div>		a	b<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 4);
-		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(annotation.tag.split(" ")[0], 'img');
 	});
 
 	QUnit.test("offset calculation works for nested items", function(assert) {
@@ -194,8 +198,8 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.parseHTML();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 4);
-		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 
 	QUnit.test("offset calculation works for nested items", function(assert) {
@@ -205,22 +209,22 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.parseHTML();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 4);
-		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(img.tag, 'img src="frop"');
 	});
 
 	QUnit.test("offset calculation works for nested items", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		//testContent.style.whiteSpace = "pre";
+		// testContent.style.whiteSpace = "pre";
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
-		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 4);
-		assert.equal(testContent.hopeEditor.currentRange.end, 4);
-	});
 
+		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(img.tag, 'img src="frop"');
+	});
 	QUnit.test("offset calculation works for nested items", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		//testContent.style.whiteSpace = "pre";
@@ -229,8 +233,8 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.parseHTML();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 4);
-		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(img.tag, 'img src="frop"');
 	});
 
 	QUnit.test("offset calculation works for nested items", function(assert) {
@@ -241,8 +245,8 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.parseHTML();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 3);
-		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 
 
@@ -254,8 +258,8 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.parseHTML();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		assert.equal(testContent.hopeEditor.currentRange.start, 4);
-		assert.equal(testContent.hopeEditor.currentRange.end, 4);
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 
 
@@ -606,7 +610,6 @@ QUnit.module("custom text settings");
 		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, '');
 	});
-
 /*
 	// FIXME: Decide if this is breaking 'by design';
 	QUnit.test("paragraph with class is found", function(assert) {
@@ -644,7 +647,6 @@ QUnit.module("custom text settings");
 		assert.equal(currentStyle, 'p class="test"', "text style is correctly updated");
 	});
 */
-
 QUnit.module("text hyperlinks");
 	QUnit.test("text hyperlink", function(assert) {
 		var testContent = document.querySelector("#testContent");
