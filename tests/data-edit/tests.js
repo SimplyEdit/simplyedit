@@ -481,9 +481,11 @@ QUnit.module("custom text settings");
 			]
 		};
 		editor.toolbars['simply-text-cursor'].init(textSettings);
+		editor.toolbars['simply-text-selection'].init(textSettings);
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
 		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		assert.equal(currentStyle, '');
 	});
 
 /*
