@@ -7,19 +7,38 @@ hope.register( 'hope.editor.selection', function() {
 		var self = this;
 
 		var updateRange = function() {
-			var sel = window.getSelection();
-			if (sel.focusNode.nodeType === ELEMENT_NODE) {
-				// cursor is not in any child node, so the offset is in nodes instead of characters;
-				self.start = self.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-			} else {
-				self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			var sel   = window.getSelection();
+			var rangeStart, rangeEnd;
+			var bestStart, bestEnd;
+
+			if (sel.rangeCount) {
+				for (var i=0; i<sel.rangeCount; i++) {
+					var range = sel.getRangeAt(i);
+					rangeStart = self.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+					rangeEnd = self.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+
+					if (rangeEnd < rangeStart) {
+						var tempRange = rangeStart;
+						rangeStart = rangeEnd;
+						rangeEnd = tempRange;
+					}
+					if (typeof bestStart !== "undefined") {
+						bestStart = Math.min(bestStart, rangeStart);
+					} else {
+						bestStart = rangeStart;
+					}
+
+					if (typeof bestEnd !== "undefined") {
+						bestEnd = Math.max(bestEnd, rangeEnd);
+					} else {
+						bestEnd = rangeEnd;
+					}
+				}
 			}
 
-			if (sel.anchorNode.nodeType === ELEMENT_NODE) {
-				self.end = self.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
-			} else {
-				self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-			}
+			self.end = bestEnd;
+			self.start = bestStart;
+
 			if (self.end < self.start) {
 				var temp = self.start;
 				self.start = self.end;
@@ -36,16 +55,36 @@ hope.register( 'hope.editor.selection', function() {
 
 	hopeEditorSelection.prototype.updateRange = function (start, end) {
 		if ((typeof start === 'undefined') && (typeof end === 'undefined')) {
-			var sel = window.getSelection();
-			if (sel.focusNode.nodeType === ELEMENT_NODE) {
-				this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-			} else {
-				this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-			}
-			if (sel.anchorNode.nodeType === ELEMENT_NODE) {
-				this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
-			} else {
-				this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			var sel   = window.getSelection();
+			var rangeStart, rangeEnd;
+			var bestStart, bestEnd;
+
+			if (sel.rangeCount) {
+				for (var i=0; i<sel.rangeCount; i++) {
+					var range = sel.getRangeAt(i);
+					rangeStart = this.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+					rangeEnd = this.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+
+					if (rangeEnd < rangeStart) {
+						var tempRange = rangeStart;
+						rangeStart = rangeEnd;
+						rangeEnd = tempRange;
+					}
+
+					if (typeof bestStart !== "undefined") {
+						bestStart = Math.min(bestStart, rangeStart);
+					} else {
+						bestStart = rangeStart;
+					}
+
+					if (typeof bestEnd !== "undefined") {
+						bestEnd = Math.max(bestEnd, rangeEnd);
+					} else {
+						bestEnd = rangeEnd;
+					}
+				}
+				this.start = bestStart;
+				this.end = bestEnd;
 			}
 		}
 
