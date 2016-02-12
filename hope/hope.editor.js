@@ -10,7 +10,7 @@ hope.register( 'hope.editor', function() {
 		var tagStart, tagEnd;
 
 		for (var i in target.childNodes) {
-			if (target.childNodes[i].nodeType == 1) {
+			if (target.childNodes[i].nodeType == ELEMENT_NODE) {
 				if (
 					target.childNodes[i].tagName.toLowerCase() == 'img' ||
 					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
@@ -54,7 +54,7 @@ hope.register( 'hope.editor', function() {
 						tags.push(node.tags[j]);
 					}
 				}
-			} else if (target.childNodes[i].nodeType == 3) {
+			} else if (target.childNodes[i].nodeType == TEXT_NODE) {
 				var textContent = target.childNodes[i].nodeValue;
 				textContent = textContent.replace(/\u00AD+/g, "");
 
@@ -77,7 +77,7 @@ hope.register( 'hope.editor', function() {
 		if (sel.rangeCount) {
 			var range = sel.getRangeAt(0);
 			var startContainer = range.startContainer;
-			if (startContainer.nodeType == 3) {
+			if (startContainer.nodeType == TEXT_NODE) {
 				startContainer = startContainer.parentNode;
 			}
 			if (node == startContainer) {
@@ -214,7 +214,7 @@ hope.register( 'hope.editor', function() {
 			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, 
 			function(node) {
 				if (
-					node.nodeType == 3 ||
+					node.nodeType == TEXT_NODE ||
 					node.tagName.toLowerCase() == "img" ||
 					node.tagName.toLowerCase() == "br" ||
 					node.tagName.toLowerCase() == "hr"
@@ -234,7 +234,7 @@ hope.register( 'hope.editor', function() {
 			lastNode = node;
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -243,7 +243,7 @@ hope.register( 'hope.editor', function() {
 		} while ( offset < start && node );
 		if ( !node ) {
 			if (lastNode) {
-				if (lastNode.nodeType == 1) {
+				if (lastNode.nodeType == ELEMENT_NODE) {
 					range.setStart(lastNode, 0);
 					range.setEndAfter(lastNode);
 				} else {
@@ -255,8 +255,8 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
-		var preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
-		if (node.nodeType == 1) {
+		var preOffset = offset - (node.nodeType == TEXT_NODE ? node.textContent.length : 1);
+		if (node.nodeType == ELEMENT_NODE) {
 			range.setStart(node, 0);
 		} else {
 			if (start-preOffset == node.textContent.length) {
@@ -274,7 +274,7 @@ hope.register( 'hope.editor', function() {
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -289,9 +289,9 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
-		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
+		preOffset = offset - (node.nodeType == TEXT_NODE ? node.textContent.length : 1);
 
-		if (node.nodeType == 1) {
+		if (node.nodeType == ELEMENT_NODE) {
 			range.setEndAfter(node);
 		} else {
 			range.setEnd(node, end - preOffset );

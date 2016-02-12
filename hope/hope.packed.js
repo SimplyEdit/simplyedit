@@ -1,3 +1,6 @@
+var ELEMENT_NODE = 1;
+var TEXT_NODE = 3;
+
 var hope = this.hope = ( function( global ) {
 
 	var registered	= {};
@@ -1514,7 +1517,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var tagStart, tagEnd;
 
 		for (var i in target.childNodes) {
-			if (target.childNodes[i].nodeType == 1) {
+			if (target.childNodes[i].nodeType == ELEMENT_NODE) {
 				if (
 					target.childNodes[i].tagName.toLowerCase() == 'img' ||
 					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
@@ -1558,7 +1561,7 @@ hope.register( 'hope.fragment.annotations', function() {
 						tags.push(node.tags[j]);
 					}
 				}
-			} else if (target.childNodes[i].nodeType == 3) {
+			} else if (target.childNodes[i].nodeType == TEXT_NODE) {
 				var textContent = target.childNodes[i].nodeValue;
 				textContent = textContent.replace(/\u00AD+/g, "");
 
@@ -1581,7 +1584,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		if (sel.rangeCount) {
 			var range = sel.getRangeAt(0);
 			var startContainer = range.startContainer;
-			if (startContainer.nodeType == 3) {
+			if (startContainer.nodeType == TEXT_NODE) {
 				startContainer = startContainer.parentNode;
 			}
 			if (node == startContainer) {
@@ -1718,7 +1721,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, 
 			function(node) {
 				if (
-					node.nodeType == 3 ||
+					node.nodeType == TEXT_NODE ||
 					node.tagName.toLowerCase() == "img" ||
 					node.tagName.toLowerCase() == "br" ||
 					node.tagName.toLowerCase() == "hr"
@@ -1738,7 +1741,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			lastNode = node;
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -1747,7 +1750,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		} while ( offset < start && node );
 		if ( !node ) {
 			if (lastNode) {
-				if (lastNode.nodeType == 1) {
+				if (lastNode.nodeType == ELEMENT_NODE) {
 					range.setStart(lastNode, 0);
 					range.setEndAfter(lastNode);
 				} else {
@@ -1759,8 +1762,8 @@ hope.register( 'hope.fragment.annotations', function() {
 			return false;
 		}
 
-		var preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
-		if (node.nodeType == 1) {
+		var preOffset = offset - (node.nodeType == TEXT_NODE ? node.textContent.length : 1);
+		if (node.nodeType == ELEMENT_NODE) {
 			range.setStart(node, 0);
 		} else {
 			if (start-preOffset == node.textContent.length) {
@@ -1778,7 +1781,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -1793,9 +1796,9 @@ hope.register( 'hope.fragment.annotations', function() {
 			return false;
 		}
 
-		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
+		preOffset = offset - (node.nodeType == TEXT_NODE ? node.textContent.length : 1);
 
-		if (node.nodeType == 1) {
+		if (node.nodeType == ELEMENT_NODE) {
 			range.setEndAfter(node);
 		} else {
 			range.setEnd(node, end - preOffset );
@@ -1942,14 +1945,17 @@ hope.register( 'hope.fragment.annotations', function() {
 
 		var updateRange = function() {
 			var sel = window.getSelection();
-			if (sel.focusNode == self.editor.refs.output) {
+			if (sel.focusNode.nodeType === ELEMENT_NODE) {
 				// cursor is not in any child node, so the offset is in nodes instead of characters;
-
 				self.start = self.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
+			} else {
+				self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			}
+
+			if (sel.anchorNode.nodeType === ELEMENT_NODE) {
 				self.end = self.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
 			} else {
 				self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-				self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
 			}
 			if (self.end < self.start) {
 				var temp = self.start;
@@ -1968,11 +1974,14 @@ hope.register( 'hope.fragment.annotations', function() {
 	hopeEditorSelection.prototype.updateRange = function (start, end) {
 		if ((typeof start === 'undefined') && (typeof end === 'undefined')) {
 			var sel = window.getSelection();
-			if (sel.focusNode == this.editor.refs.output) {
+			if (sel.focusNode.nodeType === ELEMENT_NODE) {
 				this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-				this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
 			} else {
 				this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
+			}
+			if (sel.anchorNode.nodeType === ELEMENT_NODE) {
+				this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
+			} else {
 				this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
 			}
 		}

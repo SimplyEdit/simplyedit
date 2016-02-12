@@ -1,3 +1,6 @@
+var ELEMENT_NODE = 1;
+var TEXT_NODE = 3;
+
 var hope = this.hope = ( function( global ) {
 
 	var registered	= {};
