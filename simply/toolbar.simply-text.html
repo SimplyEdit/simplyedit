@@ -18,6 +18,7 @@
 					<option value="p">Paragraph</option>
 					<option value="ol">Numbered list</option>
 					<option value="ul">Unnumbered list</option>
+					<option value="">(plain text)</option>
 				</select></li>
 			</ul>
 			<ul class="simply-text-inline">
@@ -83,6 +84,7 @@
 					<option value="p">Paragraph</option>
 					<option value="ol">Numbered list</option>
 					<option value="ul">Unnumbered list</option>
+					<option value="">(plain text)</option>
 				</select></li>
 			</ul>
 			<ul class="simply-text-inline">
@@ -131,7 +133,6 @@
 	var initTextToolbar = function(config) {
 		var toolbar = document.querySelector("#" + this.name);
 		if (typeof config === "object" && toolbar) {
-
 			// Init blockstyles
 			if (config.block) {
 				var blockStyleSelect = toolbar.querySelector('select[data-simply-action=simply-text-blockstyle]');
@@ -144,6 +145,10 @@
 							option.innerHTML = config.block[i].name;
 							blockStyleSelect.appendChild(option);
 						}
+						option = document.createElement("option");
+						option.value = '';
+						option.innerHTML = '(plain text)';
+						blockStyleSelect.appendChild(option);
 					} else {
 						blockStyleSelect.style.display = "none";
 					}
@@ -250,15 +255,15 @@
 					if (annotation) {
 						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']").selected = true;
 					} else {
-						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
+						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 					}
 				}
 			} else {
-				toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
+				toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 			}
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "block";
 		} else {
-			toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='p']").selected = true;
+			toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
 		}
 
@@ -612,6 +617,10 @@
 					}
 				}
 
+				if (blocks.length === 0) {
+					return editor.plugins.hope.annotation.apply(hopeEditor, value);
+				}
+
 				while (blocks.length) {
 					var block = blocks.shift();
 					var newRange;
@@ -635,8 +644,9 @@
 					if (nodeInfo) {
 						newValue += " " + nodeInfo;
 					}
-
-					hopeEditor.fragment = hopeEditor.fragment.apply(newRange, newValue);
+					if (value) {
+						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, newValue);
+					}
 				}
 
 				hopeEditor.update();

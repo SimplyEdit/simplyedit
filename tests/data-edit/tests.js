@@ -31,8 +31,22 @@ function setCaretPosition(elem, start, length) {
 	if (focus in elem) {
 		elem.focus();
 	}
+	var newRange = sel.getRangeAt(0);
 	editor.context.update();
 }
+function selectImage(img) {
+	var range = document.createRange();
+	range.selectNode(img);
+
+	var sel = window.getSelection();
+	sel.removeAllRanges();
+	sel.addRange(range);
+	if (focus in img) {
+		img.focus();
+	}
+	editor.context.update();
+}
+
 function setSelectionEnd(elem, offset) {
 	var range = window.getSelection().getRangeAt(0);
 	range.setEnd(elem, offset);
@@ -135,8 +149,117 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "abcdef<p><br></p>";
 		setCaretPosition(testContent.querySelector("p"), 0, 0);
+		var node1 = window.getSelection().focusNode;
 		testContent.hopeEditor.parseHTML();
-		assert.equal(window.getSelection().baseNode, testContent.querySelector("p"));
+		var node2 = window.getSelection().focusNode;
+		assert.equal(node1, node2);
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		<p>abcdef</p>		</div>		";
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.selection.updateRange();
+
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "p");
+		assert.equal(annotation.tag.split(" ")[0], 'p');
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
+		testContent.hopeEditor.parseHTML();
+		selectImage(testContent.querySelector("img"));
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(annotation.tag.split(" ")[0], 'img');
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		a	b<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		selectImage(testContent.querySelector("img"));
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(annotation.tag.split(" ")[0], 'img');
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>abc<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		assert.equal(annotation.tag.split(" ")[0], 'div');
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>ab<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(img.tag, 'img src="frop"');
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		// testContent.style.whiteSpace = "pre";
+		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
+		testContent.hopeEditor.parseHTML();
+		selectImage(testContent.querySelector("img"));
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+
+		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(img.tag, 'img src="frop"');
+	});
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		//testContent.style.whiteSpace = "pre";
+		testContent.innerHTML = "  <div>  <img src='frop'>  </div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		assert.equal(img.tag, 'img src="frop"');
+	});
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		//testContent.style.whiteSpace = "pre";
+		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 1, 1);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		assert.equal(annotation.tag.split(" ")[0], 'div');
+	});
+
+
+
+	QUnit.test("offset calculation works for nested items", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "		<div>		a<img src='frop'>		</div>";
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 
 
@@ -354,6 +477,25 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, '<p>He<em>llo</em> world</p>', "Italic uses EM tag");
 	});
 	
+	QUnit.test("text set h1 in paragraph", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello world</p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("p"), 2, 3);
+		editor.actions['simply-text-blockstyle']('h1');
+		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><p> world</p>', "Selection blockstyle creates block");
+	});
+
+	QUnit.test("text set h1", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 2, 3);
+		editor.actions['simply-text-blockstyle']('h1');
+		assert.equal(testContent.innerHTML, 'He<h1>llo</h1> world', "Selection blockstyle creates block");
+	});
 
 	QUnit.test("text style init italic", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -450,7 +592,61 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, "H<ul><li>ello</li></ul> world");
 	});
 
+QUnit.module("custom text settings");
+	QUnit.test("settings without p don't break", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>Hello world<p>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'h2', name: 'Test'}
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+		editor.toolbars['simply-text-selection'].init(textSettings);
 
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		assert.equal(currentStyle, '');
+	});
+/*
+	// FIXME: Decide if this is breaking 'by design';
+	QUnit.test("paragraph with class is found", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p class='test'>Hello world<p>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'p class="test"', name: 'Test'}
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		assert.equal(currentStyle, 'p class="test"', "text style is correctly updated");
+	});
+
+	QUnit.test("paragraph with more specific class is found", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p class='test'>Hello world<p>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'p', name: 'Paragraph'},
+				{tag: 'p class="test"', name: 'Test'}
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		assert.equal(currentStyle, 'p class="test"', "text style is correctly updated");
+	});
+*/
 QUnit.module("text hyperlinks");
 	QUnit.test("text hyperlink", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -531,7 +727,7 @@ QUnit.module("images");
 		testContent.hopeEditor.parseHTML();
 		editor.actions["simply-insert-image"]();
 		
-		assert.equal(testContent.querySelector("img").parentNode.innerText, "abcdef");
+		assert.equal(testContent.querySelector("img").parentNode, testContent.querySelector("p"));
 	});
 
 	QUnit.test("insert image at start of paragraph stays at caret location", function(assert) {
@@ -541,15 +737,15 @@ QUnit.module("images");
 		testContent.hopeEditor.parseHTML();
 		editor.actions["simply-insert-image"]();
 		
-		assert.equal(testContent.querySelector("img").parentNode.innerText, "world");
+		assert.equal(testContent.querySelector("img").parentNode, testContent.querySelector("p + p"));
 	});
 
 	QUnit.test("select image works", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>abcdef</p><p>wo<a href='#'><img src='frop'></a>rld</p>";
 		testContent.hopeEditor.parseHTML();
-		muze.event.fire(testContent.querySelector("img"), "click");
-		
+		selectImage(testContent.querySelector("img"));
+
 		assert.equal(editor.context.get(), "simply-image");
 	});
 
@@ -557,7 +753,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>abcdef</p><p><a href='#'><img src='frop'></a>rld</p>";
 		testContent.hopeEditor.parseHTML();
-		muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		
@@ -568,7 +764,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>abcdef</p><p><a href='#'><img src='frop'></a>rld</p>";
 		testContent.hopeEditor.parseHTML();
-		muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		
@@ -579,7 +775,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "a");
 	});
@@ -588,7 +784,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img + img"), "click");
+		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "b");
 	});
@@ -597,7 +793,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img"), "click");
+		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
@@ -607,7 +803,7 @@ QUnit.module("images");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>ab<img src='a'><img src='b'>cdef</p>";
 		testContent.hopeEditor.parseHTML();
-                muze.event.fire(testContent.querySelector("img + img"), "click");
+		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		assert.equal(testContent.querySelector("img + img").getAttribute("data-simply-src"), "HelloWorld");

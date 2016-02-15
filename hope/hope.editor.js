@@ -1,5 +1,19 @@
 hope.register( 'hope.editor', function() {
 	var hopeTokenCounter = 0;
+	var browserCountsWhitespace = (function() {
+		var div = document.createElement("DIV");
+		div.innerHTML = "		<div>		<span>abc</span>	</div>		";
+		document.body.appendChild(div);
+		var range = document.createRange();
+		range.setStart(div.querySelector("div"), 1);
+		var offset1 = range.startOffset;
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+		var newRange = sel.getRangeAt(0);
+		var offset2 = newRange.startOffset;
+		return offset1 == offset2;
+	}());
 
 	function unrender(target) {
 		var textValue = '';
@@ -10,7 +24,7 @@ hope.register( 'hope.editor', function() {
 		var tagStart, tagEnd;
 
 		for (var i in target.childNodes) {
-			if (target.childNodes[i].nodeType == 1) {
+			if (target.childNodes[i].nodeType == document.ELEMENT_NODE) {
 				if (
 					target.childNodes[i].tagName.toLowerCase() == 'img' ||
 					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
@@ -54,12 +68,19 @@ hope.register( 'hope.editor', function() {
 						tags.push(node.tags[j]);
 					}
 				}
-			} else if (target.childNodes[i].nodeType == 3) {
+			} else if (target.childNodes[i].nodeType == document.TEXT_NODE) {
 				var textContent = target.childNodes[i].nodeValue;
 				textContent = textContent.replace(/\u00AD+/g, "");
 
-				hopeTokenCounter += textContent.length;
-				textValue += textContent;
+				if (browserCountsWhitespace) {
+					hopeTokenCounter += textContent.length;
+					textValue += textContent;
+				} else {
+					if (textContent.trim().length) {
+						hopeTokenCounter += textContent.length;
+						textValue += textContent;
+					}
+				}
 			}
 		}
 
@@ -77,7 +98,7 @@ hope.register( 'hope.editor', function() {
 		if (sel.rangeCount) {
 			var range = sel.getRangeAt(0);
 			var startContainer = range.startContainer;
-			if (startContainer.nodeType == 3) {
+			if (startContainer.nodeType == document.TEXT_NODE) {
 				startContainer = startContainer.parentNode;
 			}
 			if (node == startContainer) {
@@ -134,6 +155,8 @@ hope.register( 'hope.editor', function() {
 			this.refs.output.innerHTML = this.refs.output.innerHTML.replace(/\/p>/g, "/p>");
 			this.parseHTML();
 		}
+
+		this.browserCountsWhitespace = browserCountsWhitespace;
 
 		var text = this.refs.text.value;
 		var annotations = this.refs.annotations.value;
@@ -214,7 +237,7 @@ hope.register( 'hope.editor', function() {
 			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, 
 			function(node) {
 				if (
-					node.nodeType == 3 ||
+					node.nodeType == document.TEXT_NODE ||
 					node.tagName.toLowerCase() == "img" ||
 					node.tagName.toLowerCase() == "br" ||
 					node.tagName.toLowerCase() == "hr"
@@ -234,7 +257,7 @@ hope.register( 'hope.editor', function() {
 			lastNode = node;
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == document.ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -243,7 +266,7 @@ hope.register( 'hope.editor', function() {
 		} while ( offset < start && node );
 		if ( !node ) {
 			if (lastNode) {
-				if (lastNode.nodeType == 1) {
+				if (lastNode.nodeType == document.ELEMENT_NODE) {
 					range.setStart(lastNode, 0);
 					range.setEndAfter(lastNode);
 				} else {
@@ -255,8 +278,8 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
-		var preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
-		if (node.nodeType == 1) {
+		var preOffset = offset - (node.nodeType == document.TEXT_NODE ? node.textContent.length : 1);
+		if (node.nodeType == document.ELEMENT_NODE) {
 			range.setStart(node, 0);
 		} else {
 			if (start-preOffset == node.textContent.length) {
@@ -274,7 +297,7 @@ hope.register( 'hope.editor', function() {
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == document.ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -289,9 +312,9 @@ hope.register( 'hope.editor', function() {
 			return false;
 		}
 
-		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
+		preOffset = offset - (node.nodeType == document.TEXT_NODE ? node.textContent.length : 1);
 
-		if (node.nodeType == 1) {
+		if (node.nodeType == document.ELEMENT_NODE) {
 			range.setEndAfter(node);
 		} else {
 			range.setEnd(node, end - preOffset );

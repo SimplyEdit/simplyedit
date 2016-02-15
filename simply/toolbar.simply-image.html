@@ -113,9 +113,9 @@
 				return image;
 			}
 
-			image = sel.baseNode.nextSibling;
+			image = sel.focusNode.nextSibling;
 			if (!image) {
-				image = sel.baseNode.parentNode.nextSibling;
+				image = sel.focusNode.parentNode.nextSibling;
 			}
 			if (image.nodeType == 1 && image.tagName.toLowerCase() == "img") {
 				var range = document.createRange();

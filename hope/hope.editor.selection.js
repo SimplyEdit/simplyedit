@@ -1,22 +1,44 @@
 hope.register( 'hope.editor.selection', function() {
-
 	function hopeEditorSelection(start, end, editor) {
 		this.start = start;
 		this.end = end;
 		this.editor = editor;
+
 		var self = this;
 
 		var updateRange = function() {
-			var sel = window.getSelection();
-			if (sel.focusNode == self.editor.refs.output) {
-				// cursor is not in any child node, so the offset is in nodes instead of characters;
+			var sel   = window.getSelection();
+			var rangeStart, rangeEnd;
+			var bestStart, bestEnd;
 
-				self.start = self.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-				self.end = self.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
-			} else {
-				self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-				self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			if (sel.rangeCount) {
+				for (var i=0; i<sel.rangeCount; i++) {
+					var range = sel.getRangeAt(i);
+					rangeStart = self.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+					rangeEnd = self.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+
+					if (rangeEnd < rangeStart) {
+						var tempRange = rangeStart;
+						rangeStart = rangeEnd;
+						rangeEnd = tempRange;
+					}
+					if (typeof bestStart !== "undefined") {
+						bestStart = Math.min(bestStart, rangeStart);
+					} else {
+						bestStart = rangeStart;
+					}
+
+					if (typeof bestEnd !== "undefined") {
+						bestEnd = Math.max(bestEnd, rangeEnd);
+					} else {
+						bestEnd = rangeEnd;
+					}
+				}
 			}
+
+			self.end = bestEnd;
+			self.start = bestStart;
+
 			if (self.end < self.start) {
 				var temp = self.start;
 				self.start = self.end;
@@ -33,13 +55,36 @@ hope.register( 'hope.editor.selection', function() {
 
 	hopeEditorSelection.prototype.updateRange = function (start, end) {
 		if ((typeof start === 'undefined') && (typeof end === 'undefined')) {
-			var sel = window.getSelection();
-			if (sel.focusNode == this.editor.refs.output) {
-				this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-				this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
-			} else {
-				this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-				this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			var sel   = window.getSelection();
+			var rangeStart, rangeEnd;
+			var bestStart, bestEnd;
+
+			if (sel.rangeCount) {
+				for (var i=0; i<sel.rangeCount; i++) {
+					var range = sel.getRangeAt(i);
+					rangeStart = this.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+					rangeEnd = this.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+
+					if (rangeEnd < rangeStart) {
+						var tempRange = rangeStart;
+						rangeStart = rangeEnd;
+						rangeEnd = tempRange;
+					}
+
+					if (typeof bestStart !== "undefined") {
+						bestStart = Math.min(bestStart, rangeStart);
+					} else {
+						bestStart = rangeStart;
+					}
+
+					if (typeof bestEnd !== "undefined") {
+						bestEnd = Math.max(bestEnd, rangeEnd);
+					} else {
+						bestEnd = rangeEnd;
+					}
+				}
+				this.start = bestStart;
+				this.end = bestEnd;
 			}
 		}
 
@@ -171,7 +216,14 @@ hope.register( 'hope.editor.selection', function() {
 		
 		node = this.getPrevTextNode(node);
 		while ( node ) {
-			offset += node.textContent.length;
+			if (this.editor.browserCountsWhitespace) {
+				offset += node.textContent.length;
+			} else {
+				if (node.textContent.trim().length !== 0) {
+					offset += node.textContent.length;
+				}
+			}
+
 			node = this.getPrevTextNode(node);
 		}
 		return offset;
