@@ -1504,6 +1504,20 @@ hope.register( 'hope.fragment.annotations', function() {
 
 } );hope.register( 'hope.editor', function() {
 	var hopeTokenCounter = 0;
+	var browserCountsWhitespace = (function() {
+		var div = document.createElement("DIV");
+		div.innerHTML = "		<div>		<span>abc</span>	</div>		";
+		document.body.appendChild(div);
+		var range = document.createRange();
+		range.setStart(div.querySelector("div"), 1);
+		var offset1 = range.startOffset;
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+		var newRange = sel.getRangeAt(0);
+		var offset2 = newRange.startOffset;
+		return offset1 == offset2;
+	}());
 
 	function unrender(target) {
 		var textValue = '';
@@ -1514,7 +1528,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var tagStart, tagEnd;
 
 		for (var i in target.childNodes) {
-			if (target.childNodes[i].nodeType == 1) {
+			if (target.childNodes[i].nodeType == document.ELEMENT_NODE) {
 				if (
 					target.childNodes[i].tagName.toLowerCase() == 'img' ||
 					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
@@ -1558,12 +1572,19 @@ hope.register( 'hope.fragment.annotations', function() {
 						tags.push(node.tags[j]);
 					}
 				}
-			} else if (target.childNodes[i].nodeType == 3) {
+			} else if (target.childNodes[i].nodeType == document.TEXT_NODE) {
 				var textContent = target.childNodes[i].nodeValue;
 				textContent = textContent.replace(/\u00AD+/g, "");
 
-				hopeTokenCounter += textContent.length;
-				textValue += textContent;
+				if (browserCountsWhitespace) {
+					hopeTokenCounter += textContent.length;
+					textValue += textContent;
+				} else {
+					if (textContent.trim().length) {
+						hopeTokenCounter += textContent.length;
+						textValue += textContent;
+					}
+				}
 			}
 		}
 
@@ -1581,7 +1602,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		if (sel.rangeCount) {
 			var range = sel.getRangeAt(0);
 			var startContainer = range.startContainer;
-			if (startContainer.nodeType == 3) {
+			if (startContainer.nodeType == document.TEXT_NODE) {
 				startContainer = startContainer.parentNode;
 			}
 			if (node == startContainer) {
@@ -1638,6 +1659,8 @@ hope.register( 'hope.fragment.annotations', function() {
 			this.refs.output.innerHTML = this.refs.output.innerHTML.replace(/\/p>/g, "/p>");
 			this.parseHTML();
 		}
+
+		this.browserCountsWhitespace = browserCountsWhitespace;
 
 		var text = this.refs.text.value;
 		var annotations = this.refs.annotations.value;
@@ -1718,7 +1741,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, 
 			function(node) {
 				if (
-					node.nodeType == 3 ||
+					node.nodeType == document.TEXT_NODE ||
 					node.tagName.toLowerCase() == "img" ||
 					node.tagName.toLowerCase() == "br" ||
 					node.tagName.toLowerCase() == "hr"
@@ -1738,7 +1761,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			lastNode = node;
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == document.ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -1747,7 +1770,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		} while ( offset < start && node );
 		if ( !node ) {
 			if (lastNode) {
-				if (lastNode.nodeType == 1) {
+				if (lastNode.nodeType == document.ELEMENT_NODE) {
 					range.setStart(lastNode, 0);
 					range.setEndAfter(lastNode);
 				} else {
@@ -1759,8 +1782,8 @@ hope.register( 'hope.fragment.annotations', function() {
 			return false;
 		}
 
-		var preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
-		if (node.nodeType == 1) {
+		var preOffset = offset - (node.nodeType == document.TEXT_NODE ? node.textContent.length : 1);
+		if (node.nodeType == document.ELEMENT_NODE) {
 			range.setStart(node, 0);
 		} else {
 			if (start-preOffset == node.textContent.length) {
@@ -1778,7 +1801,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == 1) {
+				if (node.nodeType == document.ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -1793,9 +1816,9 @@ hope.register( 'hope.fragment.annotations', function() {
 			return false;
 		}
 
-		preOffset = offset - (node.nodeType == 3 ? node.textContent.length : 1);
+		preOffset = offset - (node.nodeType == document.TEXT_NODE ? node.textContent.length : 1);
 
-		if (node.nodeType == 1) {
+		if (node.nodeType == document.ELEMENT_NODE) {
 			range.setEndAfter(node);
 		} else {
 			range.setEnd(node, end - preOffset );
@@ -1933,24 +1956,46 @@ hope.register( 'hope.fragment.annotations', function() {
 	};
 
 });hope.register( 'hope.editor.selection', function() {
-
 	function hopeEditorSelection(start, end, editor) {
 		this.start = start;
 		this.end = end;
 		this.editor = editor;
+
 		var self = this;
 
 		var updateRange = function() {
-			var sel = window.getSelection();
-			if (sel.focusNode == self.editor.refs.output) {
-				// cursor is not in any child node, so the offset is in nodes instead of characters;
+			var sel   = window.getSelection();
+			var rangeStart, rangeEnd;
+			var bestStart, bestEnd;
 
-				self.start = self.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-				self.end = self.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
-			} else {
-				self.end = self.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-				self.start = self.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			if (sel.rangeCount) {
+				for (var i=0; i<sel.rangeCount; i++) {
+					var range = sel.getRangeAt(i);
+					rangeStart = self.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+					rangeEnd = self.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+
+					if (rangeEnd < rangeStart) {
+						var tempRange = rangeStart;
+						rangeStart = rangeEnd;
+						rangeEnd = tempRange;
+					}
+					if (typeof bestStart !== "undefined") {
+						bestStart = Math.min(bestStart, rangeStart);
+					} else {
+						bestStart = rangeStart;
+					}
+
+					if (typeof bestEnd !== "undefined") {
+						bestEnd = Math.max(bestEnd, rangeEnd);
+					} else {
+						bestEnd = rangeEnd;
+					}
+				}
 			}
+
+			self.end = bestEnd;
+			self.start = bestStart;
+
 			if (self.end < self.start) {
 				var temp = self.start;
 				self.start = self.end;
@@ -1967,13 +2012,36 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeEditorSelection.prototype.updateRange = function (start, end) {
 		if ((typeof start === 'undefined') && (typeof end === 'undefined')) {
-			var sel = window.getSelection();
-			if (sel.focusNode == this.editor.refs.output) {
-				this.end = this.getTotalOffset(sel.focusNode.childNodes[sel.focusOffset]);
-				this.start = this.getTotalOffset(sel.anchorNode.childNodes[sel.anchorOffset]);
-			} else {
-				this.end = this.getTotalOffset( sel.focusNode ) + sel.focusOffset;
-				this.start = this.getTotalOffset( sel.anchorNode ) + sel.anchorOffset;
+			var sel   = window.getSelection();
+			var rangeStart, rangeEnd;
+			var bestStart, bestEnd;
+
+			if (sel.rangeCount) {
+				for (var i=0; i<sel.rangeCount; i++) {
+					var range = sel.getRangeAt(i);
+					rangeStart = this.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+					rangeEnd = this.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+
+					if (rangeEnd < rangeStart) {
+						var tempRange = rangeStart;
+						rangeStart = rangeEnd;
+						rangeEnd = tempRange;
+					}
+
+					if (typeof bestStart !== "undefined") {
+						bestStart = Math.min(bestStart, rangeStart);
+					} else {
+						bestStart = rangeStart;
+					}
+
+					if (typeof bestEnd !== "undefined") {
+						bestEnd = Math.max(bestEnd, rangeEnd);
+					} else {
+						bestEnd = rangeEnd;
+					}
+				}
+				this.start = bestStart;
+				this.end = bestEnd;
 			}
 		}
 
@@ -2105,7 +2173,14 @@ hope.register( 'hope.fragment.annotations', function() {
 		
 		node = this.getPrevTextNode(node);
 		while ( node ) {
-			offset += node.textContent.length;
+			if (this.editor.browserCountsWhitespace) {
+				offset += node.textContent.length;
+			} else {
+				if (node.textContent.trim().length !== 0) {
+					offset += node.textContent.length;
+				}
+			}
+
 			node = this.getPrevTextNode(node);
 		}
 		return offset;
