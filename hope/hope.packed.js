@@ -1,6 +1,3 @@
-var ELEMENT_NODE = 1;
-var TEXT_NODE = 3;
-
 var hope = this.hope = ( function( global ) {
 
 	var registered	= {};
@@ -1531,7 +1528,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var tagStart, tagEnd;
 
 		for (var i in target.childNodes) {
-			if (target.childNodes[i].nodeType == ELEMENT_NODE) {
+			if (target.childNodes[i].nodeType == document.ELEMENT_NODE) {
 				if (
 					target.childNodes[i].tagName.toLowerCase() == 'img' ||
 					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
@@ -1575,7 +1572,7 @@ hope.register( 'hope.fragment.annotations', function() {
 						tags.push(node.tags[j]);
 					}
 				}
-			} else if (target.childNodes[i].nodeType == TEXT_NODE) {
+			} else if (target.childNodes[i].nodeType == document.TEXT_NODE) {
 				var textContent = target.childNodes[i].nodeValue;
 				textContent = textContent.replace(/\u00AD+/g, "");
 
@@ -1605,7 +1602,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		if (sel.rangeCount) {
 			var range = sel.getRangeAt(0);
 			var startContainer = range.startContainer;
-			if (startContainer.nodeType == TEXT_NODE) {
+			if (startContainer.nodeType == document.TEXT_NODE) {
 				startContainer = startContainer.parentNode;
 			}
 			if (node == startContainer) {
@@ -1744,7 +1741,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, 
 			function(node) {
 				if (
-					node.nodeType == TEXT_NODE ||
+					node.nodeType == document.TEXT_NODE ||
 					node.tagName.toLowerCase() == "img" ||
 					node.tagName.toLowerCase() == "br" ||
 					node.tagName.toLowerCase() == "hr"
@@ -1764,7 +1761,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			lastNode = node;
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == ELEMENT_NODE) {
+				if (node.nodeType == document.ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -1773,7 +1770,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		} while ( offset < start && node );
 		if ( !node ) {
 			if (lastNode) {
-				if (lastNode.nodeType == ELEMENT_NODE) {
+				if (lastNode.nodeType == document.ELEMENT_NODE) {
 					range.setStart(lastNode, 0);
 					range.setEndAfter(lastNode);
 				} else {
@@ -1785,8 +1782,8 @@ hope.register( 'hope.fragment.annotations', function() {
 			return false;
 		}
 
-		var preOffset = offset - (node.nodeType == TEXT_NODE ? node.textContent.length : 1);
-		if (node.nodeType == ELEMENT_NODE) {
+		var preOffset = offset - (node.nodeType == document.TEXT_NODE ? node.textContent.length : 1);
+		if (node.nodeType == document.ELEMENT_NODE) {
 			range.setStart(node, 0);
 		} else {
 			if (start-preOffset == node.textContent.length) {
@@ -1804,7 +1801,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		while ( offset < end && node ) {
 			node = treeWalker.nextNode();
 			if ( node ) {
-				if (node.nodeType == ELEMENT_NODE) {
+				if (node.nodeType == document.ELEMENT_NODE) {
 					offset += 1;
 				} else {
 					offset += node.textContent.length;
@@ -1819,9 +1816,9 @@ hope.register( 'hope.fragment.annotations', function() {
 			return false;
 		}
 
-		preOffset = offset - (node.nodeType == TEXT_NODE ? node.textContent.length : 1);
+		preOffset = offset - (node.nodeType == document.TEXT_NODE ? node.textContent.length : 1);
 
-		if (node.nodeType == ELEMENT_NODE) {
+		if (node.nodeType == document.ELEMENT_NODE) {
 			range.setEndAfter(node);
 		} else {
 			range.setEnd(node, end - preOffset );
@@ -2179,7 +2176,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			if (this.editor.browserCountsWhitespace) {
 				offset += node.textContent.length;
 			} else {
-				if (node.textContent.trim().length != 0) {
+				if (node.textContent.trim().length !== 0) {
 					offset += node.textContent.length;
 				}
 			}
