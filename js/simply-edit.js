@@ -280,10 +280,7 @@
 				} 
 			},
 			load : function() {
-				document.body.style.opacity = 0;
-
 				editor.storage.load(function(data) {
-					document.body.style.opacity = 1;
 					localStorage.data = data;
 					editor.currentData = JSON.parse(data);
 					editor.data.apply(editor.currentData, document);
@@ -896,6 +893,8 @@
 						return message;
 					}
 				};
+
+				document.body.setAttribute("data-simply-edit", true);
 
 				document.body.onbeforeunload = handleBeforeUnload; // Must do it like this, not with addEventListener;
 				
