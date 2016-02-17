@@ -1,4 +1,4 @@
-/*	Slip - swiping and reordering in lists of elements on touch screens, no fuss.
+/*	Slip - swiping and reordering in lists of elements on touch screens, no fuss.
 
 	Fires these events on list elements:
 
@@ -223,7 +223,7 @@ window['Slip'] = (function(){
 				} else {
 					var holdTimer = setTimeout(function(){
 						var move = this.getAbsoluteMovement();
-						if (this.canPreventScrolling && move.x < 15 && move.y < 25) {
+						if (this.canPreventScrolling && move.x < 15 && move.y < 25 && !this.selectionChanged) {
 							if (this.dispatch(this.target.originalTarget, 'beforereorder')) {
 								this.setState(this.states.reorder);
 							}
@@ -247,9 +247,9 @@ window['Slip'] = (function(){
 								this.setState(this.states.idle);
 							}
 						}*/
-			if (move.x > 20) {
-				this.setState(this.states.idle);
-			}
+						if (move.x > 20) {
+							this.setState(this.states.idle);
+						}
 						if (move.y > 20) {
 							this.setState(this.states.idle);
 						}
@@ -433,10 +433,13 @@ window['Slip'] = (function(){
 					if (!variationInY) {
 						move.y = 0;
 					}
+					var targetRects = this.target.node.getBoundingClientRect();
+					this.target.node.focus();
 //					this.target.node.style[transformPrefix] = 'translate(0,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
 					this.target.node.style[transformPrefix] = 'rotate(2deg)	translate(' + move.x + 'px,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
 					this.target.node.style["animationName"] = 'none'; // FIXME;
-					this.target.node.style[transformPrefix + 'Origin'] = 'left';
+					// rotate around the position of the mouse to prevent the rotation from selecting text;
+					this.target.node.style[transformPrefix + "Origin"] = (this.startPosition.x - targetRects.left) + "px " + (this.startPosition.y - containerRects.top) + "px";
 
 					var height = this.target.height;
 					var width = this.target.width;
@@ -620,7 +623,7 @@ window['Slip'] = (function(){
 			this.otherNodes = [];
 
 			// selection on iOS interferes with reordering -> interferes with touch-hold selection otherwise so removed; YLJB.
-			// document.addEventListener("selectionchange", this.onSelection, false);
+			document.addEventListener("selectionchange", this.onSelection, false);
 
 			// cancel is called e.g. when iOS detects multitasking gesture
 			this.container.addEventListener('touchcancel', this.cancel, false);
@@ -675,14 +678,7 @@ window['Slip'] = (function(){
 			var isRelated = e.target === document || this.findTargetNode(e);
 			if (!isRelated) return;
 
-			if (e.cancelable || e.defaultPrevented) {
-				if (!this.state.allowTextSelection) {
-					e.preventDefault();
-				}
-			} else {
-				// iOS doesn't allow selection to be prevented
-				this.setState(this.states.idle);
-			}
+			this.selectionChanged = true;
 		},
 
 		addMouseHandlers: function() {
@@ -784,6 +780,10 @@ window['Slip'] = (function(){
 
 		startAtPosition: function(pos) {
 			this.startPosition = this.previousPosition = this.latestPosition = pos;
+			var self = this;
+			window.setTimeout(function() {
+				self.selectionChanged = false;
+			}, 5);
 			this.setState(this.states.undecided);
 		},
 
