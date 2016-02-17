@@ -3,6 +3,21 @@
 		var removeMouseSelectionEvent;
 		var removeTouchSelectionEvent;
 	
+		var selectTarget = function(target) {
+			var sel = vdSelectionState.get();
+			sel.selectNode(target);
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
+			vdSelectionState.save(sel);
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges()
+			editor.context.update();
+		};
+
+		var handleItemFocus = function(event) {
+			var target = muze.event.target(event);
+			selectTarget(target);
+		};
+
 		var handleItemSelect = function(event) {
 			var deltaX = Math.abs(event.clientX - this.clickStart.x);
 			var deltaY = Math.abs(event.clientY - this.clickStart.y);
@@ -25,13 +40,7 @@
 				target = target.parentNode;
 			}
 
-			var sel = vdSelectionState.get();
-			sel.selectNode(target);
-			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
-			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
-			vdSelectionState.save(sel);
-			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges()
-			editor.context.update();
+			selectTarget(target);
 		
 			window.setTimeout(function() {
 				removeMouseSelectionEvent = muze.event.attach(document, "mousedown", function(evt) {
@@ -73,7 +82,12 @@
 			var listItems = document.querySelectorAll("[data-simply-selectable]");
 			for (var i=0; i<listItems.length; i++) {
 				listItems[i].removeEventListener('click', handleItemSelect);
+				listItems[i].removeEventListener('focus', handleItemFocus);
+				if (!listItems[i].getAttribute("tabindex")) {
+					listItems[i].setAttribute("tabindex", 0);
+				}
 				listItems[i].addEventListener('click', handleItemSelect);
+				listItems[i].addEventListener('focus', handleItemFocus);
 				listItems[i].addEventListener('mousedown', function(evt) {
 					var target = this;
 					target.clickStart = {
