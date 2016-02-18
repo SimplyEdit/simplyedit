@@ -1555,7 +1555,7 @@ hope.register( 'hope.fragment.annotations', function() {
 
 					tagStart = hopeTokenCounter;
 
-					node = unrender(target.childNodes[i]);
+					node = this.unrender(target.childNodes[i]);
 					// hopeTokenCounter += node.length;
 					textValue += node.text;
 					tagEnd = hopeTokenCounter;
@@ -1565,7 +1565,7 @@ hope.register( 'hope.fragment.annotations', function() {
 						end : tagEnd,
 						tag : target.childNodes[i].tagName.toLowerCase(),
 						attrs : target.childNodes[i].attributes,
-						caret : getCaretOffset(target.childNodes[i])
+						caret : this.getCaretOffset(target.childNodes[i])
 					});
 
 					for (var j=0; j<node.tags.length; j++) {
@@ -1602,10 +1602,9 @@ hope.register( 'hope.fragment.annotations', function() {
 		if (sel.rangeCount) {
 			var range = sel.getRangeAt(0);
 			var startContainer = range.startContainer;
-			if (startContainer.nodeType == document.TEXT_NODE) {
-				startContainer = startContainer.parentNode;
-			}
-			if (node == startContainer) {
+			if (startContainer.nodeType == document.TEXT_NODE && (node == startContainer.parentNode)) {
+				caret = range.startOffset + this.selection.getTotalOffset(startContainer) - this.selection.getTotalOffset(startContainer.parentNode);
+			} else if (node == startContainer) {
 				caret = range.startOffset;
 			}
 		}
@@ -1616,14 +1615,16 @@ hope.register( 'hope.fragment.annotations', function() {
 		// restore the cursor into this element; current offset should be in data-hope-caret
 		var selection = document.createRange();
 
-		// FIXME: this piece of code seems 'off', but seems to work; It should always restore the cursor position to where getCaretOffset found it.
-		try {
-			selection.setStart(node, node.getAttribute('data-hope-caret'));
-		} catch (e) {
-			selection.setStart(node.childNodes[0], node.getAttribute('data-hope-caret'));
+		var caret = node.getAttribute('data-hope-caret');
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nodeOffset = this.selection.getTotalOffset(node.childNodes[i]) - this.selection.getTotalOffset(node);
+			if (nodeOffset + node.childNodes[i].textContent.length >= caret) {
+				selection.setStart(node.childNodes[i], caret - nodeOffset);
+				node.removeAttribute("data-hope-caret");
+				return selection;
+			}
 		}
-		node.removeAttribute("data-hope-caret");
-		return selection;
+
 	}
 
 	function tagsToText(tags) {
@@ -1726,10 +1727,14 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	}
 
+	hopeEditor.prototype.setCaretOffset = setCaretOffset;
+	hopeEditor.prototype.getCaretOffset = getCaretOffset;
+	hopeEditor.prototype.unrender = unrender;
+
 	hopeEditor.prototype.parseHTML = function() {
 		hopeTokenCounter = 0;
 
-		var data = unrender(this.refs.output);
+		var data = this.unrender(this.refs.output);
 		this.refs.annotations.value = tagsToText(data.tags);
 		this.refs.text.value = data.text;
 		this.fragment = hope.fragment.create( this.refs.text.value, this.refs.annotations.value );
@@ -1831,7 +1836,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var selection = this.getEditorRange(range.start, range.end);
 		var caretElm = document.querySelector('[data-hope-caret]');
 		if (caretElm) {
-			selection = setCaretOffset(caretElm);
+			selection = this.setCaretOffset(caretElm);
 		}
 		if (selection) {
 			var htmlSelection = window.getSelection();
@@ -1972,13 +1977,13 @@ hope.register( 'hope.fragment.annotations', function() {
 				for (var i=0; i<sel.rangeCount; i++) {
 					var range = sel.getRangeAt(i);
 					if (range.startContainer.nodeType === document.TEXT_NODE) {
-						rangeStart = self.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+						rangeStart = self.getTotalOffset(range.startContainer) + range.startOffset;
 					} else {
 						rangeStart = self.getTotalOffset(range.startContainer.childNodes[range.startOffset]);
 					}
 
 					if (range.endContainer.nodeType === document.TEXT_NODE) {
-						rangeEnd = self.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+						rangeEnd = self.getTotalOffset(range.endContainer) + range.endOffset;
 					} else {
 						rangeEnd = self.getTotalOffset(range.endContainer.childNodes[range.endOffset]);
 					}
@@ -2029,13 +2034,13 @@ hope.register( 'hope.fragment.annotations', function() {
 				for (var i=0; i<sel.rangeCount; i++) {
 					var range = sel.getRangeAt(i);
 					if (range.startContainer.nodeType === document.TEXT_NODE) {
-						rangeStart = this.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+						rangeStart = this.getTotalOffset(range.startContainer) + range.startOffset;
 					} else {
 						rangeStart = this.getTotalOffset(range.startContainer.childNodes[range.startOffset]);
 					}
 
 					if (range.endContainer.nodeType === document.TEXT_NODE) {
-						rangeEnd = this.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+						rangeEnd = this.getTotalOffset(range.endContainer) + range.endOffset;
 					} else {
 						rangeEnd = this.getTotalOffset(range.endContainer.childNodes[range.endOffset]);
 					}
