@@ -421,6 +421,16 @@ QUnit.module("editor text cursor");
 		assert.equal(testContent.innerHTML, '<h1>Hello world</h1>');
 	});
 
+	QUnit.test("text style unset to unnumbered list", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 2, 0);
+		editor.actions['simply-text-blockstyle']('ul');
+		assert.equal(testContent.innerHTML, '<ul><li>Hello world</li></ul>');
+	});
+
 QUnit.module("editor text selection");
 	QUnit.test("text set bold", function(assert) {
 		var testContent = document.querySelector("#testContent");

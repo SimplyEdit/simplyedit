@@ -611,7 +611,19 @@
 						hopeEditor.update();
 						return;
 					} else {
-						hopeEditor.fragment = hopeEditor.fragment.apply(range, value);
+						// find out the range that will contain all the to-be-created list items;
+						var containingRange;
+						for (var i=0; i<blocks.length; i++) {
+							if (typeof containingRange === "undefined") {
+								containingRange = hope.range.create(blocks[i].range.start, blocks[i].range.end);
+							} else {
+								containingRange = hope.range.create(Math.min(blocks[i].range.start, containingRange.start), Math.max(blocks[i].range.end, containingRange.end));
+							}
+						}
+						if (range.start != range.end) {
+							containingRange = hope.range.create(Math.max(containingRange.start, range.start), Math.min(containingRange.end, range.end));
+						}
+						hopeEditor.fragment = hopeEditor.fragment.apply(containingRange, value);
 						hopeEditor.update();
 						value = "li";
 					}
