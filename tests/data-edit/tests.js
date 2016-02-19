@@ -20,9 +20,13 @@ checkEditor();
 function setCaretPosition(elem, start, length) {
 	var range = document.createRange();
 
-	range.setStart(elem.childNodes[0], start);
+	var targetNode = elem.childNodes[0];
+	if (typeof targetNode === "undefined") {
+		targetNode = elem;
+	}
+	range.setStart(targetNode, start);
 	if (length) {
-		range.setEnd(elem.childNodes[0], start + length);
+		range.setEnd(targetNode, start + length);
 	}
 
 	var sel = window.getSelection();
@@ -262,6 +266,42 @@ QUnit.module("hope editor behaviour");
 		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 
+	QUnit.test("offset calculation with multiple text nodes", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h1>Hel<img src='frop'>lo wo<img src='frop'>rld.</h1>";
+		setCaretPosition(testContent.querySelector("h1").childNodes[4], 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.currentRange.start, 12);
+	});
+
+	QUnit.test("caret offset calculation with multiple text nodes", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h1>Hel<img src='frop'>lo wo<img src='frop'>rld.</h1>";
+		setCaretPosition(testContent.querySelector("h1").childNodes[4], 2, 0);
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		assert.equal(testContent.hopeEditor.getCaretOffset(testContent.querySelector("h1")), 12);
+	});
+
+	QUnit.test("caret offset calculation with multiple text nodes", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h1 data-hope-caret=12>Hel<img src='frop'>lo wo<img src='frop'>rld.</h1>";
+		testContent.hopeEditor.parseHTML();
+		editor.context.update();
+		testContent.hopeEditor.selection.updateRange();
+		var range = testContent.hopeEditor.setCaretOffset(testContent.querySelector("h1"));
+		if (range) {
+			var htmlSelection = window.getSelection();
+			htmlSelection.removeAllRanges();
+			htmlSelection.addRange(range);
+		}
+
+		assert.equal(testContent.hopeEditor.getCaretOffset(testContent.querySelector("h1")), 12);
+	});
+
 
 	
 QUnit.module("editor context");
@@ -419,6 +459,16 @@ QUnit.module("editor text cursor");
 		setCaretPosition(testContent.querySelector("h2"), 2, 0);
 		editor.actions['simply-text-blockstyle']('h1');
 		assert.equal(testContent.innerHTML, '<h1>Hello world</h1>');
+	});
+
+	QUnit.test("text style unset to unnumbered list", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 2, 0);
+		editor.actions['simply-text-blockstyle']('ul');
+		assert.equal(testContent.innerHTML, '<ul><li>Hello world</li></ul>');
 	});
 
 QUnit.module("editor text selection");
