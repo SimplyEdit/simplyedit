@@ -104,6 +104,9 @@ hope.register( 'hope.editor.selection', function() {
 				this.start = bestStart;
 				this.end = bestEnd;
 			}
+		} else {
+			this.start = start;
+			this.end = end;
 		}
 
 		if (this.end < this.start) {
