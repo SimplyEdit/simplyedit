@@ -622,7 +622,6 @@ window['Slip'] = (function(){
 			this.container = container;
 			this.otherNodes = [];
 
-			// selection on iOS interferes with reordering -> interferes with touch-hold selection otherwise so removed; YLJB.
 			document.addEventListener("selectionchange", this.onSelection, false);
 
 			// cancel is called e.g. when iOS detects multitasking gesture
