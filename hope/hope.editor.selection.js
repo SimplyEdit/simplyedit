@@ -15,13 +15,13 @@ hope.register( 'hope.editor.selection', function() {
 				for (var i=0; i<sel.rangeCount; i++) {
 					var range = sel.getRangeAt(i);
 					if (range.startContainer.nodeType === document.TEXT_NODE) {
-						rangeStart = self.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+						rangeStart = self.getTotalOffset(range.startContainer) + range.startOffset;
 					} else {
 						rangeStart = self.getTotalOffset(range.startContainer.childNodes[range.startOffset]);
 					}
 
 					if (range.endContainer.nodeType === document.TEXT_NODE) {
-						rangeEnd = self.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+						rangeEnd = self.getTotalOffset(range.endContainer) + range.endOffset;
 					} else {
 						rangeEnd = self.getTotalOffset(range.endContainer.childNodes[range.endOffset]);
 					}
@@ -72,13 +72,13 @@ hope.register( 'hope.editor.selection', function() {
 				for (var i=0; i<sel.rangeCount; i++) {
 					var range = sel.getRangeAt(i);
 					if (range.startContainer.nodeType === document.TEXT_NODE) {
-						rangeStart = this.getTotalOffset(range.startContainer.parentNode) + range.startOffset;
+						rangeStart = this.getTotalOffset(range.startContainer) + range.startOffset;
 					} else {
 						rangeStart = this.getTotalOffset(range.startContainer.childNodes[range.startOffset]);
 					}
 
 					if (range.endContainer.nodeType === document.TEXT_NODE) {
-						rangeEnd = this.getTotalOffset(range.endContainer.parentNode) + range.endOffset;
+						rangeEnd = this.getTotalOffset(range.endContainer) + range.endOffset;
 					} else {
 						rangeEnd = this.getTotalOffset(range.endContainer.childNodes[range.endOffset]);
 					}
@@ -104,6 +104,9 @@ hope.register( 'hope.editor.selection', function() {
 				this.start = bestStart;
 				this.end = bestEnd;
 			}
+		} else {
+			this.start = start;
+			this.end = end;
 		}
 
 		if (this.end < this.start) {

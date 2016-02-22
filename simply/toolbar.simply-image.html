@@ -4,7 +4,6 @@
 		<ul class="simply-buttons">
 			<li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
 			<li><button data-simply-section="simply-image-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
-			<li><button data-simply-section="simply-clipboard" class="simply-expands"><i class="fa fa-clipboard"></i>Clipboard</button></li>
 			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
 			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
 			<li><button data-simply-section="simply-code" data-simply-action="simply-edit-source"><i class="fa fa-code"></i>Code</button></li>
@@ -39,13 +38,6 @@
 				<button class="simply-hyperlink-newwindow" data-simply-action="simply-hyperlink-newwindow"><i class="fa fa-external-link"></i>New window</button>
 				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
 			</div>
-		</div>
-		<div class="simply-toolbar-section simply-clipboard">
-			<ul>
-				<li><button class="simply-clipboard-cut"><i class="fa fa-scissors"></i>Cut</button></li>
-				<li><button class="simply-clipboard-copy"><i class="fa fa-files-o"></i>Copy</button></li>
-				<li><button class="simply-clipboard-paste"><i class="fa fa-clipboard"></i>Paste</button></li>
-			</ul>
 		</div>
 	</div>
 </section>
@@ -428,14 +420,20 @@
 				var imageSrc = editor.plugins.image.placeholder();
 				var range = hopeEditor.currentRange;
 
+				if ( range.length ) {
+					hopeEditor.fragment = hopeEditor.fragment.delete(range);
+				}
 				var imageFragment = hope.fragment.create("\u00AD", '0-1:img src="' + imageSrc + '"');
 				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, imageFragment);
 
 				range = hope.range.create(range.start, range.start+1);
 
 				hopeEditor.fragment = hopeEditor.fragment.apply(range, 'img src="' + imageSrc + '"');
+				hopeEditor.selection.updateRange(range.start, range.start+1);
+
 				hopeEditor.update();
 				editor.plugins.image.reselect();
+				window.setTimeout(editor.context.update, 100);
 			}
 		}
 	});
