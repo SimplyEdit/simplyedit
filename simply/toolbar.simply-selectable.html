@@ -57,7 +57,7 @@
 
 					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
 					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
-					vdSelectionState.remove(sel);
+					vdSelectionState.remove();
 				});
 				removeTouchSelectionEvent = muze.event.attach(document, "touchstart", function(evt) {
 					var target = muze.event.target(evt);
@@ -73,7 +73,7 @@
 
 					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
 					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
-					vdSelectionState.remove(sel);
+					vdSelectionState.remove();
 				});
 			}, 50);
 		}
