@@ -808,6 +808,8 @@
 							for (i=0; i<newToolbars.length; i++) {
 								editor.toolbar.init(newToolbars[i]);
 							}
+						} else {
+							console.log("Warning: toolbar did not load.");
 						}
 						if (toolbarList.length) {
 							editor.editmode.loadToolbarList(toolbarList);
@@ -1210,8 +1212,13 @@
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback(http.responseText.replace(/data-vedor/g, "data-simply"));
+					if(http.readyState == 4) {
+						if (http.status == 200) {
+							callback(http.responseText.replace(/data-vedor/g, "data-simply"));
+						} else {
+							console.log("Could not load data, starting empty.");
+							callback("{}");
+						}
 					}
 				};
 				http.send();
@@ -1331,7 +1338,7 @@
 					if (err.error == 401) {
 						return callback({message : "Authorization failed."});
 					}
-					return callback({message : "Could not store."});
+					return callback({message : "SAVE FAILED: Could not store."});
 				};
 
 				this.repo.write(this.repoBranch, this.dataFile, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
@@ -1344,11 +1351,13 @@
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback(http.responseText);
-					}
-					if(http.readyState == 4 && http.status == 404) {
-						callback("{}");
+					if(http.readyState == 4) {
+						if (http.status == 200) {
+							callback(http.responseText);
+						} else {
+							console.log("No data found, starting with empty dataset");
+							callback("{}");
+						}
 					}
 				};
 				http.send();
@@ -1437,9 +1446,13 @@
 					http.withCredentials = true;
 
 					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4 && http.status == 200) {
-							callback();
-						}
+						if(http.readyState == 4) {
+							if (http.status == 200) {
+								callback();
+							} else {
+								callback({message : "SAVE FAILED: Could not store."});
+							}
+						} 
 					};
 					http.upload.onprogress = function (event) {
 						if (event.lengthComputable) {
@@ -1461,8 +1474,13 @@
 					http.withCredentials = true;
 
 					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4 && http.status == 200) {
-							callback();
+						if(http.readyState == 4) {
+							if (http.status == 200) {
+								callback();
+							} else {
+								console.log("Warning: delete failed.");
+								callback();
+							}
 						}
 					};
 
@@ -1480,10 +1498,13 @@
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && http.status == 200) {
-						callback(http.responseText);
-					} else if (http.readyState == 4 && http.status == 404) {
-						callback("{}");
+					if(http.readyState == 4) {
+						if (http.status == 200) {
+							callback(http.responseText);
+						} else {
+							callback("{}");
+							console.log("Warning: no data found. Starting with empty set");
+						}
 					}
 				};
 				http.send();
