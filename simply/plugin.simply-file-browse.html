@@ -367,7 +367,7 @@
 		editor.actions["simply-file-browse-insert"] = function(button) {
 			var target = button.getAttribute("data-value");
 			if (editor.storage.dataEndpoint) {
-				target = target.replace(editor.storage.dataEndpoint, "/");
+				target = target.replace(editor.storage.dataEndpoint, "");
 			}
 			// FIXME: check for dirty fields and stash/save the changes
 			document.location.href = target + "#simply-edit";
