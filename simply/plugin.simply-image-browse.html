@@ -14,6 +14,7 @@
 </section>
 <style type="text/css">
 	#simply-image-browse .simply-dialog-body > button,
+	#simply-image-browse .simply-dialog-body > .simply-button,
 	#simply-image-browse .simply-add-folder {
 		border: 1px solid #eee;
 		background-color: white;
@@ -26,6 +27,13 @@
 		color: #999 !important;
 		display: inline-block;
 		vertical-align: top;
+		box-sizing: border-box;
+		text-align: center;
+		padding-top: 30px;
+	}
+	#simply-image-browse .simply-dialog-body > .simply-button[data-simply-action="simply-image-browse-insert"] {
+		line-height: 149px;
+		padding-top: 0px;
 	}
 
 	#simply-image-browse .simply-add-folder {
@@ -41,7 +49,8 @@
 	#simply-image-browse input[type="file"] {
 		display: none;
 	}
-	#simply-image-browse .simply-dialog-body > button:before {
+	#simply-image-browse .simply-dialog-body > button:before,
+	#simply-image-browse .simply-dialog-body > .simply-button:before {
 		display: block;
 		content: '';
 		position: absolute;
@@ -51,6 +60,7 @@
 		width: 100%;
 	}
         #simply-image-browse .simply-dialog-body > button i,
+        #simply-image-browse .simply-dialog-body > .simply-button i,
 	#simply-image-browse .simply-add-folder > i {
 		font-size: 48px;
 		display: block;
@@ -78,18 +88,23 @@
 	#simply-image-browse .simply-add-folder > button.simply-add > i {
 		margin-right: 5px;
 	}
-	#simply-image-browse .simply-dialog-body > button img {
+	#simply-image-browse .simply-dialog-body > button img,
+	#simply-image-browse .simply-dialog-body > .simply-button img {
 		max-width: 100%;
 		max-height: 100%;
 		width: 149px;
 	}
-
-	#simply-image-browse .simply-dialog-body > button progress {
+	#simply-image-browse .simply-dialog-body > .simply-button img {
+		vertical-align: middle;
+	}
+	#simply-image-browse .simply-dialog-body > button progress,
+	#simply-image-browse .simply-dialog-body > .simply-button progress {
 		width: 100%;
 		height: 10px;
 	}
 
-	#simply-image-browse .simply-dialog-body > button i.select {
+	#simply-image-browse .simply-dialog-body > button i.select,
+	#simply-image-browse .simply-dialog-body > .simply-button i.select {
 		position: absolute;
 		top: 0;
 		right: 0px;
@@ -98,7 +113,8 @@
 		width: 40px;
 	}
 
-	#simply-image-browse .simply-dialog-body > button i.select:before {
+	#simply-image-browse .simply-dialog-body > button i.select:before,
+	#simply-image-browse .simply-dialog-body > .simply-button i.select:before {
 		width: 16px;
 		display: inline-block;
 		font-size: 20px;
@@ -112,7 +128,8 @@
 		vertical-align: top;
 		box-sizing: content-box;
 	}
-	#simply-image-browse .simply-dialog-body.simply-selecting button i.select {
+	#simply-image-browse .simply-dialog-body.simply-selecting button i.select,
+	#simply-image-browse .simply-dialog-body.simply-selecting .simply-button i.select {
 		position: absolute;
 		top: 0px;
 		left: 0px;
@@ -120,13 +137,15 @@
 		right: 0px;
 		width: auto;
 	}
-	#simply-image-browse .simply-dialog-body > button.simply-selected i.select:before {
+	#simply-image-browse .simply-dialog-body > button.simply-selected i.select:before,
+	#simply-image-browse .simply-dialog-body > .simply-button.simply-selected i.select:before {
 		border-color: #999;
 		color: #16B916;
 		background-color: rgba(255,255,255,0.8);
 	}
 	@media (max-width: 481px) {
-		#simply-image-browse .simply-dialog-body > button {
+		#simply-image-browse .simply-dialog-body > button,
+		#simply-image-browse .simply-dialog-body > .simply-button {
 			width: 50%;
 		}
 		#simply-image-browse .simply-dialog-body > .simply-add-folder {
@@ -164,7 +183,7 @@
 					var newHtml = '';
 					for (i=0; i<imageData.folders.length; i++) {
 						if (imageData.folders[i].url.indexOf(editor.plugins.imageBrowse.currentJail) === 0) {
-							newHtml += "<button data-simply-action='simply-image-browse-directory' data-value='" + imageData.folders[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + imageData.folders[i].name + "</button>";
+							newHtml += "<div class='simply-button' data-simply-action='simply-image-browse-directory' data-value='" + imageData.folders[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + imageData.folders[i].name + "</div>";
 						}
 					}
 					for (i=0; i<imageData.images.length; i++) {
@@ -231,7 +250,7 @@
 				src = imageData.src;
 			}
 
-			var result = "<button data-simply-action='simply-image-browse-insert'>";
+			var result = "<div class='simply-button' data-simply-action='simply-image-browse-insert'>";
 			result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
 			if (imageData.thumb) {
 				result += " src='" + imageData.thumb + "'";
@@ -241,7 +260,7 @@
 			if (imageData.id) {
 				result += " data-simply-id='" + imageData.id + "'";
 			}
-			result += "></button>";
+			result += "></div>";
 			return result;
 		},
 		init : function() {
@@ -259,7 +278,7 @@
 					if (target) {
 						for (i=0; i<target.length; i++) {
 							var button = document.createElement("div");
-							button.innerHTML = '<button data-simply-action="simply-image-browse"><i class="fa fa-folder"></i></button>';
+							button.innerHTML = '<div class="simply-button" data-simply-action="simply-image-browse"><i class="fa fa-folder"></i></div>';
 							target[i].parentNode.querySelector("label").appendChild(button.firstChild);
 						}
 					}
@@ -399,8 +418,8 @@
 
 		(function(targetButton, url) {
 			editor.storage.file.save(subpath + filename + '/', '', function() {
-				targetButton.innerHTML = "<button data-simply-action='simply-image-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</button>";
-				newButton = targetButton.querySelector("button");
+				targetButton.innerHTML = "<div class='simply-button' data-simply-action='simply-image-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</button>";
+				newButton = targetButton.querySelector("div");
 				targetButton.parentNode.insertBefore(newButton, targetButton);
 				targetButton.parentNode.removeChild(targetButton);
 			});
@@ -458,7 +477,7 @@
 		var currentWidth = parent.naturalWidth;
 		var currentHeight = parent.naturalHeight;
 		var targetList = document.querySelector("#simply-image-browse .simply-dialog-body");
-		var imageList = targetList.querySelectorAll("button img");
+		var imageList = targetList.querySelectorAll("div.simply-button img");
 		if (el.classList.contains("simply-selected")) {
 			for (var i=0; i<imageList.length; i++) {
 				imageList[i].parentNode.style.display = "inline-block";
