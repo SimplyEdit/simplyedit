@@ -1516,7 +1516,9 @@ hope.register( 'hope.fragment.annotations', function() {
 		sel.addRange(range);
 		var newRange = sel.getRangeAt(0);
 		var offset2 = newRange.startOffset;
-		return offset1 == offset2;
+		var result = (offset1 == offset2);
+		document.body.removeChild(div);
+		return result;
 	}());
 
 	function unrender(target) {
