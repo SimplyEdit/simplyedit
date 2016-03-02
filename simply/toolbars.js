@@ -205,7 +205,6 @@
 			}
 			return false;
 		},
-
 		hasToolbarParent : function(checkParent) {
 			var parent = checkParent;
 			while (parent && parent.parentNode) {
