@@ -12,7 +12,9 @@ hope.register( 'hope.editor', function() {
 		sel.addRange(range);
 		var newRange = sel.getRangeAt(0);
 		var offset2 = newRange.startOffset;
-		return offset1 == offset2;
+		var result = (offset1 == offset2);
+		document.body.removeChild(div);
+		return result;
 	}());
 
 	function unrender(target) {
@@ -26,17 +28,21 @@ hope.register( 'hope.editor', function() {
 		for (var i in target.childNodes) {
 			if (target.childNodes[i].nodeType == document.ELEMENT_NODE) {
 				if (
-					target.childNodes[i].tagName.toLowerCase() == 'img' ||
-					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
-					target.childNodes[i].tagName.toLowerCase() == 'hr'
+					!target.childNodes[i].hasChildNodes()
 				) {
 					tagStart = hopeTokenCounter;
 					hopeTokenCounter += 1;
 
-					if (target.childNodes[i].tagName.toLowerCase() == 'img') {
-						textValue += "\u00AD";
-					} else {
-						textValue += "\n";
+					switch (target.childNodes[i].tagName.toLowerCase()) {
+						case 'br':
+						case 'hr':
+							textValue += "\n";
+						break;
+						case 'img':
+							textValue += "\u00AD"; // &shy;
+						break;
+						default:
+							textValue += "\u00AD"; // &shy;
 					}
 
 					tagEnd = hopeTokenCounter;
@@ -243,9 +249,7 @@ hope.register( 'hope.editor', function() {
 			function(node) {
 				if (
 					node.nodeType == document.TEXT_NODE ||
-					node.tagName.toLowerCase() == "img" ||
-					node.tagName.toLowerCase() == "br" ||
-					node.tagName.toLowerCase() == "hr"
+					!node.hasChildNodes()
 				) {
 					return NodeFilter.FILTER_ACCEPT;
 				} else {

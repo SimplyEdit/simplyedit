@@ -14,6 +14,7 @@
 </section>
 <style type="text/css">
 	#simply-file-browse .simply-dialog-body > button,
+	#simply-file-browse .simply-dialog-body > .simply-button,
 	#simply-file-browse .simply-add-folder,
 	#simply-file-browse .simply-add-page {
 		border: 1px solid #eee;
@@ -27,6 +28,9 @@
 		color: #999 !important;
 		display: inline-block;
 		vertical-align: top;
+		text-align: center;
+		box-sizing: border-box;
+		padding-top: 30px;
 	}
 	#simply-file-browse .simply-add-folder,
 	#simply-file-browse .simply-add-page {
@@ -42,7 +46,8 @@
 	#simply-file-browse input[type="file"] {
 		display: none;
 	}
-	#simply-file-browse .simply-dialog-body > button:before {
+	#simply-file-browse .simply-dialog-body > button:before,
+	#simply-file-browse .simply-dialog-body > .simply-button:before {
 		display: block;
 		content: '';
 		position: absolute;
@@ -52,6 +57,7 @@
 		width: 100%;
 	}
         #simply-file-browse .simply-dialog-body > button i,
+        #simply-file-browse .simply-dialog-body > .simply-button i,
 	#simply-file-browse .simply-add-folder > i,
 	#simply-file-browse .simply-add-page > i {
 		font-size: 48px;
@@ -84,15 +90,18 @@
 		margin-right: 5px;
 	}
 
-	#simply-file-browse .simply-dialog-body > button img {
+	#simply-file-browse .simply-dialog-body > button img,
+	#simply-file-browse .simply-dialog-body > .simply-button img {
 		max-width: 100%;
 		max-height: 100%;
 	}
-	#simply-file-browse .simply-dialog-body > button progress {
+	#simply-file-browse .simply-dialog-body > button progress,
+	#simply-file-browse .simply-dialog-body > .simply-button progress {
 		width: 100%;
 		height: 10px;
 	}
-	#simply-file-browse .simply-dialog-body > button i.select {
+	#simply-file-browse .simply-dialog-body > button i.select,
+	#simply-file-browse .simply-dialog-body > .simply-button i.select {
 		position: absolute;
 		top: 0;
 		right: 0px;
@@ -100,7 +109,8 @@
 		text-align: right;
 		width: 40px;
 	}
-	#simply-file-browse .simply-dialog-body > button i.select:before {
+	#simply-file-browse .simply-dialog-body > button i.select:before,
+	#simply-file-browse .simply-dialog-body > .simply-button i.select:before {
 		width: 16px;
 		display: inline-block;
 		font-size: 20px;
@@ -114,7 +124,8 @@
 		vertical-align: top;
 		box-sizing: content-box;
 	}
-	#simply-file-browse .simply-dialog-body.simply-selecting button i.select {
+	#simply-file-browse .simply-dialog-body.simply-selecting button i.select,
+	#simply-file-browse .simply-dialog-body.simply-selecting .simply-button i.select {
 		position: absolute;
 		top: 0px;
 		left: 0px;
@@ -122,14 +133,16 @@
 		right: 0px;
 		width: auto;
 	}
-	#simply-file-browse .simply-dialog-body > button.simply-selected i.select:before {
+	#simply-file-browse .simply-dialog-body > button.simply-selected i.select:before,
+	#simply-file-browse .simply-dialog-body > .simply-button.simply-selected i.select:before {
 		border-color: #999;
 		color: #16B916;
 		background-color: rgba(255,255,255,0.8);
 	}
 
 	@media (max-width: 481px) {
-		#simply-file-browse .simply-dialog-body > button {
+		#simply-file-browse .simply-dialog-body > button,
+		#simply-file-browse .simply-dialog-body > .simply-button {
 			width: 50%;
 		}
 		#simply-file-browse .simply-dialog-body > .simply-add-folder,
@@ -168,12 +181,12 @@
 					var newHtml = '';
 					for (i=0; i<fileData.folders.length; i++) {
 						if (fileData.folders[i].url.indexOf(editor.plugins.fileBrowse.currentJail) === 0) {
-							newHtml += "<button data-simply-action='simply-file-browse-directory' data-value='" + fileData.folders[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + fileData.folders[i].name + "</button>";
+							newHtml += "<div class='simply-button' data-simply-action='simply-file-browse-directory' data-value='" + fileData.folders[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + fileData.folders[i].name + "</div>";
 						}
 					}
 					for (i=0; i<fileData.files.length; i++) {
 						if (fileData.files[i].url.indexOf(editor.plugins.fileBrowse.currentJail) === 0) {
-							newHtml += "<button data-simply-action='simply-file-browse-insert' data-value='" + fileData.files[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + fileData.files[i].name + "</button>";
+							newHtml += "<div class='simply-button' data-simply-action='simply-file-browse-insert' data-value='" + fileData.files[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + fileData.files[i].name + "</div>";
 						}
 					}
 					targetList.innerHTML = newHtml;
@@ -367,7 +380,7 @@
 		editor.actions["simply-file-browse-insert"] = function(button) {
 			var target = button.getAttribute("data-value");
 			if (editor.storage.dataEndpoint) {
-				target = target.replace(editor.storage.dataEndpoint, "/");
+				target = target.replace(editor.storage.dataEndpoint, "");
 			}
 			// FIXME: check for dirty fields and stash/save the changes
 			document.location.href = target + "#simply-edit";
@@ -426,8 +439,8 @@
 			var url = editor.plugins.fileBrowse.currentPath + "/" + filename.replace(/[^A-Za-z0-9_\.-]/, "-");
 
 			(function(targetButton, url) {
-				targetButton.innerHTML = "<button data-simply-action='simply-file-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</button>";
-				newButton = targetButton.querySelector("button");
+				targetButton.innerHTML = "<div class='simply-button' data-simply-action='simply-file-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</div>";
+				newButton = targetButton.querySelector("div");
 				targetButton.parentNode.insertBefore(newButton, targetButton);
 				targetButton.parentNode.removeChild(targetButton);
 
@@ -442,8 +455,8 @@
 
 			(function(targetButton, url) {
 				editor.storage.file.save(subpath + filename + '/', '', function() {
-					targetButton.innerHTML = "<button data-simply-action='simply-file-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</button>";
-					newButton = targetButton.querySelector("button");
+					targetButton.innerHTML = "<div class='simply-button' data-simply-action='simply-file-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</div>";
+					newButton = targetButton.querySelector("div");
 					targetButton.parentNode.insertBefore(newButton, targetButton);
 					targetButton.parentNode.removeChild(targetButton);
 				});

@@ -315,7 +315,8 @@ hope.register( 'hope.render.html', function() {
 				if (diffHTML && (
 					diffHTML.indexOf("<br>") !== -1 ||
 					diffHTML.indexOf("<hr>") !== -1 ||
-					diffHTML.indexOf("<img") !== -1
+					diffHTML.indexOf("<img") !== -1 ||
+					(offset == 1 && (content.substr(cursor, offset) == "\u00AD")) // FIXME: This should have some kind of check to see if the element was empty in the first place;
 				) ) {
 					// skip the placeholder char for the rendering;
 					cursor++;

@@ -101,11 +101,11 @@
 		init : function(toolbar) {
 			toolbar.addEventListener("click", function(evt) {
 				var el = evt.target;
-				while (el != this && el.tagName.toLowerCase() != "button") {
+				while (el != this && !(el.tagName.toLowerCase() == "button" || el.classList.contains("simply-button"))) {
 					el = el.parentNode;
 				}
 
-				if ( el.tagName == 'BUTTON' ) {
+				if ( el.tagName == 'BUTTON' || el.classList.contains("simply-button")) {
 					switch(el.getAttribute("data-simply-action")) {
 						case null:
 						break;
@@ -205,7 +205,6 @@
 			}
 			return false;
 		},
-
 		hasToolbarParent : function(checkParent) {
 			var parent = checkParent;
 			while (parent && parent.parentNode) {
