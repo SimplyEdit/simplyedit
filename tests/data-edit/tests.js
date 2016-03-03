@@ -63,18 +63,17 @@ function setSelectionEnd(elem, offset) {
 	}
 	editor.context.update();
 }
-
 QUnit.module("editor init");
 	QUnit.test("editmode init", function(assert) {
 		assert.ok(vdSelectionState, "vdSelectionState initialized");
 	});
 
 QUnit.module("hope editor behaviour");
-
 	QUnit.test("seperate p stay seperated", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello</p><p>world</p>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "<p>Hello</p><p>world</p>", "innerHTML did not change");
 	});
 
@@ -82,6 +81,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello<br><br>world</p>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "<p>Hello<br><br>world</p>", "innerHTML did not change");
 	});
 
@@ -89,6 +89,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "hello<hr><hr>world";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "hello<hr><hr>world", "innerHTML did not change");
 	});
 
@@ -96,6 +97,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>hello</p><hr><hr><p>world</p>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "<p>hello</p><hr><hr><p>world</p>", "innerHTML did not change");
 	});
 
@@ -103,12 +105,14 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "hello<div></div><div></div>world";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "hello<div></div><div></div>world", "innerHTML did not change");
 	});
 	QUnit.test("strong tag doesnt get extra p tags", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>He<strong>llo</strong> world</p>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		setCaretPosition(testContent.querySelector("p"), 1, 0);
 		assert.equal(testContent.innerHTML, "<p>He<strong>llo</strong> world</p>", "innerHTML did not change");
 	});
@@ -117,6 +121,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<div>test1</div><div><code>Hello</code></div>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		setCaretPosition(testContent.querySelector("div"), 1, 0);
 		assert.equal(testContent.innerHTML, "<div>test1</div><div><code>Hello</code></div>", "innerHTML did not change");
 	});
@@ -125,6 +130,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<ul><li>test1</li><li>test2</li></ul>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "<ul><li>test1</li><li>test2</li></ul>", "innerHTML did not change");
 	});
 
@@ -132,13 +138,31 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<ul><li><strong>test1</strong></li><li>test2</li></ul>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "<ul><li><strong>test1</strong></li><li>test2</li></ul>", "innerHTML did not change");
+	});
+	QUnit.test("unnumbered list, empty <i> tag in li", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<ul>' + "\n" + '<li><i class="fa"></i>Hello</li><li>world</li></ul>';
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+
+		// replace the newline - phantomJS removes it from between the ul and the li;
+		assert.equal(testContent.innerHTML.replace(/\n/g, ''), '<ul><li><i class="fa"></i>Hello</li><li>world</li></ul>', "innerHTML did not change");
+	});
+	QUnit.test("unnumbered list, nonempty <i> tag in li", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<ul><li><i class="fa">X</i>Hello</li><li>world</li></ul>';
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		assert.equal(testContent.innerHTML, '<ul><li><i class="fa">X</i>Hello</li><li>world</li></ul>', "innerHTML did not change");
 	});
 
 	QUnit.test("footer HTML element works", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<footer>Hello world</footer>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "<footer>Hello world</footer>", "innerHTML did not change");
 	});
 
@@ -146,6 +170,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<gobblefoo>Hello <gobblebar>world</gobblebar></gobblefoo>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, "<gobblefoo>Hello <gobblebar>world</gobblebar></gobblefoo>", "innerHTML did not change");
 	});
 
@@ -164,6 +189,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "		<div>		<p>abcdef</p>		</div>		";
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		testContent.hopeEditor.selection.updateRange();
 
 		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "p");
@@ -174,6 +200,7 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
@@ -187,6 +214,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "		<div>		a	b<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
@@ -200,6 +228,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "		<div>abc<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
@@ -211,6 +240,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "		<div>ab<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
@@ -222,6 +252,7 @@ QUnit.module("hope editor behaviour");
 		// testContent.style.whiteSpace = "pre";
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
@@ -235,6 +266,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "  <div>  <img src='frop'>  </div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
@@ -247,6 +279,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 1, 1);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
@@ -260,6 +293,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "		<div>		a<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
@@ -271,6 +305,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "<h1>Hel<img src='frop'>lo wo<img src='frop'>rld.</h1>";
 		setCaretPosition(testContent.querySelector("h1").childNodes[4], 2, 0);
 		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 		assert.equal(testContent.hopeEditor.currentRange.start, 12);
@@ -301,8 +336,6 @@ QUnit.module("hope editor behaviour");
 
 		assert.equal(testContent.hopeEditor.getCaretOffset(testContent.querySelector("h1")), 12);
 	});
-
-
 	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
@@ -375,7 +408,6 @@ QUnit.module("editor text cursor");
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-justify">Hello world</p>', "Found align class");
 	});
-
 	QUnit.test("text style init paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello world</p>";
@@ -385,7 +417,6 @@ QUnit.module("editor text cursor");
 		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, "p", "text style is correctly updated");
 	});
-
 	QUnit.test("text style init h2", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<h2>Hello world</h2>";

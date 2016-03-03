@@ -1222,7 +1222,8 @@ hope.register( 'hope.fragment.annotations', function() {
 				if (diffHTML && (
 					diffHTML.indexOf("<br>") !== -1 ||
 					diffHTML.indexOf("<hr>") !== -1 ||
-					diffHTML.indexOf("<img") !== -1
+					diffHTML.indexOf("<img") !== -1 ||
+					(offset == 1 && (content.substr(cursor, offset) == "\u00AD")) // FIXME: This should have some kind of check to see if the element was empty in the first place;
 				) ) {
 					// skip the placeholder char for the rendering;
 					cursor++;
@@ -1516,7 +1517,9 @@ hope.register( 'hope.fragment.annotations', function() {
 		sel.addRange(range);
 		var newRange = sel.getRangeAt(0);
 		var offset2 = newRange.startOffset;
-		return offset1 == offset2;
+		var result = (offset1 == offset2);
+		document.body.removeChild(div);
+		return result;
 	}());
 
 	function unrender(target) {
@@ -1530,17 +1533,21 @@ hope.register( 'hope.fragment.annotations', function() {
 		for (var i in target.childNodes) {
 			if (target.childNodes[i].nodeType == document.ELEMENT_NODE) {
 				if (
-					target.childNodes[i].tagName.toLowerCase() == 'img' ||
-					target.childNodes[i].tagName.toLowerCase() == 'br'  ||
-					target.childNodes[i].tagName.toLowerCase() == 'hr'
+					!target.childNodes[i].hasChildNodes()
 				) {
 					tagStart = hopeTokenCounter;
 					hopeTokenCounter += 1;
 
-					if (target.childNodes[i].tagName.toLowerCase() == 'img') {
-						textValue += "\u00AD";
-					} else {
-						textValue += "\n";
+					switch (target.childNodes[i].tagName.toLowerCase()) {
+						case 'br':
+						case 'hr':
+							textValue += "\n";
+						break;
+						case 'img':
+							textValue += "\u00AD"; // &shy;
+						break;
+						default:
+							textValue += "\u00AD"; // &shy;
 					}
 
 					tagEnd = hopeTokenCounter;
@@ -1747,9 +1754,7 @@ hope.register( 'hope.fragment.annotations', function() {
 			function(node) {
 				if (
 					node.nodeType == document.TEXT_NODE ||
-					node.tagName.toLowerCase() == "img" ||
-					node.tagName.toLowerCase() == "br" ||
-					node.tagName.toLowerCase() == "hr"
+					!node.hasChildNodes()
 				) {
 					return NodeFilter.FILTER_ACCEPT;
 				} else {
