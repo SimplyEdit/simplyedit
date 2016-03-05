@@ -33,7 +33,8 @@
 
 			var target = muze.event.target(event);
 			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
-				if (target.getAttribute("contenteditable")) {
+				if (target.getAttribute("data-simply-field")) {
+					event.preventDefault();
 					return;
 				}
 			
