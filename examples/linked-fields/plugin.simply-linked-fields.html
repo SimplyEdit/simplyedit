@@ -1,0 +1,80 @@
+<script type="text/javascript">
+	editor.plugins.linkedFields = {
+		get : function(target) {
+			var currentData;
+			if (target.getAttribute("data-simply-list")) {
+				var stashedFields = document.querySelectorAll("[data-simply-stashed]");
+				for (i=0; i<stashedFields.length; i++) {
+					stashedFields[i].removeAttribute("data-simply-stashed");
+				}
+
+				currentData = editor.data.get(target);
+				var dataName = target.getAttribute("data-simply-list");
+				var dataPath = editor.data.getDataPath(target);
+				currentData = currentData[dataPath][dataName];
+			} else {
+				currentData = editor.field.get(target);
+			}
+			return currentData;
+		},
+		set : function(target, data) {
+			if (target.getAttribute("data-simply-list")) {
+				var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
+				var items = target.querySelectorAll("[data-simply-list-item]");
+				for (var i=0; i<items.length; i++) {
+					items[i].parentNode.removeChild(items[i]);
+				}
+				editor.data.list.applyTemplates(target, data);
+				editor.editmode.makeEditable(target);
+				document.body.scrollTop = currentScroll;
+			} else {
+				editor.field.set(target, data);
+				if (target.hopeEditor) {
+					target.hopeEditor.parseHTML();
+				}
+			}
+		},
+		getId : function(target) {
+			var dataName = target.getAttribute("data-simply-field");
+			if (target.getAttribute("data-simply-link")) {
+				dataName = target.getAttribute("data-simply-link");
+			}
+			var dataPath = editor.data.getDataPath(target);
+			return dataPath + "[" + dataName + "]";
+		},
+		changeHandler : function(evt) {
+			if (this.getAttribute("data-simply-linked")) {
+				var twins = document.querySelectorAll('[data-simply-linked="' + this.getAttribute("data-simply-linked") + '"]');
+				if (twins.length > 1) {
+					// It has twins
+					var data = editor.plugins.linkedFields.get(this);
+					for (var i=0; i<twins.length; i++) {
+						if (twins[i] !== this) {
+							editor.plugins.linkedFields.set(twins[i], data);
+						}
+					}
+				}
+			}
+		}
+	};
+
+	editor.addToolbar({
+		name : 'simply-linked-fields',
+		init : function() {
+			var fields = document.querySelectorAll("[data-simply-field], [data-simply-list]");
+			for (var i=0; i<fields.length; i++) {
+				if (!editor.node.hasSimplyParent(fields[i])) {
+					var fieldId = editor.plugins.linkedFields.getId(fields[i]);
+					if (fieldId) {
+						fields[i].setAttribute("data-simply-linked", fieldId);
+
+						fields[i].addEventListener("keyup", editor.plugins.linkedFields.changeHandler);
+						fields[i].addEventListener("mouseup", editor.plugins.linkedFields.changeHandler);
+						fields[i].addEventListener("touchend", editor.plugins.linkedFields.changeHandler);
+						fields[i].addEventListener("slip:reorder", editor.plugins.linkedFields.changeHandler);
+					}
+				}
+			}
+		}
+	});
+</script>
