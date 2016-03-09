@@ -84,7 +84,19 @@
 				}
 
 				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
-						
+
+				var targetField = editor.node.getSimplyParent(event.target);
+				switch (targetField.tagName.toLowerCase()) {
+					case 'div':
+						// Only allow pasting HTML within divs.
+						//  - firefox has issues with nesting headings
+						// Edge even splits the editable field in two (when pasting a h1 into a contenteditable h2);
+						// FIXME: Test more elements that work correctly and add them to this 'can receive HTML' list;
+					break;
+					default:
+						pastedHtml = undefined; // Only allow pasting HTML within divs - firefox has issues with nesting headings, Edge even splits the editable field in two.
+				}
+
 				if (pastedHtml) {
 					var tempNode = event.target.ownerDocument.createElement("DIV");
 					tempNode.innerHTML = pastedHtml;
