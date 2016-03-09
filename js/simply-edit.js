@@ -20,7 +20,7 @@
 	};
 
 	var editor = {
-		version: '0.18',
+		version: '0.19',
 		apiKey : apiKey,
 		baseURL : getBaseURL(scriptEl.src),
 		data : {
@@ -755,6 +755,13 @@
 				}
 			}
 			editor.loadBaseStyles();
+
+			// convert URL for the endpoint to an absolute path;
+			if (typeof config.endpoint !== 'undefined') {
+				var parser = document.createElement("A");
+				parser.href = config.endpoint;
+				config.endpoint = parser.href;
+			}
 
 			editor.profile = config.profile;
 			editor.storage = storage.init(config.endpoint);
