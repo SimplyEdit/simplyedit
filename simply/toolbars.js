@@ -754,7 +754,6 @@
 			document.body.classList.remove("simply-overflow-hidden");
 			target.classList.remove("active");
 
-			vdSelectionState.remove();
 
 			var hopeEditor = editor.plugins.dialog.currentField.hopeEditor;
 			if (hopeEditor) {
@@ -762,7 +761,10 @@
 				hopeEditor.update();
 				hopeEditor.selection.updateRange(hopeEditor.currentRange.start, hopeEditor.currentRange.end);
 				hopeEditor.showCursor();
+			} else {
+				vdSelectionState.restore(vdSelectionState.get());
 			}
+			vdSelectionState.remove();
 
 			if (typeof callback == "function") {
 				callback();
