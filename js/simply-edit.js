@@ -756,6 +756,13 @@
 			}
 			editor.loadBaseStyles();
 
+			// convert URL for the endpoint to an absolute path;
+			if (typeof config.endpoint !== 'undefined') {
+				var parser = document.createElement("A");
+				parser.href = config.endpoint;
+				config.endpoint = parser.href;
+			}
+
 			editor.profile = config.profile;
 			editor.storage = storage.init(config.endpoint);
 			editor.data.load();
