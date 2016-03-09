@@ -30,7 +30,66 @@
 			}, 10);
 
 		}
-	}
+	};
+
+	var cleanPastedHtml = function(pastedHtml, target) {
+		var tempNode = document.createElement("DIV");
+		tempNode.innerHTML = pastedHtml;
+
+		// Remove the startfragment and endfragment bits;
+		for (var i=tempNode.childNodes.length-1; i>-1; i--) {
+			if (tempNode.childNodes[i].nodeType == 8) {
+				if ((tempNode.childNodes[i].data == "StartFragment") || (tempNode.childNodes[i].data == "EndFragment")) {
+					tempNode.removeChild(tempNode.childNodes[i]);
+				}
+			}
+		}
+	
+		// Remove inline styles;
+		var tempNodes = tempNode.querySelectorAll("*");
+		for (var i=0; i<tempNodes.length; i++) {
+			tempNodes[i].removeAttribute("style", '');
+		}
+
+		return tempNode.innerHTML.trim();
+	};
+
+	var unwrap = function(pastedHtml) {
+		var tempNode = document.createElement("DIV");
+		tempNode.innerHTML = pastedHtml;
+		if (tempNode.childNodes.length == 1) {
+			editor.node.unwrap(tempNode.firstChild);
+			return tempNode.innerHTML;
+		}
+		return;
+	};
+
+	var pasteAllowed = function(pastedHtml, target) {
+		var tempNode = document.createElement("DIV");
+		tempNode.innerHTML = pastedHtml;
+
+		if (target.nodeType === document.TEXT_NODE) {
+			target = target.parentNode;
+		}
+		while (hope.render.html.rules.nestingSets['block'].indexOf(target.tagName.toLowerCase()) < 0) {
+			target = target.parentNode;
+		}
+
+		var nestingRules = hope.render.html.rules.nesting[target.tagName.toLowerCase()];
+		if (typeof nestingRules === "undefined") {
+			nestingRules = hope.render.html.rules.nesting["span"];
+		}
+
+		for (var i=0; i<tempNode.childNodes.length; i++) {
+			if (tempNode.childNodes[i].nodeType == document.ELEMENT_NODE) {
+				var tagName = tempNode.childNodes[i].tagName.toLowerCase();
+				if (nestingRules.indexOf(tagName) === -1) {
+					return false;
+				}
+			}
+		}
+		return true;
+	};
 
 	editor.addToolbar({
 		name : 'simply-paste-handler',
@@ -83,43 +142,18 @@
 					pastedHtml = event.clipboardData.getData('text/html');
 				}
 
-				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
-
 				var targetField = editor.node.getSimplyParent(event.target);
-				switch (targetField.tagName.toLowerCase()) {
-					case 'div':
-						// Only allow pasting HTML within divs.
-						//  - firefox has issues with nesting headings
-						// Edge even splits the editable field in two (when pasting a h1 into a contenteditable h2);
-						// FIXME: Test more elements that work correctly and add them to this 'can receive HTML' list;
-					break;
-					default:
-						pastedHtml = undefined; // Only allow pasting HTML within divs - firefox has issues with nesting headings, Edge even splits the editable field in two.
+
+				pastedHtml = cleanPastedHtml(pastedHtml, event.target);
+				while (pastedHtml && (!pasteAllowed(pastedHtml, targetField))) {
+					pastedHtml = unwrap(pastedHtml);
 				}
 
+				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
 				if (pastedHtml) {
-					var tempNode = event.target.ownerDocument.createElement("DIV");
-					tempNode.innerHTML = pastedHtml;
-				
-					// Remove the startfragment and endfragment bits;
-					for (var i=tempNode.childNodes.length-1; i>-1; i--) {
-						if (tempNode.childNodes[i].nodeType == 8) {
-							if ((tempNode.childNodes[i].data == "StartFragment") || (tempNode.childNodes[i].data == "EndFragment")) {
-								tempNode.removeChild(tempNode.childNodes[i]);
-							}
-						}
-					}
-				
-					// Remove inline styles;
-					var tempNodes = tempNode.querySelectorAll("*");
-					for (var i=0; i<tempNodes.length; i++) {
-						tempNodes[i].removeAttribute("style", '');
-					}
 					event.preventDefault();
-
-					event.target.ownerDocument.execCommand("insertHtml", false, tempNode.innerHTML);
+					event.target.ownerDocument.execCommand("insertHtml", false, pastedHtml);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
-						
 					return false;
 				}
 				if (pastedText) {

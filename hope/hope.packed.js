@@ -983,7 +983,8 @@ hope.register( 'hope.fragment.annotations', function() {
 			'dd' : [ 'dl' ]
 		},
 		// which html elements to allow as the top level, default is only block elements
-		'toplevel' : nestingSets.block.concat(nestingSets.inline) // [ 'li', 'img', 'span', 'strong', 'em', 'code' ]
+		'toplevel' : nestingSets.block.concat(nestingSets.inline), // [ 'li', 'img', 'span', 'strong', 'em', 'code' ],
+		'nestingSets' : nestingSets
 	};
 
 	this.getTag = function( markup ) {
