@@ -32,19 +32,12 @@
 			}
 
 			var target = muze.event.target(event);
-			var preventDefault = false;
 			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
-				if (preventDefault) {
+				if (target.getAttribute("data-simply-field")) {
 					event.preventDefault();
 					return;
 				}
-				if (target.getAttribute("data-simply-field")) {
-					// Prevent the click event on parents above the
-					// data-simply-field; This allows you to make a hyperlink with a
-					// simply-field for the text that doesn't follow the link when you
-					// click it.
-					preventDefault = true;
-				}			
+			
 				target = target.parentNode;
 			}
 
@@ -89,12 +82,12 @@
 		var bindSelectables = function() {
 			var listItems = document.querySelectorAll("[data-simply-selectable]");
 			for (var i=0; i<listItems.length; i++) {
-				listItems[i].removeEventListener('click', handleItemSelect, true);
+				listItems[i].removeEventListener('click', handleItemSelect);
 				listItems[i].removeEventListener('focus', handleItemFocus);
 				if (!listItems[i].getAttribute("tabindex")) {
 					listItems[i].setAttribute("tabindex", 0);
 				}
-				listItems[i].addEventListener('click', handleItemSelect, true);
+				listItems[i].addEventListener('click', handleItemSelect);
 				listItems[i].addEventListener('focus', handleItemFocus);
 				listItems[i].addEventListener('mousedown', function(evt) {
 					var target = this;
