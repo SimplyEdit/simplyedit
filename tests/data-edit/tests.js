@@ -890,6 +890,58 @@ QUnit.module("images");
 		assert.equal(testContent.querySelector("img + img").getAttribute("data-simply-src"), "HelloWorld");
 	});
 
+QUnit.module("lists");
+	QUnit.test("add list item", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 2);
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 3);
+	});
+
+	QUnit.test("list item becomes editable", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[contenteditable]").length, 1);
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[contenteditable]").length, 2);
+	});
+
+/*
+	// FIXME: Find a working way to simulate mouse clicks
+	QUnit.test("text context wins", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		editor.actions["simply-list-add"](button);
+
+		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
+		var rect = target.getBoundingClientRect();
+		muze.event.fire(document.body, "mousedown", {x: rect.left + 3,y: rect.top + 3});
+		muze.event.fire(document.body, "click", {x: rect.left + 3,y: rect.top + 3});
+		muze.event.fire(document.body, "mouseup", {x: rect.left + 3,y: rect.top + 3});
+		var done = assert.async();
+		editor.context.update();
+		setTimeout(function() {
+			var context = editor.context.get();
+			assert.equal(context, "simply-text-cursor");
+			done();
+		}, 1000);
+	});
+*/
 
 QUnit.module("no context");
 	QUnit.test("remove selection at end of tests", function(assert) {
@@ -903,3 +955,4 @@ QUnit.module("plugin buttons");
 		var buttons = document.querySelectorAll("#simply-main-toolbar .simply-buttons > button");
 		assert.equal(buttons.length, 0);
 	});
+

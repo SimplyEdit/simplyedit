@@ -84,13 +84,15 @@
 
 				editor.data.list.init({}, newNode);
 
-				editor.editmode.makeEditable(newNode);
 				editor.data.list.fixFirstElementChild(newNode);
 				editor.data.list.fixFirstElementChild(list);
 
 				newNode.firstElementChild.dataset.simplyTemplate = templateName;
 				newNode.firstElementChild.dataset.simplyListItem = true;
 				newNode.firstElementChild.dataset.simplySelectable = true;
+
+				var newListItem = newNode.firstElementChild;
+				// save a reference so we can make it editable after it has gone into the document;
 
 				var listItems = list.querySelectorAll(":scope > [data-simply-list-item]");
 
@@ -101,6 +103,8 @@
 				} else {
 					list.insertBefore(newNode.firstElementChild, list.firstElementChild);
 				}
+				editor.editmode.makeEditable(newListItem);
+
 				list.classList.remove("simply-empty");
 			}
 		}
