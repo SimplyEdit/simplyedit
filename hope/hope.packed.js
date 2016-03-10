@@ -983,7 +983,8 @@ hope.register( 'hope.fragment.annotations', function() {
 			'dd' : [ 'dl' ]
 		},
 		// which html elements to allow as the top level, default is only block elements
-		'toplevel' : nestingSets.block.concat(nestingSets.inline) // [ 'li', 'img', 'span', 'strong', 'em', 'code' ]
+		'toplevel' : nestingSets.block.concat(nestingSets.inline), // [ 'li', 'img', 'span', 'strong', 'em', 'code' ],
+		'nestingSets' : nestingSets
 	};
 
 	this.getTag = function( markup ) {
@@ -1626,7 +1627,11 @@ hope.register( 'hope.fragment.annotations', function() {
 		for (var i=0; i<node.childNodes.length; i++) {
 			var nodeOffset = this.selection.getTotalOffset(node.childNodes[i]) - this.selection.getTotalOffset(node);
 			if (nodeOffset + node.childNodes[i].textContent.length >= caret) {
-				selection.setStart(node.childNodes[i], caret - nodeOffset);
+				try {
+					selection.setStart(node.childNodes[i], caret - nodeOffset);
+				} catch (e) {
+					console.log("Warning: could not set caret position");
+				}
 				node.removeAttribute("data-hope-caret");
 				return selection;
 			}

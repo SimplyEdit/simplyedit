@@ -191,6 +191,19 @@
 			}
 			return false;
 		},
+		getSimplyParent : function(checkParent) {
+			if (editor.node.isSimplyParent(checkParent)) {
+				return checkParent;
+			}
+			var parent = checkParent;
+			while (parent && parent.parentNode) {
+				if (editor.node.isSimplyParent(parent.parentNode)) {
+					return parent.parentNode;
+				}
+				parent = parent.parentNode;
+			}
+			return false;
+		},
 		isSimplyParent : function(elm) {
 			if (elm.getAttribute) {
 				if (elm.getAttribute("data-simply-field")) {
@@ -329,7 +342,9 @@
 			while (el.firstChild) {
 				target.insertBefore(el.firstChild, el);
 			}
-			el.parentNode.removeChild(el);
+			if (el.parentNode) {
+				el.parentNode.removeChild(el);
+			}
 		}
 	};
 
@@ -754,7 +769,6 @@
 			document.body.classList.remove("simply-overflow-hidden");
 			target.classList.remove("active");
 
-			vdSelectionState.remove();
 
 			var hopeEditor = editor.plugins.dialog.currentField.hopeEditor;
 			if (hopeEditor) {
@@ -762,7 +776,10 @@
 				hopeEditor.update();
 				hopeEditor.selection.updateRange(hopeEditor.currentRange.start, hopeEditor.currentRange.end);
 				hopeEditor.showCursor();
+			} else {
+				vdSelectionState.restore(vdSelectionState.get());
 			}
+			vdSelectionState.remove();
 
 			if (typeof callback == "function") {
 				callback();
