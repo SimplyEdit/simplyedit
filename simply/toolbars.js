@@ -741,6 +741,8 @@
 		backdrop : null,
 		open : function(target, callback) {
 			vdSelectionState.save(vdSelectionState.get());
+			editor.plugins.dialog.selectionIsCollapsed = window.getSelection().isCollapsed;
+
 			if (!editor.plugins.dialog.backdrop) {
 				editor.plugins.dialog.createBackdrop();
 			}
@@ -769,7 +771,6 @@
 			document.body.classList.remove("simply-overflow-hidden");
 			target.classList.remove("active");
 
-
 			var hopeEditor = editor.plugins.dialog.currentField.hopeEditor;
 			if (hopeEditor) {
 				hopeEditor.parseHTML();
@@ -778,8 +779,15 @@
 				hopeEditor.showCursor();
 			} else {
 				vdSelectionState.restore(vdSelectionState.get());
+				if (editor.plugins.dialog.selectionIsCollapsed) {
+					window.setTimeout(function() {
+						var sel = window.getSelection();
+						sel.removeAllRanges();
+					}, 10);
+				} else {
+					vdSelectionState.remove();
+				}
 			}
-			vdSelectionState.remove();
 
 			if (typeof callback == "function") {
 				callback();
