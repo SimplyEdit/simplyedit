@@ -781,7 +781,7 @@
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
-						if (http.status == 200) {
+						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
 							var toolbars = document.createElement("TEMPLATE");
 							toolbars.innerHTML = http.responseText;
 
@@ -1220,7 +1220,7 @@
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
-						if (http.status == 200) {
+						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
 							callback(http.responseText.replace(/data-vedor/g, "data-simply"));
 						} else {
 							console.log("Could not load data, starting empty.");
@@ -1359,7 +1359,7 @@
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
-						if (http.status == 200) {
+						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
 							callback(http.responseText);
 						} else {
 							console.log("No data found, starting with empty dataset");
@@ -1454,7 +1454,7 @@
 
 					http.onreadystatechange = function() {//Call a function when the state changes.
 						if(http.readyState == 4) {
-							if (http.status == 200) {
+							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
 								callback();
 							} else {
 								callback({message : "SAVE FAILED: Could not store."});
@@ -1482,7 +1482,7 @@
 
 					http.onreadystatechange = function() {//Call a function when the state changes.
 						if(http.readyState == 4) {
-							if (http.status == 200) {
+							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
 								callback();
 							} else {
 								console.log("Warning: delete failed.");
@@ -1506,7 +1506,7 @@
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
-						if (http.status == 200) {
+						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
 							callback(http.responseText);
 						} else {
 							callback("{}");
