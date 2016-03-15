@@ -363,7 +363,7 @@
 							var buttonHtml = editor.plugins.imageBrowse.getButtonHtml(image);
 							var tempNode = document.createElement("div");
 							tempNode.innerHTML = buttonHtml;
-							targetButton.innerHTML = tempNode.querySelector("button").innerHTML;
+							targetButton.innerHTML = tempNode.querySelector("button, div.simply-button").innerHTML;
 							targetButton.setAttribute("data-simply-action", "simply-image-browse-insert");
 							editor.responsiveImages.init(targetButton);
 						});
