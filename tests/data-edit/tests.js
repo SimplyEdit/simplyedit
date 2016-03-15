@@ -76,7 +76,6 @@ var simulateClick = function(target, offsetTop, offsetLeft) {
 	var targetLeft = parseInt(rect.left) + parseInt(offsetLeft);
 	
 	var targetEl = document.elementFromPoint(targetLeft, targetTop);
-	console.log(targetEl);
 	var evt = mouseEvent("mousedown", targetLeft, targetTop, 0, 0);
 	dispatchEvent(targetEl, evt);
 	evt = mouseEvent("click", targetLeft, targetTop, 0, 0);
@@ -1049,7 +1048,8 @@ QUnit.module("lists");
 		assert.equal(context, "simply-list-item");
 	});
 
-QUnit.module("static link with editable content");
+/* FIXME: Decide how this should work and make it so */
+/*QUnit.module("static link with editable content");
 	QUnit.test("click on link", function(assert) {
 		var testLink = document.querySelector("#staticLink");
 
@@ -1060,7 +1060,7 @@ QUnit.module("static link with editable content");
 		assert.ok(document.location.hash.indexOf("simply-edit") > -1);
 		document.location.hash = "simply-edit";
 	});
-
+*/
 QUnit.module("no context");
 	QUnit.test("remove selection at end of tests", function(assert) {
 		window.getSelection().removeAllRanges();
