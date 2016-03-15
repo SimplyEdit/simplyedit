@@ -64,6 +64,41 @@ function setSelectionEnd(elem, offset) {
 	editor.context.update();
 }
 
+var simulateClick = function(target, offsetTop, offsetLeft) {
+	var rect = target.getBoundingClientRect();
+	if (typeof offsetTop === "undefined") {
+		offsetTop = 0;
+	}
+	if (typeof offsetLeft === "undefined") {
+		offsetLeft = 0;
+	}
+	var targetTop = parseInt(rect.top) + parseInt(offsetTop);
+	var targetLeft = parseInt(rect.left) + parseInt(offsetLeft);
+	
+	var targetEl = document.elementFromPoint(targetLeft, targetTop);
+	console.log(targetEl);
+	var evt = mouseEvent("mousedown", targetLeft, targetTop, 0, 0);
+	dispatchEvent(targetEl, evt);
+	evt = mouseEvent("click", targetLeft, targetTop, 0, 0);
+	dispatchEvent(targetEl, evt);
+	evt = mouseEvent("mouseup", targetLeft, targetTop, 0, 0);
+	dispatchEvent(targetEl, evt);
+	targetEl.focus();
+
+	var div = document.createElement("DIV");
+	div.setAttribute("id", "clickShim");
+	div.style.position = "absolute";
+	div.style.backgroundColor = "red";
+	div.style.height = "5px";
+	div.style.width = "5px";
+	div.style.top = targetTop + "px";
+	div.style.left = targetLeft + "px";
+	document.body.appendChild(div);
+	window.setTimeout(function() {
+		document.body.removeChild(document.getElementById("clickShim"));
+	}, 500);
+};
+
 function mouseEvent(type, sx, sy, cx, cy) {
 	var evt;
 	var e = {
@@ -797,6 +832,19 @@ QUnit.module("text hyperlinks");
 		assert.ok(testContent.innerHTML, '<p>He<a href="http://www.muze.nl">llo world</a></p>', "hyperlink set");
 	});
 
+	QUnit.test("click hyperlink", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>He<a href='#test'>llo world</a></p>";
+		testContent.hopeEditor.parseHTML();
+
+		editor.context.toolbar.hide = true;
+		editor.context.update();
+		editor.context.toolbar.hide = false;
+		simulateClick(testContent.querySelector("a"), 5, 10);
+		editor.context.update();
+		assert.ok(document.location.hash.indexOf("simply-edit") > -1);
+	});
+
 	QUnit.test("set title hyperlink", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>He<a href='test/'>llo world</a></p>";
@@ -961,41 +1009,6 @@ QUnit.module("lists");
 		assert.equal(testList.querySelectorAll("[contenteditable]").length, 2);
 	});
 
-	// FIXME: Find a working way to simulate mouse clicks
-	var simulateClick = function(target, offsetTop, offsetLeft) {
-		var rect = target.getBoundingClientRect();
-		if (typeof offsetTop === "undefined") {
-			offsetTop = 0;
-		}
-		if (typeof offsetLeft === "undefined") {
-			offsetLeft = 0;
-		}
-		var targetTop = parseInt(rect.top) + parseInt(offsetTop);
-		var targetLeft = parseInt(rect.left) + parseInt(offsetLeft);
-		
-		var targetEl = document.elementFromPoint(targetLeft, targetTop);
-
-		var evt = mouseEvent("mousedown", targetLeft, targetTop, 0, 0);
-		dispatchEvent(targetEl, evt);
-		evt = mouseEvent("click", targetLeft, targetTop, 0, 0);
-		dispatchEvent(targetEl, evt);
-		evt = mouseEvent("mouseup", targetLeft, targetTop, 0, 0);
-		dispatchEvent(targetEl, evt);
-		targetEl.focus();
-
-		var div = document.createElement("DIV");
-		div.setAttribute("id", "frop");
-		div.style.position = "absolute";
-		div.style.backgroundColor = "red";
-		div.style.height = "2px";
-		div.style.width = "2px";
-		div.style.top = targetTop + "px";
-		div.style.left = targetLeft + "px";
-		document.body.appendChild(div);
-		window.setTimeout(function() {
-			document.body.removeChild(document.getElementById("frop"));
-		}, 500);
-	};
 
 	QUnit.test("click in text, text context wins", function(assert) {
 		var testList = document.querySelector("#testList");
@@ -1036,6 +1049,17 @@ QUnit.module("lists");
 		assert.equal(context, "simply-list-item");
 	});
 
+QUnit.module("static link with editable content");
+	QUnit.test("click on link", function(assert) {
+		var testLink = document.querySelector("#staticLink");
+
+		editor.context.toolbar.hide = true;
+		editor.context.update();
+		editor.context.toolbar.hide = false;
+		simulateClick(testLink, 5, 10);
+		assert.ok(document.location.hash.indexOf("simply-edit") > -1);
+		document.location.hash = "simply-edit";
+	});
 
 QUnit.module("no context");
 	QUnit.test("remove selection at end of tests", function(assert) {
