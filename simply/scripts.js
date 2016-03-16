@@ -232,7 +232,7 @@ muze.url = (function() {
 		// call other continuations that depend on this module 
 		// only after remaining code in this module has had a chance to run
 		// not all modules use an implementation callback method
-		for ( p in moduleInstance ) {
+		for ( var p in moduleInstance ) {
 			if ( moduleInstance.hasOwnProperty(p) ) {
 				// module is initialized
 				checkDependencies();
@@ -249,15 +249,17 @@ muze.url = (function() {
 	function _parseModuleInfo( moduleInfo ) {
 		var pipePos = moduleInfo.indexOf('|');
 		var slashPos = moduleInfo.indexOf('/');
+		var module, url;
+
 		if ( pipePos != -1 ) {
-			var module = moduleInfo.substring(0, pipePos);
-			var url = moduleInfo.substring(pipePos+1);
+			module = moduleInfo.substring(0, pipePos);
+			url = moduleInfo.substring(pipePos+1);
 		} else if ( slashPos != -1 ) {
-			var module = false;
-			var url = moduleInfo;
+			module = false;
+			url = moduleInfo;
 		} else {
-			var module = moduleInfo;
-			var url = document.createElement('a');
+			module = moduleInfo;
+			url = document.createElement('a');
 			url.href = muze.url.href;
 			if ( url.search.match('muze') ) {
 				url.search = '?'+module;
@@ -282,7 +284,6 @@ muze.url = (function() {
 			var modulesList = modules;
 		} else {
 			throw('Incorrect argument 1 (required modules): '+modules);
-			return false;
 		}
 		var scriptsToCheck = [];
 		for ( var i=0; i<modulesList.length; i++ ) {
@@ -302,7 +303,7 @@ muze.url = (function() {
 						// delete dependencies[i].scriptsToLoad[ii];
 					}
 				}
-				if ( dependencies[i].scriptsToLoad.length == 0 ) {
+				if ( dependencies[i].scriptsToLoad.length === 0 ) {
 					var continuation = dependencies[i].continuation;
 					dependencies[i].continuation = false;
 					continuation.call(muze.global);
@@ -337,17 +338,9 @@ muze.url = (function() {
 		};
 		if ( typeof continuation == 'function' ) {
 			if ( scriptsToLoad.length ) {
-				for ( var i = 0; i<scriptsToLoad.length; i++ ) {
-					muze.include( scriptsToLoad[i].url, scriptsToLoad[i].module );
+				for ( var j = 0; j<scriptsToLoad.length; j++ ) {
+					muze.include( scriptsToLoad[j].url, scriptsToLoad[j].module );
 					// scripts must call muze.namespace to register that they have been loaded
-					/*.onload( (function(module, url ) {
-						return function() {
-							if ( module ) { // FIXME: module may require other libs, so may not be initialized yet
-								registered[module] = url;
-							}
-							checkDependencies();
-						};
-					})(scriptsToLoad[i].module, scriptsToLoad[i].url ) );*/
 				}
 			} else {
 				continuation.call(muze.global);
@@ -402,7 +395,7 @@ muze.url = (function() {
 			var newHost = url.hostname;
 			var currentHost = document.location.href.hostname;
 			return ( newHost && newHost!=currentHost);
-		}
+		};
 		var loader = muze.loader();
 		var timestamp = null;
 		// get content from url
@@ -436,7 +429,7 @@ muze.url = (function() {
 			if ( arguments ) {
 				params = [];
 				for ( var i in arguments ) {
-					params.push( encodeURIComponent( i) + '=' + encodeURIComponent( arguments[i]) )
+					params.push( encodeURIComponent( i) + '=' + encodeURIComponent( arguments[i]) );
 				}
 				params = params.join('&');
 				http.setRequestHeader( 'Content-type', 'application/x-www-form-urlencoded' );
@@ -501,9 +494,8 @@ muze.url = (function() {
 					eventId = 0;
 				}, intervalTime );
 			}
-		}
-	}
-
+		};
+	};
 })();
 
 /*
@@ -766,7 +758,7 @@ muze.url = (function() {
 				//Return the result
 				return supported;
 			}
-		}
+		};
 	})();
 	
 	//Does the browser support a specific CSS style and/or style value
@@ -809,7 +801,7 @@ muze.url = (function() {
 					//If the string exists within the cache, return the cached value
 					return cache[str];
 				}
-			}
+			};
 		})();
 		
 		//First argument is the style to be tested (opacity, minHeight, etc.)
@@ -834,7 +826,7 @@ muze.url = (function() {
 						el.style[camel] = value || "";
 						//Unsupported styles and style values will always return undefined
 						supported = !Env.isUndefined(el.runtimeStyle[camel]);
-					}catch(e){};
+					}catch(e){}
 				}else{
 					//Must be a standards compliant browser (FF, Opera, Safari, Chrome, etc.)
 					//Set the elements style, if value is not supplied we default to inherit which is supported
@@ -864,7 +856,7 @@ muze.url = (function() {
 				//Cache the value and return it
 				return cache[key] = supported;
 			}
-		}
+		};
 	})();
 	
 	//Does the browser support cookies
@@ -922,7 +914,7 @@ muze.url = (function() {
 				//try to create a flash instance
 				new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
 				return true;
-			}catch(e){};
+			}catch(e){}
 			//If the try-catch fails, return false
 			return false;
 		}else if(navigator.plugins){
@@ -975,7 +967,7 @@ muze.url = (function() {
 		}catch(e){
 			//If an exception is caught, it must be IE and not supported
 			return false;
-		};
+		}
 		//Append the script to the root element (<html>) to allow an eval
 		document.documentElement.appendChild(script);
 		//Quickly remove the script
@@ -1000,7 +992,7 @@ muze.url = (function() {
 			el.innerHTML = "<tr><td>test</td></tr>";
 			//Query the table for a td element to check if the insert worked
 			return el.getElementsByTagName('td').length === 0;
-		}catch(e){};
+		}catch(e){}
 		//The try-catch block fails, there must be a bug
 		return true;
 	})();
@@ -1173,7 +1165,7 @@ muze.url = (function() {
 	function handler(e){
 		Env.support[e.type] = true;
 		removeEvent(e.target, e.type, arguments.callee);
-	};
+	}
 	
 	function addEvent(el, type, fn){
 		if(el.addEventListener){
@@ -1183,7 +1175,7 @@ muze.url = (function() {
 		}else{
 			el["on"+type] = fn;
 		}
-	};
+	}
 	
 	function removeEvent(el, type, fn){
 		if(el.removeEventListener){
@@ -1194,7 +1186,7 @@ muze.url = (function() {
 			el["on"+type] = null;
 			delete el["on"+type];
 		}
-	};
+	}
 	return Env;
 })();
 /*
@@ -1294,7 +1286,7 @@ muze.namespace('muze.event', function() {
 			var type = 'HTMLEvents';
 			var init = function(evt, mask) {
 				evt.initEvent(name, mask ? mask.bubbles : true, mask ? mask.cancelable : true);
-			}
+			};
 			switch (name) {
 				case 'click' :
 				case 'dblclick':
@@ -1322,7 +1314,7 @@ muze.namespace('muze.event', function() {
 						} else {
 							evt.initMouseEvent(name, true, true, win, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 						}						
-					}
+					};
 				break;
 				case 'DOMFocusIn':
 				case 'DOMFocusOut':
@@ -1334,7 +1326,7 @@ muze.namespace('muze.event', function() {
 						} else {
 							evt.initUIEvent(name, true, true, win, 1);
 						}
-					}
+					};
 				break;
 				case 'keypress':
 				case 'keydown':
@@ -1361,7 +1353,7 @@ muze.namespace('muze.event', function() {
 							} else {
 								evt.initKeyboardEvent(name, true, true, win, '', 0, '');
 							}
-						}
+						};
 					} else if (muze.env.isHostMethod(evt, 'initKeyEvent')) {
 						init = function(evt, mask) {
 							if (mask) {
@@ -1369,7 +1361,7 @@ muze.namespace('muze.event', function() {
 							} else {
 								evt.initKeyEvent(name, true, true, win, false, false, false, false, 0, 0);
 							}
-						}
+						};
 					}
 				break;
 				case 'message':
@@ -1380,13 +1372,13 @@ muze.namespace('muze.event', function() {
 						} else {
 							evt.initMessageEvent(name, true, true, '', '', '', '', null);
 						}
-					}
+					};
 				break;
 			}
 			var evt =  win.document.createEvent(type);
 			init(evt, maskEvt);
 			return evt;
-		}
+		};
 	} else if (muze.env.isHostMethod(document, 'createEventObject') ) {
 		event.create = function( name, evt, win ) {
 			if (!win) {
@@ -1409,14 +1401,14 @@ muze.namespace('muze.event', function() {
 			}
 			evt = muze.event.create(name, evt, win);
 			el.dispatchEvent(evt);
-		}
+		};
 	} else if (muze.env.isHostMethod(document, 'fireEvent')) {
 		event.fire = function(el, name, evt) {
 			if (name.substr(0,3)!=='DOM') {
 				name = 'on'+name;
 			}
 			el.fireEvent(name, evt);
-		}
+		};
 	} else {
 		event.fire = false;
 	}
@@ -1468,7 +1460,7 @@ muze.namespace('muze.event', function() {
 		} else {
 			return null;
 		}
-	}
+	};
 
 	event.getCharCode = function(evt) {
 		evt = event.get(evt);
@@ -1477,7 +1469,7 @@ muze.namespace('muze.event', function() {
 		} else {
 			return false;
 		}
-	}
+	};
 
 	var docEl = document.documentElement;
 	var listeners = [];
@@ -1499,8 +1491,8 @@ muze.namespace('muze.event', function() {
 			evt = event.get(evt, win);
 			var f = listeners[id].listener;
 			f.call(o, evt);
-		}
-	}
+		};
+	};
 
 	if (muze.env.isHostMethod(docEl, 'addEventListener')) {
 		event.attach = function(o, sEvent, fListener, useCapture) {
@@ -1561,12 +1553,12 @@ muze.namespace('muze.event', function() {
 			} else {
 				return false;
 			}
-		}
+		};
 	} else {
 		event.detach = false;
 	}
 	
-	event.clean = function() { }
+	event.clean = function() { };
 
 });
 
@@ -1574,8 +1566,8 @@ muze.namespace('muze.event', function() {
 
 muze.namespace('muze.html', function() {
 	var getType = function(obj) {
-		return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase()
-	}
+		return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+	};
 	
 	var setAttr = function(el, name, value) {
 		if ( name == 'style' ) {
@@ -1593,7 +1585,7 @@ muze.namespace('muze.html', function() {
 			}
 			el[ name ] = value;
 		}
-	}
+	};
 	
 	this.el = function(tagName) { //, attributes, children) {
 		var el = muze.global.document.createElement(tagName);
@@ -1631,7 +1623,7 @@ muze.namespace('muze.html', function() {
 			el.appendChild( subEl );
 		}
 		return el;
-	}
+	};
 
 	this.element = this.el;
 
@@ -1639,15 +1631,13 @@ muze.namespace('muze.html', function() {
 muze.namespace('simply');
 
 simply = ( function() {
-	var self = {
-	}
+	var self = {};
 	return self;
 })();
 muze.namespace('simply.dom');
 
 simply.dom= ( function() { 
-	var dom = {
-	}
+	var dom = {};
 	return dom;
 })();
 muze.namespace('simply.dom.selection');
@@ -1682,7 +1672,7 @@ simply.dom.selection = ( function() {
 					return false;
 				}
 				var position = sel.anchorNode.compareDocumentPosition(sel.focusNode);
-				if (position == 0) {
+				if (position === 0) {
 					return (sel.anchorOffset > sel.focusOffset);
 				} else if (position == 4) { // Node.DOCUMENT_POSITION_PRECEDING) {
 					return false;
@@ -1797,14 +1787,14 @@ simply.dom.selection = ( function() {
 						// Case 2: tekstnode er voor, niet er achter.
 						// start punt zit in een tekst node maar wel helemaal aan het eind. eindpunt zit in dezelfde container waar de textnode ook in zit.
 						node = range.endContainer.childNodes[ range.endOffset - 1 ];
-					} else if ( range.endContainer.nodeType == 3 && range.endOffset == 0 && 
+					} else if ( range.endContainer.nodeType == 3 && range.endOffset === 0 && 
 						range.startContainer.nodeType != 3 && range.startContainer == range.endContainer.parentNode ) 
 					{
 						// Case 3: tekstnode er achter, niet er voor;
 						// Eindpunt zit in een textnode helemaal aan het begin. Startpunt zit in dezelfde container waar de eindpunt-textnode ook in zit
 						node = range.startContainer.childNodes[ range.startOffset ];
-					} else if ( range.startContainer.nodeType == 3 && range.endContainer.nodeType == 3 
-						&& range.startOffset == range.startContainer.data.length && range.endOffset == 0 &&
+					} else if ( range.startContainer.nodeType == 3 && range.endContainer.nodeType == 3 &&
+						range.startOffset == range.startContainer.data.length && range.endOffset === 0 &&
 						range.startContainer.nextSibling == range.endContainer.previousSibling ) 
 					{
 						// Case 4: tekstnode voor en achter
@@ -1891,7 +1881,7 @@ simply.dom.selection = ( function() {
 			return range;
 		}
 
-	}
+	};
 	return self;
 
 })();
@@ -1899,8 +1889,7 @@ simply.dom.selection = ( function() {
 muze.namespace('simply.util');
 
 simply.util = ( function() { 
-	var util = {
-	}
+	var util = {};
 	return util;
 })();
 muze.namespace('simply.util.base64');
@@ -2021,7 +2010,9 @@ simply.util.base64 = ( function() {
 		_utf8_decode : function (utftext) {
 			var string = "";
 			var i = 0;
-			var c = c1 = c2 = 0;
+			var c = 0;
+			var c1 = 0;
+			var c2 = 0;
 
 			while ( i < utftext.length ) {
 
@@ -2047,16 +2038,14 @@ simply.util.base64 = ( function() {
 
 			return string;
 		}
-
-	}
+	};
 
 	return base64;
 })();
 muze.namespace('simply.widgets');
 
 simply.widgets = ( function() { 
-	var widgets = {
-	}
+	var widgets = {};
 	return widgets;
 })();
 muze.namespace('simply.widgets.fieldsets');
@@ -2134,7 +2123,7 @@ simply.widgets.fieldsets = ( function() {
 			image.className = 'vdOpenClose';
 			image.onclick = function() { 
 				fieldsets.hide(fs); 
-			}
+			};
 			return image;
 		},
 
@@ -2145,10 +2134,9 @@ simply.widgets.fieldsets = ( function() {
 			image.className = 'vdOpenClose';
 			image.onclick = function() { 
 				fieldsets.show(fs); 
-			}
+			};
 			return image;
 		},
-
 
 		init : function( doc, upImgSrc, downImgSrc ) {
 			// add hide/show buttons to all fieldsets
@@ -2171,7 +2159,7 @@ simply.widgets.fieldsets = ( function() {
 									showing[i] = false;
 								}
 							}, 500);
-						}
+						};
 					}(fs, i));
 					event.attach(fs, 'mouseout', function(fs, i) {
 						return function() {
@@ -2185,7 +2173,7 @@ simply.widgets.fieldsets = ( function() {
 									}
 								}, 500);
 							}
-						}
+						};
 					}(fs, i));
 					try {
 						legend = fs.getElementsByTagName('LEGEND')[0];
@@ -2197,7 +2185,7 @@ simply.widgets.fieldsets = ( function() {
 									fieldsets.show(fs);
 								}
 								return event.cancel(evt);
-							}
+							};
 						}(fs, i));
 						legend.style.cursor = 'pointer';
 					} catch(e) {
@@ -2205,8 +2193,7 @@ simply.widgets.fieldsets = ( function() {
 				}
 			}
 		}
-
-	}
+	};
 	return fieldsets;
 })();
 
@@ -2217,7 +2204,7 @@ simply.widgets.properties = ( function() {
 		get : function( id ) {
 			var value='';
 			var input;
-			if ((typeof id == "string") || (typeof id == "text") ) {
+			if ((typeof id == "string") ) {
 				input = document.getElementById(id);
 			} else {
 				input = id;
@@ -2255,7 +2242,7 @@ simply.widgets.properties = ( function() {
 						value=input.options[input.selectedIndex].value;
 						break;
 					case 'select-multiple' :
-						value=new Array();
+						value=[];
 						for (var i=0; i<input.length; i++) {
 							if (input.options[i].selected) {
 								value[value.length]=input.options[i].value;
@@ -2285,7 +2272,7 @@ simply.widgets.properties = ( function() {
 		set : function( id, value ) {
 			var input;
 
-			if ((typeof id == "string") || (typeof id == "text") ) {
+			if ((typeof id == "string") ) {
 				input = document.getElementById(id);
 			} else {
 				input = id;
@@ -2385,8 +2372,7 @@ simply.widgets.properties = ( function() {
 				return !input.className.match(/\bvdDisabled\b/);
 			}
 		}
-	}
-
+	};
 
 	return self;
 
@@ -2394,9 +2380,7 @@ simply.widgets.properties = ( function() {
 muze.namespace('simply.editor');
 
 simply.editor = ( function() {
-	var editor = {
-		
-	}
+	var editor = {};
 	return editor;
 })();
 // polyfill to add :scope selector for IE
@@ -2622,7 +2606,7 @@ simply.editor.selection = ( function() {
 		IMG : true,
 		OBJECT : true,
 		EMBED : true
-	}
+	};
 
 	function isUneditable( node ) {
 		return node.getAttribute('contentEditable') == 'false';
@@ -2669,7 +2653,7 @@ simply.editor.selection = ( function() {
 		remove : function() {
 			savedRange = null;
 		}
-	}
+	};
 
 	return self;
 
