@@ -501,15 +501,15 @@ window['Slip'] = (function(){
 					}
 
 					if (hoverTarget) {
-						currentTarget.hoverTarget = hoverTarget;
-
 						var hoverTargetIndex = currentTarget.parentList.indexOf(hoverTarget.node);
 						var currentTargetIndex = currentTarget.parentList.indexOf(currentTarget.node);
 						var beginIndex = Math.min(hoverTargetIndex, currentTargetIndex);
 						var endIndex = Math.max(hoverTargetIndex, currentTargetIndex);
 
 						for (var i=0; i<otherNodes.length; i++) {
-							otherNodes[i].node.style[transformPrefix] = otherNodes[i].baseTransform.original;
+							if (hoverTarget != currentTarget.hoverTarget) {
+								otherNodes[i].node.style[transformPrefix] = otherNodes[i].baseTransform.original;
+							}
 
 							var index = currentTarget.parentList.indexOf(otherNodes[i].node);
 							if (index >= beginIndex && index <= endIndex) {
@@ -539,6 +539,7 @@ window['Slip'] = (function(){
 								otherNodes[i].node.style["animationName"] = "none";
 							}
 						}
+						currentTarget.hoverTarget = hoverTarget;
 					} else {
 						for (var i=0; i<otherNodes.length; i++) {
 							otherNodes[i].node.style[transformPrefix] = otherNodes[i].baseTransform.original;
