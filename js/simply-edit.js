@@ -1010,8 +1010,12 @@
 
 					new Slip(list[i]);
 				}
-				document.addEventListener("mouseup", removeBeforeOrderEvent, false);
-				document.addEventListener("touchend", removeBeforeOrderEvent, false);
+
+				if (typeof document.simplyRemoveBeforeOrderEvent === "undefined") {
+					document.simplyRemoveBeforeOrderEvent = removeBeforeOrderEvent;
+					document.addEventListener("mouseup", removeBeforeOrderEvent, false);
+					document.addEventListener("touchend", removeBeforeOrderEvent, false);
+				}
 			},
 			textonly : function(target) {
 				var textonly = target.querySelectorAll("[data-simply-content='text']");
