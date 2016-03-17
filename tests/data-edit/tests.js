@@ -63,6 +63,84 @@ function setSelectionEnd(elem, offset) {
 	}
 	editor.context.update();
 }
+
+var simulateClick = function(target, offsetTop, offsetLeft) {
+	var rect = target.getBoundingClientRect();
+	if (typeof offsetTop === "undefined") {
+		offsetTop = 0;
+	}
+	if (typeof offsetLeft === "undefined") {
+		offsetLeft = 0;
+	}
+	var targetTop = parseInt(rect.top) + parseInt(offsetTop);
+	var targetLeft = parseInt(rect.left) + parseInt(offsetLeft);
+	
+	var targetEl = document.elementFromPoint(targetLeft, targetTop);
+	var evt = mouseEvent("mousedown", targetLeft, targetTop, 0, 0);
+	dispatchEvent(targetEl, evt);
+	evt = mouseEvent("click", targetLeft, targetTop, 0, 0);
+	dispatchEvent(targetEl, evt);
+	evt = mouseEvent("mouseup", targetLeft, targetTop, 0, 0);
+	dispatchEvent(targetEl, evt);
+	targetEl.focus();
+
+	var div = document.createElement("DIV");
+	div.setAttribute("id", "clickShim");
+	div.style.position = "absolute";
+	div.style.backgroundColor = "red";
+	div.style.height = "5px";
+	div.style.width = "5px";
+	div.style.top = targetTop + "px";
+	div.style.left = targetLeft + "px";
+	document.body.appendChild(div);
+	window.setTimeout(function() {
+		document.body.removeChild(document.getElementById("clickShim"));
+	}, 500);
+};
+
+function mouseEvent(type, sx, sy, cx, cy) {
+	var evt;
+	var e = {
+		bubbles: true,
+		cancelable: (type != "mousemove"),
+		view: window,
+		detail: 0,
+		screenX: sx, 
+		screenY: sy,
+		clientX: cx, 
+		clientY: cy,
+		ctrlKey: false,
+		altKey: false,
+		shiftKey: false,
+		metaKey: false,
+		button: 0,
+		relatedTarget: undefined
+	};
+	if (typeof( document.createEvent ) == "function") {
+		evt = document.createEvent("MouseEvents");
+		evt.initMouseEvent(type, 
+			e.bubbles, e.cancelable, e.view, e.detail,
+			e.screenX, e.screenY, e.clientX, e.clientY,
+			e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+			e.button, document.body.parentNode);
+	} else if (document.createEventObject) {
+		evt = document.createEventObject();
+		for (var prop in e) {
+		evt[prop] = e[prop];
+	}
+		evt.button = { 0:1, 1:4, 2:2 }[evt.button] || evt.button;
+	}
+	return evt;
+}
+function dispatchEvent (el, evt) {
+	if (el.dispatchEvent) {
+		el.dispatchEvent(evt);
+	} else if (el.fireEvent) {
+		el.fireEvent('on' + type, evt);
+	}
+	return evt;
+}
+
 QUnit.module("editor init");
 	QUnit.test("editmode init", function(assert) {
 		assert.ok(vdSelectionState, "vdSelectionState initialized");
@@ -753,6 +831,19 @@ QUnit.module("text hyperlinks");
 		assert.ok(testContent.innerHTML, '<p>He<a href="http://www.muze.nl">llo world</a></p>', "hyperlink set");
 	});
 
+	QUnit.test("click hyperlink", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>He<a href='#test'>llo world</a></p>";
+		testContent.hopeEditor.parseHTML();
+
+		editor.context.toolbar.hide = true;
+		editor.context.update();
+		editor.context.toolbar.hide = false;
+		simulateClick(testContent.querySelector("a"), 5, 10);
+		editor.context.update();
+		assert.ok(document.location.hash.indexOf("simply-edit") > -1);
+	});
+
 	QUnit.test("set title hyperlink", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>He<a href='test/'>llo world</a></p>";
@@ -917,9 +1008,8 @@ QUnit.module("lists");
 		assert.equal(testList.querySelectorAll("[contenteditable]").length, 2);
 	});
 
-/*
-	// FIXME: Find a working way to simulate mouse clicks
-	QUnit.test("text context wins", function(assert) {
+
+	QUnit.test("click in text, text context wins", function(assert) {
 		var testList = document.querySelector("#testList");
 		currentList = testList;
 		testList.innerHTML = '';
@@ -929,23 +1019,52 @@ QUnit.module("lists");
 		editor.actions["simply-list-add"](button);
 
 		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
-		var rect = target.getBoundingClientRect();
-		muze.event.fire(document.body, "mousedown", {x: rect.left + 3,y: rect.top + 3});
-		muze.event.fire(document.body, "click", {x: rect.left + 3,y: rect.top + 3});
-		muze.event.fire(document.body, "mouseup", {x: rect.left + 3,y: rect.top + 3});
-		var done = assert.async();
+
+		editor.context.toolbar.hide = true;
 		editor.context.update();
-		setTimeout(function() {
-			var context = editor.context.get();
-			assert.equal(context, "simply-text-cursor");
-			done();
-		}, 1000);
+		editor.context.toolbar.hide = false;
+		simulateClick(target, 5, 5);
+		var context = editor.context.get();
+		assert.equal(context, "simply-text-cursor");
+	});
+
+	QUnit.test("click on list item marker, list item context wins", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		editor.actions["simply-list-add"](button);
+
+
+		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
+		
+		editor.context.toolbar.hide = true;
+		editor.context.update();
+		editor.context.toolbar.hide = false;
+		simulateClick(target, -5, 50);
+		var context = editor.context.get();
+		assert.equal(context, "simply-list-item");
+	});
+
+/* FIXME: Decide how this should work and make it so */
+/*QUnit.module("static link with editable content");
+	QUnit.test("click on link", function(assert) {
+		var testLink = document.querySelector("#staticLink");
+
+		editor.context.toolbar.hide = true;
+		editor.context.update();
+		editor.context.toolbar.hide = false;
+		simulateClick(testLink, 5, 10);
+		assert.ok(document.location.hash.indexOf("simply-edit") > -1);
+		document.location.hash = "simply-edit";
 	});
 */
-
 QUnit.module("no context");
 	QUnit.test("remove selection at end of tests", function(assert) {
 		window.getSelection().removeAllRanges();
+		vdSelectionState.remove();
 		editor.context.update();
 		assert.equal(editor.context.get(), "simply-no-context");
 	});

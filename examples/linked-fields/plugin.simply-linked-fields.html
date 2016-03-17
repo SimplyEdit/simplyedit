@@ -36,6 +36,10 @@
 		},
 		getId : function(target) {
 			var dataName = target.getAttribute("data-simply-field");
+			if (!dataName) {
+				dataName = target.getAttribute("data-simply-list");
+			}
+			
 			if (target.getAttribute("data-simply-link")) {
 				dataName = target.getAttribute("data-simply-link");
 			}
@@ -48,11 +52,16 @@
 				if (twins.length > 1) {
 					// It has twins
 					var data = editor.plugins.linkedFields.get(this);
+					var sel = vdSelectionState.get();
 					for (var i=0; i<twins.length; i++) {
 						if (twins[i] !== this) {
+							twins[i].removeEventListener("DOMNodeInserted", editor.plugins.linkedFields.changeHandler);
 							editor.plugins.linkedFields.set(twins[i], data);
+							twins[i].addEventListener("DOMNodeInserted", editor.plugins.linkedFields.changeHandler);
 						}
 					}
+					vdSelectionState.remove();
+					vdSelectionState.restore(sel);
 				}
 			}
 		}
@@ -71,7 +80,8 @@
 						fields[i].addEventListener("keyup", editor.plugins.linkedFields.changeHandler);
 						fields[i].addEventListener("mouseup", editor.plugins.linkedFields.changeHandler);
 						fields[i].addEventListener("touchend", editor.plugins.linkedFields.changeHandler);
-						fields[i].addEventListener("slip:reorder", editor.plugins.linkedFields.changeHandler);
+						// fields[i].addEventListener("slip:reorder", editor.plugins.linkedFields.changeHandler);
+						fields[i].addEventListener("DOMNodeInserted", editor.plugins.linkedFields.changeHandler);
 					}
 				}
 			}
