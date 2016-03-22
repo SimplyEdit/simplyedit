@@ -214,9 +214,7 @@ hope.register( 'hope.editor.selection', function() {
 			NodeFilter.SHOW_ELEMENT,
 			function(node) {
 				if (
-					node.tagName.toLowerCase() == "img" ||
-					node.tagName.toLowerCase() == "br" ||
-					node.tagName.toLowerCase() == "hr"
+					!node.hasChildNodes()
 				) {
 					return NodeFilter.FILTER_ACCEPT;
 				}

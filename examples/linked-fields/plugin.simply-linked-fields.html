@@ -75,12 +75,12 @@
 				if (!editor.node.hasSimplyParent(fields[i])) {
 					var fieldId = editor.plugins.linkedFields.getId(fields[i]);
 					if (fieldId) {
+						var changeHandler = muze.throttle(editor.plugins.linkedFields.changeHandler, 100);
 						fields[i].setAttribute("data-simply-linked", fieldId);
 
-						fields[i].addEventListener("keyup", editor.plugins.linkedFields.changeHandler);
+						fields[i].addEventListener("keyup", changeHandler);
 						fields[i].addEventListener("mouseup", editor.plugins.linkedFields.changeHandler);
 						fields[i].addEventListener("touchend", editor.plugins.linkedFields.changeHandler);
-						// fields[i].addEventListener("slip:reorder", editor.plugins.linkedFields.changeHandler);
 						fields[i].addEventListener("DOMNodeInserted", editor.plugins.linkedFields.changeHandler);
 					}
 				}

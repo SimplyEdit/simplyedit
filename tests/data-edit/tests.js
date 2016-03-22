@@ -625,6 +625,18 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, 'He<em>llo</em> world', "Italic uses EM tag");
 	});
 
+	QUnit.test("text set italic after empty element", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "He<em></em>llo world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.childNodes[2], 4, 3);
+		editor.actions['simply-text-italic']();
+
+		assert.equal(testContent.innerHTML, 'He<em></em>llo <em>wor</em>ld', "Italic uses EM tag");
+	});
+
+
 	QUnit.test("text set italic in paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello world</p>";
