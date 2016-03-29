@@ -1662,7 +1662,23 @@
 				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
 					return this.listSitemap(url, callback);
 				}
-
+				if (url == editor.storage.endpoint) {
+					var result = {
+						images : [],
+						folders : [],
+						files : []
+					};
+					result.folders.push({url : editor.storage.dataEndpoint, name : 'My pages'});
+					if (document.querySelector("[data-simply-images]")) {
+						var imagesEndpoint = document.querySelector("[data-simply-images]").getAttribute("data-simply-images");
+						result.folders.push({url : imagesEndpoint, name : 'My images'});
+					}
+					if (document.querySelector("[data-simply-files]")) {
+						var filesEndpoint = document.querySelector("[data-simply-files]").getAttribute("data-simply-files");
+						result.folders.push({url : filesEndpoint, name : 'My files'});
+					}
+					return callback(result);
+				}
 				var iframe = document.createElement("IFRAME");
 				iframe.src = url;
 				iframe.style.opacity = 0;
@@ -1797,8 +1813,7 @@
 			editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
 			editor.baseURL + "simply/toolbar.simply-text.html",
 			editor.baseURL + "simply/toolbar.simply-image.html",
-			editor.baseURL + "simply/plugin.simply-image-browse.html",
-			editor.baseURL + "simply/plugin.simply-file-browse.html",
+			editor.baseURL + "simply/plugin.simply-browse.html",
 			editor.baseURL + "simply/toolbar.simply-iframe.html",
 			editor.baseURL + "simply/toolbar.simply-selectable.html",
 			editor.baseURL + "simply/toolbar.simply-list.html",
