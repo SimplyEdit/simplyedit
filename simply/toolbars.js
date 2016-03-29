@@ -784,11 +784,9 @@
 						var sel = window.getSelection();
 						sel.removeAllRanges();
 					}, 10);
-				} else {
-					vdSelectionState.remove();
 				}
 			}
-
+			vdSelectionState.remove();
 			if (typeof callback == "function") {
 				callback();
 			}

@@ -12,8 +12,8 @@
 				<img src="https://simplyedit.io/graphics/logo.svg" alt="SimplyEdit" class="simply-logo">
 			</div>
 			<div id="simply-about-key-info">
-				<div id="simply-about-key"><span class="simply-label">Your key</span><span class="simply-info">serious-business-1234</span></div>
-				<div id="simply-about-key-domains"><span class="simply-label">Valid for</span><span class="simply-info">example.com, staging.example.com</span></div>
+				<div id="simply-about-key"><span class="simply-label">Your key</span><span class="simply-info"></span></div>
+				<div id="simply-about-key-domains"><span class="simply-label">Valid for</span><span class="simply-info"></span></div>
 			</div>
 			<div id="simply-about-footer">
 				<p>SimplyEdit is a product by <button class="simply-about-muze" data-simply-action="simply-about-muze">Muze</button>, &copy; 2016, <button class="simply-about-muze" data-simply-action="simply-about-license">all rights reserved.</button></p>
@@ -22,11 +22,11 @@
 		<div id="simply-about-body" class="simply-about-body simply-toolbar-section simply-dialog-body simply-selected">
 			<div id="simply-about-header">
 				<img src="https://simplyedit.io/graphics/logo.svg" alt="SimplyEdit" class="simply-logo">
-				<div id="simply-about-version">Version beta-rc3</div>
+				<div id="simply-about-version"></div>
 			</div>
 			<div id="simply-about-info">
-				<div id="simply-about-key-valid" style="display: none">Your trial key expires in 12 days.</div>
-				<div id="simply-about-key-upgrade" style="display: none">Version 1.0 is available.</div>
+				<div id="simply-about-key-valid" style="display: none"></div>
+				<div id="simply-about-key-upgrade" style="display: none"></div>
 				<button id="simply-buy-button" data-simply-action="simply-about-buy" style="display: none">Buy now</button>
 			</div>
 			<div id="simply-about-footer">
@@ -130,13 +130,28 @@
 				// fetch key info
 				var result = muze.load('https://api.simplyedit.io/0/keys/'+editor.apiKey)
 				.onload(function(result) {
-					var info = JSON.parse(result);
 					var keyEl = document.querySelector('#simply-about-key .simply-info');
 					var hostsEl = document.querySelector('#simply-about-key-domains .simply-info');
+					var validEl = document.getElementById('simply-about-key-valid');
+					var versionEl = document.getElementById('simply-about-version');
+
+					versionEl.innerHTML = 'Version '+editor.version;
+					var majorVersion = parseInt(editor.version.split('.')[0]);
+
+					var info;
+					if (result.length) {
+						info = JSON.parse(result);
+					} else {
+						info = {
+							'expire' : false,
+							'key' : editor.apiKey,
+							'hosts' : ["(<em>Unknown - can't contact key server</em>)"],
+							'latest-version' : editor.version
+						}
+					}
+					
 					keyEl.innerHTML = info['key'];
 					hostsEl.innerHTML = info['hosts'].join(', ');
-					document.getElementById('simply-about-version').innerHTML = 'Version '+editor.version;
-					var majorVersion = parseInt(editor.version.split('.')[0]);
 					var latestVersion = parseInt(info['latest-version'].split('.')[0]);
 					if ( info['expire'] ) {
 						var ExpireDate = new Date(info['expire']*1000);
@@ -148,7 +163,6 @@
 							document.getElementById('simply-buy-button').style.display = 'block';
 						} else {
 							var diffDays = Math.floor( diff / ( 1000 * 3600 * 24 ) );
-							var validEl = document.getElementById('simply-about-key-valid');
 							validEl.innerHTML = 'Your trial key expires in '+diffDays+' days.';
 							validEl.style.display = 'block';
 							document.getElementById('simply-buy-button').style.display = 'inline-block';

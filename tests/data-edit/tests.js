@@ -944,6 +944,17 @@ QUnit.module("images");
 		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
 	});
 
+	QUnit.test("set image source for image at end of field", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>abcdef<img src='frop'></p>";
+		testContent.hopeEditor.parseHTML();
+		selectImage(testContent.querySelector("img"));
+		editor.context.update();
+		editor.actions["simply-image-src"]("HelloWorld");
+
+		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+	});
+
 	QUnit.test("responsive image source gets set", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>abcdef</p><p><a href='#'><img src='frop'></a>rld</p>";
