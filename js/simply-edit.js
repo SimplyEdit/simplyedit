@@ -1623,12 +1623,12 @@
 						}
 						result.folders.push({
 							url : url.replace(/\/[^\/]+$/, ''),
-							name : 'Parent'
+							name : '..'
 						});
 					} else {
 						result.folders.push({
 							url : url.replace(/\/[^\/]+$/, '/'),
-							name : 'Parent'
+							name : '..'
 						});
 					}
 
