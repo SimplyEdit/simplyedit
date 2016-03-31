@@ -214,19 +214,19 @@
 					var newHtml = '';
 					for (i=0; i<data.folders.length; i++) {
 						if (data.folders[i].url.indexOf(editor.plugins.browse.currentJail) === 0) {
-							newHtml += "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + data.folders[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + data.folders[i].name + "</div>";
+							newHtml += editor.plugins.browse.dialog.getFolderButtonHtml(data.folders[i]);
 						}
 					}
 
 					switch (editor.plugins.browse.mode) {
 						case 'images':
 							for (i=0; i<data.images.length; i++) {
-								newHtml += editor.plugins.browse.dialog.getButtonHtml(data.images[i]);
+								newHtml += editor.plugins.browse.dialog.getImageButtonHtml(data.images[i]);
 							}
 						break;
 						default:
 							for (i=0; i<data.files.length; i++) {
-								newHtml += editor.plugins.browse.dialog.getButtonHtml(data.files[i]);
+								newHtml += editor.plugins.browse.dialog.getFileButtonHtml(data.files[i]);
 							}
 						break;
 					}
@@ -248,31 +248,34 @@
 					}
 				});
 			},
-			getButtonHtml : function(data) {
-				switch (editor.plugins.browse.mode) {
-					case 'images' :
-						var src = data.url;
-						if (typeof data.src !== "undefined") {
-							src = data.src;
-						}
-
-						var result = "<div class='simply-button simply-image' data-simply-action='simply-browse-insert'>";
-						result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
-						if (data.thumb) {
-							result += " src='" + data.thumb + "'";
-						} else {
-							result += " data-simply-src='" + src + "'";
-						}
-						if (data.id) {
-							result += " data-simply-id='" + data.id + "'";
-						}
-						result += "></div>";
-					break;
-					default :
-						var result = "<div class='simply-button' data-simply-action='simply-browse-insert' data-value='" + data.url + "'>";
-						result += "<i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + data.name + "</div>";
-					break;
+			getImageButtonHtml : function(data) {
+				var src = data.url;
+				if (typeof data.src !== "undefined") {
+					src = data.src;
 				}
+
+				var result = "<div class='simply-button simply-image' data-simply-action='simply-browse-insert'>";
+				result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
+				if (data.thumb) {
+					result += " src='" + data.thumb + "'";
+				} else {
+					result += " data-simply-src='" + src + "'";
+				}
+				if (data.id) {
+					result += " data-simply-id='" + data.id + "'";
+				}
+				result += "></div>";
+
+				return result;
+			},
+			getFileButtonHtml : function(data) {
+				var result = "<div class='simply-button' data-simply-action='simply-browse-insert' data-value='" + data.url + "'>";
+				result += "<i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + data.name + "</div>";
+
+				return result;
+			},
+			getFolderButtonHtml : function(data) {
+				var result = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + data.url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + data.name + "</div>";
 
 				return result;
 			},
@@ -363,6 +366,17 @@
 					}
 					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
 				}
+
+				// Add Browse button to image toolbars;
+				var target = document.querySelectorAll("#simply-image .simply-toolbar .simply-buttons, #simply-image-field .simply-toolbar .simply-buttons");
+				if (target) {
+					var i;
+					for (i=0; i<target.length; i++) {
+						var button = document.createElement("LI");
+						button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i>Browse</button>';
+						target[i].appendChild(button);
+					}
+				}
 			} else {
 				window.setTimeout(editor.plugins.browse.init, 200);
 			}
@@ -424,7 +438,8 @@
 					var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
 					var targetList = document.querySelector("#simply-browse .simply-dialog-body");
 
-					var newButton = document.createElement("BUTTON");
+					var newButton = document.createElement("DIV");
+					newButton.className = "simply-button";
 					newButton.setAttribute("data-simply-action", "simply-browse-uploading");
 					newButton.innerHTML = "Uploading<br><progress value=0 max=100></progress><br>" + files[i].name;
 					targetList.appendChild(newButton);
@@ -440,18 +455,23 @@
 										src : url
 									}
 								};
-								var buttonHtml = editor.plugins.browse.dialog.getButtonHtml(image);
+								var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 								var tempNode = document.createElement("div");
 								tempNode.innerHTML = buttonHtml;
 								targetButton.innerHTML = tempNode.querySelector("button, div.simply-button").innerHTML;
 								targetButton.setAttribute("data-simply-action", "simply-browse-insert");
+								targetButton.classList.add("simply-image");
+
 								editor.responsiveImages.init(targetButton);
 							});
 						}(newButton, url));
 					} else {
 						(function(targetButton, url, name) {
 							editor.storage.file.save(subpath + files[i].name, files[i], function() {
-								targetButton.innerHTML = "<i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + name;
+								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(image);
+								var tempNode = document.createElement("div");
+								tempNode.innerHTML = buttonHtml;
+								targetButton.innerHTML = tempNode.querySelector("button, div.simply-button").innerHTML;
 								targetButton.setAttribute("data-simply-action", "simply-browse-insert");
 								targetButton.setAttribute("data-value", url);
 							});
@@ -533,7 +553,7 @@
 			var url = editor.plugins.browse.currentPath + "/" + filename.replace(/[^A-Za-z0-9_\.-]/, "-");
 
 			(function(targetButton, url) {
-				targetButton.innerHTML = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</div>";
+				targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
 				newButton = targetButton.querySelector("div");
 				targetButton.parentNode.insertBefore(newButton, targetButton);
 				targetButton.parentNode.removeChild(targetButton);
@@ -549,7 +569,7 @@
 
 			(function(targetButton, url) {
 				editor.storage.file.save(subpath + filename + '/', '', function() {
-					targetButton.innerHTML = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</div>";
+					targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
 					newButton = targetButton.querySelector("div");
 					targetButton.parentNode.insertBefore(newButton, targetButton);
 					targetButton.parentNode.removeChild(targetButton);
@@ -681,11 +701,15 @@
 			break;
 			case 'image':
 				editor.actions["simply-image-src"](target);
-				editor.plugins.browse.insertTarget.value = target;
+				if (editor.plugins.browse.insertTarget) {
+					editor.plugins.browse.insertTarget.value = target;
+				}
 			break;
 			case 'file':
 				editor.actions["simply-hyperlink-href"](target);
-				editor.plugins.browse.insertTarget.value = target;
+				if (editor.plugins.browse.insertTarget) {
+					editor.plugins.browse.insertTarget.value = target;
+				}
 			break;
 		}
 
