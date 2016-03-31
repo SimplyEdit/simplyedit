@@ -1,0 +1,697 @@
+<script>
+	/*
+		TODO: 
+		Upload input type filter for images
+
+	*/
+</script>
+<section id="simply-browse" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<!-- Add -->
+			<li><button data-simply-action="simply-browse-add-page"><i class="fa fa-file-text-o"></i>Add page</button></li>
+			<li><button data-simply-action="simply-browse-add-folder"><i class="fa fa-plus-square"></i>Add folder</button></li>
+			<li><button data-simply-action="simply-browse-upload"><i class="fa fa-upload"></i>Upload</button><input type="file" multiple></li>
+
+			<!-- Delete -->
+			<li><button data-simply-action="simply-browse-delete"><i class="fa fa-trash"></i>Delete</button></li>
+
+			<!-- Dialog -->
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+	</div>
+	<div class="simply-dialog-body">
+	</div>
+</section>
+<style type="text/css">
+	#simply-browse .simply-dialog-body > button,
+	#simply-browse .simply-dialog-body > .simply-button,
+	#simply-browse .simply-add-folder,
+	#simply-browse .simply-add-page {
+		border: 1px solid #eee;
+		background-color: white;
+		height: 149px;
+		width: 149px;
+		font-family: inherit;
+		font-size: 20px;
+		position: relative;
+		padding: 5px;
+		color: #999 !important;
+		display: inline-block;
+		vertical-align: top;
+		text-align: center;
+		box-sizing: border-box;
+		padding-top: 30px;
+	}
+	#simply-browse .simply-add-folder,
+	#simply-browse .simply-add-page {
+		box-sizing: border-box;
+		padding-top: 38px;
+	}
+
+	#simply-browse .simply-add-folder input,
+	#simply-browse .simply-add-page input {
+		width: 133px;
+		color: #333;
+	}
+	#simply-browse input[type="file"] {
+		display: none;
+	}
+	#simply-browse .simply-dialog-body > button:before,
+	#simply-browse .simply-dialog-body > .simply-button:before {
+		display: block;
+		content: '';
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		height: 100%;
+		width: 100%;
+	}
+        #simply-browse .simply-dialog-body > button i,
+        #simply-browse .simply-dialog-body > .simply-button i,
+	#simply-browse .simply-add-folder > i,
+	#simply-browse .simply-add-page > i {
+		font-size: 48px;
+		display: block;
+		width: 100%;
+		text-align: center;
+	}
+	#simply-browse .simply-add-folder > button.simply-add,
+	#simply-browse .simply-add-page > button.simply-add {
+		color: #333;
+		background-color: #eee;
+		position: absolute;
+		bottom: 5px;
+		left: 5px;
+		padding: 3px 10px 3px 6px;
+		border: 1px solid #999
+	}
+	#simply-browse .simply-add-folder > button.simply-cancel,
+	#simply-browse .simply-add-page > button.simply-cancel {
+		color: #666;
+		position: absolute;
+		bottom: 5px;
+		right: 5px;
+		border: 0px;
+		background-color: white;
+		font-size: 18px;
+	}
+	#simply-browse .simply-add-folder > button.simply-add > i,
+	#simply-browse .simply-add-page > button.simply-add > i {
+		margin-right: 5px;
+	}
+
+	#simply-browse .simply-dialog-body > button img,
+	#simply-browse .simply-dialog-body > .simply-button img {
+		max-width: 100%;
+		max-height: 100%;
+	}
+	#simply-browse .simply-dialog-body > button progress,
+	#simply-browse .simply-dialog-body > .simply-button progress {
+		width: 100%;
+		height: 10px;
+	}
+	#simply-browse .simply-dialog-body > button i.select,
+	#simply-browse .simply-dialog-body > .simply-button i.select {
+		position: absolute;
+		top: 0;
+		right: 0px;
+		display: inline-block;
+		text-align: right;
+		width: 40px;
+	}
+	#simply-browse .simply-dialog-body > button i.select:before,
+	#simply-browse .simply-dialog-body > .simply-button i.select:before {
+		width: 16px;
+		display: inline-block;
+		font-size: 20px;
+		border-left: 1px solid #ddd;
+		padding: 10px;
+		border-bottom: 1px solid #ddd;
+		color: #ddd;
+		border-bottom-left-radius: 15px;
+		z-index: 1;
+		background-color: rgba(255,255,255,0.3);
+		vertical-align: top;
+		box-sizing: content-box;
+	}
+	#simply-browse .simply-dialog-body.simply-selecting button i.select,
+	#simply-browse .simply-dialog-body.simply-selecting .simply-button i.select {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		bottom: 0px;
+		right: 0px;
+		width: auto;
+	}
+	#simply-browse .simply-dialog-body > button.simply-selected i.select:before,
+	#simply-browse .simply-dialog-body > .simply-button.simply-selected i.select:before {
+		border-color: #999;
+		color: #16B916;
+		background-color: rgba(255,255,255,0.8);
+	}
+
+	@media (max-width: 481px) {
+		#simply-browse .simply-dialog-body > button,
+		#simply-browse .simply-dialog-body > .simply-button {
+			width: 50%;
+		}
+		#simply-browse .simply-dialog-body > .simply-add-folder,
+		#simply-browse .simply-dialog-body > .simply-add-page {
+			width: 50%;
+		}
+	}
+
+	#simply-browse .simply-dialog-body > .simply-button.simply-image {
+		line-height: 149px;
+		padding-top: 0px;
+	}
+
+	#simply-browse .simply-dialog-body > button img,
+	#simply-browse .simply-dialog-body > .simply-button img {
+		max-width: 100%;
+		max-height: 100%;
+		width: 149px;
+		vertical-align: middle;
+	}
+</style>
+<script>
+	editor.plugins.browse = {
+		currentSel : null,
+		currentField : null,
+		currentJail : null,
+		path : null,
+		dialog : {
+			open : function() {
+				editor.plugins.browse.currentSel = vdSelectionState.get();
+				editor.plugins.browse.currentField = editor.node.getEditableField();
+				editor.plugins.browse.currentJail = null;
+
+				vdSelectionState.save(editor.plugins.browse.currentSel);
+				editor.plugins.dialog.open(document.getElementById('simply-browse'), editor.plugins.browse.dialog.update);
+			},
+			load : function(url) {
+				var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+				var parser = document.createElement("A");
+				parser.href = url;
+				if (editor.plugins.browse.currentJail === null) {
+					editor.plugins.browse.currentJail = parser.href;
+				}
+				editor.plugins.browse.currentPath = parser.href;
+
+				if (editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) === 0) {
+					editor.plugins.browse.mode = "images";
+				} else if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
+					editor.plugins.browse.mode = "pages";
+				} else {
+					editor.plugins.browse.mode = "files";
+				}
+
+				editor.storage.list(url, function(data) {
+					var i;
+					var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+					var newHtml = '';
+					for (i=0; i<data.folders.length; i++) {
+						if (data.folders[i].url.indexOf(editor.plugins.browse.currentJail) === 0) {
+							newHtml += "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + data.folders[i].url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + data.folders[i].name + "</div>";
+						}
+					}
+
+					switch (editor.plugins.browse.mode) {
+						case 'images':
+							for (i=0; i<data.images.length; i++) {
+								newHtml += editor.plugins.browse.dialog.getButtonHtml(data.images[i]);
+							}
+						break;
+						default:
+							for (i=0; i<data.files.length; i++) {
+								newHtml += editor.plugins.browse.dialog.getButtonHtml(data.files[i]);
+							}
+						break;
+					}
+					targetList.innerHTML = newHtml;
+					targetList.scrollTop = 0;
+
+					if (editor.plugins.browse.mode == 'images') {
+						editor.responsiveImages.init(targetList);
+					}
+
+					var selectors = targetList.querySelectorAll("i.select");
+					for (i=0; i<selectors.length; i++) {
+						selectors[i].addEventListener("click", function(evt) {
+							this.parentNode.classList.toggle("simply-selected");
+							evt.preventDefault();
+							evt.stopPropagation();
+							editor.plugins.browse.dialog.updateToolbar();
+						});
+					}
+				});
+			},
+			getButtonHtml : function(data) {
+				switch (editor.plugins.browse.mode) {
+					case 'images' :
+						var src = data.url;
+						if (typeof data.src !== "undefined") {
+							src = data.src;
+						}
+
+						var result = "<div class='simply-button simply-image' data-simply-action='simply-browse-insert'>";
+						result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
+						if (data.thumb) {
+							result += " src='" + data.thumb + "'";
+						} else {
+							result += " data-simply-src='" + src + "'";
+						}
+						if (data.id) {
+							result += " data-simply-id='" + data.id + "'";
+						}
+						result += "></div>";
+					break;
+					default :
+						var result = "<div class='simply-button' data-simply-action='simply-browse-insert' data-value='" + data.url + "'>";
+						result += "<i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + data.name + "</div>";
+					break;
+				}
+
+				return result;
+			},
+			update : function() {
+				editor.plugins.browse.dialog.load(editor.plugins.browse.path);
+			},
+			updateToolbar : function() {
+				window.setTimeout(function() {
+					var targetList = document.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
+					var uploadButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-upload']");
+					var addPageButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-add-page']");
+					var addFolderButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-add-folder']");
+					var deleteButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-delete']");
+
+					if (targetList.length === 0) {
+						document.querySelector("#simply-browse .simply-dialog-body").classList.remove("simply-selecting");
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "block";
+						}
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "block";
+						}
+						if (addFolderButton) {
+							addFolderButton.parentNode.style.display = "block";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "none";
+						}
+					} else {
+						document.querySelector("#simply-browse .simply-dialog-body").classList.add("simply-selecting");
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "none";
+						}
+						if (addFolderButton) {
+							addFolderButton.parentNode.style.display = "none";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "block";
+						}
+					}
+
+					if (editor.plugins.browse.currentPath && (editor.plugins.browse.currentPath.indexOf("data.json") > -1)) {
+						// In data.json browsing mode; disable upload button;
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+					} else {
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "none";
+						}
+					}
+				}, 50);
+			}
+
+		},
+		init : function() {
+			var listItem = document.createElement("LI");
+			var button = document.createElement("button");
+			button.dataset.simplyAction = "simply-browse-sitemap";
+			button.innerHTML = '<i class="fa fa-sitemap"></i>Sitemap';
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+
+			editor.plugins.browse.path = editor.storage.endpoint;
+			editor.storage.imagesEndpoint = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
+			editor.storage.filesEndpoint = editor.storage.endpoint;
+
+			var browseTargets = [];
+			if (editor.storage.filesEndpoint) {
+				browseTargets.push('[data-simply-action="simply-hyperlink-href"]');
+			}
+			if (editor.storage.imagesEndpoint) {
+				browseTargets.push('[data-simply-action="simply-image-src"]');
+			}
+
+			var target = document.querySelectorAll(browseTargets.join(", "));
+			if (target) {
+				for (var i=0; i<target.length; i++) {
+					var button = document.createElement("div");
+					var mode = (target[i].getAttribute("data-simply-action") === "simply-image-src") ? "images" : "files";
+					if (mode === "images") {
+						button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i></button>';
+					} else {
+						button.innerHTML = '<button data-simply-action="simply-browse"><i class="fa fa-folder"></i></button>';
+					}
+					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
+				}
+			} else {
+				window.setTimeout(editor.plugins.browse.init, 200);
+			}
+
+			if (editor.storage.file && typeof editor.storage.file.save === "function") {
+				document.querySelector("#simply-browse").addEventListener("drop", function(evt) {
+					evt.preventDefault();
+					editor.plugins.browse.handleFiles(evt.dataTransfer.files);
+				});
+				document.querySelector("#simply-browse input[type='file']").addEventListener("change", function(evt) {
+					editor.plugins.browse.handleFiles(this.files);
+				});
+			} else {
+				var uploadButton = document.querySelector('[data-simply-action="simply-browse-upload"]');
+				uploadButton.parentNode.parentNode.removeChild(uploadButton.parentNode);
+
+				var addButton = document.querySelector('[data-simply-action="simply-browse-add-folder"]');
+				addButton.parentNode.parentNode.removeChild(addButton.parentNode);
+			}
+
+			if (editor.storage.file && typeof editor.storage.file.delete === "function") {
+				// Do nothing;
+			} else {
+				var deleteButton = document.querySelector('[data-simply-action="simply-browse-delete"]');
+				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);
+			}
+
+			document.querySelector("#simply-browse").addEventListener("DOMNodeInserted", editor.plugins.browse.dialog.updateToolbar);
+			document.querySelector("#simply-browse").addEventListener("DOMNodeRemoved",editor.plugins.browse.dialog.updateToolbar);
+
+			var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+			new Slip(targetList); // slip is used for the tap-hold timing;
+			targetList.addEventListener("slip:beforereorder", function(evt) {
+				var targetButton = evt.target;
+				if (targetButton.tagName.toLowerCase() == "i") {
+					targetButton = targetButton.parentNode;
+				}
+				targetButton.classList.toggle("simply-selected");
+				editor.plugins.browse.dialog.updateToolbar();
+
+				targetButton.addEventListener("click", editor.plugins.browse.cancelClick, true);
+				targetButton.addEventListener("mouseup", function(evt) {
+					var currentButton = this;
+					window.setTimeout(function() {
+						currentButton.removeEventListener("click", editor.plugins.browse.cancelClick, true);
+					}, 50);
+				});
+				evt.preventDefault();
+				evt.stopPropagation();
+			});
+		},
+		cancelClick : function(evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+		},
+		handleFiles : function(files) {
+			if (files.length) {
+				for (var i=0; i<files.length; i++) {
+					var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
+					var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+
+					var newButton = document.createElement("BUTTON");
+					newButton.setAttribute("data-simply-action", "simply-browse-uploading");
+					newButton.innerHTML = "Uploading<br><progress value=0 max=100></progress><br>" + files[i].name;
+					targetList.appendChild(newButton);
+					newButton.querySelector("progress").setAttribute("data-simply-progress", subpath + files[i].name);
+
+					var url = editor.plugins.browse.currentPath + files[i].name.replace(/[^A-Za-z0-9_\.-]/, "-");
+
+					if (editor.plugins.browse.mode == "images") {
+						(function(targetButton, url) {
+							editor.storage.file.save(subpath + files[i].name, files[i], function(image) {
+								if (typeof image === "undefined") {
+									image = {
+										src : url
+									}
+								};
+								var buttonHtml = editor.plugins.browse.dialog.getButtonHtml(image);
+								var tempNode = document.createElement("div");
+								tempNode.innerHTML = buttonHtml;
+								targetButton.innerHTML = tempNode.querySelector("button, div.simply-button").innerHTML;
+								targetButton.setAttribute("data-simply-action", "simply-browse-insert");
+								editor.responsiveImages.init(targetButton);
+							});
+						}(newButton, url));
+					} else {
+						(function(targetButton, url, name) {
+							editor.storage.file.save(subpath + files[i].name, files[i], function() {
+								targetButton.innerHTML = "<i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + name;
+								targetButton.setAttribute("data-simply-action", "simply-browse-insert");
+								targetButton.setAttribute("data-value", url);
+							});
+						}(newButton, url, files[i].name));
+					}
+				}
+			}
+		}
+	};
+
+	editor.addAction("simply-browse", function(el) {
+		editor.plugins.browse.insertMode = "file";
+		editor.plugins.browse.insertTarget = el.parentNode.parentNode.querySelector("input");
+		editor.plugins.browse.path = editor.storage.endpoint;
+		editor.plugins.browse.dialog.open();
+	});
+	editor.addAction("simply-browse-sitemap", function(el) {
+		editor.plugins.browse.insertMode = "page";
+		editor.plugins.browse.insertTarget = null;
+		editor.plugins.browse.path = editor.storage.dataEndpoint ? editor.storage.dataEndpoint : editor.storage.endpoint;
+		editor.plugins.browse.dialog.open();
+	});
+
+	editor.addAction("simply-browse-images", function(el) {
+		editor.plugins.browse.insertMode = "image";
+		editor.plugins.browse.insertTarget = el.parentNode.parentNode.querySelector("input");
+		editor.plugins.browse.path = editor.storage.imagesEndpoint ? editor.storage.imagesEndpoint : editor.storage.endpoint;
+		editor.plugins.browse.dialog.open();
+	});
+
+	editor.addAction("simply-browse-directory", function(el) {
+		editor.plugins.browse.dialog.load(el.dataset.value);
+	});
+	editor.addAction("simply-browse-upload", function(el) {
+		var target = el.parentNode.querySelector("input");
+		muze.event.fire(target, "click");
+	});
+	editor.addAction("simply-browse-delete", function(el) {
+		var targetList = document.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
+		var subpath;
+		if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
+			if (confirm("Delete all selected pages? This action cannot be reversed and is final after you save.")) {
+				for (var i=0; i<targetList.length; i++) {
+					subpath = targetList[i].getAttribute("data-value").replace(editor.storage.dataEndpoint, "");
+					(function(targetButton) {
+						var data = JSON.parse(localStorage.data);
+						delete data[subpath];
+						localStorage.data = JSON.stringify(data);
+						targetButton.parentNode.removeChild(targetButton);
+					}(targetList[i]));
+				}
+			}
+		} else {
+			if (confirm("Delete all selected folders and files?")) {
+				for (var i=0; i<targetList.length; i++) {
+					if (targetList[i].querySelector("img")) {
+						subpath = targetList[i].querySelector("img").getAttribute("src").replace(editor.storage.endpoint, "");
+					} else {
+						subpath = targetList[i].getAttribute("data-value").replace(editor.storage.endpoint, "");
+					}
+					(function(targetButton) {
+						editor.storage.file.delete(subpath, function() {
+							targetButton.parentNode.removeChild(targetButton);
+						});
+					}(targetList[i]));
+				};
+			}
+		}
+	});
+
+	editor.addAction("simply-browse-handle-upload", function(el) {
+		editor.plugins.browse.handleFiles(el.files);
+	});
+
+	editor.addAction("simply-browse-handle-add-folder", function(el) {
+		var filename = el.parentNode.querySelector("input").value;
+		if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
+			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.dataEndpoint, "");
+			var url = editor.plugins.browse.currentPath + "/" + filename.replace(/[^A-Za-z0-9_\.-]/, "-");
+
+			(function(targetButton, url) {
+				targetButton.innerHTML = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</div>";
+				newButton = targetButton.querySelector("div");
+				targetButton.parentNode.insertBefore(newButton, targetButton);
+				targetButton.parentNode.removeChild(targetButton);
+
+				if (typeof editor.currentData[subpath + "/" + filename + "/"] === "undefined") {
+					editor.currentData[subpath + "/" + filename + "/"] = {};
+				}
+			}(el.parentNode, url));
+
+		} else {
+			var url = editor.plugins.browse.currentPath + filename.replace(/[^A-Za-z0-9_\.-]/, "-") + '/';
+			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
+
+			(function(targetButton, url) {
+				editor.storage.file.save(subpath + filename + '/', '', function() {
+					targetButton.innerHTML = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + filename + "/</div>";
+					newButton = targetButton.querySelector("div");
+					targetButton.parentNode.insertBefore(newButton, targetButton);
+					targetButton.parentNode.removeChild(targetButton);
+				});
+			}(el.parentNode, url));
+		}
+	});
+	editor.addAction("simply-browse-cancel-add-folder", function(el) {
+		var target = el.parentNode;
+		target.parentNode.removeChild(target);
+	});
+	editor.addAction("simply-browse-add-folder", function(el) {
+		var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+		var addButton = document.createElement("DIV");
+		addButton.classList.add("simply-add-folder");
+		addButton.innerHTML = '<i class="fa fa-folder"></i>';
+		var addInput = document.createElement("input");
+		addInput.type = "text";
+		addInput.value = "new-folder";
+
+		addSubmit = document.createElement("button");
+		addSubmit.setAttribute("data-simply-action", "simply-browse-handle-add-folder");
+		addSubmit.classList.add('simply-add');
+		addSubmit.innerHTML = '<i class="fa fa-check"></i>Add';
+
+		addCancel = document.createElement("button");
+		addCancel.setAttribute("data-simply-action", "simply-browse-cancel-add-folder");
+		addCancel.classList.add('simply-cancel');
+		addCancel.innerHTML = '<i class="fa fa-times"></i>';
+		addButton.appendChild(addInput);
+		addButton.appendChild(addSubmit);
+		addButton.appendChild(addCancel);
+		targetList.appendChild(addButton);
+		addInput.addEventListener("input", function(evt) {
+			this.value = this.value.replace(/[^A-Za-z0-9_\.-]/g, '');
+		});
+
+		addInput.addEventListener("keydown", function(evt) {
+			if (evt.keyCode == 13) { // enter
+				muze.event.fire(addSubmit, "click");
+				evt.stopPropagation();
+			} else if (evt.keyCode == 27) { // ESC
+				muze.event.fire(addCancel, "click");
+				evt.stopPropagation();
+			}
+		});
+
+		addInput.select();
+		addInput.focus();
+		window.setTimeout(function() { // give the mobile keyboard time to pop up;
+			targetList.scrollTop = targetList.scrollHeight; // scroll the new element into view;
+		}, 500);
+	});
+
+	editor.addAction("simply-browse-handle-add-page", function(el) {
+		var subpath = editor.plugins.browse.currentPath.replace(editor.storage.dataEndpoint, "");
+		var filename = el.parentNode.querySelector("input").value;
+		if (typeof editor.currentData[subpath + "/" + filename + "/"] === "undefined"){
+			editor.storage.page.save(document.location.protocol + '//' + document.location.hostname + subpath + "/" + filename + "/");
+		} else {
+			alert("A page with that name already exists.");
+			el.parentNode.querySelector("input").focus();
+		}
+	});
+	editor.addAction("simply-browse-cancel-add-page", function(el) {
+		var target = el.parentNode;
+		target.parentNode.removeChild(target);
+	});
+	editor.addAction("simply-browse-add-page", function(el) {
+		var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+		var addButton = document.createElement("DIV");
+		addButton.classList.add("simply-add-page");
+		addButton.innerHTML = '<i class="fa fa-file-text-o"></i>';
+		var addInput = document.createElement("input");
+		addInput.type = "text";
+		addInput.value = "new-page";
+
+		addSubmit = document.createElement("button");
+		addSubmit.setAttribute("data-simply-action", "simply-browse-handle-add-page");
+		addSubmit.classList.add('simply-add');
+		addSubmit.innerHTML = '<i class="fa fa-check"></i>Add';
+
+		addCancel = document.createElement("button");
+		addCancel.setAttribute("data-simply-action", "simply-browse-cancel-add-page");
+		addCancel.classList.add('simply-cancel');
+		addCancel.innerHTML = '<i class="fa fa-times"></i>';
+		addButton.appendChild(addInput);
+		addButton.appendChild(addSubmit);
+		addButton.appendChild(addCancel);
+		targetList.appendChild(addButton);
+		addInput.addEventListener("input", function(evt) {
+			this.value = this.value.replace(/[^A-Za-z0-9_\.-]/g, '');
+		});
+
+		addInput.addEventListener("keydown", function(evt) {
+			if (evt.keyCode == 13) { // enter
+				muze.event.fire(addSubmit, "click");
+				evt.stopPropagation();
+			} else if (evt.keyCode == 27) { // ESC
+				muze.event.fire(addCancel, "click");
+				evt.stopPropagation();
+			}
+		});
+
+		addInput.select();
+		addInput.focus();
+		window.setTimeout(function() { // give the mobile keyboard time to pop up;
+			targetList.scrollTop = targetList.scrollHeight; // scroll the new element into view;
+		}, 500);
+	});
+
+	editor.addAction("simply-browse-insert", function(el) {
+		var getTargetUrl = function(el) {
+			if (el.querySelector("img")) {
+				return el.querySelector("img").getAttribute("data-value");
+			}
+			return el.getAttribute("data-value");
+		};
+
+		var target = getTargetUrl(el);
+		if (editor.storage.dataEndpoint) {
+			target = target.replace(editor.storage.dataEndpoint, "");
+		}
+
+		switch (editor.plugins.browse.insertMode) {
+			case 'page':
+				// FIXME: check for dirty fields and stash/save the changes
+				document.location.href = target + "#simply-edit";
+			break;
+			case 'image':
+				editor.actions["simply-image-src"](target);
+				editor.plugins.browse.insertTarget.value = target;
+			break;
+			case 'file':
+				editor.actions["simply-hyperlink-href"](target);
+				editor.plugins.browse.insertTarget.value = target;
+			break;
+		}
+
+		editor.plugins.dialog.close();
+		editor.context.update();
+	});
+
+	editor.plugins.browse.init();
+</script>
