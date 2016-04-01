@@ -346,39 +346,11 @@
 			editor.storage.imagesEndpoint = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
 			editor.storage.filesEndpoint = editor.storage.endpoint;
 
-			var browseTargets = [];
 			if (editor.storage.filesEndpoint) {
-				browseTargets.push('[data-simply-action="simply-hyperlink-href"]');
+				editor.plugins.browse.initLinkBrowse();
 			}
 			if (editor.storage.imagesEndpoint) {
-				browseTargets.push('[data-simply-action="simply-image-src"]');
-			}
-
-			var target = document.querySelectorAll(browseTargets.join(", "));
-			if (target) {
-				for (var i=0; i<target.length; i++) {
-					var button = document.createElement("div");
-					var mode = (target[i].getAttribute("data-simply-action") === "simply-image-src") ? "images" : "files";
-					if (mode === "images") {
-						button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i></button>';
-					} else {
-						button.innerHTML = '<button data-simply-action="simply-browse"><i class="fa fa-folder"></i></button>';
-					}
-					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
-				}
-
-				// Add Browse button to image toolbars;
-				var target = document.querySelectorAll("#simply-image .simply-toolbar .simply-buttons, #simply-image-field .simply-toolbar .simply-buttons");
-				if (target) {
-					var i;
-					for (i=0; i<target.length; i++) {
-						var button = document.createElement("LI");
-						button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i>Browse</button>';
-						target[i].appendChild(button);
-					}
-				}
-			} else {
-				window.setTimeout(editor.plugins.browse.init, 200);
+				editor.plugins.browse.initImageBrowse();
 			}
 
 			if (editor.storage.file && typeof editor.storage.file.save === "function") {
@@ -427,6 +399,47 @@
 				evt.preventDefault();
 				evt.stopPropagation();
 			});
+		},
+		initImageBrowse : function() {
+			var browseTargets = [];
+			browseTargets.push('[data-simply-action="simply-image-src"]');
+
+			var target = document.querySelectorAll(browseTargets.join(", "));
+			if (target) {
+				for (var i=0; i<target.length; i++) {
+					var button = document.createElement("div");
+					button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i></button>';
+					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
+				}
+
+				// Add Browse button to image toolbars;
+				var target = document.querySelectorAll("#simply-image .simply-toolbar .simply-buttons, #simply-image-field .simply-toolbar .simply-buttons");
+				if (target) {
+					var i;
+					for (i=0; i<target.length; i++) {
+						var button = document.createElement("LI");
+						button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i>Browse</button>';
+						target[i].appendChild(button);
+					}
+				}
+			} else {
+				window.setTimeout(editor.plugins.browse.initImageBrowse, 200);	
+			}
+		},
+		initLinkBrowse : function() {
+			var browseTargets = [];
+			browseTargets.push('[data-simply-action="simply-hyperlink-href"]');
+
+			var target = document.querySelectorAll(browseTargets.join(", "));
+			if (target) {
+				for (var i=0; i<target.length; i++) {
+					var button = document.createElement("div");
+					button.innerHTML = '<button data-simply-action="simply-browse"><i class="fa fa-folder"></i></button>';
+					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
+				}
+			} else {
+				window.setTimeout(editor.plugins.browse.initLinkBrowse, 200);
+			}
 		},
 		cancelClick : function(evt) {
 			evt.preventDefault();

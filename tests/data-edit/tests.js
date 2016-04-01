@@ -1107,12 +1107,12 @@ QUnit.module("browse plugin");
 
 	QUnit.test("browse images button is added to image field toolbar", function(assert) {		
 		var button = document.querySelectorAll('#simply-image-field [data-simply-action="simply-browse-images"]');
-		assert.equal(button.length, 1);
+		assert.equal(button.length, 2);
 	});
 
 	QUnit.test("browse images button is added to image toolbar", function(assert) {		
 		var button = document.querySelectorAll('#simply-image [data-simply-action="simply-browse-images"]');
-		assert.equal(button.length, 1);
+		assert.equal(button.length, 2);
 	});
 
 	QUnit.test("browse files button is added to text/hyperlink toolbar", function(assert) {
