@@ -1145,10 +1145,12 @@
 
 	var storage = {
 		getType : function(endpoint) {
+			if (document.querySelector("[data-simply-storage]")) {
+				return document.querySelector("[data-simply-storage]").getAttribute("data-simply-storage");
+			}
 			if (endpoint === null) {
 				endpoint = document.location.href;
 			}
-			
 			if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
 				return "ariadne";
 			} else if (endpoint.indexOf("github.io") !== -1) {
@@ -1168,7 +1170,9 @@
 				} else {
 					console.log("Warning: custom storage not found");
 				}
-			} else {
+			}
+
+			if (!result) {
 				var storageType = storage.getType(endpoint);
 				if (!storage[storageType]) {
 					storageType = "default";
