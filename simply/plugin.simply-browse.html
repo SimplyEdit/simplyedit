@@ -346,6 +346,13 @@
 			editor.storage.imagesEndpoint = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
 			editor.storage.filesEndpoint = editor.storage.endpoint;
 
+			// Fix urls from relative to absolute;
+			var parser = document.createElement("A");
+			parser.href = editor.storage.imagesEndpoint;
+			editor.storage.imagesEndpoint = parser.href;
+			parser.href = editor.storage.filesEndpoint;
+			editor.storage.filesEndpoint = parser.href;
+
 			if (editor.storage.filesEndpoint) {
 				editor.plugins.browse.initLinkBrowse();
 			}
