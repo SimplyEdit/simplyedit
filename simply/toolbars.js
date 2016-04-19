@@ -914,7 +914,11 @@
 		muze.event.attach( document, 'keyup', function(evt) {
 			editor.context.update();
 		});
-		muze.event.attach( document, 'mouseup', function() {
+		muze.event.attach( document, 'mouseup', function(evt) {
+			if (!document.querySelector(":focus")) {
+				// firefox on mac doesn't set focus for the mouseup until after the event;
+				evt.target.focus();
+			}
 			editor.context.toolbar.hide = false;
 			editor.context.update();
 		});
