@@ -348,16 +348,15 @@
 
 			// Fix urls from relative to absolute;
 			var parser = document.createElement("A");
-			parser.href = editor.storage.imagesEndpoint;
-			editor.storage.imagesEndpoint = parser.href;
-			parser.href = editor.storage.filesEndpoint;
-			editor.storage.filesEndpoint = parser.href;
-
-			if (editor.storage.filesEndpoint) {
-				editor.plugins.browse.initLinkBrowse();
-			}
 			if (editor.storage.imagesEndpoint) {
+				parser.href = editor.storage.imagesEndpoint;
+				editor.storage.imagesEndpoint = parser.href;
 				editor.plugins.browse.initImageBrowse();
+			}
+			if (editor.storage.filesEndpoint) {
+				parser.href = editor.storage.filesEndpoint;
+				editor.storage.filesEndpoint = parser.href;
+				editor.plugins.browse.initLinkBrowse();
 			}
 
 			if (editor.storage.file && typeof editor.storage.file.save === "function") {

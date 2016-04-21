@@ -757,7 +757,7 @@
 			editor.loadBaseStyles();
 
 			// convert URL for the endpoint to an absolute path;
-			if (typeof config.endpoint !== 'undefined') {
+			if (typeof config.endpoint !== 'undefined' && config.endpoint) {
 				var parser = document.createElement("A");
 				parser.href = config.endpoint;
 				config.endpoint = parser.href;
