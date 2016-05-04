@@ -414,6 +414,15 @@ QUnit.module("hope editor behaviour");
 
 		assert.equal(testContent.hopeEditor.getCaretOffset(testContent.querySelector("h1")), 12);
 	});
+
+	QUnit.test("allow block elements in list item", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<ul><li><h2>Hello</h2><div>World</div></li></ul>';
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		console.log(testContent.innerHTML);
+		assert.equal(testContent.innerHTML, '<ul><li><h2>Hello</h2><div>World</div></li></ul>');
+	});
 	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
