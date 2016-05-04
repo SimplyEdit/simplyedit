@@ -420,7 +420,6 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = '<ul><li><h2>Hello</h2><div>World</div></li></ul>';
 		testContent.hopeEditor.parseHTML();
 		testContent.hopeEditor.update();
-		console.log(testContent.innerHTML);
 		assert.equal(testContent.innerHTML, '<ul><li><h2>Hello</h2><div>World</div></li></ul>');
 	});
 	
@@ -759,7 +758,7 @@ QUnit.module("editor text selection");
 
 		setCaretPosition(testContent.querySelector("p"), 1,4);
 		editor.actions['simply-text-blockstyle']('ul');
-		assert.equal(testContent.innerHTML, "<p>H</p><ul><li>ello</li></ul><p> world</p>");
+		assert.equal(testContent.innerHTML, "<p>H</p><ul><li><p>ello</p></li></ul><p> world</p>");
 	});
 
 	QUnit.test("converting to unnumbered list adds list item", function(assert) {
