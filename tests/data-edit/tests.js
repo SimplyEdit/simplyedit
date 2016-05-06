@@ -414,6 +414,14 @@ QUnit.module("hope editor behaviour");
 
 		assert.equal(testContent.hopeEditor.getCaretOffset(testContent.querySelector("h1")), 12);
 	});
+
+	QUnit.test("allow block elements in list item", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<ul><li><h2>Hello</h2><div>World</div></li></ul>';
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		assert.equal(testContent.innerHTML, '<ul><li><h2>Hello</h2><div>World</div></li></ul>');
+	});
 	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
@@ -750,7 +758,7 @@ QUnit.module("editor text selection");
 
 		setCaretPosition(testContent.querySelector("p"), 1,4);
 		editor.actions['simply-text-blockstyle']('ul');
-		assert.equal(testContent.innerHTML, "<p>H</p><ul><li>ello</li></ul><p> world</p>");
+		assert.equal(testContent.innerHTML, "<p>H</p><ul><li><p>ello</p></li></ul><p> world</p>");
 	});
 
 	QUnit.test("converting to unnumbered list adds list item", function(assert) {
