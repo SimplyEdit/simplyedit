@@ -1212,17 +1212,26 @@
 				this.file = storage.default.file;
 
 				if (editor.responsiveImages) {
-					editor.responsiveImages.sizes = function(src) {
-						return {
-							"1200w" : src + "?size=1200",
-							"800w" : src + "?size=800",
-							"640w" : src + "?size=640",
-							"480w" : src + "?size=480",
-							"320w" : src + "?size=320",
-							"160w" : src + "?size=160",
-							"80w" : src + "?size=80"
+					if (
+						editor.settings['simply-image'] &&
+						editor.settings['simply-image'].responsive &&
+						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+					) {
+						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+					} else {
+						editor.responsiveImages.sizes = function(src) {
+							return {
+							//	"1200w" : src + "?size=1200",
+							//	"800w" : src + "?size=800",
+								"640w" : src + "?size=640",
+								"480w" : src + "?size=480",
+								"320w" : src + "?size=320",
+								"160w" : src + "?size=160",
+								"80w" : src + "?size=80"
+							};
 						};
-					};
+					}
+
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
 			},
@@ -1319,6 +1328,17 @@
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 				this.page = storage.default.page;
+
+				if (editor.responsiveImages) {
+					if (
+						editor.settings['simply-image'] &&
+						editor.settings['simply-image'].responsive &&
+						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+					) {
+						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+					}
+					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+				}
 			},
 			connect : function() {
 				if (typeof Github === "undefined") {
@@ -1461,6 +1481,17 @@
 				this.endpoint = endpoint;
 				this.dataPath = "data/data.json";
 				this.dataEndpoint = this.url + this.dataPath;
+
+				if (editor.responsiveImages) {
+					if (
+						editor.settings['simply-image'] &&
+						editor.settings['simply-image'].responsive &&
+						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+					) {
+						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+					}
+					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+				}
 			},
 			file : {
 				save : function(path, data, callback) {
