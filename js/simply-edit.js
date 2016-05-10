@@ -281,7 +281,12 @@
 			},
 			load : function() {
 				editor.storage.load(function(data) {
-					localStorage.data = data;
+					try {
+						localStorage.data = data;
+					} catch(e) {
+						editor.readOnly = true;
+					}
+
 					editor.currentData = JSON.parse(data);
 					editor.data.apply(editor.currentData, document);
 
@@ -826,6 +831,11 @@
 				http.send();
 			},
 			init : function() {
+				if (editor.readOnly) {
+					alert("Can't start editmode, editor is in read only mode. Do you have private browsing on?");
+					return;
+				}
+
 				var toolbarsContainer = document.createElement("DIV");
 				toolbarsContainer.id = "simply-editor";
 				document.body.appendChild(toolbarsContainer);
