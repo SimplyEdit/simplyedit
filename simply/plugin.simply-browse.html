@@ -722,12 +722,14 @@
 				editor.actions["simply-image-src"](target);
 				if (editor.plugins.browse.insertTarget) {
 					editor.plugins.browse.insertTarget.value = target;
+					muze.event.fire(editor.plugins.browse.insertTarget, "change");
 				}
 			break;
 			case 'file':
 				editor.actions["simply-hyperlink-href"](target);
 				if (editor.plugins.browse.insertTarget) {
 					editor.plugins.browse.insertTarget.value = target;
+					muze.event.fire(editor.plugins.browse.insertTarget, "change");
 				}
 			break;
 		}
