@@ -422,6 +422,15 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, '<ul><li><h2>Hello</h2><div>World</div></li></ul>');
 	});
+
+	QUnit.test("render spaces as spaces, not nbsp", function(assert) {
+		var testContent = document.querySelector("#testContent");
+//		testContent.innerHTML = "<ul>\n  <li>\n  <h2>Hello</h2>\n  <div>\n      World\n  </div>\n  </li>\n</ul>";
+		testContent.innerHTML = "<span>a  b</span>";
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		assert.equal(testContent.innerHTML, '<span>a  b</span>');
+	});
 	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
@@ -950,6 +959,7 @@ QUnit.module("images");
 		editor.actions["simply-image-src"]("HelloWorld");
 		
 		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 	});
 
 	QUnit.test("set image source for image at end of field", function(assert) {
