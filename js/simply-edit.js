@@ -538,6 +538,10 @@
 
 							clone.firstElementChild.setAttribute("data-simply-list-item", true);
 							clone.firstElementChild.setAttribute("data-simply-selectable", true);
+
+							if (list.templateIcons[requestedTemplate]) {
+								clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
+							}
 							list.appendChild(clone);
 							editor.data.list.init(listData[j], clone);
 						} else {
@@ -555,6 +559,10 @@
 								}
 								clone.setAttribute("data-simply-list-item", true);
 								clone.setAttribute("data-simply-selectable", true);
+
+								if (list.templateIcons[requestedTemplate]) {
+									clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
+								}
 
 								list.appendChild(clone);
 								editor.data.list.init(listData[j], clone);

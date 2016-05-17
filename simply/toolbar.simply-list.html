@@ -91,6 +91,10 @@
 				newNode.firstElementChild.dataset.simplyListItem = true;
 				newNode.firstElementChild.dataset.simplySelectable = true;
 
+				if (list.templateIcons[templateName]) {
+					newNode.firstElementChild.dataset.simplyListIcon = list.templateIcons[templateName];
+				}
+
 				var newListItem = newNode.firstElementChild;
 				// save a reference so we can make it editable after it has gone into the document;
 
@@ -141,13 +145,17 @@
 				}
 				
 				var item = document.createElement("li");
-				var itemIcon = "fa-cube";
+				var itemIcon = '<i class="fa fa-cube"></i>';
 				if (typeof currentList.templateIcons[templateName] !== "undefined") {
-					itemIcon = currentList.templateIcons[templateName];
+					if (currentList.templateIcons[templateName].indexOf("fa-") === 0) {
+						itemIcon = '<i class="fa ' + currentList.templateIcons[templateName] + '"></i>';
+					} else {
+						itemIcon = '<i class="fa">' + currentList.templateIcons[templateName] + '</i>';
+					}
 				}
 
 				item.innerHTML = '<button data-simply-action="simply-list-item-add" data-simply-value="' + templateName + '">' +
-					'<i class="fa ' + itemIcon + '"></i>' +
+					itemIcon +
 					templateDisplay + '</button>';
 
 				listTemplates.appendChild(item);
@@ -197,14 +205,19 @@
 				}
 				
 				var item = document.createElement("li");
-				var itemIcon = "fa-cube";
+				var itemIcon = '<i class="fa fa-cube"></i>';
 				if (typeof currentList.templateIcons[templateName] !== "undefined") {
-					itemIcon = currentList.templateIcons[templateName];
+					if (currentList.templateIcons[templateName].indexOf("fa-") === 0) {
+						itemIcon = '<i class="fa ' + currentList.templateIcons[templateName] + '"></i>';
+					} else {
+						itemIcon = '<i class="fa">' + currentList.templateIcons[templateName] + '</i>';
+					}
 				}
 
 				item.innerHTML = '<button data-simply-action="simply-list-add" data-simply-value="' + templateName + '">' +
-					'<i class="fa ' + itemIcon + '"></i>' +
+					itemIcon +
 					templateDisplay + '</button>';
+
 				listTemplates.appendChild(item);
 			}
 		
