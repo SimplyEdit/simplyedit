@@ -410,6 +410,9 @@
 					if (typeof list.templates === "undefined") {
 						list.templates = {};
 					}
+					if (typeof list.templateIcons === "undefined") {
+						list.templateIcons = {};
+					}
 					for (var t=0; t<templates.length; t++) {
 						var templateName = templates[t].getAttribute("data-simply-template") ? templates[t].getAttribute("data-simply-template") : t;
 
@@ -426,6 +429,10 @@
 							}
 							list.templates[templateName].content = fragment;
 							list.templates[templateName].contentNode = fragmentNode;
+						}
+						var templateIcon = templates[t].getAttribute("data-simply-template-icon");
+						if (templateIcon) {
+							list.templateIcons[templateName] = templateIcon;
 						}
 					}
 					while (templates.length) {
