@@ -314,6 +314,7 @@
 		.simply-toolbar-section input,
 		.simply-toolbar-section select {
 			background-color: white;
+			color: black;
 			margin-top: 3px;
 			margin-bottom: 3px;
 			border: 1px solid #888;
