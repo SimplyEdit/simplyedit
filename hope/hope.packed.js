@@ -1189,7 +1189,7 @@ hope.register( 'hope.fragment.annotations', function() {
 		var annotationStack    = [];  // stack of applied (valid) annotation at current position
 
 		var relativeAnnotation = fragment.annotations.getEventList();
-		var content        = fragment.text.toString().replace(/  /g, ' \u00A0');
+		var content        = fragment.text.toString();
 
 		var renderedHTML   = '';
 		var cursor         = 0;
