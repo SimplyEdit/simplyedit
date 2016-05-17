@@ -47,7 +47,7 @@
 		*[data-simply-list-item]:before {
 			margin-left: 40px;
 		}
-		*[data-simply-list-item]:not([data-simply-list-icon]) {
+		*[data-simply-list-item]:not([data-simply-list-icon]):before {
 			content: "\f1b2"; /* cube */
 		}
 		*[data-simply-list-item][data-simply-list-icon]:not([data-simply-list-icon|="fa"]):before {
