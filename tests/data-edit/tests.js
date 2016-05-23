@@ -431,6 +431,21 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		assert.equal(testContent.innerHTML, '<span>a  b</span>');
 	});
+
+	QUnit.test("caret attribute does not repeat", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h1>Hello world</h1>";
+		setCaretPosition(testContent.querySelector("h1"), 5);
+
+		//editor.plugins.htmlsource.currentField = testContent;
+		//editor.plugins.htmlsource.currentSel = vdSelectionState.get().cloneRange();
+		editor.actions['simply-insert-source']();
+		document.getElementById('insertHTMLSource').value = "<ul><li>1</li><li>2</li></ul>";
+		editor.actions['simply-htmlsource-insert']();
+		var carets = testContent.querySelectorAll("[data-hope-caret]");
+		assert.equal(carets.length, 0, "zero caret attributes attributes found");
+	});
+
 	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
