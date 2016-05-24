@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script src="Croppie-2.1.0/croppie.js"></script>
+	<link rel="stylesheet" type="text/css" href="Croppie-2.1.0/croppie.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		div.cropper {
+			width: 320px;
+			height: 240px;
+			overflow: hidden;
+			position: relative;
+		}
+		.croppie-container {
+			padding: 0;
+		}
+		.croppie-container .cr-viewport {
+			border: 0;
+		}
+		body[data-simply-edit] [data-simply-cropper]:before {
+			position: absolute;
+			bottom: 5px;
+			left: 50%;
+			margin-left: -20px;
+			width: 40px;
+			height: 40px;
+			content: "\f125";
+			font-family: FontAwesome;
+			z-index: 10;
+			border-radius: 0px;
+			background-color: white;
+			border: 2px solid #999;
+			border-radius: 40px;
+			text-align: center;
+			vertical-align: middle;
+			line-height: 40px;
+		}
+			
+		body:not([data-simply-edit]) [data-simply-cropper] img {
+			z-index: 2;
+		}
+		.cropper > img {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div data-simply-cropper data-simply-field="image" class="cropper">
+		<img src="cat.jpg">
+	</div>
+        <script src="/simply-edit/js/simply-edit.js"
+                data-api-key="muze"
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+        ></script>
+	<script>
+		(function() {
+			var cropperGetter = function(field) {
+				var attr;
+				var attributes = {};
+				if (field.cropper) {
+					attributes.points = field.cropper.get().points;
+					attributes.zoom = field.cropper.get().zoom;
+					attributes.url = field.cropper.data.url;
+				}
+				if (field.querySelector('img')) {
+					attributes.alt = field.querySelector('img').getAttribute('alt');
+					attributes.title = field.querySelector('img').getAttribute('title');
+				}
+				return attributes;
+			};
+
+			var cropperSetter = function(field, data) {
+				var width = field.offsetWidth;
+				var height = field.offsetHeight;
+
+				var cropper = new Croppie(field, {
+					viewport: { width: width, height: height },
+					boundary: { width: width, height: height },
+					showZoomer: false,
+					update : function() {
+						if (editor.toolbars['simply-cropper']) {
+							editor.toolbars['simply-cropper'].update(document.getElementById("simply-cropper"));
+						}
+					}
+				});
+				field.cropper = cropper;
+				var url = data.url;
+				if (!url) {
+					url = field.querySelector("img").getAttribute("src");
+				}
+				var points = data.points;
+				
+				field.removeChild(field.querySelector("img"));
+
+				var sizes = editor.responsiveImages.sizes(url);
+				if (sizes["640w"]) {
+					url = sizes["640w"];
+				}
+
+				cropper.bind({
+					url: url,
+					points: points
+				});
+
+				if (data.alt) {
+					cropper.elements.img.setAttribute("alt", data.alt);
+				}
+				if (data.title) {
+					cropper.elements.img.setAttribute("title", data.title);
+				}
+			};
+
+			var cropperEditable = function(field) {
+				field.setAttribute("data-simply-selectable", true);
+				//if (!field.cropper) {
+				//	cropperSetter(field, {});
+				//}
+			};
+
+			editor.field.registerType("[data-simply-cropper]", cropperGetter, cropperSetter, cropperEditable);
+			editor.loadToolbar("cropper.toolbar.html");
+		})();
+	</script>
+</body>
+</html>
