@@ -342,6 +342,12 @@ hope.register( 'hope.editor', function() {
 		if (caretElm) {
 			selection = this.setCaretOffset(caretElm);
 		}
+		// remove all other caret attributes from the other elements;
+		var otherCarets = document.querySelectorAll('[data-hope-caret]');
+		for (var i=0; i<otherCarets.length; i++) {
+			otherCarets[i].removeAttribute("data-hope-caret");
+		}
+
 		if (selection) {
 			var htmlSelection = window.getSelection();
 			htmlSelection.removeAllRanges();
