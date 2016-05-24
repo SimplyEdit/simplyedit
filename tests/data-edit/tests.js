@@ -425,7 +425,6 @@ QUnit.module("hope editor behaviour");
 
 	QUnit.test("render spaces as spaces, not nbsp", function(assert) {
 		var testContent = document.querySelector("#testContent");
-//		testContent.innerHTML = "<ul>\n  <li>\n  <h2>Hello</h2>\n  <div>\n      World\n  </div>\n  </li>\n</ul>";
 		testContent.innerHTML = "<span>a  b</span>";
 		testContent.hopeEditor.parseHTML();
 		testContent.hopeEditor.update();
@@ -436,9 +435,6 @@ QUnit.module("hope editor behaviour");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<h1>Hello world</h1>";
 		setCaretPosition(testContent.querySelector("h1"), 5);
-
-		//editor.plugins.htmlsource.currentField = testContent;
-		//editor.plugins.htmlsource.currentSel = vdSelectionState.get().cloneRange();
 		editor.actions['simply-insert-source']();
 		document.getElementById('insertHTMLSource').value = "<ul><li>1</li><li>2</li></ul>";
 		editor.actions['simply-htmlsource-insert']();
