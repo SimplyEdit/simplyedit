@@ -56,7 +56,7 @@
 		*[data-simply-list]:not(.simply-empty):before {
 			margin-left: 0px;
 		}
-		*[data-simply-list]:not(.simply-empty):not[data-simply-list-icon]) {
+		*[data-simply-list]:not(.simply-empty):not([data-simply-list-icon]):before {
 			content: "\f1b3"; /* cubes */
 		}
 		*[data-simply-list][data-simply-list-icon]:not(.simply-empty):not([data-simply-list-icon|="fa"]):before {
