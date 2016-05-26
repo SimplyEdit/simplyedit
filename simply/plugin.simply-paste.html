@@ -9,6 +9,32 @@
 		}
 	};
 
+	var fontListener = function(ev) {
+		if (ev.target.tagName=='FONT') {
+			editor.node.unwrap(ev.target);
+			var sel = window.getSelection();
+			var range = sel.getRangeAt(0);
+			sel.removeAllRanges();
+			sel.addRange(range);
+
+			// If a browser is bold enough to ask us to insert a font tag, that must mean they are up to no good. No more tags allowed!
+			event.target.ownerDocument.addEventListener("DOMNodeInserted", noTagsAllowedListener);
+			window.setTimeout(function() {
+				document.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
+			}, 200);
+		}
+	};
+
+	var noTagsAllowedListener = function(ev) {
+		if (ev.target.tagName) {
+			editor.node.unwrap(ev.target);
+			var sel = window.getSelection();
+			var range = sel.getRangeAt(0);
+			sel.removeAllRanges();
+			sel.addRange(range);
+		}
+	};
+
 	var divListener = function(ev) {
 		if (ev.target.tagName=='DIV') {
 			var sel = window.getSelection();
@@ -94,6 +120,10 @@
 	editor.addToolbar({
 		name : 'simply-paste-handler',
 		init : function() {
+			// Chrome will remember the styling from an element that was removed and helpfully insert it back into the HTML.
+			// We never want that.
+			document.addEventListener("DOMNodeInserted", fontListener);
+
 			document.addEventListener("keydown", function(event) {
 				if (
 					editor.toolbar.getSectionEl(event.target) ||
@@ -123,6 +153,7 @@
 
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
+				event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
 			});
 
 			document.addEventListener("paste", function(event) {
@@ -150,16 +181,20 @@
 				}
 
 				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+				event.target.ownerDocument.addEventListener("DOMNodeInserted", fontListener);
+
 				if (pastedHtml) {
 					event.preventDefault();
 					event.target.ownerDocument.execCommand("insertHtml", false, pastedHtml);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
 					return false;
 				}
 				if (pastedText) {
 					event.preventDefault();
 					event.target.ownerDocument.execCommand("insertText", false, pastedText);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
 				}
 			});
 		}
