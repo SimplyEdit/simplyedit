@@ -1739,6 +1739,8 @@
 					}
 					return callback(result);
 				}
+
+				url += "?t=" + (new Date().getTime());
 				var iframe = document.createElement("IFRAME");
 				iframe.src = url;
 				iframe.style.opacity = 0;

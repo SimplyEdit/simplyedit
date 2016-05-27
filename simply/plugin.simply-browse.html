@@ -486,8 +486,15 @@
 						}(newButton, url));
 					} else {
 						(function(targetButton, url, name) {
-							editor.storage.file.save(subpath + files[i].name, files[i], function() {
-								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(image);
+							editor.storage.file.save(subpath + files[i].name, files[i], function(file) {
+								if (typeof file  === "undefined") {
+									file = {
+										name : name,
+										url : url
+									}
+								};
+
+								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(file);
 								var tempNode = document.createElement("div");
 								tempNode.innerHTML = buttonHtml;
 								targetButton.innerHTML = tempNode.querySelector("button, div.simply-button").innerHTML;
