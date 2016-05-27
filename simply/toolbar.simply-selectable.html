@@ -19,6 +19,9 @@
 		};
 
 		var handleItemSelect = function(event) {
+			if (!this.clickStart) {
+				return;
+			}
 			var deltaX = Math.abs(event.clientX - this.clickStart.x);
 			var deltaY = Math.abs(event.clientY - this.clickStart.y);
 			var deltaTime = Math.abs((new Date()).getTime() - this.clickStart.time);

@@ -658,6 +658,9 @@
 						field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 							field.hopeEditor.needsUpdate = true;
 						});
+						field.addEventListener("mousedown", function(evt) {
+							evt.stopPropagation(); // this will prevent triggering list sorting when using tap-hold on text;
+						});
 					}
 				},
 				"i.fa" : {
@@ -757,6 +760,9 @@
 				field.hopeEditor.field = field;
 				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 					field.hopeEditor.needsUpdate = true;
+				});
+				field.addEventListener("mousedown", function(evt) {
+					evt.stopPropagation(); // this will prevent triggering list sorting when using tap-hold on text;
 				});
 			}
 		},
