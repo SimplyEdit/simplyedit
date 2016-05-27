@@ -146,6 +146,7 @@ window['Slip'] = (function(){
 		this.onMouseUp = this.onMouseUp.bind(this);
 		this.onMouseLeave = this.onMouseLeave.bind(this);
 		this.onSelection = this.onSelection.bind(this);
+		this.onScroll = this.onScroll.bind(this);
 
 		this.setState(this.states.idle);
 		this.attach(container);
@@ -433,6 +434,7 @@ window['Slip'] = (function(){
 					if (!variationInY) {
 						move.y = 0;
 					}
+
 					var targetRects = this.target.node.getBoundingClientRect();
 					this.target.node.focus();
 //					this.target.node.style[transformPrefix] = 'translate(0,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
@@ -690,6 +692,8 @@ window['Slip'] = (function(){
 				window.addEventListener('mousemove', this.onMouseMove, true);
 				window.addEventListener('mouseup', this.onMouseUp, true);
 				window.addEventListener('blur', this.cancel, false);
+				window.addEventListener("scroll", this.onScroll);
+
 			}
 		},
 
@@ -700,6 +704,7 @@ window['Slip'] = (function(){
 				window.removeEventListener('mousemove', this.onMouseMove, true);
 				window.removeEventListener('mouseup', this.onMouseUp, true);
 				window.removeEventListener('blur', this.cancel, false);
+				window.removeEventListener("scroll", this.onScroll);
 			}
 		},
 
@@ -785,6 +790,11 @@ window['Slip'] = (function(){
 				self.selectionChanged = false;
 			}, 5);
 			this.setState(this.states.undecided);
+			var scrollable = this.target.scrollContainer || document.body;
+			this.scrollTopStart = scrollable.scrollTop;
+			this.scrollLeftStart = scrollable.scrollLeft;
+			this.scrollTopDelta = 0;
+			this.scrollLeftDelta = 0;
 		},
 
 		updatePosition: function(e, pos) {
@@ -822,6 +832,15 @@ window['Slip'] = (function(){
 			if (this.latestPosition.time - this.previousPosition.time > 100) {
 				this.previousPosition = this.latestPosition;
 			}
+		},
+
+		onScroll : function(e) {
+			var scrollable = this.target.scrollContainer || document.body;
+
+			this.scrollTopDelta = this.scrollTopStart - scrollable.scrollTop;
+			this.scrollLeftDelta = this.scrollLeftStart - scrollable.scrollLeft;
+
+			this.updatePosition(e, this.latestPosition);
 		},
 
 		onMouseMove: function(e) {
@@ -870,8 +889,8 @@ window['Slip'] = (function(){
 			}
 
 			return {
-				x:(this.latestPosition.x - this.startPosition.x)/scale,
-				y:(this.latestPosition.y - this.startPosition.y)/scale,
+				x:(this.latestPosition.x - this.startPosition.x - this.scrollLeftDelta)/scale,
+				y:(this.latestPosition.y - this.startPosition.y - this.scrollTopDelta)/scale,
 			};
 		},
 
