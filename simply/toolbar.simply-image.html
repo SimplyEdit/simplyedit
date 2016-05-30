@@ -101,7 +101,7 @@
 			} else if (sel.focusNode.nextSibling && sel.focusNode.nextSibling.nodeType == 1 && sel.focusNode.nextSibling.tagName.toLowerCase() == "img") {
 				image = sel.focusNode.nextSibling;
 				found = true;
-			} else if (sel.focusNode.childNodes.length && sel.focusNode.childNodes[0].nodeType == 1 && sel.focusNode.childNodes.tagName.toLowerCase() == "img") {
+			} else if (sel.focusNode.childNodes.length && sel.focusNode.childNodes[0].nodeType == 1 && sel.focusNode.childNodes[0].tagName.toLowerCase() == "img") {
 				image = sel.focusNode.childNodes[0];
 				found = true;
 			} else if (sel.focusNode.parentNode.nextSibling && sel.focusNode.parentNode.nextSibling.nodeType == 1 && sel.focusNode.parentNode.nextSibling.tagName.toLowerCase() == "img") {
