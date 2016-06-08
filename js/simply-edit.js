@@ -1936,27 +1936,39 @@
 	editor.storageConnectors = storage;
 	editor.settings = document.querySelector("[data-simply-settings]") ? window[document.querySelector("[data-simply-settings]").getAttribute("data-simply-settings")] : {};
 
+	var defaultToolbars = [
+		editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
+		editor.baseURL + "simply/toolbar.simply-text.html",
+		editor.baseURL + "simply/toolbar.simply-image.html",
+		editor.baseURL + "simply/plugin.simply-browse.html",
+		editor.baseURL + "simply/toolbar.simply-iframe.html",
+		editor.baseURL + "simply/toolbar.simply-selectable.html",
+		editor.baseURL + "simply/toolbar.simply-list.html",
+		editor.baseURL + "simply/toolbar.simply-icon.html",
+		editor.baseURL + "simply/plugin.simply-template.html",
+		editor.baseURL + "simply/plugin.simply-save.html",
+		editor.baseURL + "simply/plugin.simply-meta.html",
+		editor.baseURL + "simply/plugin.simply-htmlsource.html",
+		editor.baseURL + "simply/plugin.simply-symbol.html",
+		editor.baseURL + "simply/plugin.simply-paste.html",
+		editor.baseURL + "simply/plugin.simply-undo-redo.html",
+		editor.baseURL + "simply/plugin.simply-keyboard.html",
+		editor.baseURL + "simply/plugin.simply-about.html"
+	];
+
+	if (typeof editor.settings.plugins === 'object') {
+		for(var i=0; i<editor.settings.plugins.length; i++) {
+			var toolbarUrl = editor.settings.plugins[i];
+			if (toolbarUrl.indexOf("//") < 0) {
+				toolbarUrl = editor.baseURL + "simply/" + toolbarUrl;
+			}
+			defaultToolbars.push(toolbarUrl);
+		}
+	}
+
 	editor.init({
 		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
-		toolbars : [
-			editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
-			editor.baseURL + "simply/toolbar.simply-text.html",
-			editor.baseURL + "simply/toolbar.simply-image.html",
-			editor.baseURL + "simply/plugin.simply-browse.html",
-			editor.baseURL + "simply/toolbar.simply-iframe.html",
-			editor.baseURL + "simply/toolbar.simply-selectable.html",
-			editor.baseURL + "simply/toolbar.simply-list.html",
-			editor.baseURL + "simply/toolbar.simply-icon.html",
-			editor.baseURL + "simply/plugin.simply-template.html",
-			editor.baseURL + "simply/plugin.simply-save.html",
-			editor.baseURL + "simply/plugin.simply-meta.html",
-			editor.baseURL + "simply/plugin.simply-htmlsource.html",
-			editor.baseURL + "simply/plugin.simply-symbol.html",
-			editor.baseURL + "simply/plugin.simply-paste.html",
-			editor.baseURL + "simply/plugin.simply-undo-redo.html",
-			editor.baseURL + "simply/plugin.simply-keyboard.html",
-			editor.baseURL + "simply/plugin.simply-about.html"
-		],
+		toolbars : defaultToolbars,
 		profile : 'beta'
 	});
 }());
