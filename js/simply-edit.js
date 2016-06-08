@@ -1135,6 +1135,12 @@
 					editor.responsiveImages.initImage(images[i]);
 				}
 			},
+			errorHandler : function(evt) {
+				var src = this.getAttribute("data-simply-src");
+				this.removeAttribute("srcset");
+				this.removeAttribute("sizes");
+				this.setAttribute("src", src);
+			},
 			initImage : function(imgEl) {
 				var width = window.innerWidth;
 
@@ -1156,11 +1162,15 @@
 				imgEl.removeAttribute("sizes");
 				imgEl.removeAttribute("src");
 
+				imgEl.removeEventListener("error", editor.responsiveImages.errorHandler);
+				imgEl.addEventListener("error", editor.responsiveImages.errorHandler);
+
 				var sizeRatio = parseInt(Math.ceil(100 * imgEl.width / width));
 
 				if (sizeRatio > 0) {
 					imgEl.setAttribute("sizes", sizeRatio + "vw");
 				}
+
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
 			},
@@ -1237,12 +1247,31 @@
 				if (editor.responsiveImages) {
 					if (
 						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive &&
-						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+						editor.settings['simply-image'].responsive
 					) {
-						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+							editor.responsiveImages.sizes = (function(sizes) {
+								return function(src) {
+									var result = {};
+									var info = src.split(".");
+									var extension = info.pop().toLowerCase();
+									if (extension === "jpg" || extension === "png") {
+										for (var i=0; i<sizes.length; i++) {
+											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+										}
+									}
+									return result;
+								};
+							}(editor.settings['simply-image'].responsive.sizes));
+						}
 					} else {
 						editor.responsiveImages.sizes = function(src) {
+							if (!(src.match(/\.(jpg|png)$/i))) {
+								return {};
+							}
+
 							return {
 							//	"1200w" : src + "?size=1200",
 							//	"800w" : src + "?size=800",
@@ -1270,7 +1299,7 @@
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
-						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+						if ((http.status > 199) && (http.status < 300) && http.responseText.length) { // accept any 2xx http status as 'OK';
 							callback(http.responseText.replace(/data-vedor/g, "data-simply"));
 						} else {
 							console.log("Could not load data, starting empty.");
@@ -1355,10 +1384,25 @@
 				if (editor.responsiveImages) {
 					if (
 						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive &&
-						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+						editor.settings['simply-image'].responsive
 					) {
-						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+							editor.responsiveImages.sizes = (function(sizes) {
+								return function(src) {
+									var result = {};
+									var info = src.split(".");
+									var extension = info.pop().toLowerCase();
+									if (extension === "jpg" || extension === "png") {
+										for (var i=0; i<sizes.length; i++) {
+											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+										}
+									}
+									return result;
+								};
+							}(editor.settings['simply-image'].responsive.sizes));
+						}
 					}
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
@@ -1508,10 +1552,25 @@
 				if (editor.responsiveImages) {
 					if (
 						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive &&
-						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+						editor.settings['simply-image'].responsive
 					) {
-						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+							editor.responsiveImages.sizes = (function(sizes) {
+								return function(src) {
+									var result = {};
+									var info = src.split(".");
+									var extension = info.pop().toLowerCase();
+									if (extension === "jpg" || extension === "png") {
+										for (var i=0; i<sizes.length; i++) {
+											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+										}
+									}
+									return result;
+								};
+							}(editor.settings['simply-image'].responsive.sizes));
+						}
 					}
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
