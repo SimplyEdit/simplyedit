@@ -713,7 +713,6 @@
 				};
 			},
 			set : function(field, data) {
-				window.setTimeout(editor.responsiveImages.resizeHandler, 100); // let responsive images resize after setting data;
 				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
@@ -1142,7 +1141,12 @@
 				this.setAttribute("src", src);
 			},
 			initImage : function(imgEl) {
-				var width = window.innerWidth;
+				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
+					window.setTimeout(function() {
+						editor.responsiveImages.initImage(imgEl);
+					}, 50);
+					return;
+				}
 
 				imageSrc = imgEl.getAttribute("data-simply-src");
 				if (!imageSrc) {
@@ -1165,23 +1169,53 @@
 				imgEl.removeEventListener("error", editor.responsiveImages.errorHandler);
 				imgEl.addEventListener("error", editor.responsiveImages.errorHandler);
 
-				var sizeRatio = parseInt(Math.ceil(100 * imgEl.width / width));
-
+				var sizeRatio = editor.responsiveImages.getSizeRatio(imgEl);
 				if (sizeRatio > 0) {
 					imgEl.setAttribute("sizes", sizeRatio + "vw");
 				}
-
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
+			},
+			getSizeRatio : function(imgEl) {
+				var imageWidth = imgEl.width;
+				if (imgEl.simplyComputedWidth || imageWidth === 0) {
+					imgEl.simplyComputedWidth = true;
+					var computed = getComputedStyle(imgEl);
+
+					if (computed.maxWidth) {
+						if (computed.maxWidth.indexOf("%") != -1) {
+							imageWidth = parseFloat(computed.maxWidth) / 100.0;
+							var offsetParent = imgEl.offsetParent ? imgEl.offsetParent : imgEl.parentNode;
+							imageWidth = offsetParent.offsetWidth * imageWidth;
+						}
+						if (computed.maxWidth.indexOf("px") != -1) {
+							imageWidth = parseInt(computed.maxWidth);
+						}
+					}
+				}
+				var sizeRatio = parseInt(Math.ceil(100 * imageWidth / window.innerWidth));
+				return sizeRatio;
 			},
 			resizeHandler : function() {
 				var images = document.querySelectorAll("img[data-simply-src][sizes]");
 				for (var i=0; i<images.length; i++) {
-					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / window.innerWidth));
+					images[i].removeAttribute("sizes");
+					var sizeRatio = editor.responsiveImages.getSizeRatio(images[i]);
 					if (sizeRatio > 0) {
+						images[i].removeAttribute("sizes");
 						images[i].setAttribute("sizes", sizeRatio + "vw");
 					}
 				}
+			},
+			isInDocumentFragment : function(el) {
+				var parent = el.parentNode;
+				while (parent) {
+					if (parent.nodeType === document.DOCUMENT_FRAGMENT_NODE) {
+						return true;
+					}
+					parent = parent.parentNode;
+				}
+				return false;
 			}
 		}
 	};
@@ -1273,8 +1307,8 @@
 							}
 
 							return {
-							//	"1200w" : src + "?size=1200",
-							//	"800w" : src + "?size=800",
+								"1200w" : src + "?size=1200",
+								"800w" : src + "?size=800",
 								"640w" : src + "?size=640",
 								"480w" : src + "?size=480",
 								"320w" : src + "?size=320",
