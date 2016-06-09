@@ -1,0 +1,200 @@
+<script>
+	(function() {
+		var sizes = [];
+		if (typeof editor.settings['simply-scaler'] !== "undefined") {
+			if (typeof editor.settings['simply-scaler'].sizes !== undefined) {
+				sizes = editor.settings['simply-scaler'].sizes;
+			}
+		} else {
+			if (
+				editor.responsiveImages && 
+				typeof editor.responsiveImages.sizes === 'function'
+			) {
+				var responsiveSizes = editor.responsiveImages.sizes("test.jpg");
+				for (var i in responsiveSizes) {
+					sizes.push(i.replace(/w$/, ''));
+				}
+			}
+		}
+
+		if (sizes.length === 0) {
+			return;
+		}
+
+		var normalList = editor.storage.list;
+		var sizesRegexp = new RegExp("\\-simply-scaled-(" + sizes.join("|") + ")\\.(jpg|png)$", "i");
+
+		var isSizedImageUrl = function(url) {
+			if (url.match(sizesRegexp)) {
+				return true;
+			}
+			return false;
+		};
+
+		editor.storage.list = function(url, callback) {
+			if (url.indexOf(editor.storage.imagesEndpoint) !== 0) {
+				return normalList(url, callback);
+			} else {
+				normalList(url, function(result) {
+					var images = [];
+
+					for (var i=0; i < result.images.length; i++) {
+						// scrub the resizes images from the list;
+						if (!isSizedImageUrl(result.images[i].url)) {
+							images.push(result.images[i])
+						}
+					}
+					result.images = images;
+					callback(result);
+				});
+			};
+		};
+
+		var normalDelete = editor.storage.file.delete;
+		editor.storage.file.delete = function(path, callback) {
+			if (editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0) {
+				return normalDelete(path, callback);
+			} else {
+				normalDelete(path, function() {
+					var scaledUrls = editor.responsiveImages.sizes(path);
+					for (var i in scaledUrls) {
+						normalDelete(scaledUrls[i], function(){});
+					}
+				});
+				callback();
+			}
+		}
+
+		var normalSave = editor.storage.file.save;
+		editor.storage.file.save = function(path, data, callback) {
+			if (editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0) {
+				return normalSave(path, data, callback);
+			}
+
+			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
+			var dataURItoBlob = function(dataURI) {
+				// convert base64/URLEncoded data component to raw binary data held in a string
+				var byteString;
+
+				if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+					byteString = atob(dataURI.split(',')[1]);
+				} else {
+					byteString = unescape(dataURI.split(',')[1]);
+				}
+
+				// separate out the mime component
+				var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+				// write the bytes of the string to a typed array
+				var ia = new Uint8Array(byteString.length);
+
+				for (var i = 0; i < byteString.length; i++) {
+					ia[i] = byteString.charCodeAt(i);
+				}
+				return new Blob([ia], {
+					type: mimeString
+				});
+			}
+
+			var reader  = new FileReader();
+			reader.filename = data.name;
+			reader.onload = function (evt) {
+				var mime = this.result.split(',')[0].split(':')[1].split(';')[0];
+				if (mime !== "image/jpeg" && mime !== "image/png") {
+					return;
+				}
+
+				var canvas = document.createElement("canvas");
+
+				var targetSizes = sizes;
+				targetSizes.sort(function(a,b) {
+					return a < b; // Sort sizes from large to small;
+				});
+
+				var img = new Image();
+				img.onload = function() {
+					var size = targetSizes[0];
+					targetsize = {
+						width: size,
+						height: (img.height * size / img.width)
+					};
+
+					var ctx = canvas.getContext('2d');
+
+					// Init the canvas with full size image
+					ctx.canvas.width = img.width;
+					ctx.canvas.height = img.height;
+					ctx.drawImage(img, 0, 0, img.width, img.height);
+
+					// We'll step down the size by half each time; This makes for better quality on the scaled down images.
+					// http://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality
+					var stepsize = {
+						width: img.width * 0.5,
+						height: img.height * 0.5
+					}
+
+					var mime = this.src.split(',')[0].split(':')[1].split(';')[0];
+					var extension = false;
+					switch (mime) {
+						case "image/jpeg":
+							extension = ".jpg";
+						break;
+						case "image/png":
+							extension = ".png";
+						break;
+					}
+
+					// If the next step is smaller than our target, move to our target size. Otherwise, step down again.
+					if (targetsize.width < stepsize.width) {
+						ctx.canvas.width = stepsize.width;
+						ctx.canvas.height = stepsize.height;
+						ctx.drawImage(img, 0, 0, stepsize.width, stepsize.height);
+					} else {
+						// Final draw, set the size of the image and the canvas to the target size;
+						ctx.canvas.width = targetsize.width;
+						ctx.canvas.height = targetsize.height;
+						ctx.drawImage(img, 0, 0, targetsize.width, targetsize.height);
+
+						if (extension) {
+							var dataBlob = dataURItoBlob(canvas.toDataURL(mime), 1);
+							var url = editor.responsiveImages.sizes(subpath + reader.filename)[size + "w"];
+							if (url) {
+								normalSave(url, dataBlob, function(image) {
+									reader.progressBar.value += 25; // fixme: stepsize;
+								});
+							}
+						}
+						targetSizes.shift();
+					};
+					if (targetSizes.length) {
+						img.src = canvas.toDataURL(mime, 1);
+					} else {
+						reader.callback(reader.image);
+					}
+				}
+				img.src = reader.result;
+			};
+
+			(function(reader, file) {
+				normalSave(subpath + file.name, file, function(image) {
+					reader.readAsDataURL(file);
+					if (typeof image === "undefined") {
+						image = {
+							src : editor.plugins.browse.currentPath + file.name.replace(/[^A-Za-z0-9_\.-]/, "-")
+						}
+					};
+					var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
+					var tempNode = document.createElement("div");
+					tempNode.innerHTML = buttonHtml;
+					var progress = document.querySelector("progress[data-simply-progress='" + subpath + file.name + "']");
+					var targetButton = progress.parentNode;
+					targetButton.innerHTML = "Scaling<br><progress value=0 max=100></progress><br>" + file.name;
+					reader.progressBar = targetButton.querySelector("progress");
+					reader.buttonHtml = tempNode.querySelector("button, div.simply-button").innerHTML;
+					reader.callback = callback;
+					reader.image = image;
+				});
+			}(reader, data));
+		};
+	}());
+</script>

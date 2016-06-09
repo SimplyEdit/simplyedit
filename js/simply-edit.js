@@ -713,7 +713,6 @@
 				};
 			},
 			set : function(field, data) {
-				window.setTimeout(editor.responsiveImages.resizeHandler, 100); // let responsive images resize after setting data;
 				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
@@ -1135,8 +1134,19 @@
 					editor.responsiveImages.initImage(images[i]);
 				}
 			},
+			errorHandler : function(evt) {
+				var src = this.getAttribute("data-simply-src");
+				this.removeAttribute("srcset");
+				this.removeAttribute("sizes");
+				this.setAttribute("src", src);
+			},
 			initImage : function(imgEl) {
-				var width = window.innerWidth;
+				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
+					window.setTimeout(function() {
+						editor.responsiveImages.initImage(imgEl);
+					}, 50);
+					return;
+				}
 
 				imageSrc = imgEl.getAttribute("data-simply-src");
 				if (!imageSrc) {
@@ -1156,22 +1166,54 @@
 				imgEl.removeAttribute("sizes");
 				imgEl.removeAttribute("src");
 
-				var sizeRatio = parseInt(Math.ceil(100 * imgEl.width / width));
+				imgEl.removeEventListener("error", editor.responsiveImages.errorHandler);
+				imgEl.addEventListener("error", editor.responsiveImages.errorHandler);
 
+				var sizeRatio = editor.responsiveImages.getSizeRatio(imgEl);
 				if (sizeRatio > 0) {
 					imgEl.setAttribute("sizes", sizeRatio + "vw");
 				}
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
 			},
+			getSizeRatio : function(imgEl) {
+				var imageWidth = imgEl.width;
+				if (imgEl.simplyComputedWidth || imageWidth === 0) {
+					imgEl.simplyComputedWidth = true;
+					var computed = getComputedStyle(imgEl);
+
+					if (computed.maxWidth) {
+						if (computed.maxWidth.indexOf("%") != -1) {
+							imageWidth = parseFloat(computed.maxWidth) / 100.0;
+							var offsetParent = imgEl.offsetParent ? imgEl.offsetParent : imgEl.parentNode;
+							imageWidth = offsetParent.offsetWidth * imageWidth;
+						}
+						if (computed.maxWidth.indexOf("px") != -1) {
+							imageWidth = parseInt(computed.maxWidth);
+						}
+					}
+				}
+				var sizeRatio = parseInt(Math.ceil(100 * imageWidth / window.innerWidth));
+				return sizeRatio;
+			},
 			resizeHandler : function() {
 				var images = document.querySelectorAll("img[data-simply-src][sizes]");
 				for (var i=0; i<images.length; i++) {
-					var sizeRatio = parseInt(Math.ceil(100 * images[i].width / window.innerWidth));
+					var sizeRatio = editor.responsiveImages.getSizeRatio(images[i]);
 					if (sizeRatio > 0) {
 						images[i].setAttribute("sizes", sizeRatio + "vw");
 					}
 				}
+			},
+			isInDocumentFragment : function(el) {
+				var parent = el.parentNode;
+				while (parent) {
+					if (parent.nodeType === document.DOCUMENT_FRAGMENT_NODE) {
+						return true;
+					}
+					parent = parent.parentNode;
+				}
+				return false;
 			}
 		}
 	};
@@ -1237,15 +1279,34 @@
 				if (editor.responsiveImages) {
 					if (
 						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive &&
-						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+						editor.settings['simply-image'].responsive
 					) {
-						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+							editor.responsiveImages.sizes = (function(sizes) {
+								return function(src) {
+									var result = {};
+									var info = src.split(".");
+									var extension = info.pop().toLowerCase();
+									if (extension === "jpg" || extension === "png") {
+										for (var i=0; i<sizes.length; i++) {
+											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+										}
+									}
+									return result;
+								};
+							}(editor.settings['simply-image'].responsive.sizes));
+						}
 					} else {
 						editor.responsiveImages.sizes = function(src) {
+							if (!(src.match(/\.(jpg|png)$/i))) {
+								return {};
+							}
+
 							return {
-							//	"1200w" : src + "?size=1200",
-							//	"800w" : src + "?size=800",
+								"1200w" : src + "?size=1200",
+								"800w" : src + "?size=800",
 								"640w" : src + "?size=640",
 								"480w" : src + "?size=480",
 								"320w" : src + "?size=320",
@@ -1270,7 +1331,7 @@
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
-						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+						if ((http.status > 199) && (http.status < 300) && http.responseText.length) { // accept any 2xx http status as 'OK';
 							callback(http.responseText.replace(/data-vedor/g, "data-simply"));
 						} else {
 							console.log("Could not load data, starting empty.");
@@ -1355,10 +1416,25 @@
 				if (editor.responsiveImages) {
 					if (
 						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive &&
-						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+						editor.settings['simply-image'].responsive
 					) {
-						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+							editor.responsiveImages.sizes = (function(sizes) {
+								return function(src) {
+									var result = {};
+									var info = src.split(".");
+									var extension = info.pop().toLowerCase();
+									if (extension === "jpg" || extension === "png") {
+										for (var i=0; i<sizes.length; i++) {
+											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+										}
+									}
+									return result;
+								};
+							}(editor.settings['simply-image'].responsive.sizes));
+						}
 					}
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
@@ -1508,10 +1584,25 @@
 				if (editor.responsiveImages) {
 					if (
 						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive &&
-						(typeof editor.settings['simply-image'].responsive.sizes === "function")
+						editor.settings['simply-image'].responsive
 					) {
-						editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+							editor.responsiveImages.sizes = (function(sizes) {
+								return function(src) {
+									var result = {};
+									var info = src.split(".");
+									var extension = info.pop().toLowerCase();
+									if (extension === "jpg" || extension === "png") {
+										for (var i=0; i<sizes.length; i++) {
+											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+										}
+									}
+									return result;
+								};
+							}(editor.settings['simply-image'].responsive.sizes));
+						}
 					}
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
@@ -1877,27 +1968,39 @@
 	editor.storageConnectors = storage;
 	editor.settings = document.querySelector("[data-simply-settings]") ? window[document.querySelector("[data-simply-settings]").getAttribute("data-simply-settings")] : {};
 
+	var defaultToolbars = [
+		editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
+		editor.baseURL + "simply/toolbar.simply-text.html",
+		editor.baseURL + "simply/toolbar.simply-image.html",
+		editor.baseURL + "simply/plugin.simply-browse.html",
+		editor.baseURL + "simply/toolbar.simply-iframe.html",
+		editor.baseURL + "simply/toolbar.simply-selectable.html",
+		editor.baseURL + "simply/toolbar.simply-list.html",
+		editor.baseURL + "simply/toolbar.simply-icon.html",
+		editor.baseURL + "simply/plugin.simply-template.html",
+		editor.baseURL + "simply/plugin.simply-save.html",
+		editor.baseURL + "simply/plugin.simply-meta.html",
+		editor.baseURL + "simply/plugin.simply-htmlsource.html",
+		editor.baseURL + "simply/plugin.simply-symbol.html",
+		editor.baseURL + "simply/plugin.simply-paste.html",
+		editor.baseURL + "simply/plugin.simply-undo-redo.html",
+		editor.baseURL + "simply/plugin.simply-keyboard.html",
+		editor.baseURL + "simply/plugin.simply-about.html"
+	];
+
+	if (typeof editor.settings.plugins === 'object') {
+		for(var i=0; i<editor.settings.plugins.length; i++) {
+			var toolbarUrl = editor.settings.plugins[i];
+			if (toolbarUrl.indexOf("//") < 0) {
+				toolbarUrl = editor.baseURL + "simply/" + toolbarUrl;
+			}
+			defaultToolbars.push(toolbarUrl);
+		}
+	}
+
 	editor.init({
 		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
-		toolbars : [
-			editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
-			editor.baseURL + "simply/toolbar.simply-text.html",
-			editor.baseURL + "simply/toolbar.simply-image.html",
-			editor.baseURL + "simply/plugin.simply-browse.html",
-			editor.baseURL + "simply/toolbar.simply-iframe.html",
-			editor.baseURL + "simply/toolbar.simply-selectable.html",
-			editor.baseURL + "simply/toolbar.simply-list.html",
-			editor.baseURL + "simply/toolbar.simply-icon.html",
-			editor.baseURL + "simply/plugin.simply-template.html",
-			editor.baseURL + "simply/plugin.simply-save.html",
-			editor.baseURL + "simply/plugin.simply-meta.html",
-			editor.baseURL + "simply/plugin.simply-htmlsource.html",
-			editor.baseURL + "simply/plugin.simply-symbol.html",
-			editor.baseURL + "simply/plugin.simply-paste.html",
-			editor.baseURL + "simply/plugin.simply-undo-redo.html",
-			editor.baseURL + "simply/plugin.simply-keyboard.html",
-			editor.baseURL + "simply/plugin.simply-about.html"
-		],
+		toolbars : defaultToolbars,
 		profile : 'beta'
 	});
 }());
