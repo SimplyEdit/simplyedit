@@ -126,7 +126,8 @@
 					ctx.canvas.height = img.height;
 					ctx.drawImage(img, 0, 0, img.width, img.height);
 
-					// We'll step down the size by half each time;
+					// We'll step down the size by half each time; This makes for better quality on the scaled down images.
+					// http://stackoverflow.com/questions/18922880/html5-canvas-resize-downscale-image-high-quality
 					var stepsize = {
 						width: img.width * 0.5,
 						height: img.height * 0.5
