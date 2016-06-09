@@ -903,6 +903,15 @@
 		selectionchange.start(document); // onselectionchange event for Firefox
 
 		muze.event.attach( document, 'selectionchange', function() {
+			var field = editor.node.getEditableField();
+
+			var hopeEditor = field.hopeEditor;
+			if (hopeEditor) {
+				hopeEditor.selection.updateRange();
+				var range = hopeEditor.selection.getRange();
+				hopeEditor.currentRange = range;
+			}
+
 			if (editor.context.touching) {
 				editor.context.touching = false; // force update when selection changed;
 				editor.context.update();
