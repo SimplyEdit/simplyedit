@@ -1199,10 +1199,8 @@
 			resizeHandler : function() {
 				var images = document.querySelectorAll("img[data-simply-src][sizes]");
 				for (var i=0; i<images.length; i++) {
-					images[i].removeAttribute("sizes");
 					var sizeRatio = editor.responsiveImages.getSizeRatio(images[i]);
 					if (sizeRatio > 0) {
-						images[i].removeAttribute("sizes");
 						images[i].setAttribute("sizes", sizeRatio + "vw");
 					}
 				}
