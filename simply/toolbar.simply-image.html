@@ -91,6 +91,9 @@
 			return editor.plugins.image.placeholderData;
 		},
 		reselect : function() {
+			var field = editor.node.getEditableField();
+			var hopeEditor = field.hopeEditor;
+
 			hopeEditor.showCursor();
 			vdSelectionState.remove();
 			var sel = window.getSelection();
@@ -134,8 +137,12 @@
 		"update" : function(toolbar) {
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
+			var field = editor.node.getEditableField();
+			var hopeEditor = field.hopeEditor;
 
 			var imagePos = hopeEditor.selection.getTotalOffset(image);
+
+
 			hopeEditor.selection.start = imagePos;
 			hopeEditor.selection.end = imagePos+1;
 
@@ -296,6 +303,9 @@
 		},
 		"actions" : {
 			'simply-image-class' : function(el) {
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
@@ -335,6 +345,9 @@
 				}
 			},
 			"simply-image-delete" : function() {
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 
@@ -344,6 +357,9 @@
 				}
 			},
 			"simply-image-alt" : function(value) {
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
@@ -366,6 +382,9 @@
 				}
 			},
 			"simply-image-title" : function(value) {
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
@@ -388,6 +407,9 @@
 				}
 			},
 			"simply-image-src" : function(value) {
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+
 				value = value.replace(/\\/g, "/");
 
 				var range = hopeEditor.currentRange;
@@ -417,6 +439,9 @@
 				}
 			},
 			"simply-insert-image" : function() {
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+
 				var imageSrc = editor.plugins.image.placeholder();
 				var range = hopeEditor.currentRange;
 
@@ -450,7 +475,7 @@
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
 			
-			hopeEditor = {
+			var hopeEditor = {
 				field : image,
 				parseHTML : function(){},
 				fragment : {
