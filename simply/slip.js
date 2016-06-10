@@ -438,14 +438,15 @@ window['Slip'] = (function(){
 					var targetRects = this.target.node.getBoundingClientRect();
 					this.target.node.focus();
 
-					var yAngleCorrection = 2 * Math.sin(2 * Math.PI / 180) * (move.x); // FIXME magic number, not sure why we need to double it to get a decent result;
+					var yAngleCorrection = Math.sin(2 * Math.PI / 180) * (move.x);
 					move.y -= yAngleCorrection;
 
 //					this.target.node.style[transformPrefix] = 'translate(0,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
-					this.target.node.style[transformPrefix] = 'rotate(2deg)	translate(' + move.x + 'px,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
+					this.target.node.style[transformPrefix] = 'rotate(2deg) translate(' + move.x + 'px,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
 					this.target.node.style["animationName"] = 'none'; // FIXME;
 					// rotate around the position of the mouse to prevent the rotation from selecting text;
-					this.target.node.style[transformPrefix + "Origin"] = (this.startPosition.x - targetRects.left) + "px " + (this.startPosition.y - containerRects.top) + "px";
+					// this.target.node.style[transformPrefix + "Origin"] = (this.startPosition.x - targetRects.left) + "px " + (this.startPosition.y - targetRects.top) + "px";
+					this.target.node.style[transformPrefix + "Origin"] = this.startOrigin;
 
 					var height = this.target.height;
 					var width = this.target.width;
@@ -789,6 +790,9 @@ window['Slip'] = (function(){
 
 		startAtPosition: function(pos) {
 			this.startPosition = this.previousPosition = this.latestPosition = pos;
+
+			var targetRects = this.target.node.getBoundingClientRect();
+			this.startOrigin = (this.startPosition.x - targetRects.left) + "px " + (this.startPosition.y - targetRects.top) + "px";
 			var self = this;
 			window.setTimeout(function() {
 				self.selectionChanged = false;
