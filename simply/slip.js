@@ -437,6 +437,10 @@ window['Slip'] = (function(){
 
 					var targetRects = this.target.node.getBoundingClientRect();
 					this.target.node.focus();
+
+					var yAngleCorrection = 2 * Math.sin(2 * Math.PI / 180) * (move.x); // FIXME magic number, not sure why we need to double it to get a decent result;
+					move.y -= yAngleCorrection;
+
 //					this.target.node.style[transformPrefix] = 'translate(0,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
 					this.target.node.style[transformPrefix] = 'rotate(2deg)	translate(' + move.x + 'px,' + move.y + 'px) ' + hwTopLayerMagic + this.target.baseTransform.value;
 					this.target.node.style["animationName"] = 'none'; // FIXME;
