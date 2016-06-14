@@ -82,10 +82,8 @@
 			}
 		},
 		beforeAction : function() {
-			if (typeof hopeEditor == "undefined") {
-				var currentField = editor.node.getEditableField();
-				hopeEditor = currentField.hopeEditor;
-			}
+			var currentField = editor.node.getEditableField();
+			var hopeEditor = currentField.hopeEditor;
 
 			if (hopeEditor) {
 				editor.context.skipUpdate = true;
@@ -724,7 +722,7 @@
 			}
 
 			var field = editor.node.getEditableField();
-			hopeEditor = field.hopeEditor;
+			var hopeEditor = field.hopeEditor;
 			editor.context.fixSelection();
 			if ((typeof hopeEditor !== "undefined") && hopeEditor.needsUpdate) {
 				hopeEditor.selection.updateRange();
@@ -903,6 +901,14 @@
 		selectionchange.start(document); // onselectionchange event for Firefox
 
 		muze.event.attach( document, 'selectionchange', function() {
+			var field = editor.node.getEditableField();
+			var hopeEditor = field.hopeEditor;
+			if (hopeEditor) {
+				hopeEditor.selection.updateRange();
+				var range = hopeEditor.selection.getRange();
+				hopeEditor.currentRange = range;
+			}
+
 			if (editor.context.touching) {
 				editor.context.touching = false; // force update when selection changed;
 				editor.context.update();

@@ -270,7 +270,7 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		testContent.hopeEditor.selection.updateRange();
 
-		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "p");
+		var annotation = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "p");
 		assert.equal(annotation.tag.split(" ")[0], 'p');
 	});
 
@@ -283,7 +283,7 @@ QUnit.module("hope editor behaviour");
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 
-		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		var annotation = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "img");
 		assert.equal(annotation.tag.split(" ")[0], 'img');
 	});
 
@@ -297,7 +297,7 @@ QUnit.module("hope editor behaviour");
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 
-		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		var annotation = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "img");
 		assert.equal(annotation.tag.split(" ")[0], 'img');
 	});
 
@@ -309,7 +309,7 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		var annotation = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "div");
 		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 
@@ -321,7 +321,7 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		var img = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "img");
 		assert.equal(img.tag, 'img src="frop"');
 	});
 
@@ -335,7 +335,7 @@ QUnit.module("hope editor behaviour");
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
 
-		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		var img = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "img");
 		assert.equal(img.tag, 'img src="frop"');
 	});
 	QUnit.test("offset calculation works for nested items", function(assert) {
@@ -347,7 +347,7 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
+		var img = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "img");
 		assert.equal(img.tag, 'img src="frop"');
 	});
 
@@ -360,7 +360,7 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		var annotation = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "div");
 		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 
@@ -374,7 +374,7 @@ QUnit.module("hope editor behaviour");
 		testContent.hopeEditor.update();
 		editor.context.update();
 		testContent.hopeEditor.selection.updateRange();
-		var annotation = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "div");
+		var annotation = testContent.hopeEditor.fragment.has(testContent.hopeEditor.currentRange, "div");
 		assert.equal(annotation.tag.split(" ")[0], 'div');
 	});
 

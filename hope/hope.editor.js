@@ -103,6 +103,10 @@ hope.register( 'hope.editor', function() {
 
 		if (sel.rangeCount) {
 			var range = sel.getRangeAt(0);
+			if (!range.collapsed) {
+				return caret;
+			}
+
 			var startContainer = range.startContainer;
 			if (startContainer.nodeType == document.TEXT_NODE && (node == startContainer.parentNode)) {
 				caret = range.startOffset + this.selection.getTotalOffset(startContainer) - this.selection.getTotalOffset(startContainer.parentNode);
