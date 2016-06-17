@@ -200,6 +200,7 @@
 		if (!hopeEditor) {
 			return;
 		}
+		editor.context.hopeEditor = hopeEditor;
 
 		hopeEditor.selection.updateRange();
 		var range = hopeEditor.selection.getRange();
@@ -394,7 +395,7 @@
 			},
 			tagToggle : [],
 			apply : function(tag) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				var range = hopeEditor.currentRange;
@@ -456,7 +457,7 @@
 				hopeEditor.update();
 			},
 			blocks : function(range) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				var blocks = [];
@@ -527,7 +528,7 @@
 		init : initTextToolbar,
 		actions : {
 			'simply-text-class' : function(el) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
@@ -572,7 +573,7 @@
 				editor.plugins.hope.annotation.apply("code");
 			},
 			'simply-text-blockstyle' : function(value) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
@@ -653,7 +654,7 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-href" : function(value) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
@@ -677,7 +678,7 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-unlink" : function() {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				var range = hopeEditor.currentRange;
 				var hyperlink = hopeEditor.fragment.has(range, "a");
@@ -687,7 +688,7 @@
 				}
 			},
 			"simply-hyperlink-title" : function(value) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					hopeEditor.field.setAttribute("title", value);
@@ -709,7 +710,7 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-name" : function(value) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					hopeEditor.field.setAttribute("name", value);
@@ -731,7 +732,7 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-nofollow" : function(button) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					if (hopeEditor.field.getAttribute("rel") == "nofollow") {
@@ -766,7 +767,7 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-newwindow" : function(button) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					if (hopeEditor.field.getAttribute("target") == "_blank") {
@@ -801,7 +802,7 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-follow" : function(button) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 				var target;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {

@@ -91,7 +91,7 @@
 			return editor.plugins.image.placeholderData;
 		},
 		reselect : function() {
-			var field = editor.node.getEditableField();
+			var field = editor.context.hopeEditor.field;
 			var hopeEditor = field.hopeEditor;
 
 			hopeEditor.showCursor();
@@ -137,6 +137,7 @@
 		"update" : function(toolbar) {
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
+
 			var field = editor.node.getEditableField();
 			var hopeEditor = field.hopeEditor;
 
@@ -303,7 +304,7 @@
 		},
 		"actions" : {
 			'simply-image-class' : function(el) {
-				var field = editor.node.getEditableField();
+				editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				var range = hopeEditor.currentRange;
@@ -345,7 +346,7 @@
 				}
 			},
 			"simply-image-delete" : function() {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				var range = hopeEditor.currentRange;
@@ -357,7 +358,7 @@
 				}
 			},
 			"simply-image-alt" : function(value) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				var range = hopeEditor.currentRange;
@@ -382,7 +383,7 @@
 				}
 			},
 			"simply-image-title" : function(value) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				var range = hopeEditor.currentRange;
@@ -407,7 +408,7 @@
 				}
 			},
 			"simply-image-src" : function(value) {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				value = value.replace(/\\/g, "/");
@@ -439,7 +440,7 @@
 				}
 			},
 			"simply-insert-image" : function() {
-				var field = editor.node.getEditableField();
+				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
 
 				var imageSrc = editor.plugins.image.placeholder();
@@ -482,8 +483,21 @@
 					has : function() {
 						return false;
 					}
-				}
+				},
+				currentRange : false,
+				selection : {
+					getRange : function() {
+						return false;
+					},
+					updateRange : function() {}
+				},
+				update : function() {}
 			};
+			editor.context.hopeEditor = hopeEditor;
+
+			if (!image.hopeEditor) {
+				image.hopeEditor = hopeEditor;
+			}
 
 			var annotation = false;
 

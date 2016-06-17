@@ -82,13 +82,15 @@
 			}
 		},
 		beforeAction : function() {
-			var currentField = editor.node.getEditableField();
-			var hopeEditor = currentField.hopeEditor;
+			if (typeof editor.context.hopeEditor == "undefined") {
+				var currentField = editor.node.getEditableField();
+				editor.context.hopeEditor = currentField.hopeEditor;
+			}
 
-			if (hopeEditor) {
+			if (editor.context.hopeEditor) {
 				editor.context.skipUpdate = true;
 				if (!document.querySelector(".simply-dialog.active")) {
-					hopeEditor.parseHTML();
+					editor.context.hopeEditor.parseHTML();
 				}
 				
 				window.setTimeout(function() {
@@ -904,6 +906,7 @@
 			var field = editor.node.getEditableField();
 			var hopeEditor = field.hopeEditor;
 			if (hopeEditor) {
+				editor.context.hopeEditor = hopeEditor;
 				hopeEditor.selection.updateRange();
 				var range = hopeEditor.selection.getRange();
 				hopeEditor.currentRange = range;
