@@ -1396,7 +1396,7 @@
 					endpoint = document.location.href.replace(document.location.hash, "");
 				}
 				var script = document.createElement("SCRIPT");
-				script.src = "http://se-cdn.muze.nl/github.js";
+				script.src = "//se-cdn.muze.nl/github.js";
 				document.head.appendChild(script);
 
 				var repoInfo = this.getRepoInfo(endpoint);
