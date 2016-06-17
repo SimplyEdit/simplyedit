@@ -196,12 +196,13 @@
 		var parent = vdSelection.getNode(sel);
 		var field = editor.node.getEditableField();
 
-		var hopeEditor = field.hopeEditor;
+		hopeEditor = field.hopeEditor;
 		if (!hopeEditor) {
 			return;
 		}
 
 		hopeEditor.selection.updateRange();
+
 		var range = hopeEditor.selection.getRange();
 		hopeEditor.currentRange = range;
 
@@ -393,10 +394,7 @@
 				return result;
 			},
 			tagToggle : [],
-			apply : function(tag) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
-
+			apply : function(hopeEditor, tag) {
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, tag);
 				if (annotation) {
@@ -551,20 +549,20 @@
 				hopeEditor.update();
 			},
 			'simply-text-inline' : function(el) {
-				editor.plugins.hope.annotation.apply(el.getAttribute("data-value"));
+				editor.plugins.hope.annotation.apply(hopeEditor, el.getAttribute("data-value"));
 			},
 			// FIXME: These are here for the tests only, tests should be rewritten.
 			'simply-text-bold' : function() {
-				editor.plugins.hope.annotation.apply("strong");
+				editor.plugins.hope.annotation.apply(hopeEditor, "strong");
 			},
 			'simply-text-italic' : function(el) {
-				editor.plugins.hope.annotation.apply("em");
+				editor.plugins.hope.annotation.apply(hopeEditor, "em");
 			},
 			'simply-text-underline' : function(el) {
-				editor.plugins.hope.annotation.apply("u");
+				editor.plugins.hope.annotation.apply(hopeEditor, "u");
 			},
 			'simply-text-code' : function(el) {
-				editor.plugins.hope.annotation.apply("code");
+				editor.plugins.hope.annotation.apply(hopeEditor, "code");
 			},
 			'simply-text-blockstyle' : function(value) {
 				var range = hopeEditor.currentRange;
@@ -612,7 +610,7 @@
 				}
 
 				if (blocks.length === 0) {
-					return editor.plugins.hope.annotation.apply(value);
+					return editor.plugins.hope.annotation.apply(hopeEditor, value);
 				}
 
 				while (blocks.length) {
