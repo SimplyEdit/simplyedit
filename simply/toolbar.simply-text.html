@@ -196,12 +196,13 @@
 		var parent = vdSelection.getNode(sel);
 		var field = editor.node.getEditableField();
 
-		var hopeEditor = field.hopeEditor;
+		hopeEditor = field.hopeEditor;
 		if (!hopeEditor) {
 			return;
 		}
 
 		hopeEditor.selection.updateRange();
+
 		var range = hopeEditor.selection.getRange();
 		hopeEditor.currentRange = range;
 
@@ -393,10 +394,7 @@
 				return result;
 			},
 			tagToggle : [],
-			apply : function(tag) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
-
+			apply : function(hopeEditor, tag) {
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, tag);
 				if (annotation) {
@@ -456,9 +454,6 @@
 				hopeEditor.update();
 			},
 			blocks : function(range) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
-
 				var blocks = [];
 				if (range.start != range.end) {
 					var noBlockStart = -1;
@@ -527,8 +522,6 @@
 		init : initTextToolbar,
 		actions : {
 			'simply-text-class' : function(el) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 				while (blocks.length) {
@@ -556,24 +549,22 @@
 				hopeEditor.update();
 			},
 			'simply-text-inline' : function(el) {
-				editor.plugins.hope.annotation.apply(el.getAttribute("data-value"));
+				editor.plugins.hope.annotation.apply(hopeEditor, el.getAttribute("data-value"));
 			},
 			// FIXME: These are here for the tests only, tests should be rewritten.
 			'simply-text-bold' : function() {
-				editor.plugins.hope.annotation.apply("strong");
+				editor.plugins.hope.annotation.apply(hopeEditor, "strong");
 			},
 			'simply-text-italic' : function(el) {
-				editor.plugins.hope.annotation.apply("em");
+				editor.plugins.hope.annotation.apply(hopeEditor, "em");
 			},
 			'simply-text-underline' : function(el) {
-				editor.plugins.hope.annotation.apply("u");
+				editor.plugins.hope.annotation.apply(hopeEditor, "u");
 			},
 			'simply-text-code' : function(el) {
-				editor.plugins.hope.annotation.apply("code");
+				editor.plugins.hope.annotation.apply(hopeEditor, "code");
 			},
 			'simply-text-blockstyle' : function(value) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				var range = hopeEditor.currentRange;
 				var blocks = editor.plugins.hope.annotation.blocks(range);
 
@@ -619,7 +610,7 @@
 				}
 
 				if (blocks.length === 0) {
-					return editor.plugins.hope.annotation.apply(value);
+					return editor.plugins.hope.annotation.apply(hopeEditor, value);
 				}
 
 				while (blocks.length) {
@@ -653,9 +644,6 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-href" : function(value) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
-
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					hopeEditor.field.setAttribute("href", value);
 					return;
@@ -677,8 +665,6 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-unlink" : function() {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				var range = hopeEditor.currentRange;
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				if (hyperlink) {
@@ -687,8 +673,6 @@
 				}
 			},
 			"simply-hyperlink-title" : function(value) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					hopeEditor.field.setAttribute("title", value);
 					return;
@@ -709,8 +693,6 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-name" : function(value) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					hopeEditor.field.setAttribute("name", value);
 					return;
@@ -731,8 +713,6 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-nofollow" : function(button) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					if (hopeEditor.field.getAttribute("rel") == "nofollow") {
 						hopeEditor.field.removeAttribute("rel");
@@ -766,8 +746,6 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-newwindow" : function(button) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					if (hopeEditor.field.getAttribute("target") == "_blank") {
 						hopeEditor.field.removeAttribute("target");
@@ -801,8 +779,6 @@
 				hopeEditor.update();
 			},
 			"simply-hyperlink-follow" : function(button) {
-				var field = editor.node.getEditableField();
-				var hopeEditor = field.hopeEditor;
 				var target;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					target = hopeEditor.field;

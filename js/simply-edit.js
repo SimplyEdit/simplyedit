@@ -349,6 +349,7 @@
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-simply-list]");
 
+
 					for (var i=0; i<dataLists.length; i++) {
 						dataLists[i].innerHTML = dataLists[i].innerHTML; // reset innerHTML to make sure templates are recognized;
 
