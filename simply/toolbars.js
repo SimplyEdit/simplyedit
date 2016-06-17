@@ -82,8 +82,10 @@
 			}
 		},
 		beforeAction : function() {
-			var currentField = editor.node.getEditableField();
-			var hopeEditor = currentField.hopeEditor;
+			if (typeof hopeEditor == "undefined") {
+				var currentField = editor.node.getEditableField();
+				hopeEditor = currentField.hopeEditor;
+			}
 
 			if (hopeEditor) {
 				editor.context.skipUpdate = true;
@@ -722,7 +724,7 @@
 			}
 
 			var field = editor.node.getEditableField();
-			var hopeEditor = field.hopeEditor;
+			hopeEditor = field.hopeEditor;
 			editor.context.fixSelection();
 			if ((typeof hopeEditor !== "undefined") && hopeEditor.needsUpdate) {
 				hopeEditor.selection.updateRange();
@@ -902,6 +904,7 @@
 
 		muze.event.attach( document, 'selectionchange', function() {
 			var field = editor.node.getEditableField();
+
 			var hopeEditor = field.hopeEditor;
 			if (hopeEditor) {
 				hopeEditor.selection.updateRange();
