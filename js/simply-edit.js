@@ -2,20 +2,28 @@
 	Simply edit the Web
 
 	Written by Yvo Brevoort
-	Copyright Muze 2015, all rights reserved.
+	Copyright Muze 2015-2016, all rights reserved.
 */
 (function() {
 	if (window.editor) {
 		return;
 	}
-	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
-	
-	var scriptEl = (typeof document.currentScript != 'undefined' ? document.currentScript : document.getElementById('SimplyEditScript'));
+
+	var getScriptEl = function() {
+		var scriptEl = document.querySelector("[src$='simply-edit.js'][data-api-key]");
+		return scriptEl;
+	};
+
+	var scriptEl = getScriptEl();
+	var apiKey = scriptEl.getAttribute("data-api-key");
 
 	var getBaseURL = function(url) {
 		var scriptURL = document.createElement('a');
 		scriptURL.href = url;
 		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
+		if (apiKey !== "") {
+			scriptURL.pathname = scriptURL.pathname + apiKey + "/";
+		}
 		return scriptURL.href;
 	};
 
