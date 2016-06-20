@@ -906,10 +906,12 @@
 			var field = editor.node.getEditableField();
 			var hopeEditor = field.hopeEditor;
 			if (hopeEditor) {
-				editor.context.hopeEditor = hopeEditor;
-				hopeEditor.selection.updateRange();
-				var range = hopeEditor.selection.getRange();
-				hopeEditor.currentRange = range;
+				if (hopeEditor.field == editor.node.getSimplyParent(document.activeElement)) {
+					editor.context.hopeEditor = hopeEditor;
+					hopeEditor.selection.updateRange();
+					var range = hopeEditor.selection.getRange();
+					hopeEditor.currentRange = range;
+				}
 			}
 
 			if (editor.context.touching) {
