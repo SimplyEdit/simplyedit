@@ -1145,10 +1145,24 @@
 				}
 			},
 			errorHandler : function(evt) {
+				if (!this.parentNode) {
+					// We no longer exists in the dom;
+					return;
+				}
+
 				var src = this.getAttribute("data-simply-src");
 				this.removeAttribute("srcset");
 				this.removeAttribute("sizes");
 				this.setAttribute("src", src);
+
+				// Bugfix for chrome - the image tag somehow
+				// remembers that it is scaled, so now the
+				// "natural" size of the image source is a
+				// lot bigger than the image really is.
+				// Cloning resolves this problem.
+				var clone = this.cloneNode();
+				this.parentNode.insertBefore(clone, this);
+				this.parentNode.removeChild(this);
 			},
 			initImage : function(imgEl) {
 				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
