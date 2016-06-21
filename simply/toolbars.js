@@ -82,15 +82,15 @@
 			}
 		},
 		beforeAction : function() {
-			if (typeof hopeEditor == "undefined") {
+			if (typeof editor.context.hopeEditor == "undefined") {
 				var currentField = editor.node.getEditableField();
-				hopeEditor = currentField.hopeEditor;
+				editor.context.hopeEditor = currentField.hopeEditor;
 			}
 
-			if (hopeEditor) {
+			if (editor.context.hopeEditor) {
 				editor.context.skipUpdate = true;
 				if (!document.querySelector(".simply-dialog.active")) {
-					hopeEditor.parseHTML();
+					editor.context.hopeEditor.parseHTML();
 				}
 				
 				window.setTimeout(function() {
@@ -903,6 +903,17 @@
 		selectionchange.start(document); // onselectionchange event for Firefox
 
 		muze.event.attach( document, 'selectionchange', function() {
+			var field = editor.node.getEditableField();
+			var hopeEditor = field.hopeEditor;
+			if (hopeEditor) {
+				if (hopeEditor.field == editor.node.getSimplyParent(document.activeElement)) {
+					editor.context.hopeEditor = hopeEditor;
+					hopeEditor.selection.updateRange();
+					var range = hopeEditor.selection.getRange();
+					hopeEditor.currentRange = range;
+				}
+			}
+
 			if (editor.context.touching) {
 				editor.context.touching = false; // force update when selection changed;
 				editor.context.update();

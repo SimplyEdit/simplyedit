@@ -91,6 +91,9 @@
 			return editor.plugins.image.placeholderData;
 		},
 		reselect : function() {
+			var field = editor.context.hopeEditor.field;
+			var hopeEditor = field.hopeEditor;
+
 			hopeEditor.showCursor();
 			vdSelectionState.remove();
 			var sel = window.getSelection();
@@ -134,6 +137,9 @@
 		"update" : function(toolbar) {
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
+
+			var field = editor.node.getEditableField();
+			var hopeEditor = field.hopeEditor;
 
 			var imagePos = hopeEditor.selection.getTotalOffset(image);
 			hopeEditor.selection.start = imagePos;
@@ -296,6 +302,9 @@
 		},
 		"actions" : {
 			'simply-image-class' : function(el) {
+				editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
@@ -335,6 +344,9 @@
 				}
 			},
 			"simply-image-delete" : function() {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 
@@ -344,6 +356,9 @@
 				}
 			},
 			"simply-image-alt" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
@@ -366,6 +381,9 @@
 				}
 			},
 			"simply-image-title" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, "img");
 				if (annotation) {
@@ -388,6 +406,9 @@
 				}
 			},
 			"simply-image-src" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
 				value = value.replace(/\\/g, "/");
 
 				var range = hopeEditor.currentRange;
@@ -417,6 +438,9 @@
 				}
 			},
 			"simply-insert-image" : function() {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
 				var imageSrc = editor.plugins.image.placeholder();
 				var range = hopeEditor.currentRange;
 
@@ -457,8 +481,21 @@
 					has : function() {
 						return false;
 					}
-				}
+				},
+				currentRange : false,
+				selection : {
+					getRange : function() {
+						return false;
+					},
+					updateRange : function() {}
+				},
+				update : function() {}
 			};
+			editor.context.hopeEditor = hopeEditor;
+
+			if (!image.hopeEditor) {
+				image.hopeEditor = hopeEditor;
+			}
 
 			var annotation = false;
 

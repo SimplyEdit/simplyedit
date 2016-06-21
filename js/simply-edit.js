@@ -2,20 +2,28 @@
 	Simply edit the Web
 
 	Written by Yvo Brevoort
-	Copyright Muze 2015, all rights reserved.
+	Copyright Muze 2015-2016, all rights reserved.
 */
 (function() {
 	if (window.editor) {
 		return;
 	}
-	var apiKey = document.querySelector("[data-api-key]").getAttribute("data-api-key");
-	
-	var scriptEl = (typeof document.currentScript != 'undefined' ? document.currentScript : document.getElementById('SimplyEditScript'));
+
+	var getScriptEl = function() {
+		var scriptEl = document.querySelector("[src$='simply-edit.js'][data-api-key]");
+		return scriptEl;
+	};
+
+	var scriptEl = getScriptEl();
+	var apiKey = scriptEl.getAttribute("data-api-key");
 
 	var getBaseURL = function(url) {
 		var scriptURL = document.createElement('a');
 		scriptURL.href = url;
 		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
+		if (apiKey !== "") {
+			scriptURL.pathname = scriptURL.pathname + apiKey + "/";
+		}
 		return scriptURL.href;
 	};
 
@@ -804,7 +812,10 @@
 				var http = new XMLHttpRequest();
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
+				} else {
+					url += "?v=" + editor.version;
 				}
+
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
@@ -905,7 +916,7 @@
 				};
 
 				// Add slip.js for sortable items;
-				addScript(editor.baseURL + "simply/slip.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : ""));
+				addScript(editor.baseURL + "simply/slip.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version));
 
 				// Add hope
 				addScript(editor.baseURL + "hope/hope.packed.js");
@@ -1135,10 +1146,24 @@
 				}
 			},
 			errorHandler : function(evt) {
+				if (!this.parentNode) {
+					// We no longer exists in the dom;
+					return;
+				}
+
 				var src = this.getAttribute("data-simply-src");
 				this.removeAttribute("srcset");
 				this.removeAttribute("sizes");
 				this.setAttribute("src", src);
+
+				// Bugfix for chrome - the image tag somehow
+				// remembers that it is scaled, so now the
+				// "natural" size of the image source is a
+				// lot bigger than the image really is.
+				// Cloning resolves this problem.
+				var clone = this.cloneNode();
+				this.parentNode.insertBefore(clone, this);
+				this.parentNode.removeChild(this);
 			},
 			initImage : function(imgEl) {
 				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
@@ -1327,7 +1352,10 @@
 				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
+				} else {
+					url += "?v=" + editor.version;
 				}
+
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
@@ -1492,6 +1520,8 @@
 				var url = "https://raw.githubusercontent.com/" + this.repoUser + "/" + this.repoName + "/" + this.repoBranch + "/" + this.dataFile;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
+				} else {
+					url += "?v=" + editor.version;
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
@@ -1665,6 +1695,8 @@
 				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
+				} else {
+					url += "?v=" + editor.version;
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.

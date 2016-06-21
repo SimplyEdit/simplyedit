@@ -172,7 +172,6 @@
 	#simply-browse .simply-dialog-body > .simply-button img {
 		max-width: 100%;
 		max-height: 100%;
-		width: 149px;
 		vertical-align: middle;
 	}
 </style>
@@ -721,6 +720,8 @@
 			target = target.replace(editor.storage.dataEndpoint, "");
 		}
 
+		editor.plugins.dialog.close();
+
 		switch (editor.plugins.browse.insertMode) {
 			case 'page':
 				// FIXME: check for dirty fields and stash/save the changes
@@ -740,7 +741,6 @@
 			break;
 		}
 
-		editor.plugins.dialog.close();
 		editor.context.update();
 	});
 
