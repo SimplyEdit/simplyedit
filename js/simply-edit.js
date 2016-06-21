@@ -667,8 +667,18 @@
 							field.hopeEditor.needsUpdate = true;
 						});
 						field.addEventListener("slip:beforereorder", function(evt) {
-							evt.preventDefault(); // this will prevent triggering list sorting when using tap-hold on text;
-							return false;
+							var rect = this.getBoundingClientRect();
+							if (
+								this.clickStart.x > rect.left &&
+								this.clickStart.x < rect.right &&
+								this.clickStart.y < rect.bottom &&
+								this.clickStart.y > rect.top
+							) {
+								// this will prevent triggering list sorting when using tap-hold on text;
+								// the check of the clientrect will allow a click on the list item marker to continue, because it is positioned out of bounds;
+								evt.preventDefault(); // this will prevent triggering list sorting when using tap-hold on text;
+								return false;
+							}
 						}, false);
 					}
 				},
@@ -770,8 +780,18 @@
 					field.hopeEditor.needsUpdate = true;
 				});
 				field.addEventListener("slip:beforereorder", function(evt) {
-					evt.preventDefault(); // this will prevent triggering list sorting when using tap-hold on text;
-					return false;
+					var rect = this.getBoundingClientRect();
+					if (
+						this.clickStart.x > rect.left &&
+						this.clickStart.x < rect.right &&
+						this.clickStart.y < rect.bottom &&
+						this.clickStart.y > rect.top
+					) {
+						// this will prevent triggering list sorting when using tap-hold on text;
+						// the check of the clientrect will allow a click on the list item marker to continue, because it is positioned out of bounds;
+						evt.preventDefault(); // this will prevent triggering list sorting when using tap-hold on text;
+						return false;
+					}
 				}, false);
 			}
 		},
@@ -957,13 +977,13 @@
 				var i;
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
-
 				for (i=0; i<dataFields.length; i++) {
 					editor.field.makeEditable(dataFields[i]);
-
 					// FIXME: Add support to keep fields that point to the same field within the same path in sync here;
 				}
-
+				if (target.getAttribute && target.getAttribute("data-simply-field")) {
+					editor.field.makeEditable(target);
+				}
 				document.body.addEventListener("dragover", function(evt) {
 					evt.preventDefault();
 				});

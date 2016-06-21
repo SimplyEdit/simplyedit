@@ -107,6 +107,8 @@
 				} else {
 					list.insertBefore(newNode.firstElementChild, list.firstElementChild);
 				}
+
+				muze.event.fire(document, "simply-selectable-inserted");
 				editor.editmode.makeEditable(newListItem);
 
 				list.classList.remove("simply-empty");

@@ -369,6 +369,26 @@
 						result += 2*(filter.selector.split("[").length-1); // Add the number of attribute selectors
 					}
 
+					if (target.clickStart) {
+						var rect = target.getBoundingClientRect();
+						if (
+							target.clickStart.x > rect.left &&
+							target.clickStart.x < rect.right &&
+							target.clickStart.y < rect.bottom &&
+							target.clickStart.y > rect.top
+						) {
+							// click was in the element; less value for lists and list items;
+							if (target.getAttribute("contenteditable") && filter.context && filter.context.indexOf("simply-list") === 0) {
+								result -= 5;
+							}
+						} else {
+							// click was outside the element; more value for lists and list items;
+							if (filter.context && filter.context.indexOf("simply-list") === 0) {
+								result = result += 50 * (targets.length);
+							}
+						}
+					}
+
 					if (typeof filter["sel-collapsed"] !== 'undefined') {
 						result += 1;
 					}

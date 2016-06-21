@@ -15,6 +15,9 @@
 
 		var handleItemFocus = function(event) {
 			var target = muze.event.target(event);
+			if (target.getAttribute("contenteditable")) {
+				return;
+			}
 			selectTarget(target);
 		};
 
@@ -35,6 +38,10 @@
 			}
 
 			var target = muze.event.target(event);
+			if (target.getAttribute("contenteditable")) {
+				return;
+			}
+
 			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
 				if (target.getAttribute("contenteditable")) {
 					return;

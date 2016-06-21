@@ -76,11 +76,11 @@ var simulateClick = function(target, offsetTop, offsetLeft) {
 	var targetLeft = parseInt(rect.left) + parseInt(offsetLeft);
 	
 	var targetEl = document.elementFromPoint(targetLeft, targetTop);
-	var evt = mouseEvent("mousedown", targetLeft, targetTop, 0, 0);
+	var evt = mouseEvent("mousedown", targetLeft, targetTop, targetLeft, targetTop);
 	dispatchEvent(targetEl, evt);
-	evt = mouseEvent("click", targetLeft, targetTop, 0, 0);
+	evt = mouseEvent("click", targetLeft, targetTop, targetLeft, targetTop);
 	dispatchEvent(targetEl, evt);
-	evt = mouseEvent("mouseup", targetLeft, targetTop, 0, 0);
+	evt = mouseEvent("mouseup", targetLeft, targetTop, targetLeft, targetTop);
 	dispatchEvent(targetEl, evt);
 	targetEl.focus();
 
