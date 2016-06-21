@@ -558,20 +558,20 @@
 				hopeEditor.update();
 			},
 			'simply-text-inline' : function(el) {
-				editor.plugins.hope.annotation.apply(hopeEditor, el.getAttribute("data-value"));
+				editor.plugins.hope.annotation.apply(el.getAttribute("data-value"));
 			},
 			// FIXME: These are here for the tests only, tests should be rewritten.
 			'simply-text-bold' : function() {
-				editor.plugins.hope.annotation.apply(hopeEditor, "strong");
+				editor.plugins.hope.annotation.apply("strong");
 			},
 			'simply-text-italic' : function(el) {
-				editor.plugins.hope.annotation.apply(hopeEditor, "em");
+				editor.plugins.hope.annotation.apply("em");
 			},
 			'simply-text-underline' : function(el) {
-				editor.plugins.hope.annotation.apply(hopeEditor, "u");
+				editor.plugins.hope.annotation.apply("u");
 			},
 			'simply-text-code' : function(el) {
-				editor.plugins.hope.annotation.apply(hopeEditor, "code");
+				editor.plugins.hope.annotation.apply("code");
 			},
 			'simply-text-blockstyle' : function(value) {
 				var field = editor.context.hopeEditor.field;
@@ -621,7 +621,7 @@
 				}
 
 				if (blocks.length === 0) {
-					return editor.plugins.hope.annotation.apply(hopeEditor, value);
+					return editor.plugins.hope.annotation.apply(value);
 				}
 
 				while (blocks.length) {
