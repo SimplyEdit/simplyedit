@@ -95,6 +95,7 @@
 				
 				window.setTimeout(function() {
 					editor.context.skipUpdate = false;
+				//	editor.context.update();
 				}, 50);
 			}
 		},
@@ -136,8 +137,16 @@
 			var handleChange = function(evt) {
 				var action = editor.actions[this.getAttribute("data-simply-action")];
 				if (action) {
-					editor.toolbar.beforeAction();
-					var result = action(this.value);
+					window.setTimeout(function(value) {
+						return function() {
+							var focus = document.querySelector(":focus");
+							editor.toolbar.beforeAction();
+							var result = action(value);
+							if (focus) {
+								focus.focus();
+							}
+						};
+					}(this.value));
 				} else {
 					console.log(this.getAttribute("data-simply-action") + " not yet implemented");
 				}
