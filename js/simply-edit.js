@@ -1375,8 +1375,6 @@
 				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
-				} else {
-					url += "?v=" + editor.version;
 				}
 
 				http.open("GET", url, true);
@@ -1543,8 +1541,6 @@
 				var url = "https://raw.githubusercontent.com/" + this.repoUser + "/" + this.repoName + "/" + this.repoBranch + "/" + this.dataFile;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
-				} else {
-					url += "?v=" + editor.version;
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
@@ -1718,8 +1714,6 @@
 				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
-				} else {
-					url += "?v=" + editor.version;
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
