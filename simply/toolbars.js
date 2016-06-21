@@ -95,7 +95,7 @@
 				
 				window.setTimeout(function() {
 					editor.context.skipUpdate = false;
-				//	editor.context.update();
+					editor.context.update();
 				}, 50);
 			}
 		},
