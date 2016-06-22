@@ -201,10 +201,15 @@
 
 				if (editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) === 0) {
 					editor.plugins.browse.mode = "images";
-				} else if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
-					editor.plugins.browse.mode = "pages";
 				} else {
 					editor.plugins.browse.mode = "files";
+				}
+				if (editor.storage.imagesEndpoint == editor.storage.endpoint) {
+					if (editor.plugins.browse.insertMode == "image") {
+						editor.plugins.browse.mode = "images";
+					} else {
+						editor.plugins.browse.mode = "files";
+					}
 				}
 
 				editor.storage.list(url, function(data) {
