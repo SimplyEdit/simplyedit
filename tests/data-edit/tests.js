@@ -1148,3 +1148,49 @@ QUnit.module("browse plugin");
 		var button = document.querySelectorAll('#simply-text-selection [data-simply-action="simply-browse"]');
 		assert.equal(button.length, 1);
 	});
+
+QUnit.module("symbol plugin");
+	QUnit.test("insert euro sign (char 128) works", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+		setCaretPosition(testContent, 5, 0);
+
+		editor.actions['simply-symbol']();
+
+		var button = document.createElement("button");
+		button.setAttribute('data-value', 128);
+		editor.actions['simply-symbol-insert'](button);
+		assert.equal(testContent.innerHTML, 'Hello€ world', "Symbol was inserted");
+	});
+
+	QUnit.test("Cursor goes after inserted symbol", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+		setCaretPosition(testContent, 5, 0);
+
+		editor.actions['simply-symbol']();
+
+		var button = document.createElement("button");
+		button.setAttribute('data-value', 128);
+		editor.actions['simply-symbol-insert'](button);
+		var range = testContent.hopeEditor.selection.getRange();
+
+		assert.equal(range.start, 6, "Range was updated correctly");
+	});
+
+	QUnit.test("Insert symbol in empty list item", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ol><li>Hello world</li><li></li></ol>";
+		testContent.hopeEditor.parseHTML();
+		setCaretPosition(testContent.querySelector("li + li"), 0, 0);
+
+		editor.actions['simply-symbol']();
+
+		var button = document.createElement("button");
+		button.setAttribute('data-value', 65);
+		editor.actions['simply-symbol-insert'](button);
+
+		assert.equal(testContent.innerHTML, '<ol><li>Hello world</li><li>A</li></ol>', "Symbol was inserted in the empty list item");
+	});

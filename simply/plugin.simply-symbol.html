@@ -87,7 +87,10 @@
 			hopeEditor.selection.updateRange();
 
 			var range = hopeEditor.selection.getRange();
-			var charTyped = String.fromCharCode(el.dataset.value);
+
+			var tempNode = document.createElement("SPAN");
+			tempNode.innerHTML = "&#" + el.dataset.value + ";";
+			var charTyped = tempNode.innerText;
 
 			if ( charTyped ) { // ignore non printable characters
 				if ( range.length ) {
@@ -96,6 +99,7 @@
 				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, charTyped);
 				hopeEditor.selection.move(1);
 				hopeEditor.update();
+				hopeEditor.currentRange = hopeEditor.selection.getRange();
 			}
 		} else if (editor.plugins.symbol.currentField.tagName.toLowerCase() === "i") {
 			editor.plugins.symbol.currentField.innerHTML = "&#" + el.dataset.value + ";";

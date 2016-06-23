@@ -229,11 +229,11 @@
 				foundTag.selected = true;
 			} else if (tagName == "li") {
 				var annotation = hopeEditor.fragment.has(range, "ol");
-				if (annotation) {
+				if (annotation && toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ol']")) {
 					toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ol']").selected = true;
 				} else {
 					annotation = hopeEditor.fragment.has(range, "ul");
-					if (annotation) {
+					if (annotation && toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']")) {
 						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']").selected = true;
 					} else {
 						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
