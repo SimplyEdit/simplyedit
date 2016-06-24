@@ -1180,6 +1180,25 @@ QUnit.module("symbol plugin");
 		assert.equal(range.start, 6, "Range was updated correctly");
 	});
 
+	QUnit.test("Selection updates to the inserted character", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+		setCaretPosition(testContent, 5, 4);
+
+		editor.actions['simply-symbol']();
+
+		var button = document.createElement("button");
+		button.setAttribute('data-value', 128);
+		editor.actions['simply-symbol-insert'](button);
+		var range = testContent.hopeEditor.selection.getRange();
+
+		assert.equal(testContent.innerHTML, 'Hello€ld', 'Insert symbol replaced selected text');
+		assert.equal(range.start, 5, "Selection was updated correctly");
+		assert.equal(range.end, 6, "Selection was updated correctly");
+	});
+
+
 	QUnit.test("Insert symbol in empty list item", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<ol><li>Hello world</li><li></li></ol>";

@@ -97,7 +97,13 @@
 					hopeEditor.fragment = hopeEditor.fragment.delete(range);
 				}
 				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, charTyped);
-				hopeEditor.selection.move(1);
+				var range = hopeEditor.selection.getRange();
+				if (range.start == range.end) {
+					hopeEditor.selection.move(charTyped.length);
+				} else {
+					hopeEditor.selection.updateRange(range.start, range.start + charTyped.length);
+				}
+
 				hopeEditor.update();
 				hopeEditor.currentRange = hopeEditor.selection.getRange();
 			}
