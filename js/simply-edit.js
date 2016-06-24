@@ -18,7 +18,7 @@
 	};
 
 	var scriptEl = getScriptEl();
-	var apiKey = scriptEl.getAttribute("data-api-key");
+	var apiKey = scriptEl.getAttribute("data-api-key") ? scriptEl.getAttribute("data-api-key") : "";
 
 	var getBaseURL = function(url) {
 		var scriptURL = document.createElement('a');
