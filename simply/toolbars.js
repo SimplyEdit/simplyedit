@@ -393,7 +393,7 @@
 						} else {
 							// click was outside the element; more value for lists and list items;
 							if (filter.context && filter.context.indexOf("simply-list") === 0) {
-								result = result += 50 * (targets.length);
+								result += 50 * (targets.length);
 							}
 						}
 					}
