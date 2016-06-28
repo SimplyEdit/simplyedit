@@ -1998,6 +1998,8 @@ hope.register( 'hope.fragment.annotations', function() {
 					var range = sel.getRangeAt(i);
 					if (range.startContainer.nodeType === document.TEXT_NODE) {
 						rangeStart = self.getTotalOffset(range.startContainer) + range.startOffset;
+					} else if (range.startContainer.childNodes.length === 0) {
+						rangeStart = self.getTotalOffset(range.startContainer);
 					} else if (range.startContainer.childNodes[range.startOffset]) {
 						rangeStart = self.getTotalOffset(range.startContainer.childNodes[range.startOffset]);
 					} else {
@@ -2006,6 +2008,8 @@ hope.register( 'hope.fragment.annotations', function() {
 
 					if (range.endContainer.nodeType === document.TEXT_NODE) {
 						rangeEnd = self.getTotalOffset(range.endContainer) + range.endOffset;
+					} else if (range.endContainer.childNodes.length === 0) {
+						rangeEnd = self.getTotalOffset(range.endContainer);
 					} else if (range.endContainer.childNodes[range.endOffset]) {
 						rangeEnd = self.getTotalOffset(range.endContainer.childNodes[range.endOffset]);
 					} else {
@@ -2059,6 +2063,8 @@ hope.register( 'hope.fragment.annotations', function() {
 					var range = sel.getRangeAt(i);
 					if (range.startContainer.nodeType === document.TEXT_NODE) {
 						rangeStart = this.getTotalOffset(range.startContainer) + range.startOffset;
+					} else if (range.startContainer.childNodes.length === 0) {
+						rangeStart = this.getTotalOffset(range.startContainer);
 					} else if (range.startContainer.childNodes[range.startOffset]) {
 						rangeStart = this.getTotalOffset(range.startContainer.childNodes[range.startOffset]);
 					} else {
@@ -2067,6 +2073,8 @@ hope.register( 'hope.fragment.annotations', function() {
 
 					if (range.endContainer.nodeType === document.TEXT_NODE) {
 						rangeEnd = this.getTotalOffset(range.endContainer) + range.endOffset;
+					} else if (range.endContainer.childNodes.length === 0) {
+						rangeEnd = this.getTotalOffset(range.endContainer);
 					} else if (range.endContainer.childNodes[range.endOffset]) {
 						rangeEnd = this.getTotalOffset(range.endContainer.childNodes[range.endOffset]);
 					} else {

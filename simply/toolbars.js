@@ -95,6 +95,7 @@
 				
 				window.setTimeout(function() {
 					editor.context.skipUpdate = false;
+					editor.context.update();
 				}, 50);
 			}
 		},
@@ -136,8 +137,16 @@
 			var handleChange = function(evt) {
 				var action = editor.actions[this.getAttribute("data-simply-action")];
 				if (action) {
-					editor.toolbar.beforeAction();
-					var result = action(this.value);
+					window.setTimeout(function(value) {
+						return function() {
+							var focus = document.querySelector(":focus");
+							editor.toolbar.beforeAction();
+							var result = action(value);
+							if (focus) {
+								focus.focus();
+							}
+						};
+					}(this.value));
 				} else {
 					console.log(this.getAttribute("data-simply-action") + " not yet implemented");
 				}
@@ -367,6 +376,26 @@
 					if (typeof filter.selector !== 'undefined') {
 						result += 2*(filter.selector.split(".").length-1); // Add the number of class selectors;
 						result += 2*(filter.selector.split("[").length-1); // Add the number of attribute selectors
+					}
+
+					if (target.clickStart) {
+						var rect = target.getBoundingClientRect();
+						if (
+							target.clickStart.x > rect.left &&
+							target.clickStart.x < rect.right &&
+							target.clickStart.y < rect.bottom &&
+							target.clickStart.y > rect.top
+						) {
+							// click was in the element; less value for lists and list items;
+							if (target.getAttribute("contenteditable") && filter.context && filter.context.indexOf("simply-list") === 0) {
+								result -= 5;
+							}
+						} else {
+							// click was outside the element; more value for lists and list items;
+							if (filter.context && filter.context.indexOf("simply-list") === 0) {
+								result += 50 * (targets.length);
+							}
+						}
 					}
 
 					if (typeof filter["sel-collapsed"] !== 'undefined') {
