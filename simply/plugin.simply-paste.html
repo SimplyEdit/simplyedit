@@ -181,21 +181,22 @@
 				}
 
 				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
-				event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
 				event.target.ownerDocument.addEventListener("DOMNodeInserted", fontListener);
 
 				if (pastedHtml) {
 					event.preventDefault();
 					event.target.ownerDocument.execCommand("insertHtml", false, pastedHtml);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", fontListener);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
 					return;
 				}
 				if (pastedText) {
 					event.preventDefault();
+					event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
 					event.target.ownerDocument.execCommand("insertText", false, pastedText);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", fontListener);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
 					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
 				}
