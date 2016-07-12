@@ -800,7 +800,19 @@
 		},
 		loadBaseStyles : function() {
 			var baseStyles = document.createElement("link");
-			baseStyles.setAttribute("href", editor.baseURL + "simply/simply-base.css");
+			var cssuri = 'data:text/css,'+
+			'.simply-text-align-left { text-align: left; }'  +
+			'.simply-text-align-right { text-align: right; }' +
+			'.simply-text-align-center { text-align: center; }' +
+			'.simply-text-align-justify { text-align: justify; }' +
+			'.simply-image-align-left { float: left; }' +
+			'.simply-image-align-right { float: right; }' +
+			'.simply-image-align-middle { vertical-align: middle; }' +
+			'.simply-image-align-top { vertical-align: top; }' +
+			'.simply-image-align-bottom { vertical-align: bottom; }' +
+			'.simply-overflow-hidden { overflow: hidden; }' +
+			'';
+			baseStyles.setAttribute("href", cssuri);
 			baseStyles.setAttribute("rel", "stylesheet");
 			baseStyles.setAttribute("type", "text/css");
 			document.getElementsByTagName("HEAD")[0].appendChild(baseStyles);
