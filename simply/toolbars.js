@@ -364,6 +364,12 @@
 			var sel = vdSelectionState.get();
 
 			var target = targets.shift();
+
+			var listBonus = false;
+			if (target && target.clickStart) {
+				listBonus = true;
+			}
+
 			while (target) {
 				var tempNode = document.createElement("DIV");
 				tempNode.appendChild(target.cloneNode(false));
@@ -378,7 +384,7 @@
 						result += 2*(filter.selector.split("[").length-1); // Add the number of attribute selectors
 					}
 
-					if (target.clickStart) {
+					if (listBonus) {
 						var rect = target.getBoundingClientRect();
 						if (
 							target.clickStart.x > rect.left &&
@@ -396,6 +402,7 @@
 								result += 50 * (targets.length);
 							}
 						}
+						listBonus = false;
 					}
 
 					if (typeof filter["sel-collapsed"] !== 'undefined') {
