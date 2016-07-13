@@ -402,7 +402,6 @@
 								result += 50 * (targets.length);
 							}
 						}
-						listBonus = false;
 					}
 
 					if (typeof filter["sel-collapsed"] !== 'undefined') {
@@ -420,6 +419,7 @@
 					}
 				}
 				target = targets.shift();
+				listBonus = false;
 			}
 			return 0;
 		},
