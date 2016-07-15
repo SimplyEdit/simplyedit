@@ -67,7 +67,10 @@
 
 		var normalSave = editor.storage.file.save;
 		editor.storage.file.save = function(path, data, callback) {
-			if (editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0) {
+			if (
+					editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0 ||
+					path.slice(-1) == '/'
+			) {
 				return normalSave(path, data, callback);
 			}
 
