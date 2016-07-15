@@ -12,7 +12,7 @@
 			) {
 				var responsiveSizes = editor.responsiveImages.sizes("test.jpg");
 				for (var i in responsiveSizes) {
-					sizes.push(i.replace(/w$/, ''));
+					sizes.push(parseInt(i.replace(/w$/, '')));
 				}
 			}
 		}
