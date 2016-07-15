@@ -108,8 +108,7 @@
 				}
 
 				var canvas = document.createElement("canvas");
-
-				var targetSizes = sizes;
+				var targetSizes = sizes.slice();
 				targetSizes.sort(function(a,b) {
 					return a < b; // Sort sizes from large to small;
 				});
