@@ -721,6 +721,8 @@
 				for (var attr in data) {
 					if (attr == "innerHTML") {
 						field.innerHTML = data[attr];
+						editor.responsiveImages.init(field);
+
 					} else {
 						field.setAttribute(attr, data[attr]);
 					}
