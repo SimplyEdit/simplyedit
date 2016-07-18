@@ -378,17 +378,17 @@ window['Slip'] = (function(){
 						nodes[i].rects = nodes[i].getBoundingClientRect();
 
 						if (otherNodes[0].posX != otherNodes[otherNodes.length-1].posX) {
-						 		variationInX = true;
-						 	}
-						 	if (otherNodes[0].posY != otherNodes[otherNodes.length-1].posY) {
-						 		variationInY = true;
-						 	}
-						 	if (t != this.target.node.offsetTop) {
-						 		variationInY = true;
-						 	}
-						 	if (l != this.target.node.offsetLeft) {
-						 		variationInX = true;
-						 	}
+							variationInX = true;
+						}
+						if (otherNodes[0].posY != otherNodes[otherNodes.length-1].posY) {
+							variationInY = true;
+						}
+						if (t != this.target.node.offsetTop) {
+							variationInY = true;
+						}
+						if (l != this.target.node.offsetLeft) {
+							variationInX = true;
+						}
 					}
 				}
 
