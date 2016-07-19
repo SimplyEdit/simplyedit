@@ -184,6 +184,99 @@ window['Slip'] = (function(){
 		return originalIndex;
 	}
 
+	/* Helper functions to improve on getBoundingClientRect - also works
+	 * for elements that are collapsed because all the child elements
+	 * have float: styles. */
+
+	function getNodeBounds(el) {
+		var minTop;
+		var maxBottom;
+		var minLeft;
+		var maxRight;
+
+		if (el.offsetHeight > 0) {
+			return el.getBoundingClientRect();
+		}
+
+		// Its a collapsed element, probably because of floating child elements.
+		for (var i=0; i<el.childNodes.length; i++) {
+			if (el.childNodes[i].nodeType === document.ELEMENT_NODE) {
+				var rects = el.childNodes[i].getBoundingClientRect();
+				if (typeof minTop === "undefined") {
+					minTop = rects.top;
+				} else if (minTop > rects.top) {
+					minTop = rects.top;
+				}
+
+				if (typeof maxBottom === "undefined") {
+					maxBottom = rects.bottom;
+				} else if (maxBottom < rects.bottom) {
+					maxBottom = rects.bottom;
+				}
+
+				if (typeof minLeft === "undefined") {
+					minLeft = rects.left;
+				} else if (minLeft > rects.left) {
+					minLeft = rects.left;
+				}
+
+				if (typeof maxRight === "undefined") {
+					maxRight = rects.right;
+				} else if (maxRight < rects.right) {
+					maxRight = rects.right;
+				}
+			}
+		}
+		return {
+			top : minTop,
+			bottom : maxBottom,
+			left : minLeft,
+			right: maxRight
+		}
+	}
+
+	function getNodeHeight(el) {
+		if (el.offsetHeight > 0) {
+			return el.offsetHeight;
+		}
+		if (el.childNodes.length) {
+			var nodeBounds = getNodeBounds(el);
+			return nodeBounds.bottom - nodeBounds.top;
+		}
+		return 0;
+	}
+	function getNodeWidth(el) {
+		if (el.offsetHeight > 0) {
+			return el.offsetWidth;
+		}
+		if (el.childNodes.length) {
+			var nodeBounds = getNodeBounds(el);
+			return nodeBounds.right - nodeBounds.left;
+		}
+		return 0;
+	}
+	function getNodeLeft(el) {
+		if (el.offsetHeight > 0) {
+			return el.offsetLeft;
+		}
+		if (el.childNodes.length) {
+			var nodeBounds = getNodeBounds(el);
+			return nodeBounds.left;
+		}
+		return 0;
+	}
+	function getNodeTop(el) {
+		if (el.offsetHeight > 0) {
+			return el.offsetTop;
+		}
+		if (el.childNodes.length) {
+			var nodeBounds = getNodeBounds(el);
+			return nodeBounds.top;
+		}
+		return 0;
+	}
+
+
 	// All functions in states are going to be executed in context of Slip object
 	Slip.prototype = {
 
@@ -345,16 +438,19 @@ window['Slip'] = (function(){
 			},
 
 			reorder: function reorderStateInit() {
-				this.target.height = this.target.node.offsetHeight;
-				this.target.width = this.target.node.offsetWidth;
+
+				this.target.height = getNodeHeight(this.target.node);
+				this.target.width = getNodeWidth(this.target.node);
 
 				var nodes = this.container.childNodes;
 				var originalIndex = findIndex(this.target, nodes);
 				var mouseOutsideTimer;
-				var zeroY = this.target.node.offsetTop + this.target.height/2;
-				var zeroX = this.target.node.offsetLeft + this.target.width/2;
+				var zeroY = getNodeTop(this.target.node) + this.target.height/2;
+				var zeroX = getNodeLeft(this.target.node) + this.target.width/2;
 
-				this.target.rects = this.target.node.getBoundingClientRect();
+				this.target.rects = getNodeBounds(this.target.node);
+				this.target.node.rects = this.target.rects;
+
 				this.target.parentList = Array.prototype.slice.call(this.target.node.parentNode.children);
 
 				var otherNodes = [];
@@ -363,19 +459,19 @@ window['Slip'] = (function(){
 				 
 				for(var i=0; i < nodes.length; i++) {
 					if (nodes[i].nodeType != 1 || nodes[i] === this.target.node) continue;
-					var t = nodes[i].offsetTop;
-					var l = nodes[i].offsetLeft;
+					var t = getNodeTop(nodes[i]);
+					var l = getNodeLeft(nodes[i]);
 					
 					nodes[i].style[transitionPrefix] = transformProperty + ' 0.2s ease-in-out';
 					if (nodes[i].offsetParent) {
 						otherNodes.push({
 							node: nodes[i],
 							baseTransform: getTransform(nodes[i]),
-							rects : nodes[i].getBoundingClientRect(),
-							posY: t + (t < zeroY ? nodes[i].offsetHeight : 0) - zeroY,
-							posX: l + (l < zeroX ? nodes[i].offsetWidth : 0) - zeroX,
+							rects : getNodeBounds(nodes[i]),
+							posY: t + (t < zeroY ? getNodeHeight(nodes[i]) : 0) - zeroY,
+							posX: l + (l < zeroX ? getNodeWidth(nodes[i]) : 0) - zeroX,
 						});
-						nodes[i].rects = nodes[i].getBoundingClientRect();
+						nodes[i].rects = getNodeBounds(nodes[i]);
 
 						if (otherNodes[0].posX != otherNodes[otherNodes.length-1].posX) {
 							variationInX = true;
@@ -383,10 +479,10 @@ window['Slip'] = (function(){
 						if (otherNodes[0].posY != otherNodes[otherNodes.length-1].posY) {
 							variationInY = true;
 						}
-						if (t != this.target.node.offsetTop) {
+						if (t != getNodeTop(this.target.node)) {
 							variationInY = true;
 						}
-						if (l != this.target.node.offsetLeft) {
+						if (l != getNodeLeft(this.target.node)) {
 							variationInX = true;
 						}
 					}
@@ -435,7 +531,7 @@ window['Slip'] = (function(){
 						move.y = 0;
 					}
 
-					var targetRects = this.target.node.getBoundingClientRect();
+					var targetRects = getNodeBounds(this.target.node);
 					this.target.node.focus();
 
 					var yAngleCorrection = Math.sin(2 * Math.PI / 180) * (move.x);
@@ -531,8 +627,9 @@ window['Slip'] = (function(){
 									// console.log("swap " + (i) + " to " + (i+1));
 								}
 
-								var offY = node2.offsetTop - node1.offsetTop;
-								var offX = node2.offsetLeft - node1.offsetLeft;
+								var offY = node2.rects.top - node1.rects.top;
+								var offX = node2.rects.left - node1.rects.left;
+
 								if (offX === 0) {
 									offY = (offY > 0) ? currentTarget.height : -currentTarget.height;
 								}
