@@ -31,7 +31,7 @@
 	};
 
 	var editor = {
-		version: '0.39',
+		version: '0.40',
 		apiKey : apiKey,
 		baseURL : getBaseURL(scriptEl.src),
 		data : {
