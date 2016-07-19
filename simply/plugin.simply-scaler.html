@@ -67,13 +67,17 @@
 
 		var normalSave = editor.storage.file.save;
 		editor.storage.file.save = function(path, data, callback) {
+			// data is not a file, or we are creating a directory
 			if (
 				typeof data != 'object' ||
-				(
-					typeof editor.plugins.browse.currentPath == 'undefined'  ||
-					editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0
-				) ||
 				path.slice(-1) == '/'
+			) {
+				return normalSave(path, data, callback);
+			}
+			// not under the image endpoint, no scaling of images
+			if (
+				typeof editor.plugins.browse.currentPath == 'undefined'  ||
+				editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0
 			) {
 				return normalSave(path, data, callback);
 			}
