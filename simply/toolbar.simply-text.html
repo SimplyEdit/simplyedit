@@ -283,7 +283,10 @@
 			var hyperlinkTitle = tempNode.getAttribute('title');
 			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), hyperlinkTitle);
 
-			var hyperlinkName = tempNode.getAttribute('name');
+			var hyperlinkName = tempNode.getAttribute('id');
+			if (hyperlinkName === null) {
+				hyperlinkName = tempNode.getAttribute('name');
+			}
 			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), hyperlinkName);
 			
 			var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
@@ -715,6 +718,7 @@
 				var hopeEditor = field.hopeEditor;
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					hopeEditor.field.setAttribute("name", value);
+					hopeEditor.field.setAttribute("id", value);
 					return;
 				}
 
@@ -722,10 +726,11 @@
 				var hyperlink = hopeEditor.fragment.has(range, "a");
 				
 				if (!hyperlink) {
-					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a name="' + value + '"');
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a name="' + value + '" id="' + value + '"');
 				} else {
 					var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
 					tempNode.setAttribute("name", value);
+					tempNode.setAttribute("id", value);
 					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
 					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);

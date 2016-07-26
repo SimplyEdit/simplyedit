@@ -655,7 +655,7 @@
 				},
 				"a" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML"]);
+						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "id"]);
 					},
 					set : function(field, data) {
 						return editor.field.defaultSetter(field, data);
@@ -672,6 +672,7 @@
 						field.addEventListener("slip:beforereorder", function(evt) {
 							var rect = this.getBoundingClientRect();
 							if (
+								this.clickStart &&
 								this.clickStart.x > rect.left &&
 								this.clickStart.x < rect.right &&
 								this.clickStart.y < rect.bottom &&
@@ -785,6 +786,7 @@
 				field.addEventListener("slip:beforereorder", function(evt) {
 					var rect = this.getBoundingClientRect();
 					if (
+						this.clickStart &&
 						this.clickStart.x > rect.left &&
 						this.clickStart.x < rect.right &&
 						this.clickStart.y < rect.bottom &&
