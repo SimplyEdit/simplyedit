@@ -655,9 +655,12 @@
 				},
 				"a" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "id"]);
+						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "name"]);
 					},
 					set : function(field, data) {
+						if (data) {
+							data.id = data.name;
+						}
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
