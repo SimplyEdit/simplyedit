@@ -31,7 +31,7 @@
 	};
 
 	var editor = {
-		version: '0.36',
+		version: '0.40',
 		apiKey : apiKey,
 		baseURL : getBaseURL(scriptEl.src),
 		data : {
@@ -725,6 +725,8 @@
 				for (var attr in data) {
 					if (attr == "innerHTML") {
 						field.innerHTML = data[attr];
+						editor.responsiveImages.init(field);
+
 					} else {
 						field.setAttribute(attr, data[attr]);
 					}
@@ -805,7 +807,19 @@
 		},
 		loadBaseStyles : function() {
 			var baseStyles = document.createElement("link");
-			baseStyles.setAttribute("href", editor.baseURL + "simply/simply-base.css");
+			var cssuri = 'data:text/css,'+
+			'.simply-text-align-left { text-align: left; }'  +
+			'.simply-text-align-right { text-align: right; }' +
+			'.simply-text-align-center { text-align: center; }' +
+			'.simply-text-align-justify { text-align: justify; }' +
+			'.simply-image-align-left { float: left; }' +
+			'.simply-image-align-right { float: right; }' +
+			'.simply-image-align-middle { vertical-align: middle; }' +
+			'.simply-image-align-top { vertical-align: top; }' +
+			'.simply-image-align-bottom { vertical-align: bottom; }' +
+			'.simply-overflow-hidden { overflow: hidden; }' +
+			'';
+			baseStyles.setAttribute("href", cssuri);
 			baseStyles.setAttribute("rel", "stylesheet");
 			baseStyles.setAttribute("type", "text/css");
 			document.getElementsByTagName("HEAD")[0].appendChild(baseStyles);
@@ -1163,6 +1177,15 @@
 			}
 		},
 		responsiveImages : {
+			getEndpoint  : function() {
+				var imagesPath = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
+				if (typeof imagesPath !== 'undefined' && imagesPath) {
+					var parser = document.createElement("A");
+					parser.href = imagesPath;
+					imagesPath = parser.href;
+				}
+				return imagesPath;
+			},
 			sizes : function(src) {
 				return {};
 			},
@@ -1207,7 +1230,7 @@
 				}
 
 				var srcSet = [];
-				var imagesPath = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
+				var imagesPath = this.getEndpoint();
 				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
 					var sizes = editor.responsiveImages.sizes(imageSrc);
 					for (var size in sizes) {
@@ -1380,8 +1403,6 @@
 				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
-				} else {
-					url += "?v=" + editor.version;
 				}
 
 				http.open("GET", url, true);
@@ -1548,8 +1569,6 @@
 				var url = "https://raw.githubusercontent.com/" + this.repoUser + "/" + this.repoName + "/" + this.repoBranch + "/" + this.dataFile;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
-				} else {
-					url += "?v=" + editor.version;
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.
@@ -1723,8 +1742,6 @@
 				var url = editor.storage.dataEndpoint;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
-				} else {
-					url += "?v=" + editor.version;
 				}
 				http.open("GET", url, true);
 				http.onreadystatechange = function() {//Call a function when the state changes.

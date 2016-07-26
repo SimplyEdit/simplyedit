@@ -12,7 +12,7 @@
 			) {
 				var responsiveSizes = editor.responsiveImages.sizes("test.jpg");
 				for (var i in responsiveSizes) {
-					sizes.push(i.replace(/w$/, ''));
+					sizes.push(parseInt(i.replace(/w$/, '')));
 				}
 			}
 		}
@@ -69,9 +69,19 @@
 
 		var normalSave = editor.storage.file.save;
 		editor.storage.file.save = function(path, data, callback) {
+			// data is not a file, or we are creating a directory
+			if (
+				typeof data != 'object' ||
+				path.slice(-1) == '/'
+			) {
+				return normalSave(path, data, callback);
+			}
+
+			// not under the image endpoint, no scaling of images
 			var parser = document.createElement("A");
 			parser.href = path;
 			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
+			) {
 				return normalSave(path, data, callback);
 			}
 
@@ -109,8 +119,7 @@
 				}
 
 				var canvas = document.createElement("canvas");
-
-				var targetSizes = sizes;
+				var targetSizes = sizes.slice();
 				targetSizes.sort(function(a,b) {
 					return a < b; // Sort sizes from large to small;
 				});
