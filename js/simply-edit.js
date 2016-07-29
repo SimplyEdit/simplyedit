@@ -658,7 +658,7 @@
 						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "name"]);
 					},
 					set : function(field, data) {
-						if (data) {
+						if (typeof data.name == "string") {
 							data.id = data.name;
 						}
 						return editor.field.defaultSetter(field, data);
