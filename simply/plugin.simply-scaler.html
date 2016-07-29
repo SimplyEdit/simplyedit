@@ -52,7 +52,9 @@
 
 		var normalDelete = editor.storage.file.delete;
 		editor.storage.file.delete = function(path, callback) {
-			if (editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0) {
+			var parser = document.createElement("A");
+			parser.href = path;
+			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
 				return normalDelete(path, callback);
 			} else {
 				normalDelete(path, function() {
@@ -74,10 +76,11 @@
 			) {
 				return normalSave(path, data, callback);
 			}
+
 			// not under the image endpoint, no scaling of images
-			if (
-				typeof editor.plugins.browse.currentPath == 'undefined'  ||
-				editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) !== 0
+			var parser = document.createElement("A");
+			parser.href = path;
+			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
 			) {
 				return normalSave(path, data, callback);
 			}

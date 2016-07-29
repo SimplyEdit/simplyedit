@@ -655,9 +655,12 @@
 				},
 				"a" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML"]);
+						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "name"]);
 					},
 					set : function(field, data) {
+						if (typeof data.name == "string") {
+							data.id = data.name;
+						}
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
@@ -672,6 +675,7 @@
 						field.addEventListener("slip:beforereorder", function(evt) {
 							var rect = this.getBoundingClientRect();
 							if (
+								this.clickStart &&
 								this.clickStart.x > rect.left &&
 								this.clickStart.x < rect.right &&
 								this.clickStart.y < rect.bottom &&
@@ -787,6 +791,7 @@
 				field.addEventListener("slip:beforereorder", function(evt) {
 					var rect = this.getBoundingClientRect();
 					if (
+						this.clickStart &&
 						this.clickStart.x > rect.left &&
 						this.clickStart.x < rect.right &&
 						this.clickStart.y < rect.bottom &&
