@@ -18,7 +18,8 @@
 		}
 
 		*[data-simply-list]:not(.simply-empty):before,
-		*[data-simply-list-item]:before {
+		*[data-simply-list-item]:before,
+		*[data-simply-content='fixed']:before {
 			font-weight: normal;
 			font-style: normal;
 			font-family: FontAwesome;
@@ -41,7 +42,8 @@
 			line-height: 15px;
 		}
 		*[data-simply-list]:not(.simply-empty):hover:before,
-		*[data-simply-list-item]:hover:before {
+		*[data-simply-list-item]:hover:before,
+		*[data-simply-content='fixed']:before {
 			opacity: 1;
 		}
 		*[data-simply-list-item]:before {
@@ -50,6 +52,7 @@
 		*[data-simply-list-item]:not([data-simply-list-icon]):before {
 			content: "\f1b2"; /* cube */
 		}
+
 		*[data-simply-list-item][data-simply-list-icon]:not([data-simply-list-icon|="fa"]):before {
 			content: attr(data-simply-list-icon);
 		}
@@ -62,7 +65,18 @@
 		*[data-simply-list][data-simply-list-icon]:not(.simply-empty):not([data-simply-list-icon|="fa"]):before {
 			content: attr(data-simply-list-icon);
 		}
-
+		*[data-simply-content='fixed']:before {
+			margin-left: 0px;
+		}
+		*[data-simply-content='fixed']:not([data-simply-list-icon]):before {
+			content: "\f148"; /* level-up */
+		}
+		a[data-simply-content='fixed']:not([data-simply-list-icon]):before {
+			content: "\f0c1"; /* link */
+		}
+		*[data-simply-content='fixed'][data-simply-list-icon]:not([data-simply-list-icon|="fa"]):before {
+			content: attr(data-simply-list-icon);
+		}
 		#simply-editor {
 			font-family: arial;
 		}

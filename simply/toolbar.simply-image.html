@@ -474,24 +474,7 @@
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
 			
-			hopeEditor = {
-				field : image,
-				parseHTML : function(){},
-				fragment : {
-					has : function() {
-						return false;
-					}
-				},
-				currentRange : false,
-				selection : {
-					getRange : function() {
-						return false;
-					},
-					updateRange : function() {}
-				},
-				update : function() {},
-				showCursor : function() {}
-			};
+			var hopeEditor = image.hopeEditor;
 			editor.context.hopeEditor = hopeEditor;
 
 			if (!image.hopeEditor) {

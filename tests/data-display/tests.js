@@ -74,6 +74,22 @@ QUnit.module("editor field set");
 		assert.equal(field.innerHTML, data, "div content is set correctly");
 	});
 
+	QUnit.test("field set fixed field data", function(assert) {
+		var field = document.createElement("A");
+		field.setAttribute("data-simply-content", "fixed");
+
+		field.innerHTML = "Hello world";
+
+		var data = {
+			href : "http://www.muze.nl/logo.gif",
+			innerHTML : "Foo"
+		};
+
+		editor.field.set(field, data);
+		assert.equal(field.getAttribute("href"), data.href, "a href is set correctly");
+		assert.equal(field.innerHTML, "Hello world");
+	});
+
 QUnit.module("editor field get");
 
 	QUnit.test("field get img data", function(assert) {
@@ -178,6 +194,24 @@ QUnit.module("editor field get");
 		assert.equal(result.src, "Test me!", "content is same as inserted data");
 		assert.notOk(result.test, "test attribute should not be returned");
 	});
+
+	QUnit.test("field get fixed field data", function(assert) {
+		var field = document.createElement("A");
+		field.setAttribute("data-simply-content", "fixed");
+
+		field.innerHTML = "Hello world";
+
+		var data = {
+			href : "http://www.muze.nl/logo.gif",
+			innerHTML : "Foo"
+		};
+
+		editor.field.set(field, data);
+		var result = editor.field.get(field);
+		assert.ok(result, "got result");
+		assert.notOk(result.innerHTML, "innerHTML should not be returned");
+	});
+
 
 QUnit.module("editor data apply");
 
