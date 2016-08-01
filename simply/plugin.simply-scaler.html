@@ -33,9 +33,9 @@
 
 		editor.storage.list = function(url, callback) {
 			if (url.indexOf(editor.storage.imagesEndpoint) !== 0) {
-				return normalList(url, callback);
+				return normalList.call(this, url, callback);
 			} else {
-				normalList(url, function(result) {
+				normalList.call(this,url, function(result) {
 					var images = [];
 
 					for (var i=0; i < result.images.length; i++) {
@@ -55,12 +55,12 @@
 			var parser = document.createElement("A");
 			parser.href = path;
 			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
-				return normalDelete(path, callback);
+				return normalDelete.call(this, path, callback);
 			} else {
 				normalDelete(path, function() {
 					var scaledUrls = editor.responsiveImages.sizes(path);
 					for (var i in scaledUrls) {
-						normalDelete(scaledUrls[i], function(){});
+						normalDelete.call(this, scaledUrls[i], function(){});
 					}
 				});
 				callback();
@@ -69,19 +69,21 @@
 
 		var normalSave = editor.storage.file.save;
 		editor.storage.file.save = function(path, data, callback) {
+			var storageScope = this;
 			// data is not a file, or we are creating a directory
 			if (
 				typeof data != 'object' ||
 				path.slice(-1) == '/'
 			) {
 				return normalSave(path, data, callback);
+				return normalSave.call(storageScope, path, data, callback);
 			}
 
 			// not under the image endpoint, no scaling of images
 			var parser = document.createElement("A");
 			parser.href = path;
 			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
-				return normalSave(path, data, callback);
+				return normalSave.call(storageScope, path, data, callback);
 			}
 
 			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
@@ -171,7 +173,7 @@
 							var dataBlob = dataURItoBlob(canvas.toDataURL(mime), 1);
 							var url = editor.responsiveImages.sizes(subpath + reader.filename)[size + "w"];
 							if (url) {
-								normalSave(url, dataBlob, function(image) {
+								normalSave.call(storageScope, url, dataBlob, function(image) {
 									reader.progressBar.value += 25; // fixme: stepsize;
 								});
 							}
@@ -188,7 +190,7 @@
 			};
 
 			(function(reader, file) {
-				normalSave(subpath + file.name, file, function(image) {
+				normalSave.call(storageScope, subpath + file.name, file, function(image) {
 					reader.readAsDataURL(file);
 					if (typeof image === "undefined") {
 						image = {
