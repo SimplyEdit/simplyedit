@@ -32,10 +32,11 @@
 		};
 
 		editor.storage.list = function(url, callback) {
+			var storageScope = this;
 			if (url.indexOf(editor.storage.imagesEndpoint) !== 0) {
-				return normalList.call(this, url, callback);
+				return normalList.call(storageScope, url, callback);
 			} else {
-				normalList.call(this,url, function(result) {
+				normalList.call(storageScope, url, function(result) {
 					var images = [];
 
 					for (var i=0; i < result.images.length; i++) {
@@ -52,15 +53,16 @@
 
 		var normalDelete = editor.storage.file.delete;
 		editor.storage.file.delete = function(path, callback) {
+			var storageScope = this;
 			var parser = document.createElement("A");
 			parser.href = path;
 			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
-				return normalDelete.call(this, path, callback);
+				return normalDelete.call(storageScope, path, callback);
 			} else {
 				normalDelete(path, function() {
 					var scaledUrls = editor.responsiveImages.sizes(path);
 					for (var i in scaledUrls) {
-						normalDelete.call(this, scaledUrls[i], function(){});
+						normalDelete.call(storageScope, scaledUrls[i], function(){});
 					}
 				});
 				callback();
