@@ -55,7 +55,11 @@
 		editor.storage.file.delete = function(path, callback) {
 			var storageScope = this;
 			var parser = document.createElement("A");
-			parser.href = path;
+			if ( path.charAt(0) === '/' ) {
+				parser.href = path;
+			} else {
+				parser.href = editor.storage.endpoint + path;
+			}
 			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
 				return normalDelete.call(storageScope, path, callback);
 			} else {
@@ -83,7 +87,11 @@
 
 			// not under the image endpoint, no scaling of images
 			var parser = document.createElement("A");
-			parser.href = path;
+			if ( path.charAt(0) === '/' ) {
+				parser.href = path;
+			} else {
+				parser.href = editor.storage.endpoint + path;
+			}
 			if (parser.href.indexOf(editor.storage.imagesEndpoint) !== 0) {
 				return normalSave.call(storageScope, path, data, callback);
 			}
