@@ -625,6 +625,7 @@
 						}
 					},
 					makeEditable : function(field) {
+						editor.field.initHopeStub(field);
 						field.setAttribute("data-simply-selectable", true);
 					}
 				},
@@ -664,29 +665,12 @@
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
-						field.hopeContent = document.createElement("textarea");
-						field.hopeMarkup = document.createElement("textarea");
-						field.hopeRenderedSource = document.createElement("DIV");
-						field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
-						field.hopeEditor.field = field;
-						field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
-							field.hopeEditor.needsUpdate = true;
-						});
-						field.addEventListener("slip:beforereorder", function(evt) {
-							var rect = this.getBoundingClientRect();
-							if (
-								this.clickStart &&
-								this.clickStart.x > rect.left &&
-								this.clickStart.x < rect.right &&
-								this.clickStart.y < rect.bottom &&
-								this.clickStart.y > rect.top
-							) {
-								// this will prevent triggering list sorting when using tap-hold on text;
-								// the check of the clientrect will allow a click on the list item marker to continue, because it is positioned out of bounds;
-								evt.preventDefault(); // this will prevent triggering list sorting when using tap-hold on text;
-								return false;
-							}
-						}, false);
+						if (field.getAttribute("data-simply-content") == "fixed") {
+							editor.field.initHopeStub(field);
+							field.setAttribute("data-simply-selectable", true);
+						} else {
+							editor.field.initHopeEditor(field);
+						}
 					}
 				},
 				"i.fa" : {
@@ -699,6 +683,55 @@
 						field.contentEditable = true;
 					}
 				}
+			},
+			initHopeEditor : function(field) {
+				field.hopeContent = document.createElement("textarea");
+				field.hopeMarkup = document.createElement("textarea");
+				field.hopeRenderedSource = document.createElement("DIV");
+				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
+				field.hopeEditor.field = field;
+				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+					field.hopeEditor.needsUpdate = true;
+				});
+
+				field.addEventListener("slip:beforereorder", function(evt) {
+					var rect = this.getBoundingClientRect();
+					if (
+						this.clickStart &&
+						this.clickStart.x > rect.left &&
+						this.clickStart.x < rect.right &&
+						this.clickStart.y < rect.bottom &&
+						this.clickStart.y > rect.top
+					) {
+						// this will prevent triggering list sorting when using tap-hold on text;
+						// the check of the clientrect will allow a click on the list item marker to continue, because it is positioned out of bounds;
+						evt.preventDefault(); // this will prevent triggering list sorting when using tap-hold on text;
+						return false;
+					}
+				}, false);
+			},
+			initHopeStub : function(field) {
+				field.hopeEditor = {
+					field : field,
+					parseHTML : function(){},
+					fragment : {
+						has : function() {
+							return false;
+						}
+					},
+					getBlockAnnotation : function() {
+						return false;
+					},
+					currentRange : false,
+					selection : {
+						getRange : function() {
+							return false;
+						},
+						updateRange : function() {}
+					},
+					update : function() {},
+					showCursor : function() {}
+				};
 			},
 			matches : function(el, selector) {
 				var p = Element.prototype;
@@ -719,9 +752,16 @@
 						}
 					}
 				}
+
+				if (field.getAttribute("data-simply-content") == "fixed") {
+					delete result.innerHTML;
+				}
 				return result;
 			},
 			defaultSetter : function(field, data) {
+				if (field.getAttribute("data-simply-content") == "fixed") {
+					delete data.innerHTML;
+				}
 				for (var attr in data) {
 					if (attr == "innerHTML") {
 						field.innerHTML = data[attr];
@@ -780,29 +820,12 @@
 				if (editable) {
 					return editable(field);
 				}
-				field.hopeContent = document.createElement("textarea");
-				field.hopeMarkup = document.createElement("textarea");
-				field.hopeRenderedSource = document.createElement("DIV");
-				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
-				field.hopeEditor.field = field;
-				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
-					field.hopeEditor.needsUpdate = true;
-				});
-				field.addEventListener("slip:beforereorder", function(evt) {
-					var rect = this.getBoundingClientRect();
-					if (
-						this.clickStart &&
-						this.clickStart.x > rect.left &&
-						this.clickStart.x < rect.right &&
-						this.clickStart.y < rect.bottom &&
-						this.clickStart.y > rect.top
-					) {
-						// this will prevent triggering list sorting when using tap-hold on text;
-						// the check of the clientrect will allow a click on the list item marker to continue, because it is positioned out of bounds;
-						evt.preventDefault(); // this will prevent triggering list sorting when using tap-hold on text;
-						return false;
-					}
-				}, false);
+				if (field.getAttribute("data-simply-content") == "fixed") {
+					editor.field.initHopeStub(field);
+					field.setAttribute("data-simply-selectable", true);
+				} else {
+					editor.field.initHopeEditor(field);
+				}
 			}
 		},
 		loadBaseStyles : function() {
@@ -1050,6 +1073,9 @@
 						if (editor.node.hasSimplyParent(event.target) || editor.node.isSimplyParent(event.target)) {
 							handleClick(event);
 						}
+					}
+					if (editor.node.isSimplyParent(event.target)) {
+						handleClick(event);
 					}
 				});
 

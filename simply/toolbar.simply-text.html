@@ -264,6 +264,15 @@
 			}
 		}
 
+		// Check fixed content;
+		if (field.getAttribute("data-simply-content") == "fixed") {
+			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "none";
+			toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "none";
+		} else {
+			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "block";
+			toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "block";
+		}
+
 		// Check hyperlink;
 		toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "none";
 
