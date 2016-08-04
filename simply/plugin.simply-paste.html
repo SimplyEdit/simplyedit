@@ -37,24 +37,31 @@
 
 	var divListener = function(ev) {
 		if (ev.target.tagName=='DIV') {
-			var sel = window.getSelection();
-
-			var newP = document.createElement("p");
-			newP.innerHTML = ev.target.innerHTML;
-			ev.target.innerHTML = '';
-			ev.target.appendChild(newP);
-			if (newP.innerHTML == '') {
-				newP.innerHTML = "<br>";
-			}
-
-			editor.node.unwrap(ev.target);
 			window.setTimeout(function() {
+				// allow a bit of time before unwrapping - chrome is still moving elements around at this point
+				var newP = document.createElement("p");
+				newP.innerHTML = ev.target.innerHTML;
+				ev.target.innerHTML = '';
+				ev.target.appendChild(newP);
+				if (newP.innerHTML == '') {
+					newP.innerHTML = "<br>";
+				}
+
+				editor.node.unwrap(ev.target);
+
+				var siblings = newP.parentNode.childNodes;
+				for (var i=0; i<siblings.length; i++) {
+					if (siblings[i] && siblings[i].nodeType == document.TEXT_NODE) {
+						editor.node.wrap(siblings[i], "p");
+					}
+				}
+
+				var sel = window.getSelection();
 				var range = document.createRange();
 				range.setStart(newP, 0);
 				sel.removeAllRanges();
 				sel.addRange(range);
 			}, 10);
-
 		}
 	};
 

@@ -62,7 +62,12 @@
 				editor.plugins.dialog.open(document.getElementById('simply-template'), editor.plugins.pageTemplate.dialog.update);
 			},
 			update : function() {
-				var pageTemplate = document.head.querySelector("meta[name=page-template]") ? document.head.querySelector("meta[name=page-template]").getAttribute("content") : "index.html";
+				var pageTemplate = "index.html";
+				if (document.head.querySelector("meta[name=page-template]")) {
+					pageTemplate = document.head.querySelector("meta[name=page-template]").getAttribute("content");
+				} else if (editor.currentData[editor.data.getDataPath()]['data-simply-page-template']) {
+					pageTemplate = editor.currentData[editor.data.getDataPath()]['data-simply-page-template'];
+				}
 				simply.widgets.properties.set("simply-page-template-list", pageTemplate);
 			}
 		},
@@ -88,6 +93,7 @@
 			if (!metaTag) {
 				metaTag = document.createElement("meta");
 				metaTag.setAttribute("name", name);
+				metaTag.setAttribute("data-simply-field", "data-simply-" + name);
 				document.head.appendChild(metaTag);
 			}
 			if (value) {

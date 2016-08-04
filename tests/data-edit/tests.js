@@ -136,10 +136,26 @@ function dispatchEvent (el, evt) {
 	if (el.dispatchEvent) {
 		el.dispatchEvent(evt);
 	} else if (el.fireEvent) {
-		el.fireEvent('on' + type, evt);
+		el.fireEvent('on' + evt.type, evt);
 	}
 	return evt;
 }
+
+function simulateKeyDown(el, k) {
+	oEvent = document.createEvent('Event');
+	oEvent.initEvent('keydown', true, false);
+	oEvent.keyCode = 13;
+	oEvent.which = 13;
+	dispatchEvent(el, oEvent);
+}
+function simulateKeyUp(el, k) {
+	oEvent = document.createEvent('Event');
+	oEvent.initEvent('keyup', true, false);
+	oEvent.keyCode = 13;
+	oEvent.which = 13;
+	dispatchEvent(el, oEvent);
+}
+
 
 QUnit.module("editor init");
 	QUnit.test("editmode init", function(assert) {
@@ -606,6 +622,53 @@ QUnit.module("editor text cursor");
 		setCaretPosition(testContent, 2, 0);
 		editor.actions['simply-text-blockstyle']('ul');
 		assert.equal(testContent.innerHTML, '<ul><li>Hello world</li></ul>');
+	});
+
+	QUnit.test("text split clean text to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 5, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p>Hello</p><p>&nbsp;world</p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text split clean text to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 0, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p><br></p><p>Hello world</p>');
+			done1();
+		}, 100);
+	});
+	QUnit.test("text split clean text to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 11, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p>Hello world</p><p><br></p>');
+			done1();
+		}, 100);
 	});
 
 QUnit.module("editor text selection");
@@ -1213,3 +1276,10 @@ QUnit.module("symbol plugin");
 
 		assert.equal(testContent.innerHTML, '<ol><li>Hello world</li><li>A</li></ol>', "Symbol was inserted in the empty list item");
 	});
+
+QUnit.module("scaler plugin");
+	QUnit.test("load scaler plugin", function(assert) {
+		editor.loadToolbar("../../simply/plugin.simply-scaler.html");
+		assert.equal(true, true, "Loading scaler plugin for syntax check");
+	});
+

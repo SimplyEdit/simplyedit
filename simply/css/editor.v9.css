@@ -725,7 +725,12 @@
 	outline: 2px dashed rgba(128,128,128,0.3);
 	text-align: center;
 }
-.simply-empty[data-simply-list]:before {
+[data-simply-field]:empty {
+	min-height: 24px;
+	text-align: center;
+}
+.simply-empty[data-simply-list]:before,
+[data-simply-field]:empty:before {
 	text-align: center;
 	font-family: FontAwesome;
 	font-size: 20px;
@@ -734,15 +739,15 @@
 	line-height: 24px;
 	vertical-align: middle;
 	padding-top: 5px;
+	transition: 0.6s opacity ease;
+	opacity: 1;
 }
 .simply-empty[data-simply-list]:not([data-simply-list-icon]):before {
 	content: "\f1b3"; /* cubes */
 }
-
 .simply-empty[data-simply-list][data-simply-list-icon]:not([data-simply-list-icon]|="fa"):before {
 	content: attr(data-simply-list-icon);
 }
-
 .simply-empty[data-simply-list]:after {
 	content: "(Empty list)";
 	text-align: center;
@@ -754,6 +759,31 @@
 	vertical-align: middle;
 	padding-bottom: 5px;
 	margin-left: 4px;
+}
+[data-simply-field]:empty:hover:before,
+[data-simply-field]:empty:hover:after {
+	opacity: 0.3;
+}
+
+[data-simply-field]:empty:not([data-simply-field-icon]):before {
+	content: "\f044"; /* pencil-square-o */
+}
+[data-simply-field][data-simply-field-icon]:empty:not([data-simply-field-icon]|="fa"):before {
+	content: attr(data-simply-field-icon);
+}
+[data-simply-field]:empty:after {
+	content: "(Empty)";
+	text-align: center;
+	font-family: arial;
+	font-size: 12px;
+	color: #888;
+	width: 100%;
+	line-height: 24px;
+	vertical-align: middle;
+	padding-bottom: 5px;
+	margin-left: 4px;
+	opacity: 1;
+	transition: 0.6s opacity ease;
 }
 
 /* plain view */
