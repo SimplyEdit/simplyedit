@@ -31,7 +31,7 @@
 	};
 
 	var editor = {
-		version: '0.40',
+		version: '0.42',
 		apiKey : apiKey,
 		baseURL : getBaseURL(scriptEl.src),
 		data : {
@@ -830,7 +830,7 @@
 		},
 		loadBaseStyles : function() {
 			var baseStyles = document.createElement("link");
-			var cssuri = 'data:text/css,'+
+			var cssuri = 'data:text/css,'+ encodeURIComponent(
 			'.simply-text-align-left { text-align: left; }'  +
 			'.simply-text-align-right { text-align: right; }' +
 			'.simply-text-align-center { text-align: center; }' +
@@ -841,7 +841,7 @@
 			'.simply-image-align-top { vertical-align: top; }' +
 			'.simply-image-align-bottom { vertical-align: bottom; }' +
 			'.simply-overflow-hidden { overflow: hidden; }' +
-			'';
+			'');
 			baseStyles.setAttribute("href", cssuri);
 			baseStyles.setAttribute("rel", "stylesheet");
 			baseStyles.setAttribute("type", "text/css");
