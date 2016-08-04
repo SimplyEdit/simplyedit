@@ -671,6 +671,151 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
+	QUnit.test("text split text within inline element to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<strong>Hello world</strong>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("strong"), 6, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p><strong>Hello&nbsp;</strong></p><p><strong>world</strong></p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text split text within inline element at end to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<strong>Hello world</strong>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("strong"), 11, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p><strong>Hello world</strong></p><p><strong><br></strong></p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text split text within inline element within paragraph to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p><strong>Hello world</strong></p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("strong"), 6, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p><strong>Hello&nbsp;</strong></p><p><strong>world</strong></p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text split text within inline element followed by paragraph", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<strong>Hello</strong><p><strong>world</strong></p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("strong"), 3, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p><strong>Hel</strong></p><p><strong>lo</strong></p><p><strong>world</strong></p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text split h1 to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h1>Hello world</h1>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("h1"), 5, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			// because H1 should only occur once on each level
+			assert.equal(testContent.innerHTML, '<h1>Hello</h1><p>&nbsp;world</p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text press return at end of h1", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h1>Hello world</h1>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("h1"), 11, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<h1>Hello world</h1><p><br></p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text split h2 to two lines", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h2>Hello world</h2>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("h2"), 5, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<h2>Hello</h2><h2>&nbsp;world</h2>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text press return at end of h2", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h2>Hello world</h2>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("h2"), 11, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<h2>Hello world</h2><p><br></p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text press return at end of h1", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h1 style='display: inline;'>Hello world</h1>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("h1"), 11, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<h1 style="display: inline;">Hello world</h1><p><br></p>');
+			done1();
+		}, 100);
+	});
+
 QUnit.module("editor text selection");
 	QUnit.test("text set bold", function(assert) {
 		var testContent = document.querySelector("#testContent");

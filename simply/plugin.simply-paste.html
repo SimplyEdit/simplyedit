@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	var spanListener = function(ev) {
-		if (ev.target.tagName=='SPAN') {
+		if (ev.target.tagName && ev.target.tagName.toLowerCase()=='span') {
 			editor.node.unwrap(ev.target);
 			var sel = window.getSelection();
 			var range = sel.getRangeAt(0);
@@ -10,7 +10,7 @@
 	};
 
 	var fontListener = function(ev) {
-		if (ev.target.tagName=='FONT') {
+		if (ev.target.tagName && ev.target.tagName.toLowerCase()=='font') {
 			editor.node.unwrap(ev.target);
 			var sel = window.getSelection();
 			var range = sel.getRangeAt(0);
@@ -36,29 +36,42 @@
 	};
 
 	var divListener = function(ev) {
-		if (ev.target.tagName=='DIV') {
+		if (
+			ev.target.tagName &&
+			(ev.target.tagName.toLowerCase()=='div' || ev.target.tagName.toLowerCase() == 'h1') 
+			// special case for H1 - we don't want it inserted as a result of an enter key, it should be a paragraph instead;
+		) {
 			window.setTimeout(function() {
 				// allow a bit of time before unwrapping - chrome is still moving elements around at this point
-				var newP = document.createElement("p");
-				newP.innerHTML = ev.target.innerHTML;
-				ev.target.innerHTML = '';
-				ev.target.appendChild(newP);
-				if (newP.innerHTML == '') {
-					newP.innerHTML = "<br>";
+
+				if (ev.target.innerHTML == '') {
+					ev.target.innerHTML = "<br>";
 				}
+
+				// var siblings = newP.parentNode.childNodes;
+				var parent = ev.target.parentNode;
+				var newNode = ev.target.firstChild;
 
 				editor.node.unwrap(ev.target);
 
-				var siblings = newP.parentNode.childNodes;
+				var siblings = parent.childNodes;
+				editor.node.unwrap(ev.target);
+
 				for (var i=0; i<siblings.length; i++) {
 					if (siblings[i] && siblings[i].nodeType == document.TEXT_NODE) {
+						editor.node.wrap(siblings[i], "p");
+					} else if (
+						siblings[i] &&
+						(siblings[i].nodeType == document.ELEMENT_NODE) &&
+						(hope.render.html.rules.nestingSets['inline'].indexOf(siblings[i].tagName.toLowerCase()) > -1)
+					) {
 						editor.node.wrap(siblings[i], "p");
 					}
 				}
 
 				var sel = window.getSelection();
 				var range = document.createRange();
-				range.setStart(newP, 0);
+				range.setStart(newNode, 0);
 				sel.removeAllRanges();
 				sel.addRange(range);
 			}, 10);
