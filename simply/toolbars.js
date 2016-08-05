@@ -357,9 +357,8 @@
 		},
 		wrap : function(node, element) {
 			var el = document.createElement(element);
-			el.innerHTML = node.nodeValue;
 			node.parentNode.insertBefore(el, node);
-			node.parentNode.removeChild(node);
+			el.appendChild(node);
 		}
 	};
 
