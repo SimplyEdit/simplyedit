@@ -1971,7 +1971,7 @@
 							} else {
 								result.files.push({url : targetUrl, name : images[i].innerHTML});
 								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
-									result.images.push({url : targetUrl});
+									result.images.push({url : targetUrl, name : images[i].innerHTML});
 								}
 							}
 						}

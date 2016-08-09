@@ -180,6 +180,26 @@
 		max-height: 100%;
 		vertical-align: middle;
 	}
+	#simply-browse .simply-button span.filename {
+		position: absolute;
+		font-size: 14px;
+		text-align: center;
+		line-height: 15px;
+		word-wrap: break-word;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(255,255,255,0.3);
+		color: #666;
+		padding: 3px;
+		text-shadow: white 0px 0px 2px;
+		border-top: 1px solid #eee;
+		transition: background-color 0.6s ease;
+	}
+	#simply-browse .simply-button.simply-selected span.filename {
+		background-color: rgba(255,255,255,1);
+	}
+
 </style>
 <script>
 	editor.plugins.browse = {
@@ -274,7 +294,11 @@
 				if (data.id) {
 					result += " data-simply-id='" + data.id + "'";
 				}
-				result += "></div>";
+				result += ">";
+				result += "<span class='filename'>";
+				result += escape(data.name);
+				result += "</span>";
+				result += "</div>";
 
 				return result;
 			},
