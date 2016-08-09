@@ -473,13 +473,11 @@
 		"update" : function(toolbar) {
 			var sel = vdSelectionState.get();
 			var image = vdSelection.getNode(sel);
-			
+			if (!image.hopeEditor) {
+				editor.field.initHopeStub(image);
+			}
 			var hopeEditor = image.hopeEditor;
 			editor.context.hopeEditor = hopeEditor;
-
-			if (!image.hopeEditor) {
-				image.hopeEditor = hopeEditor;
-			}
 
 			var annotation = false;
 
