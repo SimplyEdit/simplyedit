@@ -482,8 +482,8 @@
 								if (typeof image === "undefined") {
 									image = {
 										src : url
-									}
-								};
+									};
+								}
 								var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 								var tempNode = document.createElement("div");
 								tempNode.innerHTML = buttonHtml;
@@ -501,8 +501,8 @@
 									file = {
 										name : name,
 										url : url
-									}
-								};
+									};
+								}
 
 								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(file);
 								var tempNode = document.createElement("div");
@@ -574,7 +574,7 @@
 							targetButton.parentNode.removeChild(targetButton);
 						});
 					}(targetList[i]));
-				};
+				}
 			}
 		}
 	});
