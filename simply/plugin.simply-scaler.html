@@ -81,7 +81,6 @@
 				typeof data != 'object' ||
 				path.slice(-1) == '/'
 			) {
-				return normalSave(path, data, callback);
 				return normalSave.call(storageScope, path, data, callback);
 			}
 
