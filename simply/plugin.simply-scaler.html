@@ -42,13 +42,13 @@
 					for (var i=0; i < result.images.length; i++) {
 						// scrub the resizes images from the list;
 						if (!isSizedImageUrl(result.images[i].url)) {
-							images.push(result.images[i])
+							images.push(result.images[i]);
 						}
 					}
 					result.images = images;
 					callback(result);
 				});
-			};
+			}
 		};
 
 		var normalDelete = editor.storage.file.delete;
@@ -71,7 +71,7 @@
 				});
 				callback();
 			}
-		}
+		};
 
 		var normalSave = editor.storage.file.save;
 		editor.storage.file.save = function(path, data, callback) {
@@ -81,7 +81,6 @@
 				typeof data != 'object' ||
 				path.slice(-1) == '/'
 			) {
-				return normalSave(path, data, callback);
 				return normalSave.call(storageScope, path, data, callback);
 			}
 
@@ -119,7 +118,7 @@
 				return new Blob([ia], {
 					type: mimeString
 				});
-			}
+			};
 
 			var reader  = new FileReader();
 			reader.filename = data.name;
@@ -155,7 +154,7 @@
 					var stepsize = {
 						width: img.width * 0.5,
 						height: img.height * 0.5
-					}
+					};
 
 					var mime = this.src.split(',')[0].split(':')[1].split(';')[0];
 					var extension = false;
@@ -189,13 +188,13 @@
 							}
 						}
 						targetSizes.shift();
-					};
+					}
 					if (targetSizes.length) {
 						img.src = canvas.toDataURL(mime, 1);
 					} else {
 						reader.callback(reader.image);
 					}
-				}
+				};
 				img.src = reader.result;
 			};
 
@@ -205,8 +204,8 @@
 					if (typeof image === "undefined") {
 						image = {
 							src : editor.plugins.browse.currentPath + file.name.replace(/[^A-Za-z0-9_\.-]/, "-")
-						}
-					};
+						};
+					}
 					var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 					var tempNode = document.createElement("div");
 					tempNode.innerHTML = buttonHtml;

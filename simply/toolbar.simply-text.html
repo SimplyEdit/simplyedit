@@ -385,7 +385,7 @@
 		}
 
 		return true;
-	}
+	};
 
 	editor.plugins.hope = {
 		annotation : {
@@ -451,7 +451,7 @@
 							hopeEditor.field.addEventListener("DOMCharacterDataModified", addTag);
 							var removeAddTagListener = function() {
 								hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
-							}
+							};
 						}
 
 						var index = editor.plugins.hope.annotation.tagToggle.indexOf(tag);
