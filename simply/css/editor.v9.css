@@ -745,7 +745,7 @@
 .simply-empty[data-simply-list]:not([data-simply-list-icon]):before {
 	content: "\f1b3"; /* cubes */
 }
-.simply-empty[data-simply-list][data-simply-list-icon]:not([data-simply-list-icon]|="fa"):before {
+.simply-empty[data-simply-list][data-simply-list-icon]:not([data-simply-list-icon|="fa"]):before {
 	content: attr(data-simply-list-icon);
 }
 .simply-empty[data-simply-list]:after {
@@ -768,7 +768,7 @@
 [data-simply-field]:empty:not([data-simply-field-icon]):before {
 	content: "\f044"; /* pencil-square-o */
 }
-[data-simply-field][data-simply-field-icon]:empty:not([data-simply-field-icon]|="fa"):before {
+[data-simply-field][data-simply-field-icon]:empty:not([data-simply-field-icon|="fa"]):before {
 	content: attr(data-simply-field-icon);
 }
 [data-simply-field]:empty:after {
