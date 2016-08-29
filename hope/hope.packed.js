@@ -159,7 +159,23 @@ hope.register( 'hope.range', function() {
 
 	hopeRange.prototype.overlaps = function( range ) {
 		range = hope.range.create(range);
-		if (range.start == this.start && range.end == this.end) {
+		if (range.equals(this)) {
+			return true;
+		}
+
+		// not overlapping if only the edges touch...
+		if ((range.start == this.end) && (range.start < range.end)) {
+			return false;
+		}
+		if ((range.end == this.start) && (range.start < range.end)) {
+			return false;
+		}
+
+		// but overlapping if the range to check is collapsed
+		if ((range.start == this.end) && (range.start == range.end)) {
+			return true;
+		}
+		if ((range.end == this.start) && (range.start == range.end)) {
 			return true;
 		}
 

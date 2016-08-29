@@ -458,6 +458,58 @@ QUnit.module("hope editor behaviour");
 		assert.equal(carets.length, 0, "zero caret attributes attributes found");
 	});
 
+	QUnit.test("do return elements that end on the edge of a caret without selection at the start of another element", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<a>Hello</a><p>world</p>";
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		setCaretPosition(testContent.querySelector("p"), 0, 0);
+		var range = hopeEditor.selection.getRange();
+		var annotation = hopeEditor.fragment.has(range, "a");
+
+		assert.equal(annotation.tag, "a");
+		assert.equal(annotation.range.start, 0);
+		assert.equal(annotation.range.end, 5);
+	});
+
+	QUnit.test("do return elements that end on the edge of a caret without selection at the start of another element", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<a>Hello</a><p>world</p>";
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		setCaretPosition(testContent.querySelector("a"), 5, 0);
+		var range = hopeEditor.selection.getRange();
+		var annotation = hopeEditor.fragment.has(range, "p");
+
+		assert.equal(annotation.tag, "p");
+		assert.equal(annotation.range.start, 5);
+		assert.equal(annotation.range.end, 10);
+	});
+
+	QUnit.test("do not return elements that end on the edge of a selection at the end of another element", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<a>Hello</a><p>world</p>";
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		setCaretPosition(testContent.querySelector("p"), 0, 3);
+
+		var range = hopeEditor.selection.getRange();
+		var annotation = hopeEditor.fragment.has(range, "a");
+		assert.notOk(annotation);
+	});
+
+	QUnit.test("do not return elements that end on the edge of a selection at the end of another element", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<a>Hello</a><p>world</p>";
+		testContent.hopeEditor.parseHTML();
+		testContent.hopeEditor.update();
+		setCaretPosition(testContent.querySelector("a"), 2, 3);
+
+		var range = hopeEditor.selection.getRange();
+		var annotation = hopeEditor.fragment.has(range, "p");
+		assert.notOk(annotation);
+	});
+
 	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
