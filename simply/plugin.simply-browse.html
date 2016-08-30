@@ -12,6 +12,7 @@
 			<li><button data-simply-action="simply-browse-add-page"><i class="fa fa-file-text-o"></i>Add page</button></li>
 			<li><button data-simply-action="simply-browse-add-folder"><i class="fa fa-plus-square"></i>Add folder</button></li>
 			<li><button data-simply-action="simply-browse-upload"><i class="fa fa-upload"></i>Upload</button><input type="file" multiple></li>
+			<li><button data-simply-action="simply-browse-listmode"><i class="fa fa-list"></i>List mode</button></li>
 
 			<!-- Delete -->
 			<li><button data-simply-action="simply-browse-delete"><i class="fa fa-trash"></i>Delete</button></li>
@@ -180,6 +181,98 @@
 		max-height: 100%;
 		vertical-align: middle;
 	}
+	#simply-browse .simply-button span.filename {
+		position: absolute;
+		font-size: 14px;
+		text-align: center;
+		line-height: 15px;
+		word-wrap: break-word;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(255,255,255,0.3);
+		color: #666;
+		padding: 3px;
+		text-shadow: white 0px 0px 2px;
+		border-top: 1px solid #eee;
+		transition: background-color 0.6s ease;
+	}
+	#simply-browse .simply-button.simply-selected span.filename {
+		background-color: rgba(255,255,255,1);
+	}
+
+	#simply-browse.simply-listmode .simply-dialog-body > button i.select:before,
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button i.select:before {
+		border-bottom: 0;
+		border-bottom-left-radius: 0;
+		border-left: 1px solid #eee;
+	}
+	#simply-browse.simply-listmode .simply-dialog-body > button,
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button,
+	#simply-browse.simply-listmode .simply-add-folder,
+	#simply-browse.simply-listmode .simply-add-page {
+		height: 40px;
+		width: 50%;
+		padding: 7px;
+		padding-right: 40px;
+		text-align: left;
+	}
+	
+	#simply-browse.simply-listmode .simply-dialog-body > button i,
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button i,
+	#simply-browse.simply-listmode .simply-add-folder > i,
+	#simply-browse.simply-listmode .simply-add-page > i {
+		font-size: 24px;
+		display: inline-block;
+		width: auto;
+		padding-right: 7px;
+		text-align: left;
+	}
+
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button.simply-image {
+		line-height: inherit;
+	}
+	#simply-browse.simply-listmode .simply-dialog-body > button img[data-value],
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button img[data-value] {
+		display: none;
+	}
+	#simply-browse.simply-listmode .simply-button span.filename {
+		position: static;
+		font-size: inherit;
+		text-align: inherit;
+		display: inline;
+		color: inherit;
+		border: 0;
+		padding: 0;
+		text-shadow: 0;
+		display: inline-block;
+		overflow: hidden;
+		max-width: 95%;
+		text-overflow: ellipsis;
+		line-height: 26px;
+		white-space: nowrap;
+	}
+	#simply-browse.simply-listmode .simply-dialog-body.simply-selecting button i.select,
+	#simply-browse.simply-listmode .simply-dialog-body.simply-selecting .simply-button i.select {
+		left: auto;
+	}
+
+	#simply-browse.simply-listmode .simply-add-folder > button.simply-add,
+	#simply-browse.simply-listmode .simply-add-page > button.simply-add {
+		bottom: -40px;
+		margin-bottom: 10px;
+	}
+	#simply-browse.simply-listmode .simply-add-folder input,
+	#simply-browse.simply-listmode .simply-add-page input {
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	#simply-browse.simply-listmode .simply-add-folder > button.simply-cancel,
+	#simply-browse.simply-listmode .simply-add-page > button.simply-cancel {
+		bottom: 7px;
+		right: 9px;
+	}
 </style>
 <script>
 	editor.plugins.browse = {
@@ -274,7 +367,11 @@
 				if (data.id) {
 					result += " data-simply-id='" + data.id + "'";
 				}
-				result += "></div>";
+				result += ">";
+				result += "<span class='filename'>";
+				result += editor.node.escapeHtml(data.name);
+				result += "</span>";
+				result += "</div>";
 
 				return result;
 			},
@@ -753,6 +850,9 @@
 		}
 
 		editor.context.update();
+	});
+	editor.addAction("simply-browse-listmode", function(el) {
+		document.getElementById("simply-browse").classList.toggle("simply-listmode");
 	});
 
 	editor.plugins.browse.init();
