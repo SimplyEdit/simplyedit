@@ -566,9 +566,9 @@
 								for (t in list.templates) {
 									counter++;
 								}
-								//if (counter > 1) {
+								if (counter > 1) {
 									clone.setAttribute("data-simply-template", requestedTemplate);
-								//}
+								}
 								clone.setAttribute("data-simply-list-item", true);
 								clone.setAttribute("data-simply-selectable", true);
 								clone.simplyData = listData[j];
