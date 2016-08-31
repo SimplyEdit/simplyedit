@@ -8,21 +8,7 @@
 			}
 		},
 		storeUndo : function(target, saveCurrent) {
-			var currentData;
-			if (target.getAttribute("data-simply-list")) {
-				var stashedFields = document.querySelectorAll("[data-simply-stashed]");
-				for (i=0; i<stashedFields.length; i++) {
-					stashedFields[i].removeAttribute("data-simply-stashed");
-				}
-
-				currentData = editor.data.get(target);
-				var dataName = target.getAttribute("data-simply-list");
-				var dataPath = editor.data.getDataPath(target);
-				currentData = currentData[dataPath][dataName];
-			} else {
-				currentData = editor.field.get(target);
-			}
-
+			var currentData = editor.data.get(target);
 			if (saveCurrent) {
 				editor.plugins.undoRedo.undoSet.push({target: target, data: currentData});
 				target.previousData = currentData;
