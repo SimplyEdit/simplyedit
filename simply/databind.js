@@ -1,4 +1,13 @@
-dataBinding = function(data, key) {
+dataBinding = function(config) {
+	var data = config.data;
+	var key = config.key;
+	this.config = config;
+	this.setter = config.setter;
+	this.getter = config.getter;
+	if (!this.config.mode) {
+		this.config.mode = "field";
+	}
+
 	if (data.hasOwnProperty("_bindings_") && data._bindings_[key]) {
 		return data._bindings_[key];
 	}
@@ -71,7 +80,7 @@ dataBinding = function(data, key) {
 			for (var i=0; i<binding.elements.length; i++) {
 				if (JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue)) {
 					// this element changed when we were not listening; play catch up;
-					binding.set(binding.elements[i].element.getter());
+					binding.set(binding.elements[i].getter());
 				}
 				binding.addListeners(binding.elements[i]);
 			}
@@ -80,46 +89,14 @@ dataBinding = function(data, key) {
 	};
 
 	this.bind = function(element, skipSet) {
-		element.mutationObserver = new MutationObserver(this.handleMutation);
+		if (binding.config.mode == "field") {
+			element.mutationObserver = new MutationObserver(this.handleMutation);
+		}
+
 		binding.elements.push(element);
 
-		if (element.getAttribute("data-simply-field")) {
-			element.getter = function() {
-				return editor.field.get(this);
-			};
-			element.setter = function(value) {
-				element.simplyData = value;
-				return editor.field.set(this, value);
-			};
-
-		} else if (element.getAttribute("data-simply-list")) {
-			element.getter = function() {
-				var dataName = this.getAttribute("data-simply-list");
-				var dataPath = editor.data.getDataPath(this);
-				var stashedFields = this.querySelectorAll("[data-simply-stashed]");
-				for (i=0; i<stashedFields.length; i++) {
-					stashedFields[i].removeAttribute("data-simply-stashed");
-				}
-				this.removeAttribute("data-simply-stashed");
-
-				var data = editor.data.list.get(this);
-				return data[dataPath][dataName];
-			};
-			element.setter = function(value) {
-				element.simplyData = value;
-				var children = this.querySelectorAll("[data-simply-list-item]");
-				for (var i=0; i<children.length; i++) {
-					this.removeChild(children[i]);
-				}
-
-				editor.data.list.applyTemplates(this, value);
-				if (document.body.getAttribute("data-simply-edit")) {
-					editor.editmode.makeEditable(this);
-				}
-			};
-		} else {
-			return;
-		}
+		element.getter = binding.getter;
+		element.setter = binding.setter;
 
 		if (!skipSet) {
 			element.setter(shadowValue);
@@ -138,6 +115,7 @@ dataBinding = function(data, key) {
 		}
 	};
 };
+
 var fieldNodeRemovedHandler = function(evt) {
 	if (!this.parentNode) {
 		this.dataBinding.unbind(this);
@@ -148,35 +126,27 @@ dataBinding.prototype.addListeners = function(element) {
 	if (element.dataBinding) {
 		element.dataBinding.removeListeners(element);
 	}
-	if (element.getAttribute("data-simply-field")) {
+	if (this.config.mode == "field") {
 		element.mutationObserver.observe(element, {attributes: true});
-	//	element.addEventListener("DOMCharacterDataModified", this.handleEvent);
-
-	//	element.addEventListener("DOMAttrModified", this, false);
 		element.addEventListener("DOMSubtreeModified", this.handleEvent);
 		element.addEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
-
 	}
-	if (element.getAttribute("data-simply-list")) {
-		element.addEventListener("DOMNodeRemoved", this, false);
-		element.addEventListener("DOMNodeInserted", this, false);
+	if (this.config.mode == "list") {
+		element.addEventListener("DOMNodeRemoved", this.handleEvent);
+		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
 	element.dataBinding = this;
 };
 dataBinding.prototype.removeListeners = function(element) {
-	if (element.getAttribute("data-simply-field")) {
-	//	element.removeEventListener("DOMCharacterDataModified", this.handleEvent);
+	if (this.config.mode == "field") {
 		element.mutationObserver.disconnect();
 		element.removeEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
-
-	//	element.removeEventListener("DOMAttrModified", this, false);
 		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
 	}
-	if (element.getAttribute("data-simply-list")) {
+	if (this.config.mode == "list") {
 		element.removeEventListener("DOMNodeRemoved", this, false);
 		element.removeEventListener("DOMNodeInserted", this, false);
 	}
-//	element.removeEventListener("DOMSubtreeModified", this, false);
 };
 
 dataBinding.prototype.handleMutation = function(event) {

@@ -61,7 +61,12 @@
 						if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
 							fieldDataBinding = data[dataPath]._bindings_[dataName];
 						} else {
-							fieldDataBinding = new dataBinding(data[dataPath], dataName);
+							fieldDataBinding = new dataBinding({
+								data   : data[dataPath],
+								key    : dataName,
+								getter : editor.field.dataBindingGetter,
+								setter : editor.field.dataBindingSetter
+							});
 						}
 						fieldDataBinding.bind(dataFields[i]);
 						dataFields[i].simplyData = data[dataPath][dataName];
@@ -341,6 +346,30 @@
 						window.setTimeout(function() {editor.data.list.applyDataSource(list, dataSource, listData);}, 500);
 					}
 				},
+				dataBindingGetter : function() {
+					var dataName = this.getAttribute("data-simply-list");
+					var dataPath = editor.data.getDataPath(this);
+					var stashedFields = this.querySelectorAll("[data-simply-stashed]");
+					for (i=0; i<stashedFields.length; i++) {
+						stashedFields[i].removeAttribute("data-simply-stashed");
+					}
+					this.removeAttribute("data-simply-stashed");
+
+					var data = editor.data.list.get(this);
+					return data[dataPath][dataName];
+				},
+				dataBindingSetter : function(value) {
+					this.simplyData = value;
+					var children = this.querySelectorAll("[data-simply-list-item]");
+					for (var i=0; i<children.length; i++) {
+						this.removeChild(children[i]);
+					}
+
+					editor.data.list.applyTemplates(this, value);
+					if (document.body.getAttribute("data-simply-edit")) {
+						editor.editmode.makeEditable(this);
+					}
+				},
 				init : function(data, target) {
 					var dataName, dataPath;
 					var dataLists = target.querySelectorAll("[data-simply-list]");
@@ -366,7 +395,13 @@
 							if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
 								listDataBinding = data[dataPath]._bindings_[dataName];
 							} else {
-								listDataBinding = new dataBinding(data[dataPath], dataName);
+								listDataBinding = new dataBinding({
+									data   : data[dataPath],
+									key    : dataName,
+									getter : editor.data.list.dataBindingGetter,
+									setter : editor.data.list.dataBindingSetter,
+									mode   : "list"
+								});
 							}
 							listDataBinding.bind(dataLists[i]);
 							dataLists[i].simplyData = data[dataPath][dataName];
@@ -456,7 +491,12 @@
 								if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
 									fieldDataBinding = listData[j]._bindings_[dataName];
 								} else {
-									fieldDataBinding = new dataBinding(listData[j], dataName);
+									fieldDataBinding = new dataBinding({
+										data   : listData[j],
+										key    : dataName,
+										getter : editor.field.dataBindingGetter,
+										setter : editor.field.dataBindingSetter
+									});
 								}
 								fieldDataBinding.bind(elm);
 								elm.simplyData = listData[j][dataName];
@@ -610,6 +650,13 @@
 			}
 		},
 		field : {
+			dataBindingGetter : function() {
+				return editor.field.get(this);
+			},
+			dataBindingSetter : function(value) {
+				this.simplyData = value;
+				return editor.field.set(this, value);
+			},
 			fieldTypes : {
 				"img" : {
 					get : function(field) {
