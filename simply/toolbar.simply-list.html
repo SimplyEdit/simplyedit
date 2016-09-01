@@ -87,7 +87,14 @@
 				editor.data.list.fixFirstElementChild(newNode);
 				editor.data.list.fixFirstElementChild(list);
 
-				newNode.firstElementChild.dataset.simplyTemplate = templateName;
+				counter = 0;
+				for (t in list.templates) {
+					counter++;
+				}
+				if (counter > 1) {
+					newNode.firstElementChild.dataset.simplyTemplate = templateName;
+				}
+
 				newNode.firstElementChild.dataset.simplyListItem = true;
 				newNode.firstElementChild.dataset.simplySelectable = true;
 
