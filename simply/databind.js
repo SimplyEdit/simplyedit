@@ -29,6 +29,24 @@ dataBinding = function(config) {
 				monitor(data, key);
 			}
 		}
+		if (data instanceof Array) {
+			overrideArrayFunction = function(name) {
+				Object.defineProperty(data, name, {
+					value : function() {
+						var result = Array.prototype[name].apply(shadowValue, arguments);
+						newValue = JSON.parse(JSON.stringify(shadowValue));
+						shadowValue = null;
+						binding.set(newValue);
+						return result;
+					}
+				});
+			};
+			overrideArrayFunction("pop");
+			overrideArrayFunction("push");
+			overrideArrayFunction("shift");
+			overrideArrayFunction("unshift");
+			overrideArrayFunction("splice");
+		}
 	};
 
 	if (data.hasOwnProperty("_bindings_") && data._bindings_[key]) {
