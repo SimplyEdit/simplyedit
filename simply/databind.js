@@ -8,11 +8,35 @@ dataBinding = function(config) {
 		this.config.mode = "field";
 	}
 
+	var monitorChildData = function(data) {
+		if (typeof data === "object") {
+			var monitor = function(data, key) {
+				var myvalue = data[key];
+				Object.defineProperty(data, key, {
+					set : function(value) {
+						myvalue = value;
+						newValue = JSON.parse(JSON.stringify(shadowValue));
+						shadowValue = null;
+						binding.set(newValue);
+					},
+					get : function() {
+						return myvalue;
+					}
+				});
+			};
+
+			for (var key in data) {
+				monitor(data, key);
+			}
+		}
+	};
+
 	if (data.hasOwnProperty("_bindings_") && data._bindings_[key]) {
 		return data._bindings_[key];
 	}
 	this.elements = [];
 	var shadowValue = data[key];
+	monitorChildData(shadowValue);
 
 	var changeStack = [];
 
@@ -64,14 +88,18 @@ dataBinding = function(config) {
 			return;
 		}
 
-		if (typeof value == "object") {
-			value = JSON.parse(JSON.stringify(value)); // clone the value;
+		if (typeof value === "object") {
+		 	value = JSON.parse(JSON.stringify(value)); // clone the value;
 		}
 		shadowValue = value;
+		monitorChildData(shadowValue);
 
 		for (var i=0; i<binding.elements.length; i++) {
 			binding.removeListeners(binding.elements[i]);
-			if (JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue)) {
+			if (
+				binding.config.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
+				(JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue))
+			) {
 				binding.elements[i].setter(value);
 			}
 		}
