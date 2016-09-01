@@ -337,7 +337,6 @@ QUnit.module("editor data get");
 		};
 		editor.data.apply(data, target);
 		var result = editor.data.get(target);
-		result = editor.data.get(target);
 
 		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
 	});
