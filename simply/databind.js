@@ -131,7 +131,9 @@ dataBinding = function(config) {
 		}
 		this.addListeners(element);
 
-		setInterval(this.resolve, 200);
+		if (!binding.resolver) {
+			binding.resolver = setInterval(this.resolve, 200);
+		}
 	};
 	this.rebind = function(element) {
 		return this.bind(element, true);
