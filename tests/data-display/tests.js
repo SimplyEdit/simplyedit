@@ -335,10 +335,11 @@ QUnit.module("editor data get");
 				]
 			}
 		};
+		var expected = JSON.stringify(data);
 		editor.data.apply(data, target);
 		var result = editor.data.get(target);
 
-		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
+		assert.equal(JSON.stringify(result), expected, "source and result data are the same");
 	});
 
 	QUnit.test("get 2nd degree list", function(assert) {
@@ -358,10 +359,11 @@ QUnit.module("editor data get");
 				]
 			}
 		};
+		var expected = JSON.stringify(data);
 		editor.data.apply(data, target);
 
 		var result = editor.data.get(target);
-		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
+		assert.equal(JSON.stringify(result), expected, "source and result data are the same");
 	});
 
 	QUnit.test("get 2nd degree list deeper structure", function(assert) {
@@ -381,10 +383,11 @@ QUnit.module("editor data get");
 				]
 			}
 		};
+		var expected = JSON.stringify(data);
 		editor.data.apply(data, target);
 
 		var result = editor.data.get(target);
-		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
+		assert.equal(JSON.stringify(result), expected, "source and result data are the same");
 	});
 /*
 QUnit.module("data merge");

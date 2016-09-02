@@ -37,10 +37,12 @@ dataBinding = function(config) {
 			overrideArrayFunction = function(name) {
 				Object.defineProperty(data, name, {
 					value : function() {
+						binding.resolve(); // make sure the shadowValue is in sync with the latest state;
 						var result = Array.prototype[name].apply(shadowValue, arguments);
 						newValue = JSON.parse(JSON.stringify(shadowValue));
 						shadowValue = null;
 						binding.set(newValue);
+						binding.resolve(); // and apply our array change;
 						return result;
 					}
 				});
@@ -102,7 +104,6 @@ dataBinding = function(config) {
 		if (!changeStack.length) {
 			return;
 		}
-
 		var value = changeStack.pop();
 		changeStack = [];
 
@@ -116,8 +117,11 @@ dataBinding = function(config) {
 		shadowValue = value;
 		monitorChildData(shadowValue);
 
-		for (var i=0; i<binding.elements.length; i++) {
+		var i;
+		for (i=0; i<binding.elements.length; i++) {
 			binding.removeListeners(binding.elements[i]);
+		}
+		for (i=0; i<binding.elements.length; i++) {
 			if (
 				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
 				(JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue))
@@ -127,11 +131,14 @@ dataBinding = function(config) {
 		}
 		
 		var addListener = function() {
-			for (var i=0; i<binding.elements.length; i++) {
+			var i;
+			for (i=0; i<binding.elements.length; i++) {
 				if (JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue)) {
 					// this element changed when we were not listening; play catch up;
 					binding.set(binding.elements[i].getter());
 				}
+			}
+			for (i=0; i<binding.elements.length; i++) {
 				binding.addListeners(binding.elements[i]);
 			}
 		};
@@ -203,13 +210,16 @@ dataBinding.prototype.removeListeners = function(element) {
 		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
 	}
 	if (this.mode == "list") {
-		element.removeEventListener("DOMNodeRemoved", this, false);
-		element.removeEventListener("DOMNodeInserted", this, false);
+		element.removeEventListener("DOMNodeRemoved", this.handleEvent);
+		element.removeEventListener("DOMNodeInserted", this.handleEvent);
 	}
 };
 
 dataBinding.prototype.handleMutation = function(event) {
 	var target = event[0].target;
+//	if (event[0].attributeName == "data-simply-stashed") {
+//		return;
+//	}
 	var self = target.dataBinding;
 	self.set(target.getter());
 };			

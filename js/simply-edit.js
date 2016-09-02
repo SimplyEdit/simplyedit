@@ -47,7 +47,7 @@
 				return location.pathname;
 			},
 			apply : function(data, target) {
-				data = JSON.parse(JSON.stringify(data)); // clone data to prevent reference issues;
+				// data = JSON.parse(JSON.stringify(data)); // clone data to prevent reference issues;
 
 				if (typeof editor.data.originalBody === "undefined") {
 					editor.data.originalBody = document.body.cloneNode(true);
@@ -199,6 +199,7 @@
 
 					editor.currentData = JSON.parse(data);
 					editor.data.apply(editor.currentData, document);
+					editor.pageData = editor.currentData[document.location.pathname];
 
 					var checkEdit = function() {
 						if (document.location.hash == "#simply-edit" && !document.body.getAttribute("data-simply-edit")) {
