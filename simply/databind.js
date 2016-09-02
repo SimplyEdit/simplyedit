@@ -122,6 +122,9 @@ dataBinding = function(config) {
 				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
 				(JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue))
 			) {
+				console.log("setting value " + value);
+				console.log(binding.elements[i].getter());
+				console.log(shadowValue);
 				binding.elements[i].setter(value);
 			}
 		}
@@ -230,10 +233,8 @@ dataBinding.prototype.handleEvent = function (event) {
 		case "DOMNodeInserted":
 		case "DOMCharacterDataModified":
 		case "DOMSubtreeModified":
-			self.set(target.getter());
-		break;
 		case "DOMNodeRemoved":
-			// Allow the node to be removed before setting the new data;
+			// Allow the browser to fix what it thinks needs to be fixed (node to be removed, cleaned etc) before setting the new data;
 			window.setTimeout(function() {
 				self.set(target.getter());
 			}, 1);
