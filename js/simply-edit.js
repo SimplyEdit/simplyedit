@@ -47,6 +47,8 @@
 				return location.pathname;
 			},
 			apply : function(data, target) {
+				data = JSON.parse(JSON.stringify(data)); // clone data to prevent reference issues;
+
 				if (typeof editor.data.originalBody === "undefined") {
 					editor.data.originalBody = document.body.cloneNode(true);
 				}
