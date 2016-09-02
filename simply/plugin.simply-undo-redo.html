@@ -38,7 +38,7 @@
 					for (var i=0; i<items.length; i++) {
 						items[i].parentNode.removeChild(items[i]);
 					}
-					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
+					editor.list.set(undoStep.target, undoStep.data);
 					editor.editmode.makeEditable(undoStep.target);
 					document.body.scrollTop = currentScroll;
 				} else {
@@ -66,7 +66,7 @@
 					for (var i=0; i<items.length; i++) {
 						items[i].parentNode.removeChild(items[i]);
 					}
-					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
+					editor.list.set(undoStep.target, undoStep.data);
 					editor.editmode.makeEditable(undoStep.target);
 					document.body.scrollTop = currentScroll;
 				} else {

@@ -69,6 +69,7 @@
 			}
 		},
 		insertTemplate : function(list, templateName, targetNode) {
+			editor.bindingParents = [list.dataBinding.parentKey + list.dataBinding.key];
 			var template = list.templates[templateName];
 
 			if (template) {
@@ -82,10 +83,10 @@
 					importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
 				}
 
-				editor.data.list.init({}, newNode);
+				// editor.list.init({}, newNode);
 
-				editor.data.list.fixFirstElementChild(newNode);
-				editor.data.list.fixFirstElementChild(list);
+				editor.list.fixFirstElementChild(newNode);
+				editor.list.fixFirstElementChild(list);
 
 				counter = 0;
 				for (t in list.templates) {
@@ -109,15 +110,22 @@
 
 				if ( targetNode ) {
 					list.insertBefore(newNode.firstElementChild, targetNode.nextElementSibling);
+					editor.bindingParents.push(listItems.indexOf(targetNode));
 				} else if (listItems.length) {
 					list.insertBefore(newNode.firstElementChild, listItems[listItems.length-1].nextSibling);
+					editor.bindingParents.push(listItems.length-1);
 				} else {
+					editor.bindingParents.push(0);
 					list.insertBefore(newNode.firstElementChild, list.firstElementChild);
 				}
 
 				muze.event.fire(document, "simply-selectable-inserted");
-				editor.editmode.makeEditable(newListItem);
 
+				editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
+				editor.data.apply({}, newListItem);
+				editor.editmode.makeEditable(newListItem);
+				editor.bindingParents.pop();
+				editor.bindingParents.pop();
 				list.classList.remove("simply-empty");
 			}
 		}

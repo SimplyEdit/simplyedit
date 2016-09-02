@@ -512,7 +512,7 @@ QUnit.module("editor list fixFirstElementChild");
 	QUnit.test("get title", function(assert) {
 		var target = document.querySelector("#testContent");
 		target.innerHTML = "Test 123 <div data-simply-field='title'>Test title</div>";
-		editor.data.list.fixFirstElementChild(target);
+		editor.list.fixFirstElementChild(target);
 		
 		assert.equal(target.firstElementChild.nodeType, 1, "First child is an element");
 		assert.equal(target.firstElementChild.innerHTML, "Test title", "First child innerHTML found");

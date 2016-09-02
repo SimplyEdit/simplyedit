@@ -34,6 +34,7 @@
 		version: '0.42',
 		apiKey : apiKey,
 		baseURL : getBaseURL(scriptEl.src),
+		bindingParents : [],
 		data : {
 			getDataPath : function(field) {
 				var parent = field;
@@ -56,17 +57,24 @@
 					var dataName = dataFields[i].getAttribute("data-simply-field");
 					var dataPath = editor.data.getDataPath(dataFields[i]);
 
+					if (!data[dataPath]) {
+						data[dataPath] = {};
+					}
+					if (!data[dataPath][dataName]) {
+						data[dataPath][dataName] = editor.field.get(dataFields[i]);
+					}
 					if (data[dataPath] && data[dataPath][dataName]) {
 						var fieldDataBinding;
 						if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
 							fieldDataBinding = data[dataPath]._bindings_[dataName];
 						} else {
-							fieldDataBinding = new dataBinding({
-								data   : data[dataPath],
-								key    : dataName,
-								getter : editor.field.dataBindingGetter,
-								setter : editor.field.dataBindingSetter
-							});
+							var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+							bindingConfig.data   = data[dataPath];
+							bindingConfig.key    = dataName;
+							bindingConfig.getter = editor.field.dataBindingGetter;
+							bindingConfig.setter = editor.field.dataBindingSetter;
+
+							fieldDataBinding = new dataBinding(bindingConfig);
 						}
 						fieldDataBinding.bind(dataFields[i]);
 						dataFields[i].simplyData = data[dataPath][dataName];
@@ -75,7 +83,7 @@
 					}
 				}
 
-				editor.data.list.init(data, target);
+				editor.list.init(data, target);
 
 				if ("removeEventListener" in document) {
 					document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
@@ -127,7 +135,7 @@
 						target.removeAttribute("data-simply-stashed");
 					}
 
-					return editor.data.list.get(target);
+					return editor.list.get(target);
 				}
 			},
 			stash : function() {
@@ -213,438 +221,478 @@
 					}
 					checkEdit();
 				});
-			},
-			list : {
-				get : function(target) {
-					var i, j;
-					var data = {};
-					var dataName, dataPath, dataFields, dataLists, listItems;
+			}
+		},
+		list : {
+			get : function(target) {
+				var i, j;
+				var data = {};
+				var dataName, dataPath, dataFields, dataLists, listItems;
 
-					var addListData = function(list) {
-						if (list.getAttribute("data-simply-stashed")) {
-							return;
-						}
-						dataName = list.getAttribute("data-simply-list");
-						dataPath = editor.data.getDataPath(list);
+				var addListData = function(list) {
+					if (list.getAttribute("data-simply-stashed")) {
+						return;
+					}
+					dataName = list.getAttribute("data-simply-list");
+					dataPath = editor.data.getDataPath(list);
 
-						if (!data[dataPath]) {
-							data[dataPath] = {};
-						}
-
-						if (!data[dataPath][dataName]) {
-							data[dataPath][dataName] = [];
-						}
-
-						listItems = list.querySelectorAll("[data-simply-list-item]");
-						var counter = 0;
-						for (j=0; j<listItems.length; j++) {
-							if (listItems[j].parentNode != list) {
-								continue;
-							}
-
-							if (!data[dataPath][dataName][counter]) {
-								data[dataPath][dataName][counter] = {};
-							}
-							var subData = editor.data.list.get(listItems[j]);
-							for (var subPath in subData) {
-								if (subPath != dataPath) {
-									console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
-								}
-								data[dataPath][dataName][counter] = subData[subPath];
-							}
-							// data[dataPath][dataName][counter] = editor.data.get(listItems[j]);
-							if (listItems[j].getAttribute("data-simply-template")) {
-								data[dataPath][dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");
-							}
-							counter++;
-						}
-						list.setAttribute("data-simply-stashed", 1);
-
-						var dataSource = list.getAttribute("data-simply-data");
-						if (dataSource) {
-							if (editor.dataSources[dataSource]) {
-								if (!editor.dataSources[dataSource].stash) {
-									editor.dataSources[dataSource].stash = [];
-								}
-
-								editor.dataSources[dataSource].stash.push({
-									list : list,
-									dataPath : dataPath,
-									dataName : dataName,
-									data : data[dataPath][dataName]
-								});
-
-								if (typeof editor.dataSources[dataSource].get === "function") {
-									data[dataPath][dataName] = editor.dataSources[dataSource].get(list);
-								}
-							}
-						}
-					};
-
-					var addData = function(field) {
-						if (field.getAttribute("data-simply-stashed")) {
-							return;
-						}
-
-						dataName = field.getAttribute("data-simply-field");
-						dataPath = editor.data.getDataPath(field);
-
-						if (!data[dataPath]) {
-							data[dataPath] = {};
-						}
-
-						data[dataPath][dataName] = editor.field.get(field);
-						field.setAttribute("data-simply-stashed", 1);
-					};
-
-					if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
-						addListData(target);
+					if (!data[dataPath]) {
+						data[dataPath] = {};
 					}
 
-					dataLists = target.querySelectorAll("[data-simply-list]");
-					for (i=0; i<dataLists.length; i++) {
-						addListData(dataLists[i]);
+					if (!data[dataPath][dataName]) {
+						data[dataPath][dataName] = [];
 					}
 
-					dataFields = target.querySelectorAll("[data-simply-field]");
-					for (i=0; i<dataFields.length; i++) {
-						addData(dataFields[i]);
-					}
-					if (target.nodeType == 1 && target.getAttribute("data-simply-field")) {
-						addData(target);
-					}
+					listItems = list.querySelectorAll("[data-simply-list-item]");
+					var counter = 0;
+					for (j=0; j<listItems.length; j++) {
+						if (listItems[j].parentNode != list) {
+							continue;
+						}
 
-					return data;
-				},
-				keyDownHandler : function(evt) {
-					if(evt.ctrlKey && evt.altKey && evt.keyCode == 65) { // ctrl-alt-A
-						if (typeof editor.plugins.list.add !== "undefined") {
-							editor.plugins.list.add(this);
-							evt.preventDefault();
+						if (!data[dataPath][dataName][counter]) {
+							data[dataPath][dataName][counter] = {};
 						}
+						var subData = editor.list.get(listItems[j]);
+						for (var subPath in subData) {
+							if (subPath != dataPath) {
+								console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
+							}
+							data[dataPath][dataName][counter] = subData[subPath];
+						}
+						// data[dataPath][dataName][counter] = editor.data.get(listItems[j]);
+						if (listItems[j].getAttribute("data-simply-template")) {
+							data[dataPath][dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");
+						}
+						counter++;
 					}
-				},
-				applyDataSource : function (list, dataSource, listData) {
-					if (editor.dataSources[dataSource]) {
-						if (typeof editor.dataSources[dataSource].set === "function") {
-							editor.dataSources[dataSource].set(list, listData);
-						}
-						if (typeof editor.dataSources[dataSource].load === "function") {
-							editor.dataSources[dataSource].load(list, function(result) {
-								editor.data.list.applyTemplates(list, result);
-								if (typeof hope !== "undefined") {
-									editor.editmode.makeEditable(list);
-								}
+					list.setAttribute("data-simply-stashed", 1);
+
+					var dataSource = list.getAttribute("data-simply-data");
+					if (dataSource) {
+						if (editor.dataSources[dataSource]) {
+							if (!editor.dataSources[dataSource].stash) {
+								editor.dataSources[dataSource].stash = [];
+							}
+
+							editor.dataSources[dataSource].stash.push({
+								list : list,
+								dataPath : dataPath,
+								dataName : dataName,
+								data : data[dataPath][dataName]
 							});
-						} else if (editor.dataSources[dataSource].load) {
-							editor.data.list.applyTemplates(list, editor.dataSources[dataSource].load);
+
+							if (typeof editor.dataSources[dataSource].get === "function") {
+								data[dataPath][dataName] = editor.dataSources[dataSource].get(list);
+							}
+						}
+					}
+				};
+
+				var addData = function(field) {
+					if (field.getAttribute("data-simply-stashed")) {
+						return;
+					}
+
+					dataName = field.getAttribute("data-simply-field");
+					dataPath = editor.data.getDataPath(field);
+
+					if (!data[dataPath]) {
+						data[dataPath] = {};
+					}
+
+					data[dataPath][dataName] = editor.field.get(field);
+					field.setAttribute("data-simply-stashed", 1);
+				};
+
+				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
+					addListData(target);
+				}
+
+				dataLists = target.querySelectorAll("[data-simply-list]");
+				for (i=0; i<dataLists.length; i++) {
+					addListData(dataLists[i]);
+				}
+
+				dataFields = target.querySelectorAll("[data-simply-field]");
+				for (i=0; i<dataFields.length; i++) {
+					addData(dataFields[i]);
+				}
+				if (target.nodeType == 1 && target.getAttribute("data-simply-field")) {
+					addData(target);
+				}
+
+				return data;
+			},
+			keyDownHandler : function(evt) {
+				if(evt.ctrlKey && evt.altKey && evt.keyCode == 65) { // ctrl-alt-A
+					if (typeof editor.plugins.list.add !== "undefined") {
+						editor.plugins.list.add(this);
+						evt.preventDefault();
+					}
+				}
+			},
+			applyDataSource : function (list, dataSource, listData) {
+				if (editor.dataSources[dataSource]) {
+					if (typeof editor.dataSources[dataSource].set === "function") {
+						editor.dataSources[dataSource].set(list, listData);
+					}
+					if (typeof editor.dataSources[dataSource].load === "function") {
+						editor.dataSources[dataSource].load(list, function(result) {
+							editor.list.set(list, result);
 							if (typeof hope !== "undefined") {
 								editor.editmode.makeEditable(list);
 							}
+						});
+					} else if (editor.dataSources[dataSource].load) {
+						editor.list.set(list, editor.dataSources[dataSource].load);
+						if (typeof hope !== "undefined") {
+							editor.editmode.makeEditable(list);
 						}
-					} else {
-						window.setTimeout(function() {editor.data.list.applyDataSource(list, dataSource, listData);}, 500);
 					}
-				},
-				dataBindingGetter : function() {
-					var dataName = this.getAttribute("data-simply-list");
-					var dataPath = editor.data.getDataPath(this);
-					var stashedFields = this.querySelectorAll("[data-simply-stashed]");
-					for (i=0; i<stashedFields.length; i++) {
-						stashedFields[i].removeAttribute("data-simply-stashed");
-					}
-					this.removeAttribute("data-simply-stashed");
+				} else {
+					window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
+				}
+			},
+			dataBindingGetter : function() {
+				var dataName = this.getAttribute("data-simply-list");
+				var dataPath = editor.data.getDataPath(this);
+				var stashedFields = this.querySelectorAll("[data-simply-stashed]");
+				for (i=0; i<stashedFields.length; i++) {
+					stashedFields[i].removeAttribute("data-simply-stashed");
+				}
+				this.removeAttribute("data-simply-stashed");
 
-					var data = editor.data.list.get(this);
-					return data[dataPath][dataName];
-				},
-				dataBindingSetter : function(value) {
-					this.simplyData = value;
-					var children = this.querySelectorAll("[data-simply-list-item]");
-					for (var i=0; i<children.length; i++) {
+				var data = editor.list.get(this);
+				return data[dataPath][dataName];
+			},
+			dataBindingSetter : function(value) {
+				this.simplyData = value;
+				var children = this.querySelectorAll("[data-simply-list-item]");
+				for (var i=0; i<children.length; i++) {
+					if (children[i].parentNode == this) {
 						this.removeChild(children[i]);
 					}
+				}
 
-					editor.data.list.applyTemplates(this, value);
-					if (document.body.getAttribute("data-simply-edit")) {
-						editor.editmode.makeEditable(this);
-					}
-				},
-				init : function(data, target) {
-					var dataName, dataPath;
-					var dataLists = target.querySelectorAll("[data-simply-list]");
+				if (this.dataBinding) {
+					editor.bindingParents = [this.dataBinding.parentKey];
+				}
+				editor.list.set(this, value);
+				if (document.body.getAttribute("data-simply-edit")) {
+					editor.editmode.makeEditable(this);
+				}
+			},
+			init : function(data, target) {
+				var dataName, dataPath;
+				var dataLists = target.querySelectorAll("[data-simply-list]");
 
-					for (var i=0; i<dataLists.length; i++) {
-						dataLists[i].innerHTML = dataLists[i].innerHTML; // reset innerHTML to make sure templates are recognized;
+				for (var i=0; i<dataLists.length; i++) {
+					editor.list.parseTemplates(dataLists[i]);
+					dataName = dataLists[i].getAttribute("data-simply-list");
+					dataPath = editor.data.getDataPath(dataLists[i]);
 
-						editor.data.list.parseTemplates(dataLists[i]);
-						dataName = dataLists[i].getAttribute("data-simply-list");
-						dataPath = editor.data.getDataPath(dataLists[i]);
-
-						var dataSource = dataLists[i].getAttribute("data-simply-data");
-						if (dataSource !== null) {
-							var listData = {};
-							if (data && data[dataPath] && data[dataPath][dataName]) {
-								listData = data[dataPath][dataName];
-							}
-				
-							editor.data.list.applyDataSource(dataLists[i], dataSource, listData);
-						} else if (data[dataPath] && data[dataPath][dataName]) {
-
+					var dataSource = dataLists[i].getAttribute("data-simply-data");
+					if (dataSource !== null) {
+						var listData = {};
+						if (data && data[dataPath] && data[dataPath][dataName]) {
+							listData = data[dataPath][dataName];
+						}
+			
+						editor.list.applyDataSource(dataLists[i], dataSource, listData);
+					} else {
+						if (!data[dataPath]) {
+							data[dataPath] = {};
+						}
+						if (!data[dataPath][dataName]) {
+							data[dataPath][dataName] = [];
+						}
+						if (data[dataPath] && data[dataPath][dataName]) {
 							var listDataBinding;
 							if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
 								listDataBinding = data[dataPath]._bindings_[dataName];
 							} else {
-								listDataBinding = new dataBinding({
-									data   : data[dataPath],
-									key    : dataName,
-									getter : editor.data.list.dataBindingGetter,
-									setter : editor.data.list.dataBindingSetter,
-									mode   : "list"
-								});
+								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								bindingConfig.data   = data[dataPath];
+								bindingConfig.key    = dataName;
+								bindingConfig.getter = editor.list.dataBindingGetter;
+								bindingConfig.setter = editor.list.dataBindingSetter;
+								bindingConfig.mode   = "list";
+
+								listDataBinding = new dataBinding(bindingConfig);
 							}
 							listDataBinding.bind(dataLists[i]);
 							dataLists[i].simplyData = data[dataPath][dataName];
-							// editor.data.list.applyTemplates(dataLists[i], data[dataPath][dataName]);
+							// editor.list.set(dataLists[i], data[dataPath][dataName]);
+						}
+					}
+					var hasChild = false;
+					for (var j=0; j<dataLists[i].childNodes.length; j++) {
+						if (
+							dataLists[i].childNodes[j].nodeType == 1 && 
+							dataLists[i].childNodes[j].getAttribute("data-simply-list-item")
+						) {
+							hasChild = true;
+						}
+					}
+					if (!hasChild) {
+						if ("classList" in dataLists[i]) {
+							dataLists[i].classList.add("simply-empty");
+						} else {
+							dataLists[i].className += " simply-empty";
+						}
+					}
+
+					if ("addEventListener" in dataLists[i]) {
+						dataLists[i].addEventListener("keydown", editor.list.keyDownHandler);
+					}
+				}
+			},
+			fixFirstElementChild : function(clone) {
+				if (!("firstElementChild" in clone)) {
+					for (var l=0; l<clone.childNodes.length; l++) {
+						if (clone.childNodes[l].nodeType == 1) {
+							clone.firstElementChild = clone.childNodes[l];
+						}
+					}
+				}
+			},
+			parseTemplates : function(list) {
+				var dataName = list.getAttribute("data-simply-list");
+				var dataPath = editor.data.getDataPath(list);
+
+				list.innerHTML = list.innerHTML; // reset innerHTML to make sure templates are recognized;
+				var templates = list.getElementsByTagName("template");
+
+				if (typeof list.templates === "undefined") {
+					list.templates = {};
+				}
+				if (typeof list.templateIcons === "undefined") {
+					list.templateIcons = {};
+				}
+				for (var t=0; t<templates.length; t++) {
+					var templateName = templates[t].getAttribute("data-simply-template") ? templates[t].getAttribute("data-simply-template") : t;
+
+					list.templates[templateName] = templates[t];
+					if (!("content" in list.templates[templateName])) {
+						var fragment = document.createDocumentFragment();
+						var fragmentNode = document.createElement("FRAGMENT");
+
+						content  = list.templates[templateName].children;
+						for (j = 0; j < content.length; j++) {
+							fragmentNode.appendChild(content[j].cloneNode(true));
+							fragment.appendChild(content[j]);
+						}
+						list.templates[templateName].content = fragment;
+						list.templates[templateName].contentNode = fragmentNode;
+					}
+					var templateIcon = templates[t].getAttribute("data-simply-template-icon");
+					if (templateIcon) {
+						list.templateIcons[templateName] = templateIcon;
+					}
+				}
+				while (templates.length) {
+					templates[0].parentNode.removeChild(templates[0]);
+				}
+			},
+			set : function(list, listData) {
+				var e,j,k,l;
+				var dataName;
+				var t, counter;
+
+				if (!listData) {
+					listData = [];
+				}
+
+				var initFields = function(clone) {
+					var handleFields = function(elm) {
+						dataName = elm.getAttribute("data-simply-field");
+						if (!listData[j][dataName]) {
+							listData[j][dataName] = editor.field.get(elm);
+						}
+						if (listData[j][dataName]) {
+							var fieldDataBinding;
+							if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
+								fieldDataBinding = listData[j]._bindings_[dataName];
+							} else {
+								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
+								bindingConfig.data   = listData[j];
+								bindingConfig.key    = dataName;
+								bindingConfig.getter = editor.field.dataBindingGetter;
+								bindingConfig.setter = editor.field.dataBindingSetter;
+								bindingConfig.mode   = "field";
+								fieldDataBinding = new dataBinding(bindingConfig);
+							}
+							fieldDataBinding.bind(elm);
+							elm.simplyData = listData[j][dataName];
+							// editor.field.set(elm, listData[j][dataName]);
+						}
+					};
+
+					var handleLists = function(elm) {
+						editor.list.parseTemplates(elm);
+						dataName = elm.getAttribute("data-simply-list");
+
+						var dataSource = elm.getAttribute("data-simply-data");
+						if (dataSource !== null) {
+							editor.list.applyDataSource(elm, dataSource, listData[j][dataName]);
+						} else if (listData[j][dataName]) {
+							if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
+								listDataBinding = listData[j]._bindings_[dataName];
+							} else {
+								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
+								bindingConfig.data   = listData[j];
+								bindingConfig.key    = dataName;
+								bindingConfig.getter = editor.list.dataBindingGetter;
+								bindingConfig.setter = editor.list.dataBindingSetter;
+								bindingConfig.mode   = "list";
+								listDataBinding = new dataBinding(bindingConfig);
+							}
+							listDataBinding.bind(elm);
+							elm.simplyData = listData[j][dataName];
+							// editor.list.set(elm, listData[j][dataName]);
 						}
 
 						var hasChild = false;
-						for (var j=0; j<dataLists[i].childNodes.length; j++) {
+						for (var m=0; m<elm.childNodes.length; m++) {
 							if (
-								dataLists[i].childNodes[j].nodeType == 1 && 
-								dataLists[i].childNodes[j].getAttribute("data-simply-list-item")
+								elm.childNodes[m].nodeType == 1 &&
+								elm.childNodes[m].getAttribute("data-simply-list-item")
 							) {
 								hasChild = true;
 							}
 						}
 						if (!hasChild) {
-							if ("classList" in dataLists[i]) {
-								dataLists[i].classList.add("simply-empty");
+							if ("classList" in elm) {
+								elm.classList.add("simply-empty");
 							} else {
-								dataLists[i].className += " simply-empty";
+								elm.className += " simply-empty";
 							}
-						}
-
-						if ("addEventListener" in dataLists[i]) {
-							dataLists[i].addEventListener("keydown", editor.data.list.keyDownHandler);
-						}
-					}
-				},
-				fixFirstElementChild : function(clone) {
-					if (!("firstElementChild" in clone)) {
-						for (var l=0; l<clone.childNodes.length; l++) {
-							if (clone.childNodes[l].nodeType == 1) {
-								clone.firstElementChild = clone.childNodes[l];
-							}
-						}
-					}
-				},
-				parseTemplates : function(list) {
-					var dataName = list.getAttribute("data-simply-list");
-					var dataPath = editor.data.getDataPath(list);
-
-//					var templates = list.querySelectorAll("template");
-					var templates = list.getElementsByTagName("template");
-
-					if (typeof list.templates === "undefined") {
-						list.templates = {};
-					}
-					if (typeof list.templateIcons === "undefined") {
-						list.templateIcons = {};
-					}
-					for (var t=0; t<templates.length; t++) {
-						var templateName = templates[t].getAttribute("data-simply-template") ? templates[t].getAttribute("data-simply-template") : t;
-
-//						list.templates[templateName] = templates[t].cloneNode(true);
-						list.templates[templateName] = templates[t];
-						if (!("content" in list.templates[templateName])) {
-							var fragment = document.createDocumentFragment();
-							var fragmentNode = document.createElement("FRAGMENT");
-
-							content  = list.templates[templateName].children;
-							for (j = 0; j < content.length; j++) {
-								fragmentNode.appendChild(content[j].cloneNode(true));
-								fragment.appendChild(content[j]);
-							}
-							list.templates[templateName].content = fragment;
-							list.templates[templateName].contentNode = fragmentNode;
-						}
-						var templateIcon = templates[t].getAttribute("data-simply-template-icon");
-						if (templateIcon) {
-							list.templateIcons[templateName] = templateIcon;
-						}
-					}
-					while (templates.length) {
-						templates[0].parentNode.removeChild(templates[0]);
-					}
-				},
-				applyTemplates : function(list, listData) {
-					var e,j,k,l;
-					var dataName;
-					var t, counter;
-
-					var initFields = function(clone) {
-						var handleFields = function(elm) {
-							dataName = elm.getAttribute("data-simply-field");
-							if (listData[j][dataName]) {
-								var fieldDataBinding;
-								if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
-									fieldDataBinding = listData[j]._bindings_[dataName];
-								} else {
-									fieldDataBinding = new dataBinding({
-										data   : listData[j],
-										key    : dataName,
-										getter : editor.field.dataBindingGetter,
-										setter : editor.field.dataBindingSetter
-									});
-								}
-								fieldDataBinding.bind(elm);
-								elm.simplyData = listData[j][dataName];
-								// editor.field.set(elm, listData[j][dataName]);
-							}
-						};
-
-						var handleLists = function(elm) {
-							editor.data.list.parseTemplates(elm);
-							dataName = elm.getAttribute("data-simply-list");
-
-							var dataSource = elm.getAttribute("data-simply-data");
-							if (dataSource !== null) {
-								editor.data.list.applyDataSource(elm, dataSource, listData[j][dataName]);
-							} else if (listData[j][dataName]) {
-								editor.data.list.applyTemplates(elm, listData[j][dataName]);
-							}
-
-							var hasChild = false;
-							for (var m=0; m<elm.childNodes.length; m++) {
-								if (
-									elm.childNodes[m].nodeType == 1 &&
-									elm.childNodes[m].getAttribute("data-simply-list-item")
-								) {
-									hasChild = true;
-								}
-							}
-							if (!hasChild) {
-								if ("classList" in elm) {
-									elm.classList.add("simply-empty");
-								} else {
-									elm.className += " simply-empty";
-								}
-							}
-						};
-
-						var dataName;
-						var dataFields = clone.querySelectorAll("[data-simply-field]");
-						for (k=0; k<dataFields.length; k++) {
-							handleFields(dataFields[k]);
-						}
-						if (clone.nodeType == 1 && clone.getAttribute("data-simply-field")) {
-							handleFields(clone);
-						}
-
-						var dataLists = clone.querySelectorAll("[data-simply-list]");
-						for (k=0; k<dataLists.length; k++) {
-							handleLists(dataLists[k]);
-						}
-						if (clone.nodeType == 1 && clone.getAttribute("data-simply-list")) {
-							handleLists(clone);
 						}
 					};
 
-					for (j=0; j<listData.length; j++) {
-						var requestedTemplate = listData[j]["data-simply-template"];
+					var dataName;
+					var dataFields = clone.querySelectorAll("[data-simply-field]");
+					for (k=0; k<dataFields.length; k++) {
+						handleFields(dataFields[k]);
+					}
+					if (clone.nodeType == 1 && clone.getAttribute("data-simply-field")) {
+						handleFields(clone);
+					}
 
-						if (!list.templates[requestedTemplate]) {
-							for (t in list.templates) {
-								requestedTemplate = t;
-								break;
-							}
-							// requestedTemplate = Object.keys(list.templates)[0];
+					var dataLists = clone.querySelectorAll("[data-simply-list]");
+					for (k=0; k<dataLists.length; k++) {
+						handleLists(dataLists[k]);
+					}
+					if (clone.nodeType == 1 && clone.getAttribute("data-simply-list")) {
+						handleLists(clone);
+					}
+				};
+
+				editor.bindingParents.push(list.getAttribute("data-simply-list"));
+				for (j=0; j<listData.length; j++) {
+					editor.bindingParents.push(j);
+
+					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
+
+					var requestedTemplate = listData[j]["data-simply-template"];
+
+					if (!list.templates[requestedTemplate]) {
+						for (t in list.templates) {
+							requestedTemplate = t;
+							break;
+						}
+						// requestedTemplate = Object.keys(list.templates)[0];
+					}
+
+					var clone;
+					if ("importNode" in document) {
+						clone = document.importNode(list.templates[requestedTemplate].content, true);
+
+						// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
+						var originalTemplates = list.templates[requestedTemplate].content.querySelectorAll("template");
+						var importedTemplates = clone.querySelectorAll("template");
+
+						for (var i=0; i<importedTemplates.length; i++) {
+							importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
 						}
 
-						var clone;
-						if ("importNode" in document) {
-							clone = document.importNode(list.templates[requestedTemplate].content, true);
+						initFields(clone);
+	
+						editor.list.fixFirstElementChild(clone);
 
-							// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
-							var originalTemplates = list.templates[requestedTemplate].content.querySelectorAll("template");
-							var importedTemplates = clone.querySelectorAll("template");
+						counter = 0;
+						for (t in list.templates) {
+							counter++;
+						}
+						
+						if (counter > 1) {
+							clone.firstElementChild.setAttribute("data-simply-template", requestedTemplate);
+						}
 
-							for (var i=0; i<importedTemplates.length; i++) {
-								importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
-							}
+						clone.firstElementChild.setAttribute("data-simply-list-item", true);
+						clone.firstElementChild.setAttribute("data-simply-selectable", true);
+						clone.firstElementChild.simplyData = listData[j];
 
+						if (list.templateIcons[requestedTemplate]) {
+							clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
+						}
+						list.appendChild(clone);
+						editor.list.init(listData[j], clone);
+					} else {
+						for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
+							clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
 							initFields(clone);
-		
-							editor.data.list.fixFirstElementChild(clone);
+							editor.list.fixFirstElementChild(clone);
 
 							counter = 0;
 							for (t in list.templates) {
 								counter++;
 							}
-							
 							if (counter > 1) {
-								clone.firstElementChild.setAttribute("data-simply-template", requestedTemplate);
+								clone.setAttribute("data-simply-template", requestedTemplate);
 							}
-
-							clone.firstElementChild.setAttribute("data-simply-list-item", true);
-							clone.firstElementChild.setAttribute("data-simply-selectable", true);
-							clone.firstElementChild.simplyData = listData[j];
-
+							clone.setAttribute("data-simply-list-item", true);
+							clone.setAttribute("data-simply-selectable", true);
+							clone.simplyData = listData[j];
+							
 							if (list.templateIcons[requestedTemplate]) {
 								clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 							}
+
 							list.appendChild(clone);
-							editor.data.list.init(listData[j], clone);
-						} else {
-							for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
-								clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
-								initFields(clone);
-								editor.data.list.fixFirstElementChild(clone);
-
-								counter = 0;
-								for (t in list.templates) {
-									counter++;
-								}
-								if (counter > 1) {
-									clone.setAttribute("data-simply-template", requestedTemplate);
-								}
-								clone.setAttribute("data-simply-list-item", true);
-								clone.setAttribute("data-simply-selectable", true);
-								clone.simplyData = listData[j];
-								
-								if (list.templateIcons[requestedTemplate]) {
-									clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
-								}
-
-								list.appendChild(clone);
-								editor.data.list.init(listData[j], clone);
-							}
+							editor.list.init(listData[j], clone);
 						}
 					}
-					list.setAttribute("data-simply-selectable", true);
 
-					var hasChild = false;
-					for (j=0; j<list.childNodes.length; j++) {
-						if (
-							list.childNodes[j].nodeType == 1 && 
-							list.childNodes[j].getAttribute("data-simply-list-item")
-						) {
-							hasChild = true;
-						}
+					editor.bindingParents.pop();
+				}
+				list.setAttribute("data-simply-selectable", true);
+				editor.bindingParents.pop();
+
+				var hasChild = false;
+				for (j=0; j<list.childNodes.length; j++) {
+					if (
+						list.childNodes[j].nodeType == 1 && 
+						list.childNodes[j].getAttribute("data-simply-list-item")
+					) {
+						hasChild = true;
 					}
-					if ("classList" in list) {
-						if (!hasChild) {
-							list.classList.add("simply-empty");
-						} else {
-							list.classList.remove("simply-empty");
-						}
+				}
+				if ("classList" in list) {
+					if (!hasChild) {
+						list.classList.add("simply-empty");
 					} else {
-						if (!hasChild) {
-							list.className += " simply-empty";
-						} else {
-							list.className.replace(/ simply-empty/g, '');
-						}
+						list.classList.remove("simply-empty");
+					}
+				} else {
+					if (!hasChild) {
+						list.className += " simply-empty";
+					} else {
+						list.className.replace(/ simply-empty/g, '');
 					}
 				}
 			}
@@ -654,8 +702,10 @@
 				return editor.field.get(this);
 			},
 			dataBindingSetter : function(value) {
-				this.simplyData = value;
-				return editor.field.set(this, value);
+				if (JSON.stringify(editor.field.get(this)) != JSON.stringify(value)) {
+					this.simplyData = value;
+					return editor.field.set(this, value);
+				}
 			},
 			fieldTypes : {
 				"img" : {
@@ -2129,6 +2179,10 @@
 	window.editor = editor;
 	editor.storageConnectors = storage;
 	editor.settings = document.querySelector("[data-simply-settings]") ? window[document.querySelector("[data-simply-settings]").getAttribute("data-simply-settings")] : {};
+
+	if (!editor.settings.databind) {
+		editor.settings.databind = {};
+	}
 
 	var defaultToolbars = [
 		editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
