@@ -122,9 +122,6 @@ dataBinding = function(config) {
 				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
 				(JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue))
 			) {
-				console.log("setting value " + value);
-				console.log(binding.elements[i].getter());
-				console.log(shadowValue);
 				binding.elements[i].setter(value);
 			}
 		}
