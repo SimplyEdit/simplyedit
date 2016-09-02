@@ -4,8 +4,12 @@ dataBinding = function(config) {
 	this.config = config;
 	this.setter = config.setter;
 	this.getter = config.getter;
-	if (!this.config.mode) {
-		this.config.mode = "field";
+	this.mode = config.mode;
+	this.parentKey = config.parentKey ? config.parentKey : "";
+	this.key = config.key;
+
+	if (!this.mode) {
+		this.mode = "field";
 	}
 
 	var monitorChildData = function(data) {
@@ -115,7 +119,7 @@ dataBinding = function(config) {
 		for (var i=0; i<binding.elements.length; i++) {
 			binding.removeListeners(binding.elements[i]);
 			if (
-				binding.config.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
+				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
 				(JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue))
 			) {
 				binding.elements[i].setter(value);
@@ -132,10 +136,17 @@ dataBinding = function(config) {
 			}
 		};
 		window.setTimeout(addListener, 5);
+		if (typeof binding.config.resolve === "function") {
+			binding.config.resolve.call(binding, key, value);
+		}
 	};
 
+	if (typeof binding.config.init === "function") {
+		binding.config.init.call(binding);
+	}
+
 	this.bind = function(element, skipSet) {
-		if (binding.config.mode == "field") {
+		if (binding.mode == "field") {
 			element.mutationObserver = new MutationObserver(this.handleMutation);
 		}
 
@@ -174,24 +185,24 @@ dataBinding.prototype.addListeners = function(element) {
 	if (element.dataBinding) {
 		element.dataBinding.removeListeners(element);
 	}
-	if (this.config.mode == "field") {
+	if (this.mode == "field") {
 		element.mutationObserver.observe(element, {attributes: true});
 		element.addEventListener("DOMSubtreeModified", this.handleEvent);
 		element.addEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 	}
-	if (this.config.mode == "list") {
+	if (this.mode == "list") {
 		element.addEventListener("DOMNodeRemoved", this.handleEvent);
 		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
 	element.dataBinding = this;
 };
 dataBinding.prototype.removeListeners = function(element) {
-	if (this.config.mode == "field") {
+	if (this.mode == "field") {
 		element.mutationObserver.disconnect();
 		element.removeEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
 	}
-	if (this.config.mode == "list") {
+	if (this.mode == "list") {
 		element.removeEventListener("DOMNodeRemoved", this, false);
 		element.removeEventListener("DOMNodeInserted", this, false);
 	}
@@ -206,6 +217,12 @@ dataBinding.prototype.handleMutation = function(event) {
 dataBinding.prototype.handleEvent = function (event) {
 	var target = event.currentTarget;
 	var self = target.dataBinding;
+
+	if (self.mode === "list") {
+		if (target != event.relatedNode) {
+			return;
+		}
+	}
 
 	switch (event.type) {
 		case "change":
