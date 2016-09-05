@@ -94,6 +94,9 @@ dataBinding = function(config) {
 
 	this.set = function (value) {
 		changeStack.push(value);
+		if (!this.resolveTimer) {
+			this.resolveTimer = window.setTimeout(this.resolve, 100);
+		}
 	};
 
 	this.get = function() {
@@ -104,6 +107,7 @@ dataBinding = function(config) {
 	};
 
 	this.resolve = function() {
+		binding.resolveTimer = false;
 		if (!changeStack.length) {
 			return;
 		}
@@ -173,8 +177,8 @@ dataBinding = function(config) {
 
 		this.addListeners(element);
 
-		if (!binding.resolver) {
-			binding.resolver = setInterval(this.resolve, 200);
+		if (!binding.resolveTimer) {
+			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
 	};
 	this.rebind = function(element) {
