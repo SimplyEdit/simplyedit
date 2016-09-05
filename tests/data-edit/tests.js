@@ -1253,6 +1253,7 @@ QUnit.module("images");
 		editor.actions["simply-image-src"]("HelloWorld");
 		
 		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, get src in first image", function(assert) {
@@ -1262,6 +1263,7 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "a");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, get src in second image", function(assert) {
@@ -1271,6 +1273,7 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "b");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, set src in first image", function(assert) {
@@ -1281,6 +1284,7 @@ QUnit.module("images");
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, set src in second image", function(assert) {
@@ -1290,7 +1294,9 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
+
 		assert.equal(testContent.querySelector("img + img").getAttribute("data-simply-src"), "HelloWorld");
+		testContent.innerHTML = '';
 	});
 
 QUnit.module("lists");
@@ -1348,7 +1354,6 @@ QUnit.module("lists");
 		var button = document.createElement("button");
 		editor.actions["simply-list-add"](button);
 		editor.actions["simply-list-add"](button);
-
 
 		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
 		
