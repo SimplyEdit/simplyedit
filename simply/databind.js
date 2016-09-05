@@ -139,16 +139,17 @@ dataBinding = function(config) {
 				if (JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue)) {
 					// this element changed when we were not listening; play catch up;
 					binding.set(binding.elements[i].getter());
+					binding.resolve();
 				}
 			}
 			for (i=0; i<binding.elements.length; i++) {
 				binding.addListeners(binding.elements[i]);
 			}
 		};
-		window.setTimeout(addListener, 5);
 		if (typeof binding.config.resolve === "function") {
 			binding.config.resolve.call(binding, key, value);
 		}
+		window.setTimeout(addListener, 5);
 	};
 
 	if (typeof binding.config.init === "function") {
@@ -247,6 +248,7 @@ dataBinding.prototype.handleEvent = function (event) {
 		case "DOMSubtreeModified":
 		case "DOMNodeRemoved":
 			// Allow the browser to fix what it thinks needs to be fixed (node to be removed, cleaned etc) before setting the new data;
+			self.set(target.getter());
 			window.setTimeout(function() {
 				self.set(target.getter());
 			}, 1);

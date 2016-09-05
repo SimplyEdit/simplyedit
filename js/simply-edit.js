@@ -55,6 +55,8 @@
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
+				editor.settings.databind.parentKey = [];
+
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-simply-field");
 					var dataPath = editor.data.getDataPath(dataFields[i]);
@@ -62,9 +64,9 @@
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
-					if (!data[dataPath][dataName]) {
-						data[dataPath][dataName] = editor.field.get(dataFields[i]);
-					}
+					//if (!data[dataPath][dataName]) {
+					//	data[dataPath][dataName] = editor.field.get(dataFields[i]);
+					//}
 					if (data[dataPath] && data[dataPath][dataName]) {
 						var fieldDataBinding;
 						if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
@@ -92,29 +94,11 @@
 					window.removeEventListener("load", preventDOMContentLoaded, true);
 				}
 
-				var fireEvent = function(evtname, target) {
-					var event; // The custom event that will be created
-					if (document.createEvent) {
-						event = document.createEvent("HTMLEvents");
-						event.initEvent(evtname, true, true);
-					} else {
-						event = document.createEventObject();
-						event.eventType = evtname;
-					}
-
-					event.eventName = evtname;
-
-					if (document.createEvent) {
-						target.dispatchEvent(event);
-					} else {
-						// target.fireEvent("on" + event.eventType, event);
-					}
-				};
 
 				
-				fireEvent("DOMContentLoaded", document);
+				editor.fireEvent("DOMContentLoaded", document);
 				window.setTimeout(function() {
-					fireEvent("load", window);
+					editor.fireEvent("load", window);
 				}, 100);
 
 				if (typeof jQuery !== "undefined") {
@@ -788,6 +772,12 @@
 				}
 			},
 			initHopeEditor : function(field) {
+				if (typeof hope === "undefined") {
+					window.setTimeout(function() {
+						editor.field.initHopeEditor(field);
+					}, 300);
+					return;
+				}
 				field.hopeContent = document.createElement("textarea");
 				field.hopeMarkup = document.createElement("textarea");
 				field.hopeRenderedSource = document.createElement("DIV");
@@ -929,6 +919,24 @@
 				} else {
 					editor.field.initHopeEditor(field);
 				}
+			}
+		},
+		fireEvent : function(evtname, target) {
+			var event; // The custom event that will be created
+			if (document.createEvent) {
+				event = document.createEvent("HTMLEvents");
+				event.initEvent(evtname, true, true);
+			} else {
+				event = document.createEventObject();
+				event.eventType = evtname;
+			}
+
+			event.eventName = evtname;
+
+			if (document.createEvent) {
+				target.dispatchEvent(event);
+			} else {
+				// target.fireEvent("on" + event.eventType, event);
 			}
 		},
 		loadBaseStyles : function() {
@@ -2185,6 +2193,18 @@
 
 	if (!editor.settings.databind) {
 		editor.settings.databind = {};
+	}
+
+	if (editor.settings.databind.resolve) {
+		var savedResolver = editor.settings.databind.resolve;
+		editor.settings.databind.resolve = function() {
+			editor.fireEvent("simply-data-changed", document);
+			savedResolver();
+		};
+	} else {
+		editor.settings.databind.resolve = function(key, value) {
+			editor.fireEvent("simply-data-changed", document);
+		};
 	}
 
 	var defaultToolbars = [
