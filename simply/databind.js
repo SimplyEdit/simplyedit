@@ -60,6 +60,10 @@ dataBinding = function(config) {
 	}
 	this.elements = [];
 	var shadowValue = data[key];
+	if (typeof shadowValue === "object") {
+		shadowValue = JSON.parse(JSON.stringify(shadowValue)); // clone the value;
+	}
+
 	monitorChildData(shadowValue);
 
 	var changeStack = [];
@@ -85,9 +89,8 @@ dataBinding = function(config) {
 			}
 		});
 	}
-
 	data._bindings_[key] = this;
-	var binding = data._bindings_[key];
+	var binding = this;
 
 	this.set = function (value) {
 		changeStack.push(value);
@@ -165,6 +168,8 @@ dataBinding = function(config) {
 		if (!skipSet) {
 			element.setter(shadowValue);
 		}
+		element.dataBinding = binding;
+
 		this.addListeners(element);
 
 		if (!binding.resolver) {
@@ -201,8 +206,8 @@ dataBinding.prototype.addListeners = function(element) {
 		element.addEventListener("DOMNodeRemoved", this.handleEvent);
 		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
-	element.dataBinding = this;
 };
+
 dataBinding.prototype.removeListeners = function(element) {
 	if (this.mode == "field") {
 		element.mutationObserver.disconnect();
