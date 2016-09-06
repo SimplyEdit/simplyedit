@@ -55,7 +55,7 @@
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
-				editor.settings.databind.parentKey = [];
+				editor.settings.databind.parentKey = '';
 
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-simply-field");
@@ -64,10 +64,10 @@
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
-					//if (!data[dataPath][dataName]) {
-					//	data[dataPath][dataName] = editor.field.get(dataFields[i]);
-					//}
-					if (data[dataPath] && data[dataPath][dataName]) {
+					if (!data[dataPath][dataName]) {
+						data[dataPath][dataName] = ''; // editor.field.get(dataFields[i]);
+					}
+					if (data[dataPath]) {
 						var fieldDataBinding;
 						if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
 							fieldDataBinding = data[dataPath]._bindings_[dataName];
@@ -921,7 +921,7 @@
 				}
 			}
 		},
-		fireEvent : function(evtname, target) {
+		fireEvent : function(evtname, target, eventData) {
 			var event; // The custom event that will be created
 			if (document.createEvent) {
 				event = document.createEvent("HTMLEvents");
@@ -931,6 +931,7 @@
 				event.eventType = evtname;
 			}
 
+			event.data = eventData;
 			event.eventName = evtname;
 
 			if (document.createEvent) {
@@ -2198,12 +2199,20 @@
 	if (editor.settings.databind.resolve) {
 		var savedResolver = editor.settings.databind.resolve;
 		editor.settings.databind.resolve = function() {
-			editor.fireEvent("simply-data-changed", document);
-			savedResolver();
+			var args = {
+				dataBinding : this,
+				arguments : arguments
+			};
+			editor.fireEvent("simply-data-changed", document, args);
+			savedResolver.apply(this, arguments);
 		};
 	} else {
-		editor.settings.databind.resolve = function(key, value) {
-			editor.fireEvent("simply-data-changed", document);
+		editor.settings.databind.resolve = function() {
+			var args = {
+				dataBinding : this,
+				arguments : arguments
+			};
+			editor.fireEvent("simply-data-changed", document, args);
 		};
 	}
 

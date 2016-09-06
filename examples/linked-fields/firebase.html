@@ -44,9 +44,9 @@
 
 					binding.firebase.changeStack = [];
 					binding.firebase.on("value", function(remoteData) {
-						console.log("value received " + binding.firebase.toString());
+						//console.log("value received " + binding.firebase.toString());
 						var val = remoteData.val();
-						console.log(val);
+						//console.log(val);
 
 						if (binding.parentKey != '') {
 							return; // the uppermost parent will also be triggered, and it will handle everything.
@@ -60,17 +60,34 @@
 						}
 						
 						if (!seen) {
+							// console.log('XXX - setting ' + binding.key);
+							if (editor.plugins.undoRedo) {
+								editor.plugins.undoRedo.undoing = true;
+								editor.plugins.undoRedo.setTimer();
+							}
 							binding.set(val);
 							binding.firebase.changeStack = [];
+						} else {
+							// console.log('seen');
 						}
 					});
 				},
-				resolve : function(key, value) {
+				resolve : function(key, value, oldValue) {
 					// Save data to firebase;
-					this.firebase.changeStack.push(value);
-					this.firebase.set(value);
-					console.log("setting value in " + this.firebase.toString());
-					console.log(value);
+					var binding = this;
+
+					binding.firebase.changeStack.push(value);
+					// binding.firebase.set(value);
+
+					binding.firebase.transaction(function(current_value) {
+						if (JSON.stringify(oldValue) == JSON.stringify(current_value)) {
+							return value;
+						}
+						return;
+					});
+
+					//console.log("setting value in " + this.firebase.toString());
+					//console.log(value);
 				}
 			}
 		};
@@ -81,7 +98,7 @@
 		data-simply-settings="myCustomSettings"
 	></script>
 	<script>
-		setInterval(function() {
+/*		setInterval(function() {
 			if (editor.currentData) {
 				var d = new Date();
 
@@ -96,6 +113,7 @@
 					pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
 			}
 		}, 10000);
+*/
 	</script>
 </body>
 </html>

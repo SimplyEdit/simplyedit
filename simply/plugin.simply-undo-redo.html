@@ -2,6 +2,7 @@
 	editor.plugins.undoRedo = {
 		currentUndo : -1,
 		undoSet : [],
+		timer : false,
 		isEqual : function(data1, data2) {
 			if (typeof data1 === "undefined" || typeof data2 === "undefined") {
 				return false;
@@ -11,17 +12,14 @@
 			}
 			return false;
 		},
-		storeUndo : function() {
+		storeUndo : function(undoAction) {
 			if (editor.plugins.undoRedo.undoing) {
 				return;
 			}
-			var currentData = JSON.stringify(editor.currentData);
-			if (!editor.plugins.undoRedo.isEqual(editor.plugins.undoRedo.previousData, currentData)) {
-				editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo + 1);
-				editor.plugins.undoRedo.undoSet.push(currentData);
-				editor.plugins.undoRedo.previousData = currentData;
-				editor.plugins.undoRedo.currentUndo++;
-			}
+			editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo + 1);
+			editor.plugins.undoRedo.undoSet.push(undoAction);
+			editor.plugins.undoRedo.currentUndo++;
+
 			editor.toolbars["simply-undo-redo"].update();
 		},
 		undo : function() {
@@ -30,24 +28,15 @@
 			}
 			editor.plugins.undoRedo.undoing = true;
 			editor.context.toolbar.hide = true;
-			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo - 1];
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
 			if (typeof undoStep !== "undefined") {
-				if (editor.plugins.undoRedo.currentUndo == editor.plugins.undoRedo.undoSet.length-1) { 
-					editor.plugins.undoRedo.storeUndo();
-				}
 				var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
-				editor.currentData = JSON.parse(undoStep);
-
-				editor.data.apply(editor.currentData, document);
-				editor.plugins.undoRedo.previousData = undoStep;
+				undoStep.undo();
 				document.body.scrollTop = currentScroll;
 				editor.plugins.undoRedo.currentUndo--;
 			}
 			editor.toolbars["simply-undo-redo"].update();
-			window.setTimeout(function() {
-				editor.plugins.undoRedo.undoing = false;
-				editor.toolbars["simply-undo-redo"].update();
-			}, 200);
+			editor.plugins.undoRedo.setTimer();
 		},
 		redo : function() {
 			if (!editor.plugins.undoRedo.canRedo) {
@@ -58,32 +47,30 @@
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo + 1];
 			if (typeof undoStep !== "undefined") {
 				var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
-				editor.currentData = JSON.parse(undoStep);
-				editor.data.apply(editor.currentData, document);
-				editor.plugins.undoRedo.previousData = undoStep;
+				undoStep.redo();
 				document.body.scrollTop = currentScroll;
 				editor.plugins.undoRedo.currentUndo++;
 			}
 			editor.toolbars["simply-undo-redo"].update();
-			window.setTimeout(function() {
+			editor.plugins.undoRedo.setTimer();
+		},
+		setTimer : function() {
+			if (editor.plugins.undoRedo.timer) {
+				window.clearTimeout(editor.plugins.undoRedo.timer);
+			}
+			editor.plugins.undoRedo.timer = window.setTimeout(function() {
 				editor.plugins.undoRedo.undoing = false;
 				editor.toolbars["simply-undo-redo"].update();
 			}, 200);
 		},
 		canUndo : function() {
-			if (editor.plugins.undoRedo.undoing) {
-				return false;
-			}
-			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo - 1];
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
                         if (typeof undoStep !== "undefined") {
 				return true;
 			}
 			return false;
 		},
 		canRedo : function() {
-			if (editor.plugins.undoRedo.undoing) {
-				return false;
-			}
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo + 1];
 			if (typeof undoStep !== "undefined") {
 				return true;
@@ -92,8 +79,34 @@
 		},
 		changeHandler : function(evt) {
 			if (!editor.plugins.undoRedo.undoing) {
-				editor.plugins.undoRedo.storeUndo();
-				this.undoSaved = false;
+				var dataBinding = evt.data.dataBinding;
+				var newValue = evt.data.arguments[1];
+				var oldValue = evt.data.arguments[2];
+
+				var dataPath = editor.data.getDataPath(dataBinding.elements[0]);
+
+				var set = function(value) {
+					var targetValue = editor.currentData[dataPath];
+					var subkeys = dataBinding.parentKey.split("/");
+					var subkey;
+					while (subkeys.length) {
+						subkey = subkeys.shift();
+						if (subkey != "") {
+							targetValue = targetValue[subkey];
+						}
+					}
+					targetValue[dataBinding.key] = value;
+				};
+					
+				var undoAction = {
+					undo : function() {
+						set(oldValue);
+					},
+					redo : function() {
+						set(newValue);
+					}
+				};
+				editor.plugins.undoRedo.storeUndo(undoAction);
 			}
 		}
 	};
@@ -116,7 +129,6 @@
 			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
 			document.addEventListener("simply-data-changed", editor.plugins.undoRedo.changeHandler);
-			editor.plugins.undoRedo.storeUndo();
 		},
 		update : function() {
 			var undoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
