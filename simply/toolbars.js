@@ -107,6 +107,9 @@
 				}
 
 				if ( el.tagName == 'BUTTON' || el.classList.contains("simply-button")) {
+					if (el.getAttribute('disabled')) {
+						return;
+					}
 					switch(el.getAttribute("data-simply-action")) {
 						case null:
 						break;
