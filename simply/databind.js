@@ -121,6 +121,7 @@ dataBinding = function(config) {
 		if (typeof value === "object") {
 		 	value = JSON.parse(JSON.stringify(value)); // clone the value;
 		}
+		var oldValue = shadowValue;
 		shadowValue = value;
 		monitorChildData(shadowValue);
 
@@ -151,7 +152,7 @@ dataBinding = function(config) {
 			}
 		};
 		if (typeof binding.config.resolve === "function") {
-			binding.config.resolve.call(binding, key, value);
+			binding.config.resolve.call(binding, key, value, oldValue);
 		}
 		window.setTimeout(addListener, 5);
 	};
