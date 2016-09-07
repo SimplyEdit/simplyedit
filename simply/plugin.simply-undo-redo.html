@@ -117,6 +117,7 @@
 			var listItem = document.createElement("li");
 			var button = document.createElement("button");
 			button.dataset.simplyAction = "simply-undo";
+			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-undo"></i>Undo';
 			listItem.appendChild(button);
 			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
@@ -124,10 +125,10 @@
 			listItem = document.createElement("li");
 			button = document.createElement("button");
 			button.dataset.simplyAction = "simply-redo";
+			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-repeat"></i>Redo';
 			listItem.appendChild(button);
 			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
-
 			document.addEventListener("simply-data-changed", editor.plugins.undoRedo.changeHandler);
 		},
 		update : function() {
