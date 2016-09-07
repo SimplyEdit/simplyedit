@@ -968,9 +968,6 @@
 			}
 			editor.loadBaseStyles();
 
-			// Add databinding
-			editor.loadScript(editor.baseURL + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version));
-
 			// convert URL for the endpoint to an absolute path;
 			if (typeof config.endpoint !== 'undefined' && config.endpoint) {
 				var parser = document.createElement("A");
@@ -980,12 +977,19 @@
 
 			editor.profile = config.profile;
 			editor.storage = storage.init(config.endpoint);
-			editor.data.load();
+
+			// Add databinding and load data afterwards
+			editor.loadScript(editor.baseURL + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
 		},
-		loadScript : function(src) {
+		loadScript : function(src, callback) {
 			if (!document.head.querySelector('script[src="'+src+'"]')) {
 				var scriptTag = document.createElement("SCRIPT");
 				scriptTag.setAttribute("src", src);
+				scriptTag.addEventListener("load", function(evt) {
+					if (typeof callback === "function") {
+						callback();
+					}
+				});
 				document.head.appendChild(scriptTag);
 			}
 		},
