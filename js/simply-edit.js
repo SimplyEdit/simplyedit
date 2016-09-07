@@ -338,6 +338,7 @@
 					if (typeof editor.dataSources[dataSource].load === "function") {
 						editor.dataSources[dataSource].load(list, function(result) {
 							editor.list.set(list, result);
+							editor.responsiveImages.init(list);
 							if (typeof hope !== "undefined") {
 								editor.editmode.makeEditable(list);
 							}
@@ -376,7 +377,12 @@
 				if (this.dataBinding) {
 					editor.bindingParents = [this.dataBinding.parentKey];
 				}
-				editor.list.set(this, value);
+
+				if (this.getAttribute('data-simply-data')) {
+					editor.list.applyDataSource(this, this.getAttribute('data-simply-data'), value);
+				} else {
+					editor.list.set(this, value);
+				}
 				if (document.body.getAttribute("data-simply-edit")) {
 					editor.editmode.makeEditable(this);
 				}
@@ -390,40 +396,31 @@
 					dataName = dataLists[i].getAttribute("data-simply-list");
 					dataPath = editor.data.getDataPath(dataLists[i]);
 
-					var dataSource = dataLists[i].getAttribute("data-simply-data");
-					if (dataSource !== null) {
-						var listData = {};
-						if (data && data[dataPath] && data[dataPath][dataName]) {
-							listData = data[dataPath][dataName];
-						}
-			
-						editor.list.applyDataSource(dataLists[i], dataSource, listData);
-					} else {
-						if (!data[dataPath]) {
-							data[dataPath] = {};
-						}
-						if (!data[dataPath][dataName]) {
-							data[dataPath][dataName] = [];
-						}
-						if (data[dataPath] && data[dataPath][dataName]) {
-							var listDataBinding;
-							if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
-								listDataBinding = data[dataPath]._bindings_[dataName];
-							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-								bindingConfig.data   = data[dataPath];
-								bindingConfig.key    = dataName;
-								bindingConfig.getter = editor.list.dataBindingGetter;
-								bindingConfig.setter = editor.list.dataBindingSetter;
-								bindingConfig.mode   = "list";
-
-								listDataBinding = new dataBinding(bindingConfig);
-							}
-							listDataBinding.bind(dataLists[i]);
-							dataLists[i].simplyData = data[dataPath][dataName];
-							// editor.list.set(dataLists[i], data[dataPath][dataName]);
-						}
+					if (!data[dataPath]) {
+						data[dataPath] = {};
 					}
+					if (!data[dataPath][dataName]) {
+						data[dataPath][dataName] = [];
+					}
+					if (data[dataPath] && data[dataPath][dataName]) {
+						var listDataBinding;
+						if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
+							listDataBinding = data[dataPath]._bindings_[dataName];
+						} else {
+							var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+							bindingConfig.data   = data[dataPath];
+							bindingConfig.key    = dataName;
+							bindingConfig.getter = editor.list.dataBindingGetter;
+							bindingConfig.setter = editor.list.dataBindingSetter;
+							bindingConfig.mode   = "list";
+
+							listDataBinding = new dataBinding(bindingConfig);
+						}
+						listDataBinding.bind(dataLists[i]);
+						dataLists[i].simplyData = data[dataPath][dataName];
+						// editor.list.set(dataLists[i], data[dataPath][dataName]);
+					}
+
 					var hasChild = false;
 					for (var j=0; j<dataLists[i].childNodes.length; j++) {
 						if (
@@ -532,26 +529,21 @@
 						editor.list.parseTemplates(elm);
 						dataName = elm.getAttribute("data-simply-list");
 
-						var dataSource = elm.getAttribute("data-simply-data");
-						if (dataSource !== null) {
-							editor.list.applyDataSource(elm, dataSource, listData[j][dataName]);
-						} else if (listData[j][dataName]) {
-							if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
-								listDataBinding = listData[j]._bindings_[dataName];
-							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
-								bindingConfig.data   = listData[j];
-								bindingConfig.key    = dataName;
-								bindingConfig.getter = editor.list.dataBindingGetter;
-								bindingConfig.setter = editor.list.dataBindingSetter;
-								bindingConfig.mode   = "list";
-								listDataBinding = new dataBinding(bindingConfig);
-							}
-							listDataBinding.bind(elm);
-							elm.simplyData = listData[j][dataName];
-							// editor.list.set(elm, listData[j][dataName]);
+						if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
+							listDataBinding = listData[j]._bindings_[dataName];
+						} else {
+							var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+							// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
+							bindingConfig.data   = listData[j];
+							bindingConfig.key    = dataName;
+							bindingConfig.getter = editor.list.dataBindingGetter;
+							bindingConfig.setter = editor.list.dataBindingSetter;
+							bindingConfig.mode   = "list";
+							listDataBinding = new dataBinding(bindingConfig);
 						}
+						listDataBinding.bind(elm);
+						elm.simplyData = listData[j][dataName];
+						// editor.list.set(elm, listData[j][dataName]);
 
 						var hasChild = false;
 						for (var m=0; m<elm.childNodes.length; m++) {

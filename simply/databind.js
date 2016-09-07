@@ -162,9 +162,7 @@ dataBinding = function(config) {
 	}
 
 	this.bind = function(element, skipSet) {
-		if (binding.mode == "field") {
-			element.mutationObserver = new MutationObserver(this.handleMutation);
-		}
+		element.mutationObserver = new MutationObserver(this.handleMutation);
 
 		binding.elements.push(element);
 
@@ -209,6 +207,7 @@ dataBinding.prototype.addListeners = function(element) {
 		element.addEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 	}
 	if (this.mode == "list") {
+		element.mutationObserver.observe(element, {attributes: true});
 		element.addEventListener("DOMNodeRemoved", this.handleEvent);
 		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
@@ -221,6 +220,7 @@ dataBinding.prototype.removeListeners = function(element) {
 		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
 	}
 	if (this.mode == "list") {
+		element.mutationObserver.disconnect();
 		element.removeEventListener("DOMNodeRemoved", this.handleEvent);
 		element.removeEventListener("DOMNodeInserted", this.handleEvent);
 	}
@@ -228,17 +228,22 @@ dataBinding.prototype.removeListeners = function(element) {
 
 dataBinding.prototype.handleMutation = function(event) {
 	var target = event[0].target;
-//	if (event[0].attributeName == "data-simply-stashed") {
-//		return;
-//	}
+	if (!target.dataBinding) {
+		return;
+	}
+
 	var self = target.dataBinding;
+	self.removeListeners(target);	// prevent possible looping, getter sometimes also triggers an attribute change;
 	self.set(target.getter());
+	self.addListeners(target);
 };			
 
 dataBinding.prototype.handleEvent = function (event) {
 	var target = event.currentTarget;
 	var self = target.dataBinding;
-
+	if (typeof self === 'undefined') {
+		return;
+	}
 	if (self.mode === "list") {
 		if (target != event.relatedNode) {
 			return;

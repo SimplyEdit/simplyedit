@@ -36,6 +36,9 @@
 						if (value) {
 							var target = vdSelectionState.currentNode;
 							target.setAttribute("data-simply-feed", value);
+
+//							target.dataBinding.set(target.getter());
+/*
 							target.style.opacity = 0.5;
 							target.classList.add("simply-empty");
 							editor.dataSources["rss"].load(
@@ -43,9 +46,10 @@
 								function(result) {
 									target.style.opacity = 1;
 									target.innerHTML = '';
-									editor.data.list.applyTemplates(target, result)
+									editor.list.set(target, result)
 								}
 							);
+*/
 						}
 					}
 				}

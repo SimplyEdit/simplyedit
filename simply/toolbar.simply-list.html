@@ -122,7 +122,9 @@
 				muze.event.fire(document, "simply-selectable-inserted");
 
 				editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
-				editor.data.apply({}, newListItem);
+
+				var newData = editor.data.get(newListItem);
+				editor.data.apply(newData, newListItem);
 				editor.editmode.makeEditable(newListItem);
 				editor.bindingParents.pop();
 				editor.bindingParents.pop();
