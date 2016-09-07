@@ -260,3 +260,12 @@ dataBinding.prototype.handleEvent = function (event) {
 		break;
 	}
 };
+
+// Housekeeping, remove references to deleted nodes
+document.addEventListener("DOMNodeRemoved", function(evt) {
+	var target = evt.srcElement;
+	if (target.dataBinding) {
+		target.dataBinding.unbind(target);
+		delete target.dataBinding;
+	}
+});
