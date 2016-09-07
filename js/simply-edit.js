@@ -20,6 +20,13 @@
 	var scriptEl = getScriptEl();
 	var apiKey = scriptEl.getAttribute("data-api-key") ? scriptEl.getAttribute("data-api-key") : "";
 
+	var getKeylessBaseURL  = function(url) {
+		var scriptURL = document.createElement('a');
+		scriptURL.href = url;
+		scriptURL.pathname = scriptURL.pathname.replace('simply-edit.js', '').replace(/\/js\/$/, '/');
+		return scriptURL.href;
+	};
+
 	var getBaseURL = function(url) {
 		var scriptURL = document.createElement('a');
 		scriptURL.href = url;
@@ -34,6 +41,7 @@
 		version: '0.42',
 		apiKey : apiKey,
 		baseURL : getBaseURL(scriptEl.src),
+		baseURLClean : getKeylessBaseURL(scriptEl.src),
 		bindingParents : [],
 		data : {
 			getDataPath : function(field) {
@@ -979,7 +987,7 @@
 			editor.storage = storage.init(config.endpoint);
 
 			// Add databinding and load data afterwards
-			editor.loadScript(editor.baseURL + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
+			editor.loadScript(editor.baseURLClean + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
 		},
 		loadScript : function(src, callback) {
 			if (!document.head.querySelector('script[src="'+src+'"]')) {
