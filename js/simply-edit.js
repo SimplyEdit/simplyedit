@@ -63,7 +63,9 @@
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
-				editor.settings.databind.parentKey = '';
+				if (target == document) {
+					editor.settings.databind.parentKey = '';
+				}
 
 				for (var i=0; i<dataFields.length; i++) {
 					var dataName = dataFields[i].getAttribute("data-simply-field");

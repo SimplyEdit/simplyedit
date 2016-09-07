@@ -77,15 +77,17 @@
 					var binding = this;
 
 					binding.firebase.changeStack.push(value);
-					// binding.firebase.set(value);
+//					binding.firebase.set(value);
 
 					binding.firebase.transaction(function(current_value) {
 						if (JSON.stringify(oldValue) == JSON.stringify(current_value)) {
 							return value;
 						}
+						if (current_value === null) {
+							return value;
+						}
 						return;
 					});
-
 					//console.log("setting value in " + this.firebase.toString());
 					//console.log(value);
 				}
