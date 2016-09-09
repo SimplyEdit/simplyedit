@@ -1229,7 +1229,6 @@ QUnit.module("images");
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		
-		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
 		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 	});
 
@@ -1241,7 +1240,7 @@ QUnit.module("images");
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 
-		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 	});
 
 	QUnit.test("responsive image source gets set", function(assert) {
@@ -1283,7 +1282,7 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
-		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 		testContent.innerHTML = '';
 	});
 

@@ -140,6 +140,7 @@
 
 			var field = editor.node.getEditableField();
 			var hopeEditor = field.hopeEditor;
+			editor.context.hopeEditor = hopeEditor;
 
 			var imagePos = hopeEditor.selection.getTotalOffset(image);
 			hopeEditor.selection.start = imagePos;
@@ -476,6 +477,7 @@
 			if (!image.hopeEditor) {
 				editor.field.initHopeStub(image);
 			}
+
 			var hopeEditor = image.hopeEditor;
 			editor.context.hopeEditor = hopeEditor;
 
