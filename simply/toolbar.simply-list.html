@@ -108,16 +108,22 @@
 
 				var listItems = list.querySelectorAll(":scope > [data-simply-list-item]");
 
+				var listIndex = 0;
 				if ( targetNode ) {
 					list.insertBefore(newNode.firstElementChild, targetNode.nextElementSibling);
-					editor.bindingParents.push(listItems.indexOf(targetNode));
+					for (var i=0; i<listItems.length; i++) {
+						if (listItems[i] == targetNode) {
+							listIndex = i+1;
+						}
+					}
 				} else if (listItems.length) {
 					list.insertBefore(newNode.firstElementChild, listItems[listItems.length-1].nextSibling);
-					editor.bindingParents.push(listItems.length-1);
+					listIndex = listItems.length-1;
 				} else {
-					editor.bindingParents.push(0);
 					list.insertBefore(newNode.firstElementChild, list.firstElementChild);
+					listIndex = 0;
 				}
+				editor.bindingParents.push(listIndex);
 
 				muze.event.fire(document, "simply-selectable-inserted");
 
