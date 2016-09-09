@@ -8,6 +8,8 @@ dataBinding = function(config) {
 	this.parentKey = config.parentKey ? config.parentKey : "";
 	this.key = config.key;
 
+	this.resolveCounter = 0;
+
 	if (!this.mode) {
 		this.mode = "field";
 	}
@@ -118,6 +120,15 @@ dataBinding = function(config) {
 			return;
 		}
 
+		binding.resolveCounter++;
+		if (binding.resolveCounter > 5) {
+			console.log("Warning: resolve loop detected!");
+			window.setTimeout(function() {
+				binding.resolveCounter = 0;
+			}, 300);
+			return;
+		}
+
 		if (typeof value === "object") {
 		 	value = JSON.parse(JSON.stringify(value)); // clone the value;
 		}
@@ -150,6 +161,7 @@ dataBinding = function(config) {
 			for (i=0; i<binding.elements.length; i++) {
 				binding.addListeners(binding.elements[i]);
 			}
+			binding.resolveCounter--;
 		};
 		if (typeof binding.config.resolve === "function") {
 			binding.config.resolve.call(binding, key, value, oldValue);
@@ -258,9 +270,14 @@ dataBinding.prototype.handleEvent = function (event) {
 		case "DOMSubtreeModified":
 		case "DOMNodeRemoved":
 			// Allow the browser to fix what it thinks needs to be fixed (node to be removed, cleaned etc) before setting the new data;
+			self.removeListeners(target);
 			self.set(target.getter());
+			self.addListeners(target);
+
 			window.setTimeout(function() {
+				self.removeListeners(target);
 				self.set(target.getter());
+				self.addListeners(target);
 			}, 1);
 		break;
 	}
