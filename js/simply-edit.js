@@ -413,7 +413,7 @@
 							bindingConfig.getter = editor.list.dataBindingGetter;
 							bindingConfig.setter = editor.list.dataBindingSetter;
 							bindingConfig.mode   = "list";
-
+							bindingConfig.attributeFilter = ["data-simply-selectable", "class"];
 							listDataBinding = new dataBinding(bindingConfig);
 						}
 						listDataBinding.bind(dataLists[i]);
@@ -543,6 +543,7 @@
 								bindingConfig.getter = editor.list.dataBindingGetter;
 								bindingConfig.setter = editor.list.dataBindingSetter;
 								bindingConfig.mode   = "list";
+								bindingConfig.attributeFilter = ["data-simply-selectable", "class"];
 								listDataBinding = new dataBinding(bindingConfig);
 							}
 							listDataBinding.bind(elm);
@@ -589,6 +590,10 @@
 
 				editor.bindingParents.push(list.getAttribute("data-simply-list"));
 				for (j=0; j<listData.length; j++) {
+					if (!listData[j]) {
+						continue;
+					}
+
 					editor.bindingParents.push(j);
 
 					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
@@ -615,11 +620,11 @@
 							importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
 						}
 
-//						if (list.getAttribute("data-simply-data")) {
-//							initFields(clone, false);
-//						} else {
+						if (list.getAttribute("data-simply-data")) {
+							initFields(clone, false);
+						} else {
 							initFields(clone, true);
-//						}
+						}
 						editor.list.fixFirstElementChild(clone);
 
 						counter = 0;
@@ -643,7 +648,11 @@
 					} else {
 						for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
 							clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
-							initFields(clone);
+							if (list.getAttribute("data-simply-data")) {
+								initFields(clone, false);
+							} else {
+								initFields(clone, true);
+							}
 							editor.list.fixFirstElementChild(clone);
 
 							counter = 0;
@@ -668,6 +677,7 @@
 
 					editor.bindingParents.pop();
 				}
+
 				list.setAttribute("data-simply-selectable", true);
 				editor.bindingParents.pop();
 
@@ -1386,11 +1396,20 @@
 					return;
 				}
 
-				imageSrc = imgEl.getAttribute("data-simply-src");
+				if (!imgEl.responsiveImageInitDone) {
+					imgEl.responsiveImageInitDone = true;
+				} else {
+					return;
+				}
+
+				var imageSrc = imgEl.getAttribute("data-simply-src");
 				if (!imageSrc) {
 					return;
 				}
 
+				if (typeof imageSrc === "undefined") {
+					return;
+				}
 				var srcSet = [];
 				var imagesPath = this.getEndpoint();
 				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
@@ -1413,7 +1432,6 @@
 				}
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
-				imgEl.removeAttribute("data-simply-src");
 			},
 			getSizeRatio : function(imgEl) {
 				var imageWidth = imgEl.width;

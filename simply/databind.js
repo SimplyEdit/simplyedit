@@ -7,6 +7,7 @@ dataBinding = function(config) {
 	this.mode = config.mode;
 	this.parentKey = config.parentKey ? config.parentKey : "";
 	this.key = config.key;
+	this.attributeFilter = config.attributeFilter;
 
 	this.resolveCounter = 0;
 
@@ -186,7 +187,7 @@ dataBinding = function(config) {
 		}
 		element.dataBinding = binding;
 
-		this.addListeners(element);
+		binding.addListeners(element);
 
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
@@ -242,6 +243,12 @@ dataBinding.prototype.handleMutation = function(event) {
 	var target = event[0].target;
 	if (!target.dataBinding) {
 		return;
+	}
+
+	for (var i=0; i<event.length; i++) {
+		if (target.dataBinding.attributeFilter.indexOf(event[i].attributeName)) {
+			return;
+		}
 	}
 
 	var self = target.dataBinding;
