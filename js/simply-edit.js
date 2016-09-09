@@ -499,29 +499,32 @@
 					listData = [];
 				}
 
-				var initFields = function(clone) {
+				var initFields = function(clone, useDataBinding) {
 					var handleFields = function(elm) {
 						dataName = elm.getAttribute("data-simply-field");
 						if (!listData[j][dataName]) {
 							listData[j][dataName] = editor.field.get(elm);
 						}
 						if (listData[j][dataName]) {
-							var fieldDataBinding;
-							if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
-								fieldDataBinding = listData[j]._bindings_[dataName];
+							if (useDataBinding) {
+								var fieldDataBinding;
+								if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
+									fieldDataBinding = listData[j]._bindings_[dataName];
+								} else {
+									var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+									// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
+									bindingConfig.data   = listData[j];
+									bindingConfig.key    = dataName;
+									bindingConfig.getter = editor.field.dataBindingGetter;
+									bindingConfig.setter = editor.field.dataBindingSetter;
+									bindingConfig.mode   = "field";
+									fieldDataBinding = new dataBinding(bindingConfig);
+								}
+								fieldDataBinding.bind(elm);
+								elm.simplyData = listData[j][dataName];
 							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
-								bindingConfig.data   = listData[j];
-								bindingConfig.key    = dataName;
-								bindingConfig.getter = editor.field.dataBindingGetter;
-								bindingConfig.setter = editor.field.dataBindingSetter;
-								bindingConfig.mode   = "field";
-								fieldDataBinding = new dataBinding(bindingConfig);
+								editor.field.set(elm, listData[j][dataName]);
 							}
-							fieldDataBinding.bind(elm);
-							elm.simplyData = listData[j][dataName];
-							// editor.field.set(elm, listData[j][dataName]);
 						}
 					};
 
@@ -529,21 +532,24 @@
 						editor.list.parseTemplates(elm);
 						dataName = elm.getAttribute("data-simply-list");
 
-						if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
-							listDataBinding = listData[j]._bindings_[dataName];
+						if (useDataBinding) {
+							if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
+								listDataBinding = listData[j]._bindings_[dataName];
+							} else {
+								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
+								bindingConfig.data   = listData[j];
+								bindingConfig.key    = dataName;
+								bindingConfig.getter = editor.list.dataBindingGetter;
+								bindingConfig.setter = editor.list.dataBindingSetter;
+								bindingConfig.mode   = "list";
+								listDataBinding = new dataBinding(bindingConfig);
+							}
+							listDataBinding.bind(elm);
+							elm.simplyData = listData[j][dataName];
 						} else {
-							var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-							// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
-							bindingConfig.data   = listData[j];
-							bindingConfig.key    = dataName;
-							bindingConfig.getter = editor.list.dataBindingGetter;
-							bindingConfig.setter = editor.list.dataBindingSetter;
-							bindingConfig.mode   = "list";
-							listDataBinding = new dataBinding(bindingConfig);
+							editor.list.set(elm, listData[j][dataName]);
 						}
-						listDataBinding.bind(elm);
-						elm.simplyData = listData[j][dataName];
-						// editor.list.set(elm, listData[j][dataName]);
 
 						var hasChild = false;
 						for (var m=0; m<elm.childNodes.length; m++) {
@@ -609,8 +615,11 @@
 							importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
 						}
 
-						initFields(clone);
-	
+//						if (list.getAttribute("data-simply-data")) {
+//							initFields(clone, false);
+//						} else {
+							initFields(clone, true);
+//						}
 						editor.list.fixFirstElementChild(clone);
 
 						counter = 0;
@@ -1404,6 +1413,7 @@
 				}
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
+				imgEl.removeAttribute("data-simply-src");
 			},
 			getSizeRatio : function(imgEl) {
 				var imageWidth = imgEl.width;
