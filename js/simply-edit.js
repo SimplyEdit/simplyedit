@@ -383,6 +383,8 @@
 				} else {
 					editor.list.set(this, value);
 				}
+				editor.responsiveImages.init(this);
+
 				if (document.body.getAttribute("data-simply-edit")) {
 					editor.editmode.makeEditable(this);
 				}
