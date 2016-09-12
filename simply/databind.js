@@ -1,5 +1,8 @@
 /*
-	Two way databinding on elements and a data object.
+	Two way databinding between a data object and DOM element(s).
+	A databinding is attached to one data object. It can be bound to one or more elements.
+	Changes in the element are resolved every x ms;
+	Changes in the data are resolved to the element directly;
 
 	config options:
 		data: the data object to be used for databinding. Note that this is the 'outer' object, the databinding itself will be set on data[key];
@@ -13,7 +16,7 @@
 		attributeFilter: a blacklist of attributes that should not trigger a change in data;
 		resolve: a function that is called _after_ a change in data has been resolved. The arguments provided to the function are: dataBinding, key, value, oldValue
 
-	Example usage:
+	Basic usage usage:
 		var data = {
 			"title" : "foo"
 		};
@@ -26,17 +29,17 @@
 			},
 			getter: function() {
 				return this.innerHTML;
-			},
-			resolve: function(binding, key, value, oldValue) {
-				console.log("data in " + key + " changed from " + oldValue + " to " + value);
 			}
 		});
 
 
-		dataBinding.bind(elm1);
-		dataBinding.bind(elm2);
+		dataBinding.bind(document.getElementById('title'));
 
-		data.title = "Hello world";		
+		console.log(data.title); // "foo"
+		data.title = "Hello world"; // innerHTML for title is changed to 'Hello world';
+		console.log(data.title); // "Hello world"
+		document.getElementById('title').innerHTML = "Bar";
+		console.log(data.title); // "Bar"
 */
 
 dataBinding = function(config) {
@@ -49,21 +52,45 @@ dataBinding = function(config) {
 	this.parentKey = config.parentKey ? config.parentKey : "";
 	this.key = config.key;
 	this.attributeFilter = config.attributeFilter;
+	this.elements = [];
+	var changeStack = [];
+	var binding = this;
+	var shadowValue;
 
-	this.resolveCounter = 0;
+	resolveCounter = 0;
 
 	if (!this.mode) {
 		this.mode = "field";
 	}
 
+	// If we already have a databinding on this data[key], re-use that one instead of creating a new one;
+	if (data.hasOwnProperty("_bindings_") && data._bindings_[key]) {
+		return data._bindings_[key];
+	}
+
+	var dereference = function(value) {
+		return JSON.parse(JSON.stringify(value));
+	};
+	var isEqual = function(value1, value2) {
+		return JSON.stringify(value1) == JSON.stringify(value2);
+	};
+	var setShadowValue = function(value) {
+		shadowValue = value;
+		if (typeof shadowValue === "object") {
+			shadowValue = dereference(shadowValue);
+		}
+		monitorChildData(shadowValue);
+	};
 	var monitorChildData = function(data) {
+		// Watch for changes in our child data, because these also need to register as changes in the databound data/elements;
+		// This allows the use of simple data structures (1 key deep) as databound values and still resolve changes on a specific entry;
 		if (typeof data === "object") {
 			var monitor = function(data, key) {
 				var myvalue = data[key];
 				Object.defineProperty(data, key, {
 					set : function(value) {
 						myvalue = value;
-						newValue = JSON.parse(JSON.stringify(shadowValue));
+						newValue = dereference(shadowValue);
 						shadowValue = null;
 						binding.set(newValue);
 						binding.resolve();
@@ -78,13 +105,16 @@ dataBinding = function(config) {
 				monitor(data, key);
 			}
 		}
+
+		// Override basic array functions in the databound data, if it is an array;
+		// Allows the use of basic array functions and still resolve changes.
 		if (data instanceof Array) {
 			overrideArrayFunction = function(name) {
 				Object.defineProperty(data, name, {
 					value : function() {
 						binding.resolve(); // make sure the shadowValue is in sync with the latest state;
 						var result = Array.prototype[name].apply(shadowValue, arguments);
-						newValue = JSON.parse(JSON.stringify(shadowValue));
+						newValue = dereference(shadowValue);
 						shadowValue = null;
 						binding.set(newValue);
 						binding.resolve(); // and apply our array change;
@@ -99,44 +129,74 @@ dataBinding = function(config) {
 			overrideArrayFunction("splice");
 		}
 	};
-
-	if (data.hasOwnProperty("_bindings_") && data._bindings_[key]) {
-		return data._bindings_[key];
-	}
-	this.elements = [];
-	var shadowValue = data[key];
-	if (typeof shadowValue === "object") {
-		shadowValue = JSON.parse(JSON.stringify(shadowValue)); // clone the value;
-	}
-
-	monitorChildData(shadowValue);
-
-	var changeStack = [];
-
-	Object.defineProperty(data, key, { 
-		set : function(value) {
-			binding.set(value);
-			binding.resolve();
-		},
-		get : function() {
-			return shadowValue;
+	var resumeListeners = function() {
+		var i;
+		for (i=0; i<binding.elements.length; i++) {
+			if (!isEqual(binding.elements[i].getter(), shadowValue)) {
+				// this element changed when we were not listening; play catch up;
+				binding.set(binding.elements[i].getter());
+				binding.resolve();
+			}
 		}
-	});
+		for (i=0; i<binding.elements.length; i++) {
+			binding.addListeners(binding.elements[i]);
+		}
+		resolveCounter--;
+	};
+	var pauseListeners = function() {
+		for (var i=0; i<binding.elements.length; i++) {
+			binding.removeListeners(binding.elements[i]); // Stop listening before we set new values to prevent looping;
+		}
+	};
+	var resolverIsLooping = function() {
+		// Check for resolve loops - 5 seems like a safe count. If we pass this point 5 times within the same stack execution, break the loop.
+		resolveCounter++;
+		if (resolveCounter > 5) {
+			console.log("Warning: databinding resolve loop detected!");
+			window.setTimeout(function() {
+				resolveCounter = 0;
+			}, 300); // 300 is a guess; could be any other number. It needs to be long enough so that everyone can settle down before we start resolving again.
+			return true;
+		}
+		return false;
+	};
+	var setElements = function(value) {
+		for (var i=0; i<binding.elements.length; i++) {
+			if (
+				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
+				(!isEqual(binding.elements[i].getter(), shadowValue))
+			) {
+				binding.elements[i].setter(value);
+			}
+		}
+	};
+	var initBindings = function(data, key) {
+		if (!data.hasOwnProperty("_bindings_")) {
+			var bindings = {};
 
-	if (!data.hasOwnProperty("_bindings_")) {
-		var bindings = {};
+			Object.defineProperty(data, "_bindings_", {
+				get : function() {
+					return bindings;
+				},
+				set : function(value) {
+					bindings[key] = binding;
+				}
+			});
+		}
+		data._bindings_[key] = binding;
 
-		Object.defineProperty(data, "_bindings_", {
-			get : function() {
-				return bindings;
-			},
+		setShadowValue(data[key]);
+
+		Object.defineProperty(data, key, { 
 			set : function(value) {
-				bindings[key] = this;
+				binding.set(value);
+				binding.resolve();
+			},
+			get : function() {
+				return shadowValue;
 			}
 		});
-	}
-	data._bindings_[key] = this;
-	var binding = this;
+	};
 
 	this.set = function (value) {
 		changeStack.push(value);
@@ -154,89 +214,50 @@ dataBinding = function(config) {
 
 	this.resolve = function() {
 		binding.resolveTimer = false;
+
 		if (!changeStack.length) {
-			return;
+			return; // No changes to resolve;
 		}
-		var value = changeStack.pop();
+		var value = changeStack.pop(); // Only apply the last change;
 		changeStack = [];
 
-		if (JSON.stringify(value) == JSON.stringify(shadowValue)) {
-			return;
+		if (isEqual(value, shadowValue)) {
+			return; // The change is not actually a change, so no action needed;
 		}
 
-		binding.resolveCounter++;
-		if (binding.resolveCounter > 5) {
-			console.log("Warning: resolve loop detected!");
-			window.setTimeout(function() {
-				binding.resolveCounter = 0;
-			}, 300);
-			return;
+		if (resolverIsLooping()) {
+			return; // The resolver is looping, yield to give everything time to settle down;
 		}
 
-		if (typeof value === "object") {
-		 	value = JSON.parse(JSON.stringify(value)); // clone the value;
-		}
-		var oldValue = shadowValue;
-		shadowValue = value;
-		monitorChildData(shadowValue);
+		var oldValue = shadowValue;	// keep the old value for the custom resolver;
+		setShadowValue(value);		// Update the shadowValue to the new value;
+		pauseListeners();		// Stop listening while we set the new value in the elements, to prevent looping;
+		setElements(value);		// Set the new value in all the databound elements;
 
-		var i;
-		for (i=0; i<binding.elements.length; i++) {
-			binding.removeListeners(binding.elements[i]);
-		}
-		for (i=0; i<binding.elements.length; i++) {
-			if (
-				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
-				(JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue))
-			) {
-				binding.elements[i].setter(value);
-			}
-		}
-		
-		var addListener = function() {
-			var i;
-			for (i=0; i<binding.elements.length; i++) {
-				if (JSON.stringify(binding.elements[i].getter()) != JSON.stringify(shadowValue)) {
-					// this element changed when we were not listening; play catch up;
-					binding.set(binding.elements[i].getter());
-					binding.resolve();
-				}
-			}
-			for (i=0; i<binding.elements.length; i++) {
-				binding.addListeners(binding.elements[i]);
-			}
-			binding.resolveCounter--;
-		};
 		if (typeof binding.config.resolve === "function") {
 			binding.config.resolve.call(binding, key, value, oldValue);
 		}
-		window.setTimeout(addListener, 5);
+		window.setTimeout(resumeListeners, 5);
 	};
 
-	if (typeof binding.config.init === "function") {
-		binding.config.init.call(binding);
-	}
-
 	this.bind = function(element, skipSet) {
-		element.mutationObserver = new MutationObserver(this.handleMutation);
-
 		binding.elements.push(element);
-
-		element.getter = binding.getter;
-		element.setter = binding.setter;
+		element.getter 		= binding.getter;
+		element.setter 		= binding.setter;
+		element.dataBinding 	= binding;
 
 		if (!skipSet) {
 			element.setter(shadowValue);
 		}
-		element.dataBinding = binding;
-
 		binding.addListeners(element);
 
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
 	};
+
 	this.rebind = function(element) {
+		// Use this when a DOM node is cloned and the clone needs to be registered with the databinding, without setting its data.
 		return this.bind(element, true);
 	};
 
@@ -245,6 +266,12 @@ dataBinding = function(config) {
 			binding.elements.splice(binding.elements.indexOf(element), 1);
 		}
 	};
+
+	initBindings(data, key);
+	// Call the custom init function, if it is there;
+	if (typeof binding.config.init === "function") {
+		binding.config.init.call(binding);
+	}
 };
 
 var fieldNodeRemovedHandler = function(evt) {
@@ -256,6 +283,9 @@ var fieldNodeRemovedHandler = function(evt) {
 dataBinding.prototype.addListeners = function(element) {
 	if (element.dataBinding) {
 		element.dataBinding.removeListeners(element);
+	}
+	if (typeof element.mutationObserver === "undefined") {
+		element.mutationObserver = new MutationObserver(this.handleMutation);
 	}
 	if (this.mode == "field") {
 		element.mutationObserver.observe(element, {attributes: true});
@@ -271,12 +301,16 @@ dataBinding.prototype.addListeners = function(element) {
 
 dataBinding.prototype.removeListeners = function(element) {
 	if (this.mode == "field") {
-		element.mutationObserver.disconnect();
+		if (element.mutationObserver) {
+			element.mutationObserver.disconnect();
+		}
 		element.removeEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
 	}
 	if (this.mode == "list") {
-		element.mutationObserver.disconnect();
+		if (element.mutationObserver) {
+			element.mutationObserver.disconnect();
+		}
 		element.removeEventListener("DOMNodeRemoved", this.handleEvent);
 		element.removeEventListener("DOMNodeInserted", this.handleEvent);
 	}
