@@ -1,3 +1,44 @@
+/*
+	Two way databinding on elements and a data object.
+
+	config options:
+		data: the data object to be used for databinding. Note that this is the 'outer' object, the databinding itself will be set on data[key];
+		key: the key within the data object to be bound
+		setter: a function that sets the data on the element. A simple example would take the provided value and set it as innerHTML.
+		getter: a function that fetches the data from an element. Simple example would be "return target.innerHTML";
+		mode: "list" of "field"; the only difference between the two is the listeners that are applied to the supplied element.
+			"list" listens on attribute changes, node insertions and node removals.
+			"field" listens on attribute changes, subtree modifications.
+		parentKey: an additional pointer to where the data is bound without your datastructure; use this to keep track of nesting within your data.
+		attributeFilter: a blacklist of attributes that should not trigger a change in data;
+		resolve: a function that is called _after_ a change in data has been resolved. The arguments provided to the function are: dataBinding, key, value, oldValue
+
+	Example usage:
+		var data = {
+			"title" : "foo"
+		};
+
+		var dataBinding = new databinding({
+			data : data,
+			key : title,
+			setter : function(value) {
+				this.innerHTML = value;
+			},
+			getter: function() {
+				return this.innerHTML;
+			},
+			resolve: function(binding, key, value, oldValue) {
+				console.log("data in " + key + " changed from " + oldValue + " to " + value);
+			}
+		});
+
+
+		dataBinding.bind(elm1);
+		dataBinding.bind(elm2);
+
+		data.title = "Hello world";		
+*/
+
 dataBinding = function(config) {
 	var data = config.data;
 	var key = config.key;
@@ -207,7 +248,7 @@ dataBinding = function(config) {
 };
 
 var fieldNodeRemovedHandler = function(evt) {
-	if (!this.parentNode) {
+	if (!this.parentNode && this.dataBinding) {
 		this.dataBinding.unbind(this);
 	}
 };
