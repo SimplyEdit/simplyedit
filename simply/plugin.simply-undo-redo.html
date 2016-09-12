@@ -23,7 +23,7 @@
 			editor.toolbars["simply-undo-redo"].update();
 		},
 		undo : function() {
-			if (!editor.plugins.undoRedo.canUndo) {
+			if (!editor.plugins.undoRedo.canUndo()) {
 				return;
 			}
 			editor.plugins.undoRedo.undoing = true;
@@ -35,11 +35,11 @@
 				document.body.scrollTop = currentScroll;
 				editor.plugins.undoRedo.currentUndo--;
 			}
+			editor.plugins.undoRedo.undoing = false;
 			editor.toolbars["simply-undo-redo"].update();
-			editor.plugins.undoRedo.setTimer();
 		},
 		redo : function() {
-			if (!editor.plugins.undoRedo.canRedo) {
+			if (!editor.plugins.undoRedo.canRedo()) {
 				return;
 			}
 			editor.plugins.undoRedo.undoing = true;
@@ -51,17 +51,8 @@
 				document.body.scrollTop = currentScroll;
 				editor.plugins.undoRedo.currentUndo++;
 			}
+			editor.plugins.undoRedo.undoing = false;
 			editor.toolbars["simply-undo-redo"].update();
-			editor.plugins.undoRedo.setTimer();
-		},
-		setTimer : function() {
-			if (editor.plugins.undoRedo.timer) {
-				window.clearTimeout(editor.plugins.undoRedo.timer);
-			}
-			editor.plugins.undoRedo.timer = window.setTimeout(function() {
-				editor.plugins.undoRedo.undoing = false;
-				editor.toolbars["simply-undo-redo"].update();
-			}, 200);
 		},
 		canUndo : function() {
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];

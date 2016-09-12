@@ -25,6 +25,7 @@ dataBinding = function(config) {
 						newValue = JSON.parse(JSON.stringify(shadowValue));
 						shadowValue = null;
 						binding.set(newValue);
+						binding.resolve();
 					},
 					get : function() {
 						return myvalue;
@@ -74,6 +75,7 @@ dataBinding = function(config) {
 	Object.defineProperty(data, key, { 
 		set : function(value) {
 			binding.set(value);
+			binding.resolve();
 		},
 		get : function() {
 			return shadowValue;
@@ -240,21 +242,25 @@ dataBinding.prototype.removeListeners = function(element) {
 };
 
 dataBinding.prototype.handleMutation = function(event) {
+	// FIXME: assuming that one set of mutation events always have the same target; this might not be the case;
 	var target = event[0].target;
 	if (!target.dataBinding) {
 		return;
 	}
 
+	var handleMe = false;
 	for (var i=0; i<event.length; i++) {
-		if (target.dataBinding.attributeFilter.indexOf(event[i].attributeName)) {
-			return;
+		if (target.dataBinding.attributeFilter.indexOf(event[i].attributeName) == -1) {
+			handleMe = true; // only handle the event 
 		}
 	}
 
-	var self = target.dataBinding;
-	self.removeListeners(target);	// prevent possible looping, getter sometimes also triggers an attribute change;
-	self.set(target.getter());
-	self.addListeners(target);
+	if (handleMe) {
+		var self = target.dataBinding;
+		self.removeListeners(target);	// prevent possible looping, getter sometimes also triggers an attribute change;
+		self.set(target.getter());
+		self.addListeners(target);
+	}
 };			
 
 dataBinding.prototype.handleEvent = function (event) {
