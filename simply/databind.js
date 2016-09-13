@@ -57,10 +57,13 @@ dataBinding = function(config) {
 	var binding = this;
 	var shadowValue;
 
-	resolveCounter = 0;
+	binding.resolveCounter = 0;
 
 	if (!this.mode) {
 		this.mode = "field";
+	}
+	if (!this.attributeFilter) {
+		this.attributeFilter = [];
 	}
 
 	// If we already have a databinding on this data[key], re-use that one instead of creating a new one;
@@ -141,7 +144,6 @@ dataBinding = function(config) {
 		for (i=0; i<binding.elements.length; i++) {
 			binding.addListeners(binding.elements[i]);
 		}
-		resolveCounter--;
 	};
 	var pauseListeners = function() {
 		for (var i=0; i<binding.elements.length; i++) {
@@ -150,11 +152,11 @@ dataBinding = function(config) {
 	};
 	var resolverIsLooping = function() {
 		// Check for resolve loops - 5 seems like a safe count. If we pass this point 5 times within the same stack execution, break the loop.
-		resolveCounter++;
-		if (resolveCounter > 5) {
+		binding.resolveCounter++;
+		if (binding.resolveCounter > 5) {
 			console.log("Warning: databinding resolve loop detected!");
 			window.setTimeout(function() {
-				resolveCounter = 0;
+				binding.resolveCounter = 0;
 			}, 300); // 300 is a guess; could be any other number. It needs to be long enough so that everyone can settle down before we start resolving again.
 			return true;
 		}
@@ -237,6 +239,7 @@ dataBinding = function(config) {
 		if (typeof binding.config.resolve === "function") {
 			binding.config.resolve.call(binding, key, value, oldValue);
 		}
+		binding.resolveCounter--;
 		window.setTimeout(resumeListeners, 5);
 	};
 

@@ -110,8 +110,10 @@
 		editor.plugins.text = {};
 	}, 3000);
 
+
 	var initTextToolbar = function(config) {
 		var toolbar = document.querySelector("#" + this.name);
+
 		if (typeof config === "object" && toolbar) {
 			// Init blockstyles
 			if (config.block) {
@@ -149,6 +151,7 @@
 							button.innerHTML = "<i class='fa " + config.inline[i].icon + "'></i>" + config.inline[i].name;
 							item.appendChild(button);
 							inlineStyles.appendChild(item);
+
 						}
 					} else {
 						inlineStyles.style.display = "none";
@@ -185,13 +188,128 @@
 				}
 			}
 		}
+
+		var bindInput = function(data, key, elm) {
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					this.value = value;
+				},
+				getter : function() {
+					return this.value;
+				},
+				resolve : function() {
+					if (!toolbar.updating) {
+						muze.event.fire(this.elements[0], "change");
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		};
+		var bindButton = function(data, key, elm) {
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					if (value) {
+						this.classList.add("simply-selected");
+					} else {
+						this.classList.remove("simply-selected");
+					}
+				},
+				getter : function() {
+					return this.classList.contains("simply-selected");
+				},
+				resolve : function(key, value, oldValue) {
+					if (!toolbar.updating && (value != oldValue)) {
+						muze.event.fire(this.elements[0], "click");
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		};
+		var bindButtonGroup = function(data, key, elm) {
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					var values = this.querySelectorAll("button");
+					for (var i=0; i<values.length; i++) {
+						values[i].classList.remove("simply-selected");
+						if (values[i].getAttribute("data-value") == value) {
+							values[i].classList.add("simply-selected");
+						}
+					}
+				},
+				getter : function() {
+					var value = this.querySelector("button.simply-selected");
+					if (value) {
+						return value.getAttribute("data-value");
+					} else {
+						return '';
+					}
+				},
+				resolve : function(key, value, oldValue) {
+					if (!toolbar.updating && (value != oldValue)) {
+						muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		};
+
+
+		toolbar.data = {};
+		// Blockstyles
+		toolbar.data.blockstyle = '';
+		bindInput(toolbar.data, 'blockstyle', toolbar.querySelector("select[data-simply-action=simply-text-blockstyle]"));
+
+		// Inline styles
+		toolbar.data.inline = {};
+		var inlineButtons = toolbar.querySelectorAll("button[data-simply-action=simply-text-inline]");
+		for (var i=0; i<inlineButtons.length; i++) {
+			var key = inlineButtons[i].getAttribute('data-value');
+			toolbar.data.inline[key] = false;
+			bindButton(toolbar.data.inline, key, inlineButtons[i]);
+		}
+
+		// Alignment
+		toolbar.data.align = '';
+		bindButtonGroup(toolbar.data, 'align', toolbar.querySelector("div.simply-text-align [data-type=simply-buttongroup-radio]"));
+
+		// Classes
+		toolbar.data.class = [];
+		var classGroups = toolbar.querySelectorAll("div.simply-text-class [data-type=simply-buttongroup-radio]");
+		for (var i=0; i<classGroups.length; i++) {
+			bindButtonGroup(toolbar.data.class, i, classGroups[i]);
+		}
+
+		toolbar.data.hyperlink = {
+			href      : '',
+			title     : '',
+			name      : '',
+			nofollow  : false,
+			newwindow : false
+		};
+		if (toolbar.querySelector("#vdHyperlinkHref")) {
+			// Databinding for hyperlinks, experimental;
+			bindInput(toolbar.data.hyperlink, "href", toolbar.querySelector("#vdHyperlinkHref"));
+			bindInput(toolbar.data.hyperlink, "title", toolbar.querySelector("#vdHyperlinkTitle"));
+			bindInput(toolbar.data.hyperlink, "name", toolbar.querySelector("#vdHyperlinkName"));
+			bindButton(toolbar.data.hyperlink, "nofollow", toolbar.querySelector("button.simply-hyperlink-nofollow"));
+			bindButton(toolbar.data.hyperlink, "newwindow", toolbar.querySelector("button.simply-hyperlink-newwindow"));
+		}
 	};
 
 	var updateTextToolbar = function(toolbar) {
 		if (toolbar === null) {
 			return;
 		}
-		
+
 		var sel = vdSelectionState.get();
 		var parent = vdSelection.getNode(sel);
 		var field = editor.node.getEditableField();
@@ -222,6 +340,9 @@
 			}
 		}
 
+		toolbar.updating = true;
+
+		toolbar.data.blockstyle = '';
 		if (blockAnnotation) {
 			var tagName = blockAnnotation.tag.split(/ /, 2)[0].toLowerCase();
 			var foundTag = toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']");
@@ -230,21 +351,16 @@
 			} else if (tagName == "li") {
 				var annotation = hopeEditor.fragment.has(range, "ol");
 				if (annotation && toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ol']")) {
-					toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ol']").selected = true;
+					toolbar.data.blockstyle = 'ol';
 				} else {
 					annotation = hopeEditor.fragment.has(range, "ul");
 					if (annotation && toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']")) {
-						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']").selected = true;
-					} else {
-						toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
+						toolbar.data.blockstyle = 'ul';
 					}
 				}
-			} else {
-				toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 			}
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "block";
 		} else {
-			toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='']").selected = true;
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
 		}
 
@@ -254,14 +370,12 @@
 			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "none";
 		}
 
+
 		// Check inline styles;
 		var inlineStyles = toolbar.querySelectorAll("[data-simply-action='simply-text-inline']");
 		for (var i=0; i<inlineStyles.length; i++) {
-			if (hopeEditor.fragment.has(range, inlineStyles[i].getAttribute("data-value"))) {
-				inlineStyles[i].classList.add("simply-selected");
-			} else {
-				inlineStyles[i].classList.remove("simply-selected");
-			}
+			var inlineStyle = inlineStyles[i].getAttribute("data-value");
+			toolbar.data.inline[inlineStyle] = hopeEditor.fragment.has(range, inlineStyle) ? true : false;
 		}
 
 		// Check fixed content;
@@ -278,7 +392,18 @@
 
 		var hyperlink = hopeEditor.fragment.has(range, "a");
 		if (hyperlink || (hopeEditor.field.tagName.toLowerCase() === 'a')) {
+			toolbar.data.hyperlink.href = '';
+			toolbar.data.hyperlink.title = '';
+			toolbar.data.hyperlink.name = '';
+			toolbar.data.hyperlink.nofollow = false;
+			toolbar.data.hyperlink.newwindow = false;
+
 			toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
+
+			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+			if (hyperlinkUnlink) {
+				toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
+			}
 
 			var tempNode;
 			if (hyperlink) {
@@ -286,58 +411,10 @@
 			} else {
 				tempNode = hopeEditor.field;
 			}
-			var hyperlinkHref = tempNode.getAttribute('href');
-			simply.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), hyperlinkHref);
 
-			var hyperlinkTitle = tempNode.getAttribute('title');
-			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), hyperlinkTitle);
-
-			var hyperlinkName = tempNode.getAttribute('id');
-			if (hyperlinkName === null) {
-				hyperlinkName = tempNode.getAttribute('name');
-			}
-			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), hyperlinkName);
-			
-			var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
-			if (hyperlinkNofollow) {
-				if (tempNode.getAttribute("rel") && tempNode.getAttribute("rel").match(/nofollow/)) {
-					hyperlinkNofollow.classList.add("simply-selected");
-				} else {
-					hyperlinkNofollow.classList.remove("simply-selected");
-				}
-			}
-
-			var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
-			if (hyperlinkTargetBlank) {
-				if (tempNode.getAttribute("target") && tempNode.getAttribute("target").match(/_blank/)) {
-					hyperlinkTargetBlank.classList.add("simply-selected");
-				} else {
-					hyperlinkTargetBlank.classList.remove("simply-selected");
-				}
-			}
-
-			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
-			if (hyperlinkUnlink) {
-				toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
-			}
-		} else {
-			simply.widgets.properties.set(toolbar.querySelector("#vdHyperlinkHref"), '');
-			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkTitle'), '');
-			simply.widgets.properties.set(toolbar.querySelector('#vdHyperlinkName'), '');
-
-			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
-			if (hyperlinkUnlink) {
-				toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "none";
-			}
-
-			var hyperlinkNofollow = toolbar.querySelector("button.simply-hyperlink-nofollow");
-			if (hyperlinkNofollow) {
-				hyperlinkNofollow.classList.remove("simply-selected");
-			}
-
-			var hyperlinkTargetBlank = toolbar.querySelector("button.simply-hyperlink-newwindow");
-			if (hyperlinkTargetBlank) {
-				hyperlinkTargetBlank.classList.remove("simply-selected");
+			var hyperlinkData = editor.field.get(tempNode);
+			for (var key in toolbar.data.hyperlink) {
+				toolbar.data.hyperlink[key] = (typeof hyperlinkData[key] !== "undefined") ? hyperlinkData[key] : '';
 			}
 		}
 
@@ -347,43 +424,39 @@
 		if (blockAnnotation && textAlign) {
 			var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
 			var buttons = textAlign.querySelectorAll("[data-value]");
-			simply.widgets.properties.set(textAlign, "none");
+			toolbar.data.align = "none";
 			for (var j=0; j<buttons.length; j++) {
 				if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
-					simply.widgets.properties.set(textAlign, buttons[j].getAttribute("data-value"));
+					toolbar.data.align = buttons[j].getAttribute("data-value");
 				}
 			}
 
-			if (simply.widgets.properties.get(textAlign) != "none") {
-				// Set the parent icon for alignment as well;
-				var currentIcon = textAlign.querySelector("button.simply-selected i");
-				var icons = toolbar.querySelectorAll("button[data-simply-section=simply-text-align] i");
-				for (i=0; i<icons.length; i++) {
-					icons[i].className = currentIcon.className;
-				}
-			} else {
-				var currentIcon = textAlign.querySelector("button i");
-				var icons = toolbar.querySelectorAll("button[data-simply-section=simply-text-align] i");
-				for (i=0; i<icons.length; i++) {
-					icons[i].className = currentIcon.className;
-				}
+			var currentIcon = textAlign.querySelector("button.simply-selected i");
+			if (!currentIcon || (toolbar.data.align == "none")) {
+				currentIcon = textAlign.querySelector("button i");
 			}
+
+			// Set the parent icon for alignment as well;
+			var icon = toolbar.querySelector("button[data-simply-section=simply-text-align] i");
+			icon.className = currentIcon.className;
 		}
+
 
 		var textClasses = toolbar.querySelectorAll(".simply-text-class [data-type=simply-buttongroup-radio]");
 		if (blockAnnotation && textClasses) {
 			var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
 			for (var i=0; i<textClasses.length; i++) {
+				toolbar.data.class[i] = '';
 				var buttons = textClasses[i].querySelectorAll("[data-value]");
-				simply.widgets.properties.set(textClasses[i], "none");
 				for (var j=0; j<buttons.length; j++) {
 					if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
-						simply.widgets.properties.set(textClasses[i], buttons[j].getAttribute("data-value"));
+						toolbar.data.class[i] = buttons[j].getAttribute("data-value");
 					}
 				}
 			}
 		}
 
+		toolbar.updating = false;
 		return true;
 	}
 
@@ -752,11 +825,10 @@
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					if (hopeEditor.field.getAttribute("rel") == "nofollow") {
 						hopeEditor.field.removeAttribute("rel");
-						button.classList.remove("simply-selected");
 					} else {
 						hopeEditor.field.setAttribute("rel", "nofollow");
-						button.classList.add("simply-selected");
 					}
+					hopeEditor.update();
 					return;
 				}
 
@@ -770,10 +842,8 @@
 
 					if (tempNode.getAttribute("rel") == "nofollow") {
 						tempNode.removeAttribute("rel");
-						button.classList.remove("simply-selected");
 					} else {
 						tempNode.setAttribute("rel", "nofollow");
-						button.classList.add("simply-selected");
 					}
 					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
@@ -787,11 +857,10 @@
 				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
 					if (hopeEditor.field.getAttribute("target") == "_blank") {
 						hopeEditor.field.removeAttribute("target");
-						button.classList.remove("simply-selected");
 					} else {
 						hopeEditor.field.setAttribute("target", "_blank");
-						button.classList.add("simply-selected");
 					}
+					hopeEditor.update();
 					return;
 				}
 
@@ -805,10 +874,8 @@
 
 					if (tempNode.getAttribute("target") == "_blank") {
 						tempNode.removeAttribute("target");
-						button.classList.remove("simply-selected");
 					} else {
 						tempNode.setAttribute("target", "_blank");
-						button.classList.add("simply-selected");
 					}
 					var newValue = editor.plugins.hope.annotation.implode(tempNode);
 					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);

@@ -766,12 +766,33 @@
 				},
 				"a" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "name"]);
+						var result = editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "name", "rel", "target"]);
+						if (result.rel == "nofollow") {
+							result.nofollow = true;
+						}
+						if (result.target == "_blank") {
+							result.newwindow = true;
+						}
+						delete result.rel;
+						delete result.target;
+						return result;
 					},
 					set : function(field, data) {
 						if (typeof data.name == "string") {
 							data.id = data.name;
 						}
+						if (data.newwindow) {
+							data.target = "_blank";
+						} else {
+							data.target = null;
+						}
+						if (data.nofollow) {
+							data.rel = "nofollow";
+						} else {
+							data.rel = null;
+						}
+						delete data.newwindow;
+						delete data.nofollow;
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
@@ -809,7 +830,6 @@
 				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 					field.hopeEditor.needsUpdate = true;
 				});
-
 				field.addEventListener("slip:beforereorder", function(evt) {
 					var rect = this.getBoundingClientRect();
 					if (
@@ -882,9 +902,15 @@
 					if (attr == "innerHTML") {
 						field.innerHTML = data[attr];
 						editor.responsiveImages.init(field);
-
+						if (field.hopeEditor) {
+							field.hopeEditor.needsUpdate = true;
+						}
 					} else {
-						field.setAttribute(attr, data[attr]);
+						if (data[attr] !== null) {
+							field.setAttribute(attr, data[attr]);
+						} else {
+							field.removeAttribute(attr);
+						}
 					}
 				}
 			},
@@ -908,6 +934,9 @@
 					return setter(field, data);
 				}
 				field.innerHTML = data;
+				if (field.hopeEditor) {
+					field.hopeEditor.needsUpdate = true;
+				}
 			},
 			get : function(field) {
 				var getter;
