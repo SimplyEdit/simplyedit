@@ -99,6 +99,90 @@
 				}, 50);
 			}
 		},
+		bindInput : function(data, key, elm) {
+			if (!elm) {
+				console.log("Warning: element for binding does not exist");
+				return;
+			}
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					this.value = value;
+				},
+				getter : function() {
+					return this.value;
+				},
+				resolve : function() {
+					if (!editor.toolbar.updating) {
+						muze.event.fire(this.elements[0], "change");
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		},
+		bindButton : function(data, key, elm) {
+			if (!elm) {
+				console.log("Warning: element for binding does not exist");
+				return;
+			}
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					if (value) {
+						this.classList.add("simply-selected");
+					} else {
+						this.classList.remove("simply-selected");
+					}
+				},
+				getter : function() {
+					return this.classList.contains("simply-selected");
+				},
+				resolve : function(key, value, oldValue) {
+					if (!editor.toolbar.updating && (value != oldValue)) {
+						muze.event.fire(this.elements[0], "click");
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		},
+		bindButtonGroup : function(data, key, elm) {
+			if (!elm) {
+				console.log("Warning: element for binding does not exist");
+				return;
+			}
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					var values = this.querySelectorAll("button");
+					for (var i=0; i<values.length; i++) {
+						values[i].classList.remove("simply-selected");
+						if (values[i].getAttribute("data-value") == value) {
+							values[i].classList.add("simply-selected");
+						}
+					}
+				},
+				getter : function() {
+					var value = this.querySelector("button.simply-selected");
+					if (value) {
+						return value.getAttribute("data-value");
+					} else {
+						return '';
+					}
+				},
+				resolve : function(key, value, oldValue) {
+					if (!editor.toolbar.updating && (value != oldValue)) {
+						muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		},
 		init : function(toolbar) {
 			toolbar.addEventListener("click", function(evt) {
 				var el = evt.target;
@@ -717,7 +801,9 @@
 			}
 			
 			if (editor.toolbars[context] && editor.toolbars[context].update) {
-				return editor.toolbars[context].update(document.getElementById(context));
+				editor.toolbar.updating = true;
+				editor.toolbars[context].update(document.getElementById(context));
+				editor.toolbar.updating = false;
 			}
 		},
 		fixSelection : function() {

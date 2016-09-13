@@ -189,84 +189,10 @@
 			}
 		}
 
-		var bindInput = function(data, key, elm) {
-			var bindingConfig = {
-				data : data,
-				setter : function(value) {
-					this.value = value;
-				},
-				getter : function() {
-					return this.value;
-				},
-				resolve : function() {
-					if (!toolbar.updating) {
-						muze.event.fire(this.elements[0], "change");
-					}
-				},
-				key : key
-			};
-			var binding = new dataBinding(bindingConfig);
-			binding.bind(elm);
-		};
-		var bindButton = function(data, key, elm) {
-			var bindingConfig = {
-				data : data,
-				setter : function(value) {
-					if (value) {
-						this.classList.add("simply-selected");
-					} else {
-						this.classList.remove("simply-selected");
-					}
-				},
-				getter : function() {
-					return this.classList.contains("simply-selected");
-				},
-				resolve : function(key, value, oldValue) {
-					if (!toolbar.updating && (value != oldValue)) {
-						muze.event.fire(this.elements[0], "click");
-					}
-				},
-				key : key
-			};
-			var binding = new dataBinding(bindingConfig);
-			binding.bind(elm);
-		};
-		var bindButtonGroup = function(data, key, elm) {
-			var bindingConfig = {
-				data : data,
-				setter : function(value) {
-					var values = this.querySelectorAll("button");
-					for (var i=0; i<values.length; i++) {
-						values[i].classList.remove("simply-selected");
-						if (values[i].getAttribute("data-value") == value) {
-							values[i].classList.add("simply-selected");
-						}
-					}
-				},
-				getter : function() {
-					var value = this.querySelector("button.simply-selected");
-					if (value) {
-						return value.getAttribute("data-value");
-					} else {
-						return '';
-					}
-				},
-				resolve : function(key, value, oldValue) {
-					if (!toolbar.updating && (value != oldValue)) {
-						muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
-					}
-				},
-				key : key
-			};
-			var binding = new dataBinding(bindingConfig);
-			binding.bind(elm);
-		};
-
-
 		toolbar.data = {};
 		// Blockstyles
 		toolbar.data.blockstyle = '';
-		bindInput(toolbar.data, 'blockstyle', toolbar.querySelector("select[data-simply-action=simply-text-blockstyle]"));
+		editor.toolbar.bindInput(toolbar.data, 'blockstyle', toolbar.querySelector("select[data-simply-action=simply-text-blockstyle]"));
 
 		// Inline styles
 		toolbar.data.inline = {};
@@ -274,18 +200,18 @@
 		for (var i=0; i<inlineButtons.length; i++) {
 			var key = inlineButtons[i].getAttribute('data-value');
 			toolbar.data.inline[key] = false;
-			bindButton(toolbar.data.inline, key, inlineButtons[i]);
+			editor.toolbar.bindButton(toolbar.data.inline, key, inlineButtons[i]);
 		}
 
 		// Alignment
 		toolbar.data.align = '';
-		bindButtonGroup(toolbar.data, 'align', toolbar.querySelector("div.simply-text-align [data-type=simply-buttongroup-radio]"));
+		editor.toolbar.bindButtonGroup(toolbar.data, 'align', toolbar.querySelector("div.simply-text-align [data-type=simply-buttongroup-radio]"));
 
 		// Classes
 		toolbar.data.class = [];
 		var classGroups = toolbar.querySelectorAll("div.simply-text-class [data-type=simply-buttongroup-radio]");
 		for (var i=0; i<classGroups.length; i++) {
-			bindButtonGroup(toolbar.data.class, i, classGroups[i]);
+			editor.toolbar.bindButtonGroup(toolbar.data.class, i, classGroups[i]);
 		}
 
 		toolbar.data.hyperlink = {
@@ -297,11 +223,11 @@
 		};
 		if (toolbar.querySelector("#vdHyperlinkHref")) {
 			// Databinding for hyperlinks, experimental;
-			bindInput(toolbar.data.hyperlink, "href", toolbar.querySelector("#vdHyperlinkHref"));
-			bindInput(toolbar.data.hyperlink, "title", toolbar.querySelector("#vdHyperlinkTitle"));
-			bindInput(toolbar.data.hyperlink, "name", toolbar.querySelector("#vdHyperlinkName"));
-			bindButton(toolbar.data.hyperlink, "nofollow", toolbar.querySelector("button.simply-hyperlink-nofollow"));
-			bindButton(toolbar.data.hyperlink, "newwindow", toolbar.querySelector("button.simply-hyperlink-newwindow"));
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "href", toolbar.querySelector("#vdHyperlinkHref"));
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "title", toolbar.querySelector("#vdHyperlinkTitle"));
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "name", toolbar.querySelector("#vdHyperlinkName"));
+			editor.toolbar.bindButton(toolbar.data.hyperlink, "nofollow", toolbar.querySelector("button.simply-hyperlink-nofollow"));
+			editor.toolbar.bindButton(toolbar.data.hyperlink, "newwindow", toolbar.querySelector("button.simply-hyperlink-newwindow"));
 		}
 	};
 
@@ -339,8 +265,6 @@
 				blockAnnotation = false;
 			}
 		}
-
-		toolbar.updating = true;
 
 		toolbar.data.blockstyle = '';
 		if (blockAnnotation) {
@@ -400,11 +324,6 @@
 
 			toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
 
-			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
-			if (hyperlinkUnlink) {
-				toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
-			}
-
 			var tempNode;
 			if (hyperlink) {
 				tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
@@ -416,7 +335,23 @@
 			for (var key in toolbar.data.hyperlink) {
 				toolbar.data.hyperlink[key] = (typeof hyperlinkData[key] !== "undefined") ? hyperlinkData[key] : '';
 			}
+			if (toolbar.data.hyperlink.nofollow == '') {
+				toolbar.data.hyperlink.nofollow = false;
+			}
+			if (toolbar.data.hyperlink.newwindow == '') {
+				toolbar.data.hyperlink.newwindow = false;
+			}
+
+			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+			if (hyperlinkUnlink) {
+				if (hyperlink) {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
+				} else {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "none";
+				}
+			}
 		}
+
 
 		// Check aligment
 		blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
@@ -456,7 +391,6 @@
 			}
 		}
 
-		toolbar.updating = false;
 		return true;
 	}
 
