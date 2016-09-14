@@ -813,6 +813,14 @@
 					makeEditable : function(field) {
 						field.contentEditable = true;
 					}
+				},
+				"input[type=text]" : {
+					get : function(field) {
+						return field.value;
+					},
+					set : function(field, data) {
+						field.value = data;
+					}
 				}
 			},
 			initHopeEditor : function(field) {
@@ -883,7 +891,7 @@
 					if (attr == "innerHTML") {
 						result.innerHTML = field.innerHTML;
 					} else {
-						if (field.getAttribute(attr)) {
+						if (field.getAttribute(attr) !== null) {
 							result[attr] = field.getAttribute(attr);
 						}
 					}
