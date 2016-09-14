@@ -138,10 +138,14 @@ dataBinding = function(config) {
 			if (!isEqual(binding.elements[i].getter(), shadowValue)) {
 				// this element changed when we were not listening; play catch up;
 				binding.set(binding.elements[i].getter());
-				binding.resolve();
 			}
 		}
+		binding.resolve();
 		for (i=0; i<binding.elements.length; i++) {
+			if (!isEqual(binding.elements[i].getter(), shadowValue)) {
+				console.log("Warning: Setters and getters for elements in this databinding are using differing data models.");
+				binding.resolveCounter = 5;
+			}
 			binding.addListeners(binding.elements[i]);
 		}
 	};
@@ -243,15 +247,18 @@ dataBinding = function(config) {
 		window.setTimeout(resumeListeners, 5);
 	};
 
-	this.bind = function(element, skipSet) {
+	this.bind = function(element, config) {
+		if (element.dataBinding) {
+			element.dataBinding.unbind(element);
+		}
+
 		binding.elements.push(element);
-		element.getter 		= binding.getter;
-		element.setter 		= binding.setter;
+		element.getter 		= (config && typeof config.getter === "function") ? config.getter : binding.getter;
+		element.setter 		= (config && typeof config.setter === "function") ? config.setter : binding.setter;
 		element.dataBinding 	= binding;
 
-		if (!skipSet) {
-			element.setter(shadowValue);
-		}
+		element.setter(shadowValue);
+
 		binding.addListeners(element);
 
 		if (!binding.resolveTimer) {
@@ -259,13 +266,27 @@ dataBinding = function(config) {
 		}
 	};
 
-	this.rebind = function(element) {
+	this.rebind = function(element, config) {
 		// Use this when a DOM node is cloned and the clone needs to be registered with the databinding, without setting its data.
-		return this.bind(element, true);
+		if (element.dataBinding) {
+			element.dataBinding.unbind(element);
+		}
+
+		binding.elements.push(element);
+		element.getter 		= (typeof config.getter === "function") ? config.getter : binding.getter;
+		element.setter 		= (typeof config.setter === "function") ? config.setter : binding.setter;
+		element.dataBinding 	= binding;
+
+		binding.addListeners(element);
+
+		if (!binding.resolveTimer) {
+			binding.resolveTimer = window.setTimeout(this.resolve, 100);
+		}
 	};
 
 	this.unbind = function(element) {
 		if (binding.elements.indexOf(element) > -1) {
+			binding.removeListeners(element);
 			binding.elements.splice(binding.elements.indexOf(element), 1);
 		}
 	};
@@ -294,12 +315,14 @@ dataBinding.prototype.addListeners = function(element) {
 		element.mutationObserver.observe(element, {attributes: true});
 		element.addEventListener("DOMSubtreeModified", this.handleEvent);
 		element.addEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
+		element.addEventListener("change", this.handleEvent);
 	}
 	if (this.mode == "list") {
 		element.mutationObserver.observe(element, {attributes: true});
 		element.addEventListener("DOMNodeRemoved", this.handleEvent);
 		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
+	element.addEventListener("databinding:valuechanged", this.handleEvent);
 };
 
 dataBinding.prototype.removeListeners = function(element) {
@@ -309,6 +332,7 @@ dataBinding.prototype.removeListeners = function(element) {
 		}
 		element.removeEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
+		element.removeEventListener("change", this.handleEvent);
 	}
 	if (this.mode == "list") {
 		if (element.mutationObserver) {
@@ -317,6 +341,7 @@ dataBinding.prototype.removeListeners = function(element) {
 		element.removeEventListener("DOMNodeRemoved", this.handleEvent);
 		element.removeEventListener("DOMNodeInserted", this.handleEvent);
 	}
+	element.removeEventListener("databinding:valuechanged", this.handleEvent);
 };
 
 dataBinding.prototype.handleMutation = function(event) {
@@ -354,6 +379,7 @@ dataBinding.prototype.handleEvent = function (event) {
 	}
 
 	switch (event.type) {
+		case "databinding:valuechanged":
 		case "change":
 		case "DOMAttrModified":
 		case "DOMNodeInserted":
