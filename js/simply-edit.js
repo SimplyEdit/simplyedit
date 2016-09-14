@@ -889,7 +889,7 @@
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
 					if (attr == "innerHTML") {
-						result.innerHTML = field.innerHTML;
+						result.innerHTML = editor.field.getInnerHTML(field);
 					} else {
 						if (field.getAttribute(attr) !== null) {
 							result[attr] = field.getAttribute(attr);
@@ -942,8 +942,25 @@
 					return setter(field, data);
 				}
 				field.innerHTML = data;
+				editor.responsiveImages.init(field);
 				if (field.hopeEditor) {
 					field.hopeEditor.needsUpdate = true;
+				}
+			},
+			getInnerHTML : function(field) {
+				// misc cleanups to revert any changes made by simply edit - this should return a pristine version of the content;
+				if (!field.querySelectorAll("img[data-simply-src]")) {
+					return field.innerHTML;
+				} else {
+					// There are responsive images in the field; clean them up to return to a pristine state and return that;
+					var fieldClone = field.cloneNode(true);
+					var responsiveImages = fieldClone.querySelectorAll("img[data-simply-src]");
+					for (var i=0; i<responsiveImages.length; i++) {
+						responsiveImages[i].removeAttribute("src");
+						responsiveImages[i].removeAttribute("sizes");
+						responsiveImages[i].removeAttribute("srcset");
+					}
+					return fieldClone.innerHTML;
 				}
 			},
 			get : function(field) {
@@ -959,7 +976,7 @@
 				if (getter) {
 					return getter(field);
 				}
-				return field.innerHTML;
+				return editor.field.getInnerHTML(field);
 			},
 			makeEditable : function(field) {
 				var editable;
