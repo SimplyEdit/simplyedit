@@ -784,13 +784,9 @@
 						}
 						if (data.newwindow) {
 							data.target = "_blank";
-						} else {
-							data.target = null;
 						}
 						if (data.nofollow) {
 							data.rel = "nofollow";
-						} else {
-							data.rel = null;
 						}
 						delete data.newwindow;
 						delete data.nofollow;
