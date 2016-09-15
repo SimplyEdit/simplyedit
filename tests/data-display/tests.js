@@ -762,3 +762,48 @@ QUnit.module("databinding");
 		assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
 		assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
 	});
+
+	QUnit.test("databinding list push 2 items", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		editor.pageData.hello.push({item : "Hi world 2!"});
+		assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world!"}, {item:"Hi world 2!"}]), "added item is found in data");
+		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
+		assert.equal(field.querySelector("li + li div").innerHTML, "Hi world 2!", "added item is found in DOM");
+	});
+
+	QUnit.test("databinding push 2 items, reorder items in dom", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		editor.pageData.hello.push({item : "Hi world 2!"});
+		field.appendChild(field.querySelector("li"));
+		field.dataBinding.resolve();
+		stop();
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world 2!"}, {item:"Hi world!"}]), "added item is found in data");
+			assert.equal(field.querySelector("div").innerHTML, "Hi world 2!", "added item is found in DOM");
+			assert.equal(field.querySelector("li + li div").innerHTML, "Hi world!", "added item is found in DOM");
+			start();
+		}, 5);
+	});
+
