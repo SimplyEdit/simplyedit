@@ -79,9 +79,9 @@ dataBinding = function(config) {
 	};
 	var setShadowValue = function(value) {
 		shadowValue = value;
-		if (typeof shadowValue === "object") {
-			shadowValue = dereference(shadowValue);
-		}
+		//if (typeof shadowValue === "object") {
+		//	shadowValue = dereference(shadowValue);
+		//}
 		monitorChildData(shadowValue);
 	};
 	var monitorChildData = function(data) {
@@ -113,6 +113,9 @@ dataBinding = function(config) {
 		// Allows the use of basic array functions and still resolve changes.
 		if (data instanceof Array) {
 			overrideArrayFunction = function(name) {
+				if (data.hasOwnProperty(name)) {
+					return; // we already did this;
+				}
 				Object.defineProperty(data, name, {
 					value : function() {
 						binding.resolve(); // make sure the shadowValue is in sync with the latest state;
@@ -258,7 +261,6 @@ dataBinding = function(config) {
 		element.dataBinding 	= binding;
 
 		element.setter(shadowValue);
-
 		binding.addListeners(element);
 
 		if (!binding.resolveTimer) {
@@ -402,9 +404,17 @@ dataBinding.prototype.handleEvent = function (event) {
 
 // Housekeeping, remove references to deleted nodes
 document.addEventListener("DOMNodeRemoved", function(evt) {
-	var target = evt.srcElement;
-	if (target.dataBinding) {
-		target.dataBinding.unbind(target);
-		delete target.dataBinding;
+	var target = evt.target;
+	if (target.nodeType != document.ELEMENT_NODE) { // We don't care about removed text nodes;
+		return;
 	}
+	if (!target.dataBinding) { // nor any element that doesn't have a databinding;
+		return;
+	}
+	window.setTimeout(function() { // chrome sometimes 'helpfully' removes the element and then inserts it back, probably as a rendering optimalization. We're fine cleaning up in a bit, if still needed.
+		if (!target.parentNode && target.dataBinding) {
+			target.dataBinding.unbind(target);
+			delete target.dataBinding;
+		}
+	}, 1000);
 });
