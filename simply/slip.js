@@ -509,6 +509,10 @@ window['Slip'] = (function(){
 						(window.innerWidth)/containerRects.width
 					);
 
+					if (this.container.scale < 0.4) {
+						this.container.scale = 0.4;
+					};
+
 					this.container.style[transitionPrefix] = transformProperty + " .3s ease-in-out";
 					this.container.style[transformPrefix + "Origin"] = (this.startPosition.x - containerRects.left) + "px " + (this.startPosition.y - containerRects.top) + "px";
 					this.container.style[transformPrefix] = "scale(" + this.container.scale + ")";
