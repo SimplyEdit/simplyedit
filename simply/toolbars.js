@@ -1039,25 +1039,33 @@
 		vdSelectionState.init(window);
 		selectionchange.start(document); // onselectionchange event for Firefox
 
+		editor.selectionChangeTimer = false;
 		muze.event.attach( document, 'selectionchange', function() {
-			var field = editor.node.getEditableField();
-			var hopeEditor = field.hopeEditor;
-			if (hopeEditor) {
-				if (hopeEditor.field == editor.node.getSimplyParent(document.activeElement)) {
-					editor.context.hopeEditor = hopeEditor;
-					hopeEditor.selection.updateRange();
-					var range = hopeEditor.selection.getRange();
-					hopeEditor.currentRange = range;
+			if (editor.selectionChangeTimer) {
+				return;
+			}
+			// throttle selection changed - only execute this once in one loop;
+			editor.selectionChangeTimer = window.setTimeout(function() {
+				editor.selectionChangeTimer = false;
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+				if (hopeEditor) {
+					if (hopeEditor.field == editor.node.getSimplyParent(document.activeElement)) {
+						editor.context.hopeEditor = hopeEditor;
+						hopeEditor.selection.updateRange();
+						var range = hopeEditor.selection.getRange();
+						hopeEditor.currentRange = range;
+					}
 				}
-			}
 
-			if (editor.context.touching) {
-				editor.context.touching = false; // force update when selection changed;
-				editor.context.update();
-				editor.context.touching = true;
-			} else {
-				editor.context.update();
-			}
+				if (editor.context.touching) {
+					editor.context.touching = false; // force update when selection changed;
+					editor.context.update();
+					editor.context.touching = true;
+				} else {
+					editor.context.update();
+				}
+			}, 0);
 		});
 		muze.event.attach( document, 'keyup', function(evt) {
 			editor.context.update();
