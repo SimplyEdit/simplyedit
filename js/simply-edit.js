@@ -75,7 +75,7 @@
 						data[dataPath] = {};
 					}
 					if (!data[dataPath][dataName]) {
-						data[dataPath][dataName] = ''; // editor.field.get(dataFields[i]);
+						data[dataPath][dataName] = editor.field.get(dataFields[i]);
 					}
 					if (data[dataPath]) {
 						var fieldDataBinding;
@@ -504,10 +504,10 @@
 				var initFields = function(clone, useDataBinding) {
 					var handleFields = function(elm) {
 						dataName = elm.getAttribute("data-simply-field");
-						if (!listData[j][dataName]) {
+						if (listData[j][dataName] === null) {
 							listData[j][dataName] = editor.field.get(elm);
 						}
-						if (listData[j][dataName]) {
+						if (listData[j][dataName] !== null) {
 							if (useDataBinding) {
 								var fieldDataBinding;
 								if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
@@ -821,6 +821,21 @@
 					set : function(field, data) {
 						field.value = data;
 					}
+				},
+				"input[type=checkbox]" : {
+					get : function(field) {
+						if (field.checked) {
+							return 1;
+						}
+						return 0;
+					},
+					set : function(field, data) {
+						if (data) {
+							field.checked = true;
+						} else {
+							field.checked = false;
+						}
+					}
 				}
 			},
 			initHopeEditor : function(field) {
@@ -1056,7 +1071,8 @@
 			editor.storage = storage.init(config.endpoint);
 
 			// Add databinding and load data afterwards
-			editor.loadScript(editor.baseURLClean + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
+			// editor.loadScript(editor.baseURLClean + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
+			editor.loadScript(editor.baseURLClean + "simply/databind.js" + "?v=" + editor.version, editor.data.load);
 		},
 		loadScript : function(src, callback) {
 			if (!document.head.querySelector('script[src="'+src+'"]')) {
