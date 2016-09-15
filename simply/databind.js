@@ -56,7 +56,6 @@ dataBinding = function(config) {
 	var changeStack = [];
 	var binding = this;
 	var shadowValue;
-
 	binding.resolveCounter = 0;
 
 	if (!this.mode) {
@@ -383,19 +382,26 @@ dataBinding.prototype.handleEvent = function (event) {
 	}
 
 	switch (event.type) {
+		case "DOMCharacterDataModified":
 		case "databinding:valuechanged":
 		case "change":
 		case "DOMAttrModified":
 		case "DOMNodeInserted":
-		case "DOMCharacterDataModified":
 		case "DOMSubtreeModified":
 		case "DOMNodeRemoved":
 			// Allow the browser to fix what it thinks needs to be fixed (node to be removed, cleaned etc) before setting the new data;
+
+			// there are needed to keep the focus in an element while typing;
+			self.removeListeners(target);
+			self.set(target.getter());
+			self.addListeners(target);
+
+			// these are needed to update after the browser is done doing its thing;
 			window.setTimeout(function() {
 				self.removeListeners(target);
 				self.set(target.getter());
 				self.addListeners(target);
-			}, 0); // allow the rest of the mutation event to occur;
+			}, 1); // allow the rest of the mutation event to occur;
 		break;
 	}
 };
