@@ -10,7 +10,34 @@
 	<div id="qunit-fixture"></div>
 	<div id="testContent">
 	</div>
-	<script src="../../js/simply-edit.js" data-api-key="" data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"></script>
+	<script>
+		var myCustomStorage = {
+			init : function(endpoint) {
+				return true;
+			},
+			save : function(data, callback) {
+				return true;
+			},
+			load : function(callback) {
+				return true;
+			},
+			connect : function() {
+				return true;
+			},
+			disconnect : function() {
+				return true;
+			},
+			list : function(url, callback) {
+				var result = {
+					folders : [],
+					files : [],
+					images : []
+				};
+				callback(result);
+			}
+		};
+	</script>
+	<script src="../../js/simply-edit.js" data-api-key="" data-simply-storage="myCustomStorage" data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"></script>
 	<script src="//code.jquery.com/qunit/qunit-1.19.0.js"></script>
 	<script src="tests.js"></script>
 </body>
