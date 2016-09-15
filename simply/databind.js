@@ -362,9 +362,11 @@ dataBinding.prototype.handleMutation = function(event) {
 
 	if (handleMe) {
 		var self = target.dataBinding;
-		self.removeListeners(target);	// prevent possible looping, getter sometimes also triggers an attribute change;
-		self.set(target.getter());
-		self.addListeners(target);
+		window.setTimeout(function() {
+			self.removeListeners(target);	// prevent possible looping, getter sometimes also triggers an attribute change;
+			self.set(target.getter());
+			self.addListeners(target);
+		}, 0); // allow the rest of the mutation event to occur;
 	}
 };			
 
@@ -389,15 +391,11 @@ dataBinding.prototype.handleEvent = function (event) {
 		case "DOMSubtreeModified":
 		case "DOMNodeRemoved":
 			// Allow the browser to fix what it thinks needs to be fixed (node to be removed, cleaned etc) before setting the new data;
-			self.removeListeners(target);
-			self.set(target.getter());
-			self.addListeners(target);
-
 			window.setTimeout(function() {
 				self.removeListeners(target);
 				self.set(target.getter());
 				self.addListeners(target);
-			}, 1);
+			}, 0); // allow the rest of the mutation event to occur;
 		break;
 	}
 };

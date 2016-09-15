@@ -617,10 +617,13 @@ QUnit.module("databinding");
 		editor.pageData = editor.currentData[document.location.pathname];
 
 		field.innerHTML = "Hi world!";
-		field.dataBinding.resolve();
-
-		assert.equal(field.innerHTML, "Hi world!", "new content remains in div");
-		assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+		stop();
+		window.setTimeout(function() {
+			field.dataBinding.resolve();
+			assert.equal(field.innerHTML, "Hi world!", "new content remains in div");
+			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+			start();
+		}, 1);
 	});
 
 	QUnit.test("databinding change div data from data", function(assert) {
@@ -707,10 +710,13 @@ QUnit.module("databinding");
 		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
 
 		field.querySelector("DIV").innerHTML = "Way out there";
-		field.querySelector("DIV").dataBinding.resolve();
-
-		assert.equal(field.querySelector("div").innerHTML, "Way out there", "setting innerHTML does it");
-		assert.equal(field.querySelector("div").innerHTML, "Way out there", "modified item is modified in DOM");
+		stop();
+		window.setTimeout(function() {
+			field.querySelector("DIV").dataBinding.resolve();
+			assert.equal(field.querySelector("div").innerHTML, "Way out there", "setting innerHTML does it");
+			assert.equal(field.querySelector("div").innerHTML, "Way out there", "modified item is modified in DOM");
+			start();
+		}, 1);
 	});
 
 
@@ -756,11 +762,15 @@ QUnit.module("databinding");
 		editor.pageData = editor.currentData[document.location.pathname];
 
 		field.innerHTML = "Hi world!";
-		field.dataBinding.resolve();
+		stop();
+		window.setTimeout(function() {
+			field.dataBinding.resolve();
 
-		assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
-		assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
-		assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+			assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
+			assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
+			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+			start();
+		}, 1);
 	});
 
 	QUnit.test("databinding list push 2 items", function(assert) {
