@@ -416,7 +416,7 @@
 							bindingConfig.getter = editor.list.dataBindingGetter;
 							bindingConfig.setter = editor.list.dataBindingSetter;
 							bindingConfig.mode   = "list";
-							bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex"];
+							bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex", "data-simply-stashed", "contenteditable", "style", "data-simply-list-item"];
 							listDataBinding = new dataBinding(bindingConfig);
 						}
 						listDataBinding.bind(dataLists[i]);
@@ -546,7 +546,7 @@
 								bindingConfig.getter = editor.list.dataBindingGetter;
 								bindingConfig.setter = editor.list.dataBindingSetter;
 								bindingConfig.mode   = "list";
-								bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex"];
+								bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex", "data-simply-stashed", "contenteditable", "style", "data-simply-list-item"];
 								listDataBinding = new dataBinding(bindingConfig);
 							}
 							listDataBinding.bind(elm);
