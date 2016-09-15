@@ -87,6 +87,7 @@
 							bindingConfig.key    = dataName;
 							bindingConfig.getter = editor.field.dataBindingGetter;
 							bindingConfig.setter = editor.field.dataBindingSetter;
+							bindingConfig.mode   = "field";
 
 							fieldDataBinding = new dataBinding(bindingConfig);
 						}
