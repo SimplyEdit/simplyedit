@@ -2,7 +2,7 @@
 	var documentHandler = function(event) {
 		var key = event.keyCode || event.which;
 
-		if (key == 66 && event.ctrlKey) { // Ctrl-B
+		if (key == 66 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-B
 			if (typeof editor.actions["simply-text-bold"] === "function") {
 				editor.toolbar.beforeAction();
 				editor.actions["simply-text-bold"]();
@@ -17,25 +17,25 @@
 				editor.context.update();
 			}
 			event.preventDefault();
-		} else if (key == 73 && event.ctrlKey) { // Ctrl-I
+		} else if (key == 73 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-I
 			if (typeof editor.actions["simply-text-italic"] === "function") {
 				editor.toolbar.beforeAction();
 				editor.actions["simply-text-italic"]();
 				event.preventDefault();
 			}
-		} else if (key == 85 && event.ctrlKey) { // Ctrl-U
+		} else if (key == 85 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-U
 			if (typeof editor.actions["simply-text-underline"] === "function") {
 				editor.toolbar.beforeAction();
 				editor.actions["simply-text-underline"]();
 				event.preventDefault();
 			}
-		} else if (key == 83 && event.ctrlKey) { // Ctrl-S
+		} else if (key == 83 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-S
 			if (typeof editor.actions["simply-save"] === "function") {
 				editor.toolbar.beforeAction();
 				editor.actions["simply-save"]();
 				event.preventDefault();
 			}
-		} else if (key == 32 && event.ctrlKey) { // Ctrl-space
+		} else if (key == 32 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-space
 			var activeDialog = document.querySelector(".simply-dialog.active");
 			if (activeDialog) {
 				var firstButton = activeDialog.querySelector("button");
@@ -61,15 +61,15 @@
 				toolbarTarget.focus();
 			}
 			event.preventDefault();
-		} else if (key == 77 && event.ctrlKey) { // Ctrl-M
+		} else if (key == 77 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-M
 			document.querySelector("#simply-main-toolbar button").focus();
 			event.preventDefault();
-		} else if (key == 90 && event.ctrlKey) { // Ctrl-Z
+		} else if (key == 90 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-Z
 			if (typeof editor.actions["simply-undo"] === "function") {
 				editor.actions["simply-undo"]();
 				event.preventDefault();
 			}
-		} else if (key == 89 && event.ctrlKey) { // Ctrl-Y
+		} else if (key == 89 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-Y
 			if (typeof editor.actions["simply-redo"] === "function") {
 				editor.actions["simply-redo"]();
 				event.preventDefault();
