@@ -73,6 +73,9 @@ dataBinding = function(config) {
 	}
 
 	var dereference = function(value) {
+		if (typeof value==="undefined") {
+			return value;
+		}
 		return JSON.parse(JSON.stringify(value));
 	};
 	var isEqual = function(value1, value2) {
