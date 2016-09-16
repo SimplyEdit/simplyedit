@@ -404,7 +404,7 @@ dataBinding.prototype.handleEvent = function (event) {
 	}
 	if (self.mode === "list") {
 		if (target != event.relatedNode) {
-	//		return;
+			return;
 		}
 	}
 
