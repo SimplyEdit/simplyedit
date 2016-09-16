@@ -326,7 +326,6 @@ dataBinding.prototype.addListeners = function(element) {
 	}
 	if (this.mode == "list") {
 		element.mutationObserver.observe(element, {attributes: true});
-		element.addEventListener("DOMSubtreeModified", this.handleEvent);
 		element.addEventListener("DOMNodeRemoved", this.handleEvent);
 		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
@@ -352,7 +351,6 @@ dataBinding.prototype.removeListeners = function(element) {
 		if (element.mutationObserver) {
 			element.mutationObserver.disconnect();
 		}
-		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
 		element.removeEventListener("DOMNodeRemoved", this.handleEvent);
 		element.removeEventListener("DOMNodeInserted", this.handleEvent);
 	}
@@ -411,10 +409,10 @@ dataBinding.prototype.handleEvent = function (event) {
 	if (self.mode === "list" && event.type == "DOMNodeRemoved") {
 		// find the index of the removed target node;
 		items = this.querySelectorAll(":scope > [data-simply-list-item]");
-		window.handlingDataBinding = true;
-		window.setTimeout(function() {
-			window.handlingDataBinding = false;
-		}, 0);
+//		window.handlingDataBinding = true;
+//		window.setTimeout(function() {
+//			window.handlingDataBinding = false;
+//		}, 0);
 		for (i=0; i<items.length; i++) {
 			if (items[i] == event.target) {
 				// console.log("removing node " + i);
@@ -431,10 +429,10 @@ dataBinding.prototype.handleEvent = function (event) {
 	if (self.mode === "list" && event.type == "DOMNodeInserted") {
 		// find the index of the inserted target node;
 		items = this.querySelectorAll(":scope > [data-simply-list-item]");
-		window.handlingDataBinding = true;
-		window.setTimeout(function() {
-			window.handlingDataBinding = false;
-		}, 0);
+//		window.handlingDataBinding = true;
+//		window.setTimeout(function() {
+//			window.handlingDataBinding = false;
+//		}, 0);
 		for (i=0; i<items.length; i++) {
 			if (items[i] == event.target) {
 				// console.log("inserted node " + i);
@@ -451,16 +449,16 @@ dataBinding.prototype.handleEvent = function (event) {
 		}
 	}
 
-	if (window.handlingDataBinding) {
-		return;
-	}
+//	if (window.handlingDataBinding) {
+//		return;
+//	}
 
-	if ((event.type == "DOMNodeRemoved") && !window.handlingDataBinding) {
-		window.handlingDataBinding = true;
-	}
-	if ((event.type == "DOMNodeInserted") && !window.handlingDataBinding) {
-		window.handlingDataBinding = true;
-	}
+//	if ((event.type == "DOMNodeRemoved") && !window.handlingDataBinding) {
+//		window.handlingDataBinding = true;
+//	}
+//	if ((event.type == "DOMNodeInserted") && !window.handlingDataBinding) {
+//		window.handlingDataBinding = true;
+//	}
 
 	switch (event.type) {
 		case "DOMCharacterDataModified":
@@ -486,9 +484,9 @@ dataBinding.prototype.handleEvent = function (event) {
 		break;
 	}
 
-	window.setTimeout(function() {
-		window.handlingDataBinding = false;
-	}, 0);
+//	window.setTimeout(function() {
+//		window.handlingDataBinding = false;
+//	}, 0);
 };
 
 // Housekeeping, remove references to deleted nodes

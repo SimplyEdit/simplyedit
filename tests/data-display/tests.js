@@ -714,15 +714,15 @@ QUnit.module("databinding");
 		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
 
 		field.querySelector("DIV").innerHTML = "Way out there";
+		field.querySelector("DIV").dataBinding.resolve(true);
 		stop();
 		window.setTimeout(function() {
 			field.querySelector("DIV").dataBinding.resolve(true);
-			assert.equal(field.querySelector("div").innerHTML, "Way out there", "setting innerHTML does it");
+			assert.equal(editor.pageData.hello[0].item, "Way out there", "setting innerHTML does it");
 			assert.equal(field.querySelector("div").innerHTML, "Way out there", "modified item is modified in DOM");
 			start();
-		}, 1);
+		}, 150);
 	});
-
 
 	QUnit.test("databinding list push item, clone and append it to the list", function(assert) {
 		var field = document.createElement("ul");
@@ -824,4 +824,3 @@ QUnit.module("databinding");
 			start();
 		}, 5);
 	});
-

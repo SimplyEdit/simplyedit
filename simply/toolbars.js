@@ -114,7 +114,9 @@
 				},
 				resolve : function() {
 					if (!editor.toolbar.updating) {
-						muze.event.fire(this.elements[0], "change");
+						if (this.elements[0]) {
+							muze.event.fire(this.elements[0], "change");
+						}
 					}
 				},
 				key : key
