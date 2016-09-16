@@ -387,7 +387,14 @@
 				editor.responsiveImages.init(this);
 
 				if (document.body.getAttribute("data-simply-edit")) {
-					editor.editmode.makeEditable(this);
+					var list = this;
+					// wait a bit for making things editable, just in case someone is doing a lot of changes to our dataset.
+					if (!list.makeEditableTimer) {
+						list.makeEditableTimer = window.setTimeout(function() {
+							list.makeEditableTimer = false;
+							editor.editmode.makeEditable(list);
+						}, 1);
+					}
 				}
 			},
 			init : function(data, target) {
