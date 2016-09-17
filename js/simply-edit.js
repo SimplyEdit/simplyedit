@@ -64,7 +64,7 @@
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
 				if (target == document) {
-					editor.settings.databind.parentKey = '';
+					editor.settings.databind.parentKey = '/';
 				}
 
 				for (var i=0; i<dataFields.length; i++) {
@@ -88,6 +88,7 @@
 							bindingConfig.getter = editor.field.dataBindingGetter;
 							bindingConfig.setter = editor.field.dataBindingSetter;
 							bindingConfig.mode   = "field";
+							bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
 
 							fieldDataBinding = new dataBinding(bindingConfig);
 						}
@@ -376,7 +377,7 @@
 				}
 
 				if (this.dataBinding) {
-					editor.bindingParents = [this.dataBinding.parentKey];
+					editor.bindingParents = [this.dataBinding.parentKey.replace(/\/$/,'')];
 				}
 
 				if (this.getAttribute('data-simply-data')) {
@@ -528,6 +529,7 @@
 									bindingConfig.getter = editor.field.dataBindingGetter;
 									bindingConfig.setter = editor.field.dataBindingSetter;
 									bindingConfig.mode   = "field";
+									bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
 									fieldDataBinding = new dataBinding(bindingConfig);
 								}
 								fieldDataBinding.bind(elm);
@@ -686,10 +688,12 @@
 					}
 
 					editor.bindingParents.pop();
+					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
 				}
 
 				list.setAttribute("data-simply-selectable", true);
 				editor.bindingParents.pop();
+				editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
 
 				var hasChild = false;
 				for (j=0; j<list.childNodes.length; j++) {
@@ -998,6 +1002,12 @@
 				return editor.field.getInnerHTML(field);
 			},
 			makeEditable : function(field) {
+				if (field.dataBinding) {
+					field.dataBinding.pauseListeners(field);
+					window.setTimeout(function() {
+						field.dataBinding.resumeListeners(field);
+					});
+				}
 				var editable;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
@@ -1495,6 +1505,9 @@
 					}
 				}
 
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.pauseListeners(imgEl);
+				}
 				imgEl.removeAttribute("srcset");
 				imgEl.removeAttribute("sizes");
 				imgEl.removeAttribute("src");
@@ -1508,6 +1521,9 @@
 				}
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.resumeListeners(imgEl);
+				}
 			},
 			getSizeRatio : function(imgEl) {
 				var imageWidth = imgEl.width;

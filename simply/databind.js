@@ -50,6 +50,7 @@ dataBinding = function(config) {
 	this.getter = config.getter;
 	this.mode = config.mode;
 	this.parentKey = config.parentKey ? config.parentKey : "";
+
 	this.key = config.key;
 	this.attributeFilter = config.attributeFilter;
 	this.elements = [];
@@ -71,7 +72,6 @@ dataBinding = function(config) {
 	if (data.hasOwnProperty("_bindings_") && data._bindings_[key]) {
 		return data._bindings_[key];
 	}
-
 	var dereference = function(value) {
 		if (typeof value==="undefined") {
 			return value;
@@ -158,9 +158,13 @@ dataBinding = function(config) {
 		return false;
 	};
 	var setElements = function() {
+		if (binding.elementTimer) {
+			window.clearTimeout(binding.elementTimer);
+		}
 		for (var i=0; i<binding.elements.length; i++) {
 			if (
 				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
+				// FIXME: Always setting a list element will make a loop - find a better way to setup the bindings;
 				(!isEqual(binding.elements[i].getter(), shadowValue))
 			) {
 				binding.pauseListeners(binding.elements[i]);
@@ -393,6 +397,7 @@ dataBinding.prototype.handleMutation = function(event) {
 dataBinding.prototype.handleEvent = function (event) {
 	var target = event.currentTarget;
 	var self = target.dataBinding;
+
 	if (typeof self === 'undefined') {
 		return;
 	}
@@ -412,10 +417,6 @@ dataBinding.prototype.handleEvent = function (event) {
 	if (self.mode === "list" && event.type == "DOMNodeRemoved") {
 		// find the index of the removed target node;
 		items = this.querySelectorAll(":scope > [data-simply-list-item]");
-//		window.handlingDataBinding = true;
-//		window.setTimeout(function() {
-//			window.handlingDataBinding = false;
-//		}, 0);
 		for (i=0; i<items.length; i++) {
 			if (items[i] == event.target) {
 				// console.log("removing node " + i);
@@ -432,10 +433,6 @@ dataBinding.prototype.handleEvent = function (event) {
 	if (self.mode === "list" && event.type == "DOMNodeInserted") {
 		// find the index of the inserted target node;
 		items = this.querySelectorAll(":scope > [data-simply-list-item]");
-//		window.handlingDataBinding = true;
-//		window.setTimeout(function() {
-//			window.handlingDataBinding = false;
-//		}, 0);
 		for (i=0; i<items.length; i++) {
 			if (items[i] == event.target) {
 				// console.log("inserted node " + i);
@@ -451,17 +448,6 @@ dataBinding.prototype.handleEvent = function (event) {
 			}
 		}
 	}
-
-//	if (window.handlingDataBinding) {
-//		return;
-//	}
-
-//	if ((event.type == "DOMNodeRemoved") && !window.handlingDataBinding) {
-//		window.handlingDataBinding = true;
-//	}
-//	if ((event.type == "DOMNodeInserted") && !window.handlingDataBinding) {
-//		window.handlingDataBinding = true;
-//	}
 
 	switch (event.type) {
 		case "DOMCharacterDataModified":
@@ -486,10 +472,6 @@ dataBinding.prototype.handleEvent = function (event) {
 			}, 1); // allow the rest of the mutation event to occur;
 		break;
 	}
-
-//	window.setTimeout(function() {
-//		window.handlingDataBinding = false;
-//	}, 0);
 };
 
 // Housekeeping, remove references to deleted nodes
