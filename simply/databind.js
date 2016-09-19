@@ -176,7 +176,7 @@ dataBinding = function(config) {
 		if (typeof binding.config.resolve === "function") {
 			if (!isEqual(oldValue, shadowValue)) {
 				binding.config.resolve.call(binding, key, dereference(shadowValue), dereference(oldValue));
-				fireEvent("databinding-resolved", document);
+				fireEvent(document, "resolved");
 				oldValue = shadowValue;
 			}
 		}
@@ -209,24 +209,16 @@ dataBinding = function(config) {
 			}
 		});
 	};
-	var fireEvent = function(evtname, target, eventData) {
-		var event; // The custom event that will be created
-		if (document.createEvent) {
-			event = document.createEvent("HTMLEvents");
-			event.initEvent(evtname, true, true);
+	var fireEvent = function(targetNode, eventName, detail) {
+		var event = document.createEvent('CustomEvent');
+		if (event && event.initCustomEvent) {
+			event.initCustomEvent('databind:' + eventName, true, true, detail);
 		} else {
-			event = document.createEventObject();
-			event.eventType = evtname;
+			event = document.createEvent('Event');
+			event.initEvent('databind:' + eventName, true, true);
+			event.detail = detail;
 		}
-
-		event.data = eventData;
-		event.eventName = evtname;
-
-		if (document.createEvent) {
-			target.dispatchEvent(event);
-		} else {
-			target.fireEvent("on" + event.eventType, event);
-		}
+		return targetNode.dispatchEvent(event);
 	};
 	this.set = function (value) {
 		changeStack.push(value);
@@ -324,7 +316,7 @@ dataBinding = function(config) {
 	}
 
 	if (binding.mode == "list") {
-		document.addEventListener("databinding-resolved", function() {
+		document.addEventListener("databind:resolved", function() {
 			oldValue = dereference(binding.get());
 		});
 	}
