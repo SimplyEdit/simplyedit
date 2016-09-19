@@ -97,6 +97,7 @@ dataBinding = function(config) {
 				Object.defineProperty(data, key, {
 					set : function(value) {
 						myvalue = value;
+						// Marker is set by the array function, it will do the resolve after we're done.
 						if (!binding.runningArrayFunction) {
 							newValue = dereference(shadowValue);
 							shadowValue = null;
@@ -172,10 +173,10 @@ dataBinding = function(config) {
 				binding.resumeListeners(binding.elements[i]);
 			}
 		}
-
 		if (typeof binding.config.resolve === "function") {
 			if (!isEqual(oldValue, shadowValue)) {
 				binding.config.resolve.call(binding, key, dereference(shadowValue), dereference(oldValue));
+				fireEvent("databinding-resolved", document);
 				oldValue = shadowValue;
 			}
 		}
@@ -208,7 +209,25 @@ dataBinding = function(config) {
 			}
 		});
 	};
+	var fireEvent = function(evtname, target, eventData) {
+		var event; // The custom event that will be created
+		if (document.createEvent) {
+			event = document.createEvent("HTMLEvents");
+			event.initEvent(evtname, true, true);
+		} else {
+			event = document.createEventObject();
+			event.eventType = evtname;
+		}
 
+		event.data = eventData;
+		event.eventName = evtname;
+
+		if (document.createEvent) {
+			target.dispatchEvent(event);
+		} else {
+			target.fireEvent("on" + event.eventType, event);
+		}
+	};
 	this.set = function (value) {
 		changeStack.push(value);
 		this.resolve();
@@ -305,8 +324,7 @@ dataBinding = function(config) {
 	}
 
 	if (binding.mode == "list") {
-		// FIXME: This should be an event we fire ourselves;
-		document.addEventListener("simply-data-changed", function() {
+		document.addEventListener("databinding-resolved", function() {
 			oldValue = dereference(binding.get());
 		});
 	}
