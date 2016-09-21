@@ -433,8 +433,6 @@ dataBinding.prototype.handleEvent = function (event) {
 				// console.log(editor.list.get(event.target));
 				data = target.dataBinding.get();
 				items[i].simplyData = data.splice(i, 1)[0];
-				self.set(JSON.parse(JSON.stringify(data)));
-				self.resolve();
 				return;
 			}
 		}
@@ -451,8 +449,6 @@ dataBinding.prototype.handleEvent = function (event) {
 
 					data = target.dataBinding.get();
 					data.splice(i, 0, items[i].simplyData);
-					self.set(JSON.parse(JSON.stringify(data)));
-					self.resolve();
 					return;
 				}
 			}
