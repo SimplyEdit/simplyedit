@@ -176,10 +176,10 @@ dataBinding = function(config) {
 		if (typeof binding.config.resolve === "function") {
 			if (!isEqual(oldValue, shadowValue)) {
 				binding.config.resolve.call(binding, key, dereference(shadowValue), dereference(oldValue));
-				fireEvent(document, "resolved");
-				oldValue = shadowValue;
+				oldValue = dereference(shadowValue);
 			}
 		}
+		fireEvent(document, "resolved");
 	};
 	var initBindings = function(data, key) {
 		if (!data.hasOwnProperty("_bindings_")) {
