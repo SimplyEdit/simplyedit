@@ -389,13 +389,7 @@
 
 				if (document.body.getAttribute("data-simply-edit")) {
 					var list = this;
-					// wait a bit for making things editable, just in case someone is doing a lot of changes to our dataset.
-					if (!list.makeEditableTimer) {
-						list.makeEditableTimer = window.setTimeout(function() {
-							list.makeEditableTimer = false;
-							editor.editmode.makeEditable(list);
-						}, 1);
-					}
+					editor.editmode.makeEditable(list);
 				}
 			},
 			init : function(data, target) {
@@ -600,6 +594,14 @@
 					}
 				};
 
+				// Remove the list from the DOM, do all the stuff and reinsert it, so we only redraw once for all our modifications.
+				var nextNode = list.nextSibling;
+				var listParent = list.parentNode;
+				list.reattach = function() {
+					listParent.insertBefore(list, nextNode);
+				};
+				listParent.removeChild(list);
+
 				editor.bindingParents.push(list.getAttribute("data-simply-list"));
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
@@ -717,6 +719,7 @@
 						list.className.replace(/ simply-empty/g, '');
 					}
 				}
+				list.reattach();
 			}
 		},
 		field : {
@@ -853,6 +856,10 @@
 					}, 300);
 					return;
 				}
+				if (typeof field.hopeEditor !== "undefined") {
+					return;
+				}
+
 				field.hopeContent = document.createElement("textarea");
 				field.hopeMarkup = document.createElement("textarea");
 				field.hopeRenderedSource = document.createElement("DIV");
@@ -878,6 +885,9 @@
 				}, false);
 			},
 			initHopeStub : function(field) {
+				if (typeof field.hopeEditor !== "undefined") {
+					return;
+				}
 				field.hopeEditor = {
 					field : field,
 					parseHTML : function(){},
