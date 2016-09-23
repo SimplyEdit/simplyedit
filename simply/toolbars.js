@@ -570,13 +570,9 @@
 				}
 				var rects = range.getClientRects();
 				var parent = vdSelection.getNode(sel);
-			/*	if ( !rects.length ) {
-					var simplyParent = editor.node.getSimplyParent(range.startContainer);
-					if (simplyParent.dataBinding) {
-						simplyParent.dataBinding.pauseListeners(simplyParent);
-					}
+				if ( !rects.length ) {
+					muze.event.fire(range.startContainer, "databinding:pause");
 					// insert element at range and get its position, other options aren't exact enough
-					// FIXME: this triggers insert/remove events for databinding;
 					var span = document.createElement('span');
 					if ( span.getClientRects ) {
 						// Ensure span has dimensions and position by
@@ -592,11 +588,8 @@
 						} catch(e) {
 						}
 					}
-					if (simplyParent.dataBinding) {
-						simplyParent.dataBinding.resumeListeners(simplyParent);
-					}
+					muze.event.fire(range.startContainer, "databinding:resume");
 				}
-			*/
 				if ( rects.length ) {
 					ltop = rects[0].top;
 					lleft = rects[0].left;

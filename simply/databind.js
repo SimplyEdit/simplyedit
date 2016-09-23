@@ -347,6 +347,13 @@ dataBinding.prototype.addListeners = function(element) {
 		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
 	element.addEventListener("databinding:valuechanged", this.handleEvent);
+
+	element.addEventListener("databinding:pause", function() {
+		this.dataBinding.pauseListeners(this);
+	});
+	element.addEventListener("databinding:resume", function() {
+		this.dataBinding.resumeListeners(this);
+	});
 	element.dataBindingPaused = false;
 };
 dataBinding.prototype.resumeListeners = function(element) {
@@ -425,6 +432,9 @@ dataBinding.prototype.handleEvent = function (event) {
 
 	var i, data, items;
 	if (self.mode === "list" && event.type == "DOMNodeRemoved") {
+		if (event.target.nodeType != document.ELEMENT_NODE) {
+			return;
+		}
 		// find the index of the removed target node;
 		items = this.querySelectorAll(":scope > [data-simply-list-item]");
 		for (i=0; i<items.length; i++) {
