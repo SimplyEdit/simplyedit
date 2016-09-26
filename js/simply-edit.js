@@ -963,6 +963,9 @@
 				};
 			},
 			set : function(field, data) {
+				window.setTimeout(function() {
+					editor.fireEvent("selectionchange", document); // fire this after we're done. Using settimeout so it will run afterwards.
+				}, 0);
 				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
@@ -1478,23 +1481,19 @@
 
 				// FIXME: Replacing the element causes a problem for databinding - need to rebind this.
 				var clone = this.cloneNode();
-				this.parentNode.insertBefore(clone, this);
+				this.parentNode.insertBefore(clone, this.nextSibling); // insert the clone after! the current image to keep the selection;
+
 				if (this.dataBinding) {
 					this.dataBinding.rebind(clone);
 				}
 				this.parentNode.removeChild(this);
+				editor.fireEvent("selectionchange", document);
 			},
 			initImage : function(imgEl) {
 				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
 					window.setTimeout(function() {
 						editor.responsiveImages.initImage(imgEl);
 					}, 50);
-					return;
-				}
-
-				if (!imgEl.responsiveImageInitDone) {
-					imgEl.responsiveImageInitDone = true;
-				} else {
 					return;
 				}
 
@@ -1534,6 +1533,7 @@
 				if (imgEl.dataBinding) {
 					imgEl.dataBinding.resumeListeners(imgEl);
 				}
+				editor.fireEvent("selectionchange", document);
 			},
 			getSizeRatio : function(imgEl) {
 				var imageWidth = imgEl.width;
