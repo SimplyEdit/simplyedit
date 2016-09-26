@@ -2283,6 +2283,9 @@
 		if (!filter.context) {
 			filter.context = name;
 		}
+		if (typeof editor.contextFilters[name] !== "undefined") {
+			console.log("Warning: Context filter " + name + " is already defined.");
+		}
 		editor.contextFilters[name] = filter;
 	};
 	editor.addAction = function(name, action) {
