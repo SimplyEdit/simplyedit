@@ -645,22 +645,38 @@
 				}
 				var top = pos.top;
 				var left = pos.left;
-					
 				var activeToolbar = activeSection.querySelector("div.simply-toolbar");
 				top += document.body.offsetTop;
 				var newleft = left - (activeToolbar.offsetWidth/2);
-				if (newleft < 0) {
-					markerLeft = activeToolbar.offsetWidth/2 + newleft;
-					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft+'px';
-					newleft = 0;
-				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth) {
-					var delta = newleft + activeToolbar.offsetWidth - document.body.offsetWidth;
-					markerLeft = activeToolbar.offsetWidth/2 + delta;
-					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft+'px';
-					newleft = document.body.offsetWidth - activeToolbar.offsetWidth;
+
+				// Recalculate toolbar position if it is off-screen left/right
+				if (newleft < document.body.scrollLeft) {
+					markerLeft = Math.max(activeToolbar.offsetWidth/2 + newleft - document.body.scrollLeft, 20) + "px";
+				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth + document.body.scrollLeft) {
+					var delta = newleft + activeToolbar.offsetWidth - document.body.offsetWidth - document.body.scrollLeft;
+					markerLeft = Math.min(activeToolbar.offsetWidth/2 + delta, activeToolbar.offsetWidth - 20) + "px";
 				} else {
-					activeToolbar.getElementsByClassName("marker")[0].style.left = "50%";
+					markerLeft = "50%";
 				}
+				activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft;
+
+				// Recalculate toolbar position if it is off-screen left/right
+				if (newleft < document.body.scrollLeft) {
+					newleft = document.body.scrollLeft;
+				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth + document.body.scrollLeft) {
+					newleft = document.body.offsetWidth -  activeToolbar.offsetWidth + document.body.scrollLeft;
+				} else {
+				}
+
+				// Recalculate the toolbar width, the browser messes this up because the buttons are floating;
+				var buttons = activeToolbar.querySelectorAll("ul.simply-buttons > li");
+				var width = activeToolbar.offsetWidth;
+				var newWidth = 0;
+				for (var i=0; i<buttons.length; i++) {
+					newWidth += buttons[i].offsetWidth;
+				}
+				activeToolbar.style.width = newWidth + "px";
+
 				// Move the toolbar to beneath the top of the selection if the toolbar goes out of view;
 				// check the position 
 				// - if toolbar bottom <= editor pane bottom, no problem
@@ -679,7 +695,7 @@
 					if ( mintop + toolbarRect.height <= editPaneRect.height ) {
 						// toolbar can be repositioned
 						// FIXME: min top should be position of the cursor, not selection
-						top = editPaneRect.height - toolbarRect.height;
+						top = editPaneRect.height - toolbarRect.height - 32; // 32 to allow space for scrollbars;
 					} else {
 						top = mintop;
 						scrollHeight = Math.max(document.body.scrollHeight, document.body.clientHeight);
@@ -690,6 +706,7 @@
 						}
 					}
 				}
+
 				if ( document.body.classList.contains('simply-footer-space') ) {
 					scrollHeight = Math.max(document.body.scrollHeight, document.body.clientHeight);
 					scrollTop    = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
