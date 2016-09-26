@@ -291,8 +291,8 @@ dataBinding = function(config) {
 		}
 
 		binding.elements.push(element);
-		element.getter 		= (typeof config.getter === "function") ? config.getter : binding.getter;
-		element.setter 		= (typeof config.setter === "function") ? config.setter : binding.setter;
+		element.getter 		= (config && typeof config.getter === "function") ? config.getter : binding.getter;
+		element.setter 		= (config && typeof config.setter === "function") ? config.setter : binding.setter;
 		element.dataBinding 	= binding;
 
 		binding.addListeners(element);
