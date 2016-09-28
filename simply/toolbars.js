@@ -461,6 +461,7 @@
 	editor.context = {
 		touching : false,
 		skipUpdate : false,
+		explain : {},
 		weigh : function(filter, targets) {
 			var sel = vdSelectionState.get();
 
@@ -471,17 +472,26 @@
 				listBonus = true;
 			}
 
+			if (!filter.context) {
+				filter.context = "parent";
+			}
+
 			while (target) {
 				var tempNode = document.createElement("DIV");
 				tempNode.appendChild(target.cloneNode(false));
+
+				editor.context.explain[filter.context] = [];
 				var result = 0;
 				if (
 					( (typeof filter.selector !== 'undefined') ? tempNode.querySelectorAll(":scope > " + filter.selector).length : true) && 
 					( (typeof filter["sel-collapsed"] !== 'undefined') ? (sel.collapsed == filter["sel-collapsed"]) : true)
 				) {
+					editor.context.explain[filter.context].push("click depth score, +" + (50 * (targets.length+1)) + " points");
 					result += 50 * (targets.length+1); // tagName weight
 					if (typeof filter.selector !== 'undefined') {
+						editor.context.explain[filter.context].push("class selector bonus, +" + (2*(filter.selector.split(".").length-1)) + " points");
 						result += 2*(filter.selector.split(".").length-1); // Add the number of class selectors;
+						editor.context.explain[filter.context].push("attribute selectors bonus, +" + (2*(filter.selector.split("[").length-1)) + " points");
 						result += 2*(filter.selector.split("[").length-1); // Add the number of attribute selectors
 					}
 
@@ -495,26 +505,34 @@
 						) {
 							// click was in the element; less value for lists and list items;
 							if (target.getAttribute("contenteditable") && filter.context && filter.context.indexOf("simply-list") === 0) {
+								editor.context.explain[filter.context].push("click was in the element, -5 points");
 								result -= 5;
 							}
 						} else {
 							// click was outside the element; more value for lists and list items;
 							if (filter.context && filter.context.indexOf("simply-list") === 0) {
+								editor.context.explain[filter.context].push("click was outside the element, more value for lists and list items; +" + 50 * (targets.length) + " points");
 								result += 50 * (targets.length);
 							}
 						}
 					}
 
 					if (typeof filter["sel-collapsed"] !== 'undefined') {
+						editor.context.explain[filter.context].push("filters on selection collapsed, +1 point");
 						result += 1;
 					}
 					if (typeof filter.parent == 'undefined') {
+						editor.context.explain[filter.context].push("result = " + result);
 						return result;
 					} else {
 						var parentResult = editor.context.weigh(filter.parent, targets);
 						if (parentResult) {
+							editor.context.explain[filter.context].push("has parent filter value, +" + parentResult + " points");
+							editor.context.explain[filter.context].push(JSON.parse(JSON.stringify(editor.context.explain.parent)));
+							editor.context.explain[filter.context].push("result = " + parseInt(result + parentResult));
 							return result + parentResult;
 						} else {
+							editor.context.explain[filter.context].push("parent filter did not match, result = 0");
 							return 0;
 						}
 					}
@@ -522,9 +540,12 @@
 				target = targets.shift();
 				listBonus = false;
 			}
+			editor.context.explain[filter.context].push("result = 0");
 			return 0;
 		},
 		get : function() {
+			editor.context.explain = {};
+
 			var sel = vdSelectionState ? vdSelectionState.get() : false;
 
 			if (sel) {
