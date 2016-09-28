@@ -4,10 +4,16 @@
 		<ul class="simply-buttons">
 			<li><button data-simply-action="simply-list-item-delete"><i class="fa fa-times"></i>Delete</button></li>
 			<li><button data-simply-action="simply-list-item-add"><i class="fa fa-plus-circle"></i>Add</button></li>
+			<li><button data-simply-section="simply-list-mogrify" class="simply-expands"><i class="fa fa-cube"></i>Switch type</button></li>
 		</ul>
 		<div class="simply-toolbar-section simply-list-templates">
 			<ul>
 				<li><button data-simply-action="simply-list-item-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-list-mogrify">
+			<ul>
+				<li><button data-simply-action="simply-list-item-mogrify"><i class="fa fa-cube"></i>Template</button></li>
 			</ul>
 		</div>
 	</div>
@@ -55,6 +61,30 @@
 				editor.context.show(); // force toolbar context update to remove the toolbar pointing to the deleted item;
 
 				// FIXME: register change stond hier;
+			},
+			mogrify : function(el) {
+				var mogrifyData = currentList.mogrifyData ? currentList.mogrifyData : {};
+				var currentData = editor.list.get(currentListItem);
+
+				// Accumulate the data in mogrifyData so we don't lose any data while switching around;
+				for (i in currentData) {
+					if (!mogrifyData[i]) {
+						mogrifyData[i] = {};
+					}
+
+					for (j in currentData[i]) {
+						mogrifyData[i][j] = currentData[i][j];
+					}
+				}
+
+				editor.plugins.list.item.add(el);
+				var newItem = currentListItem.nextElementSibling;
+				editor.data.apply(mogrifyData, newItem);
+				currentListItem.parentNode.removeChild(currentListItem);
+				currentListItem = newItem;
+				currentList.mogrifyData = mogrifyData;
+				newItem.focus();
+				editor.context.update();
 			}
 		},
 		add : function(el) {
@@ -116,6 +146,48 @@
 		}
 	};
 
+	document.addEventListener("slip:beforeswipe", function(e) {
+		var listItem = e.target;
+		while (listItem != document && !listItem.getAttribute("data-simply-list")) {
+			listItem = listItem.parentNode;
+		}
+
+		if (listItem != currentList) {
+			e.preventDefault();
+		}
+
+	});
+	document.addEventListener("slip:swipe", function(e) {
+		var currentTemplate = e.target.getAttribute("data-simply-template");
+		if (!currentTemplate) {
+			currentTemplate = 0;
+		}
+		var templateList = Object.keys(currentList.templates);
+		var currentIndex = templateList.indexOf(currentTemplate);
+		var nextIndex = currentIndex + 1;
+		var prevIndex = currentIndex - 1;
+
+		if (nextIndex >= templateList.length) {
+			nextIndex = 0;
+		}
+		if (prevIndex < 0) {
+			prevIndex = templateList.length-1;
+		}
+
+		var el = document.createElement("button");
+		if (e.detail.direction == "left") {
+			el.setAttribute('data-simply-value', templateList[nextIndex]);
+		} else {
+			el.setAttribute('data-simply-value', templateList[prevIndex]);
+		}
+		listItem = e.target;
+		while (listItem != document && !listItem.getAttribute("data-simply-list-item")) {
+			listItem = listItem.parentNode;
+		}
+		currentListItem = listItem;
+		editor.plugins.list.item.mogrify(el);
+	});
+
 	editor.addToolbar({
 		name: 'simply-list-item',
 		filter:{
@@ -126,18 +198,22 @@
 		},
 		actions: {
 			"simply-list-item-add" : editor.plugins.list.item.add,
-			"simply-list-item-delete" : editor.plugins.list.item.delete
+			"simply-list-item-delete" : editor.plugins.list.item.delete,
+			"simply-list-item-mogrify" : editor.plugins.list.item.mogrify
 		},
 		update : function(toolbar) {
 			currentListItem = vdSelection.getNode(vdSelectionState.get());
-
 			currentList = currentListItem.parentNode;
 			while (currentList && !currentList.getAttribute('data-simply-list')) {
 				currentList = currentList.parentNode;
 			}
 
 			var listTemplates = toolbar.querySelector("div.simply-list-templates ul");
+			var mogrifyTemplates = toolbar.querySelector("div.simply-list-mogrify ul");
+
 			listTemplates.innerHTML = '';
+			mogrifyTemplates.innerHTML = '';
+
 			for (var i=0; i<Object.keys(currentList.templates).length; i++) {
 				var templateName = Object.keys(currentList.templates)[i];
 				var templateDisplay = templateName;				
@@ -161,18 +237,35 @@
 					templateDisplay + '</button>';
 
 				listTemplates.appendChild(item);
+
+				// FIXME: Only add compatible templates;
+				item = document.createElement("li");
+				item.innerHTML = '<button data-simply-action="simply-list-item-mogrify" data-simply-value="' + templateName + '">' +
+					itemIcon +
+					templateDisplay + '</button>';
+
+				if (templateName == currentListItem.getAttribute("data-simply-template")) {
+					item.querySelector("button").classList.add("simply-selected");
+				}
+				mogrifyTemplates.appendChild(item);
 			}
-		
 			var addButton = toolbar.querySelector("button[data-simply-action='simply-list-item-add'], button[data-simply-section='simply-list-templates']");
+			var mogrifyButton = toolbar.querySelector("button[data-simply-action='simply-list-mogrify']");
 
 			if (Object.keys(currentList.templates).length > 1) {
 				delete addButton.dataset.simplyAction;
 				addButton.dataset.simplySection = "simply-list-templates";
 				addButton.classList.add("simply-expands");
-			} else { 
+				if (mogrifyButton) {
+					mogrifyButton.style.display = "block";
+				}
+			} else {
 				delete addButton.dataset.simplySection;
 				addButton.dataset.simplyAction = "simply-list-item-add";
 				addButton.classList.remove("simply-expands");
+				if (mogrifyButton) {
+					mogrifyButton.style.display = "none";
+				}
 			}
 			addButton.classList.remove("simply-selected");
 			toolbar.querySelector("div.simply-list-templates").classList.remove("simply-selected");
