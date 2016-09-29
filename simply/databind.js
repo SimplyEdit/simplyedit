@@ -99,10 +99,21 @@ dataBinding = function(config) {
 						myvalue = value;
 						// Marker is set by the array function, it will do the resolve after we're done.
 						if (!binding.runningArrayFunction) {
-							newValue = dereference(shadowValue);
+							newValue = shadowValue;
 							shadowValue = null;
 							binding.set(newValue);
 							binding.resolve();
+						}
+
+						// Renumber parent indexes;
+						for (var subkey in this) {
+							for (var bindingKey in this[subkey]._bindings_) {
+								var index = this[subkey]._bindings_[bindingKey].parentKey.split('/');
+								index.pop();
+								index.pop();
+								index.push(subkey);
+								this[subkey]._bindings_[bindingKey].parentKey = index.join("/") + '/';
+							}
 						}
 					},
 					get : function() {
@@ -130,8 +141,11 @@ dataBinding = function(config) {
 						// Add a marker so that array value set does not trigger resolving, we will resolve after we're done.
 						binding.runningArrayFunction = true;
 						var result = Array.prototype[name].apply(shadowValue, arguments);
+						for (var i in shadowValue) {
+							shadowValue[i] = shadowValue[i]; // this will force a renumber/reindex for the parentKeys;
+						}
 						binding.runningArrayFunction = false;
-						newValue = dereference(shadowValue);
+						newValue = shadowValue;
 						shadowValue = null;
 						binding.set(newValue);
 						binding.resolve(); // and apply our array change;
@@ -164,7 +178,7 @@ dataBinding = function(config) {
 		}
 		for (var i=0; i<binding.elements.length; i++) {
 			if (
-				binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
+				// binding.mode == "list" || // if it is a list, we need to reset the values so that the bindings are setup properly.
 				// FIXME: Always setting a list element will make a loop - find a better way to setup the bindings;
 				(!isEqual(binding.elements[i].getter(), shadowValue))
 			) {
@@ -317,7 +331,9 @@ dataBinding = function(config) {
 
 	if (binding.mode == "list") {
 		document.addEventListener("databind:resolved", function() {
-			oldValue = dereference(binding.get());
+			if (!binding.skipOldValueUpdate) {
+				oldValue = dereference(binding.get());
+			}
 		});
 	}
 };
