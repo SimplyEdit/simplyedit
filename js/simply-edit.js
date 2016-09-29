@@ -80,22 +80,26 @@
 						data[dataPath][dataName] = editor.field.get(dataFields[i]);
 					}
 					if (data[dataPath]) {
-						var fieldDataBinding;
-						if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
-							fieldDataBinding = data[dataPath]._bindings_[dataName];
+						if (dataFields[i].dataBinding) {
+							dataFields[i].dataBinding.set(data[dataPath][dataName]);
+							dataFields[i].dataBinding.resolve(true);
 						} else {
-							var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-							bindingConfig.data   = data[dataPath];
-							bindingConfig.key    = dataName;
-							bindingConfig.getter = editor.field.dataBindingGetter;
-							bindingConfig.setter = editor.field.dataBindingSetter;
-							bindingConfig.mode   = "field";
-							bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
+							var fieldDataBinding;
+							if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
+								fieldDataBinding = data[dataPath]._bindings_[dataName];
+							} else {
+								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								bindingConfig.data   = data[dataPath];
+								bindingConfig.key    = dataName;
+								bindingConfig.getter = editor.field.dataBindingGetter;
+								bindingConfig.setter = editor.field.dataBindingSetter;
+								bindingConfig.mode   = "field";
+								bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
 
-							fieldDataBinding = new dataBinding(bindingConfig);
+								fieldDataBinding = new dataBinding(bindingConfig);
+							}
+							fieldDataBinding.bind(dataFields[i]);
 						}
-						fieldDataBinding.bind(dataFields[i]);
-						dataFields[i].simplyData = data[dataPath][dataName];
 
 						// editor.field.set(dataFields[i], data[dataPath][dataName]);
 					}
