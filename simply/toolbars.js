@@ -437,6 +437,9 @@
 			if ( !target ) {
 				target = el.parentNode;
 			}
+			if (!target) {
+				return;
+			}
 			while (el.firstChild) {
 				target.insertBefore(el.firstChild, el);
 			}
