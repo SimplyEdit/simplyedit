@@ -328,6 +328,23 @@
 					addData(target);
 				}
 
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list-item")) {
+					if (target.getAttribute("data-simply-template")) {
+						dataPath = editor.data.getDataPath(target);
+						if (!data[dataPath]) {
+							data[dataPath] = {};
+						}
+						data[dataPath]['data-simply-template'] = target.getAttribute("data-simply-template");
+					}
+				}
+
+				// timeout so we do this cleanup after all is done;
+				window.setTimeout(function() {
+					var stashedFields = target.querySelectorAll("[data-simply-stashed]");
+					for (i=0; i<stashedFields.length; i++) {
+						stashedFields[i].removeAttribute("data-simply-stashed");
+					}
+				});
 				return data;
 			},
 			keyDownHandler : function(evt) {
@@ -398,13 +415,11 @@
 				}
 			},
 			init : function(data, target) {
-				var dataName, dataPath;
-				var dataLists = target.querySelectorAll("[data-simply-list]");
-
-				for (var i=0; i<dataLists.length; i++) {
-					editor.list.parseTemplates(dataLists[i]);
-					dataName = dataLists[i].getAttribute("data-simply-list");
-					dataPath = editor.data.getDataPath(dataLists[i]);
+				var initList = function(data, list) {
+					var dataName, dataPath;
+					editor.list.parseTemplates(list);
+					dataName = list.getAttribute("data-simply-list");
+					dataPath = editor.data.getDataPath(list);
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -511,6 +526,7 @@
 				var e,j,k,l;
 				var dataName;
 				var t, counter;
+				var stashedFields, i, newData, dataPath;
 
 				if (!listData) {
 					listData = [];
@@ -640,7 +656,7 @@
 						var originalTemplates = list.templates[requestedTemplate].content.querySelectorAll("template");
 						var importedTemplates = clone.querySelectorAll("template");
 
-						for (var i=0; i<importedTemplates.length; i++) {
+						for (i=0; i<importedTemplates.length; i++) {
 							importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
 						}
 
@@ -662,11 +678,20 @@
 
 						clone.firstElementChild.setAttribute("data-simply-list-item", true);
 						clone.firstElementChild.setAttribute("data-simply-selectable", true);
-						clone.firstElementChild.simplyData = listData[j];
 
 						if (list.templateIcons[requestedTemplate]) {
 							clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 						}
+						
+						stashedFields = clone.firstElementChild.querySelectorAll("[data-simply-stashed]");
+						for (i=0; i<stashedFields.length; i++) {
+							stashedFields[i].removeAttribute("data-simply-stashed");
+						}
+						newData = editor.list.get(clone.firstElementChild);
+						editor.data.apply(newData, clone.firstElementChild);
+						dataPath = editor.data.getDataPath(clone.firstElementChild);
+						clone.firstElementChild.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
+						
 						list.appendChild(clone);
 						editor.list.init(listData[j], clone);
 					} else {
@@ -688,11 +713,19 @@
 							}
 							clone.setAttribute("data-simply-list-item", true);
 							clone.setAttribute("data-simply-selectable", true);
-							clone.simplyData = listData[j];
 							
 							if (list.templateIcons[requestedTemplate]) {
 								clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 							}
+
+							stashedFields = clone.querySelectorAll("[data-simply-stashed]");
+							for (i=0; i<stashedFields.length; i++) {
+								stashedFields[i].removeAttribute("data-simply-stashed");
+							}
+							newData = editor.list.get(clone);
+							editor.data.apply(newData, clone);
+							dataPath = editor.data.getDataPath(clone);
+							clone.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 
 							list.appendChild(clone);
 							editor.list.init(listData[j], clone);
