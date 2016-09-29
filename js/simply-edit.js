@@ -135,7 +135,7 @@
 					for (i=0; i<stashedFields.length; i++) {
 						stashedFields[i].removeAttribute("data-simply-stashed");
 					}
-					if (target.nodeType == 1) {
+					if (target.nodeType == document.ELEMENT_NODE) {
 						target.removeAttribute("data-simply-stashed");
 					}
 
@@ -311,7 +311,7 @@
 					field.setAttribute("data-simply-stashed", 1);
 				};
 
-				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
 					addListData(target);
 				}
 
@@ -324,7 +324,7 @@
 				for (i=0; i<dataFields.length; i++) {
 					addData(dataFields[i]);
 				}
-				if (target.nodeType == 1 && target.getAttribute("data-simply-field")) {
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
 					addData(target);
 				}
 
@@ -427,37 +427,44 @@
 							bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex", "data-simply-stashed", "contenteditable", "style", "data-simply-list-item"];
 							listDataBinding = new dataBinding(bindingConfig);
 						}
-						listDataBinding.bind(dataLists[i]);
-						dataLists[i].simplyData = data[dataPath][dataName];
-						// editor.list.set(dataLists[i], data[dataPath][dataName]);
+						listDataBinding.bind(list);
+						// editor.list.set(list, data[dataPath][dataName]);
 					}
 
 					var hasChild = false;
-					for (var j=0; j<dataLists[i].childNodes.length; j++) {
+					for (var j=0; j<list.childNodes.length; j++) {
 						if (
-							dataLists[i].childNodes[j].nodeType == 1 && 
-							dataLists[i].childNodes[j].getAttribute("data-simply-list-item")
+							list.childNodes[j].nodeType == document.ELEMENT_NODE &&
+							list.childNodes[j].getAttribute("data-simply-list-item")
 						) {
 							hasChild = true;
 						}
 					}
 					if (!hasChild) {
-						if ("classList" in dataLists[i]) {
-							dataLists[i].classList.add("simply-empty");
+						if ("classList" in list) {
+							list.classList.add("simply-empty");
 						} else {
-							dataLists[i].className += " simply-empty";
+							list.className += " simply-empty";
 						}
 					}
 
-					if ("addEventListener" in dataLists[i]) {
-						dataLists[i].addEventListener("keydown", editor.list.keyDownHandler);
+					if ("addEventListener" in list) {
+						list.addEventListener("keydown", editor.list.keyDownHandler);
 					}
+				};
+
+				var dataLists = target.querySelectorAll("[data-simply-list]");
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
+					initList(data, target);
+				}
+				for (var i=0; i<dataLists.length; i++) {
+					initList(data, dataLists[i]);
 				}
 			},
 			fixFirstElementChild : function(clone) {
 				if (!("firstElementChild" in clone)) {
 					for (var l=0; l<clone.childNodes.length; l++) {
-						if (clone.childNodes[l].nodeType == 1) {
+						if (clone.childNodes[l].nodeType == document.ELEMENT_NODE) {
 							clone.firstElementChild = clone.childNodes[l];
 						}
 					}
@@ -567,7 +574,7 @@
 						var hasChild = false;
 						for (var m=0; m<elm.childNodes.length; m++) {
 							if (
-								elm.childNodes[m].nodeType == 1 &&
+								elm.childNodes[m].nodeType == document.ELEMENT_NODE &&
 								elm.childNodes[m].getAttribute("data-simply-list-item")
 							) {
 								hasChild = true;
@@ -587,7 +594,7 @@
 					for (k=0; k<dataFields.length; k++) {
 						handleFields(dataFields[k]);
 					}
-					if (clone.nodeType == 1 && clone.getAttribute("data-simply-field")) {
+					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
 						handleFields(clone);
 					}
 
@@ -595,7 +602,7 @@
 					for (k=0; k<dataLists.length; k++) {
 						handleLists(dataLists[k]);
 					}
-					if (clone.nodeType == 1 && clone.getAttribute("data-simply-list")) {
+					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
 						handleLists(clone);
 					}
 				};
@@ -706,7 +713,7 @@
 				var hasChild = false;
 				for (j=0; j<list.childNodes.length; j++) {
 					if (
-						list.childNodes[j].nodeType == 1 && 
+						list.childNodes[j].nodeType == document.ELEMENT_NODE &&
 						list.childNodes[j].getAttribute("data-simply-list-item")
 					) {
 						hasChild = true;
