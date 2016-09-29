@@ -479,11 +479,22 @@
 				filter.context = "parent";
 			}
 
+			if (typeof editor.context.explain[filter.context] === "undefined") {
+				editor.context.explain[filter.context] = [];
+			}
+			editor.context.explain[filter.context].push({
+				"filter" : filter,
+				"targets" : targets
+			});
+
 			while (target) {
 				var tempNode = document.createElement("DIV");
 				tempNode.appendChild(target.cloneNode(false));
 
-				editor.context.explain[filter.context] = [];
+				if (typeof editor.context.explain[filter.context] === "undefined") {
+					editor.context.explain[filter.context] = [];
+				}
+
 				var result = 0;
 				if (
 					( (typeof filter.selector !== 'undefined') ? tempNode.querySelectorAll(":scope > " + filter.selector).length : true) && 
@@ -531,7 +542,7 @@
 						var parentResult = editor.context.weigh(filter.parent, targets);
 						if (parentResult) {
 							editor.context.explain[filter.context].push("has parent filter value, +" + parentResult + " points");
-							editor.context.explain[filter.context].push(JSON.parse(JSON.stringify(editor.context.explain.parent)));
+							editor.context.explain[filter.context].push(editor.context.explain.parent);
 							editor.context.explain[filter.context].push("result = " + parseInt(result + parentResult));
 							return result + parentResult;
 						} else {
@@ -571,15 +582,20 @@
 								}
 							}
 						}
+						editor.context.explain.validFilters = validFilters;
+
 						return bestFilter;
 					} else {
 						if (sel.collapsed) {
+							editor.context.explain['simply-text-cursor'] = ["cursor is in a contentEditable field and selection is collapsed."];
 							return "simply-text-cursor";
 						} else {
+							editor.context.explain['simply-text-selection'] = ["cursor is in a contentEditable field and selection is not collapsed."];
 							return "simply-text-selection";
 						}
 					}
 				} else {
+					editor.context.explain['simply-no-context'] = ["selection parent is not editable, not selectable and does not have an editable parent"];
 					return "simply-no-context";
 				}
 			}
