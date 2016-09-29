@@ -111,8 +111,6 @@
 					document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
 					window.removeEventListener("load", preventDOMContentLoaded, true);
 				}
-
-
 				
 				editor.fireEvent("DOMContentLoaded", document);
 				window.setTimeout(function() {
