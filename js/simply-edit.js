@@ -128,8 +128,8 @@
 			get : function(target) {
 				if (target == document && editor.currentData) {
 					return editor.currentData;
-				} else if (target.simplyData) {
-					return target.simplyData;
+				} else if (target.dataBinding) {
+					return target.dataBinding.get();
 				} else {
 					var stashedFields = target.querySelectorAll("[data-simply-stashed]");
 					for (i=0; i<stashedFields.length; i++) {
@@ -374,7 +374,6 @@
 				return data[dataPath][dataName];
 			},
 			dataBindingSetter : function(value) {
-				this.simplyData = value;
 				var children = this.querySelectorAll("[data-simply-list-item]");
 				for (var i=0; i<children.length; i++) {
 					if (children[i].parentNode == this) {
@@ -540,7 +539,6 @@
 									fieldDataBinding = new dataBinding(bindingConfig);
 								}
 								fieldDataBinding.bind(elm);
-								elm.simplyData = listData[j][dataName];
 							} else {
 								editor.field.set(elm, listData[j][dataName]);
 							}
@@ -566,7 +564,6 @@
 								listDataBinding = new dataBinding(bindingConfig);
 							}
 							listDataBinding.bind(elm);
-							elm.simplyData = listData[j][dataName];
 						} else {
 							editor.list.set(elm, listData[j][dataName]);
 						}
@@ -741,7 +738,6 @@
 			},
 			dataBindingSetter : function(value) {
 				if (JSON.stringify(editor.field.get(this)) != JSON.stringify(value)) {
-					this.simplyData = value;
 					return editor.field.set(this, value);
 				}
 			},
@@ -751,7 +747,6 @@
 						return editor.field.defaultGetter(field, ["src", "class", "alt", "title"]);
 					},
 					set : function(field, data) {
-						data = JSON.parse(JSON.stringify(data));
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
@@ -976,6 +971,9 @@
 				};
 			},
 			set : function(field, data) {
+				if (typeof data === "undefined") {
+					return;
+				}
 				window.setTimeout(function() {
 					editor.fireEvent("selectionchange", document); // fire this after we're done. Using settimeout so it will run afterwards.
 				}, 0);
