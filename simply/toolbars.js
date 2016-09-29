@@ -715,7 +715,15 @@
 				for (var i=0; i<buttons.length; i++) {
 					newWidth += buttons[i].offsetWidth;
 				}
-				activeToolbar.style.width = newWidth + "px";
+
+				// activeToolbar.style.width = newWidth + "px"; // FIXME: This messes up when expanding a section with more items than the top section;
+
+				// hide the marker if no active buttons are left;
+				if (newWidth === 0) {
+					activeToolbar.getElementsByClassName("marker")[0].style.display = "none";
+				} else {
+					activeToolbar.getElementsByClassName("marker")[0].style.display = "block";
+				}
 
 				// Move the toolbar to beneath the top of the selection if the toolbar goes out of view;
 				// check the position 
