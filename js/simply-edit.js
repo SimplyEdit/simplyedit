@@ -65,6 +65,8 @@
 
 				if (target == document) {
 					editor.settings.databind.parentKey = '/';
+				} else {
+					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
 				}
 
 				for (var i=0; i<dataFields.length; i++) {
