@@ -824,3 +824,134 @@ QUnit.module("databinding");
 			start();
 		}, 5);
 	});
+
+	QUnit.test("databinding in 2nd degree list", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		assert.ok(document.querySelector("#testContent ul").dataBinding === editor.currentData['/']._bindings_.menu);
+		assert.ok(document.querySelector("#testContent li").dataBinding === editor.currentData['/'].menu[0]._bindings_.items);
+		assert.ok(document.querySelector("#testContent li > span").dataBinding === editor.currentData['/'].menu[0].items[0]._bindings_.item);
+
+		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+	});
+
+	QUnit.test("databinding in 2nd degree list, reorder 2-depth items", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.data.apply(data, document);
+		// editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		// reorder the 2-depth list items;
+		field.querySelector("li").appendChild(field.querySelector("li > span"));
+		field.querySelector("li+li").appendChild(field.querySelector("li + li > span"));
+
+		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+	});
+
+
+	QUnit.test("databinding in 2nd degree list, reorder 1-depth items", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		// editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		// reorder the 1-depth list items;
+		field.appendChild(field.querySelector("li"));
+		assert.equal(document.querySelector("#testContent li").dataBinding.parentKey, "/menu/0/");
+		assert.equal(document.querySelector("#testContent li + li").dataBinding.parentKey, "/menu/1/");
+	});
+
+
+	QUnit.test("databinding in 2nd degree list, reorder 1-depth with children", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		// editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		// reorder the 1-depth list items;
+		field.appendChild(field.querySelector("li"));
+		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+	});
