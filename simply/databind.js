@@ -106,14 +106,23 @@ dataBinding = function(config) {
 						}
 
 						// Renumber parent indexes;
+						var changes = [];
 						for (var subkey in this) {
 							for (var bindingKey in this[subkey]._bindings_) {
 								var index = this[subkey]._bindings_[bindingKey].parentKey.split('/');
+								var oldKey = this[subkey]._bindings_[bindingKey].parentKey;
 								index.pop();
 								index.pop();
 								index.push(subkey);
 								this[subkey]._bindings_[bindingKey].parentKey = index.join("/") + '/';
+								var newKey = this[subkey]._bindings_[bindingKey].parentKey;
+								changes.push({oldKey : oldKey, newKey : newKey});
 							}
+						}
+
+						for (var i=0; i<binding.elements.length; i++) {
+							// send the set of changes to the event listeners, so child nodes can renumber themselves too.
+							fireEvent(document.body, "renumber", changes);
 						}
 					},
 					get : function() {
@@ -172,6 +181,7 @@ dataBinding = function(config) {
 		}
 		return false;
 	};
+
 	var setElements = function() {
 		if (binding.elementTimer) {
 			window.clearTimeout(binding.elementTimer);
@@ -296,6 +306,20 @@ dataBinding = function(config) {
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
+
+		document.body.addEventListener("databind:renumber", function(evt) {
+			var oldParent, newParent;
+			for (var i=0; i<evt.detail.length; i++) {
+				if (binding.parentKey.indexOf(evt.detail[i].oldKey) === 0) {
+					oldParent = evt.detail[i].oldKey;
+					newParent =  evt.detail[i].newKey;
+				}
+			}
+
+			if (oldParent) {
+				binding.parentKey = newParent +  binding.parentKey.substring(oldParent.length, binding.parentKey.length);
+			}
+		});
 	};
 
 	this.rebind = function(element, config) {
@@ -455,8 +479,6 @@ dataBinding.prototype.handleEvent = function (event) {
 		items = this.querySelectorAll(":scope > [data-simply-list-item]");
 		for (i=0; i<items.length; i++) {
 			if (items[i] == event.target) {
-				// console.log("removing node " + i);
-				// console.log(editor.list.get(event.target));
 				data = target.dataBinding.get();
 				items[i].simplyData = data.splice(i, 1)[0];
 				return;
@@ -469,10 +491,7 @@ dataBinding.prototype.handleEvent = function (event) {
 		items = this.querySelectorAll(":scope > [data-simply-list-item]");
 		for (i=0; i<items.length; i++) {
 			if (items[i] == event.target) {
-				// console.log("inserted node " + i);
 				if (items[i].simplyData) {
-					// console.log("have saved data");
-
 					data = target.dataBinding.get();
 					data.splice(i, 0, items[i].simplyData);
 					return;
