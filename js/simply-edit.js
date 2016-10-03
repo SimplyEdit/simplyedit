@@ -76,7 +76,7 @@
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
-					if (!data[dataPath][dataName]) {
+					if (!data[dataPath][dataName] && !Object.keys(data[dataPath]).length) {
 						data[dataPath][dataName] = editor.field.get(dataFields[i]);
 					}
 					if (data[dataPath]) {
@@ -397,7 +397,7 @@
 				}
 
 				if (this.dataBinding) {
-					editor.bindingParents = [this.dataBinding.parentKey.replace(/\/$/,'')];
+					editor.bindingParents = this.dataBinding.parentKey.replace(/\/$/,'').split("/");
 				}
 
 				if (this.getAttribute('data-simply-data')) {
@@ -685,9 +685,14 @@
 						for (i=0; i<stashedFields.length; i++) {
 							stashedFields[i].removeAttribute("data-simply-stashed");
 						}
+
 						newData = editor.list.get(clone.firstElementChild);
-						editor.data.apply(newData, clone.firstElementChild);
 						dataPath = editor.data.getDataPath(clone.firstElementChild);
+						if (clone.firstElementChild.dataBinding) {
+							newData[dataPath] = clone.firstElementChild.dataBinding.get();
+						} else {
+							editor.data.apply(newData, clone.firstElementChild);
+						}
 						clone.firstElementChild.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 						
 						list.appendChild(clone);
@@ -721,8 +726,12 @@
 								stashedFields[i].removeAttribute("data-simply-stashed");
 							}
 							newData = editor.list.get(clone);
-							editor.data.apply(newData, clone);
 							dataPath = editor.data.getDataPath(clone);
+							if (clone.dataBinding) {
+								newData[dataPath] = clone.dataBinding.get();
+							} else {
+								editor.data.apply(newData, clone);
+							}
 							clone.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 
 							list.appendChild(clone);
