@@ -143,7 +143,9 @@
 				},
 				resolve : function(key, value, oldValue) {
 					if (!editor.toolbar.updating && (value != oldValue)) {
-						muze.event.fire(this.elements[0], "click");
+						if (this.elements[0]) {
+							muze.event.fire(this.elements[0], "click");
+						}
 					}
 				},
 				key : key
@@ -177,7 +179,9 @@
 				},
 				resolve : function(key, value, oldValue) {
 					if (!editor.toolbar.updating && (value != oldValue)) {
-						muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
+						if (this.elements[0]) {
+							muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
+						}
 					}
 				},
 				key : key
