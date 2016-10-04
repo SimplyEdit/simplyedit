@@ -64,7 +64,9 @@
 				var dataFields = target.querySelectorAll("[data-simply-field]");
 
 				if (target == document) {
-					editor.settings.databind.parentKey = '';
+					editor.settings.databind.parentKey = '/';
+				} else {
+					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
 				}
 
 				for (var i=0; i<dataFields.length; i++) {
@@ -74,60 +76,49 @@
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
-					if (!data[dataPath][dataName]) {
-						data[dataPath][dataName] = ''; // editor.field.get(dataFields[i]);
+					if (!data[dataPath][dataName] && !Object.keys(data[dataPath]).length) {
+						data[dataPath][dataName] = editor.field.get(dataFields[i]);
 					}
 					if (data[dataPath]) {
-						var fieldDataBinding;
-						if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
-							fieldDataBinding = data[dataPath]._bindings_[dataName];
+						if (dataFields[i].dataBinding) {
+							dataFields[i].dataBinding.set(data[dataPath][dataName]);
+							dataFields[i].dataBinding.resolve(true);
 						} else {
-							var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-							bindingConfig.data   = data[dataPath];
-							bindingConfig.key    = dataName;
-							bindingConfig.getter = editor.field.dataBindingGetter;
-							bindingConfig.setter = editor.field.dataBindingSetter;
+							var fieldDataBinding;
+							if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
+								fieldDataBinding = data[dataPath]._bindings_[dataName];
+							} else {
+								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								bindingConfig.data   = data[dataPath];
+								bindingConfig.key    = dataName;
+								bindingConfig.getter = editor.field.dataBindingGetter;
+								bindingConfig.setter = editor.field.dataBindingSetter;
+								bindingConfig.mode   = "field";
+								bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
 
-							fieldDataBinding = new dataBinding(bindingConfig);
+								fieldDataBinding = new dataBinding(bindingConfig);
+							}
+							fieldDataBinding.bind(dataFields[i]);
 						}
-						fieldDataBinding.bind(dataFields[i]);
-						dataFields[i].simplyData = data[dataPath][dataName];
 
 						// editor.field.set(dataFields[i], data[dataPath][dataName]);
 					}
 				}
 
 				editor.list.init(data, target);
-
-				if ("removeEventListener" in document) {
-					document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-					window.removeEventListener("load", preventDOMContentLoaded, true);
-				}
-
-
-				
-				editor.fireEvent("DOMContentLoaded", document);
-				window.setTimeout(function() {
-					editor.fireEvent("load", window);
-				}, 100);
-
-				if (typeof jQuery !== "undefined") {
-					if (typeof jQuery.holdReady === "function") {
-						jQuery.holdReady(false);
-					}
-				}
+				editor.fireEvent("simply-data-applied", target);
 			},
 			get : function(target) {
 				if (target == document && editor.currentData) {
 					return editor.currentData;
-				} else if (target.simplyData) {
-					return target.simplyData;
+				} else if (target.dataBinding) {
+					return target.dataBinding.get();
 				} else {
 					var stashedFields = target.querySelectorAll("[data-simply-stashed]");
 					for (i=0; i<stashedFields.length; i++) {
 						stashedFields[i].removeAttribute("data-simply-stashed");
 					}
-					if (target.nodeType == 1) {
+					if (target.nodeType == document.ELEMENT_NODE) {
 						target.removeAttribute("data-simply-stashed");
 					}
 
@@ -194,6 +185,7 @@
 					editor.currentData = JSON.parse(data);
 					editor.data.apply(editor.currentData, document);
 					editor.pageData = editor.currentData[document.location.pathname];
+					editor.fireEvent("simply-content-loaded", document);
 
 					var checkEdit = function() {
 						if (document.location.hash == "#simply-edit" && !document.body.getAttribute("data-simply-edit")) {
@@ -303,7 +295,7 @@
 					field.setAttribute("data-simply-stashed", 1);
 				};
 
-				if (target.nodeType == 1 && target.getAttribute("data-simply-list")) {
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
 					addListData(target);
 				}
 
@@ -316,10 +308,27 @@
 				for (i=0; i<dataFields.length; i++) {
 					addData(dataFields[i]);
 				}
-				if (target.nodeType == 1 && target.getAttribute("data-simply-field")) {
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
 					addData(target);
 				}
 
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list-item")) {
+					if (target.getAttribute("data-simply-template")) {
+						dataPath = editor.data.getDataPath(target);
+						if (!data[dataPath]) {
+							data[dataPath] = {};
+						}
+						data[dataPath]['data-simply-template'] = target.getAttribute("data-simply-template");
+					}
+				}
+
+				// timeout so we do this cleanup after all is done;
+				window.setTimeout(function() {
+					var stashedFields = target.querySelectorAll("[data-simply-stashed]");
+					for (i=0; i<stashedFields.length; i++) {
+						stashedFields[i].removeAttribute("data-simply-stashed");
+					}
+				});
 				return data;
 			},
 			keyDownHandler : function(evt) {
@@ -366,7 +375,6 @@
 				return data[dataPath][dataName];
 			},
 			dataBindingSetter : function(value) {
-				this.simplyData = value;
 				var children = this.querySelectorAll("[data-simply-list-item]");
 				for (var i=0; i<children.length; i++) {
 					if (children[i].parentNode == this) {
@@ -375,7 +383,7 @@
 				}
 
 				if (this.dataBinding) {
-					editor.bindingParents = [this.dataBinding.parentKey];
+					editor.bindingParents = this.dataBinding.parentKey.replace(/\/$/,'').split("/");
 				}
 
 				if (this.getAttribute('data-simply-data')) {
@@ -386,17 +394,16 @@
 				editor.responsiveImages.init(this);
 
 				if (document.body.getAttribute("data-simply-edit")) {
-					editor.editmode.makeEditable(this);
+					var list = this;
+					editor.editmode.makeEditable(list);
 				}
 			},
 			init : function(data, target) {
-				var dataName, dataPath;
-				var dataLists = target.querySelectorAll("[data-simply-list]");
-
-				for (var i=0; i<dataLists.length; i++) {
-					editor.list.parseTemplates(dataLists[i]);
-					dataName = dataLists[i].getAttribute("data-simply-list");
-					dataPath = editor.data.getDataPath(dataLists[i]);
+				var initList = function(data, list) {
+					var dataName, dataPath;
+					editor.list.parseTemplates(list);
+					dataName = list.getAttribute("data-simply-list");
+					dataPath = editor.data.getDataPath(list);
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
@@ -415,40 +422,47 @@
 							bindingConfig.getter = editor.list.dataBindingGetter;
 							bindingConfig.setter = editor.list.dataBindingSetter;
 							bindingConfig.mode   = "list";
-							bindingConfig.attributeFilter = ["data-simply-selectable", "class"];
+							bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex", "data-simply-stashed", "contenteditable", "style", "data-simply-list-item"];
 							listDataBinding = new dataBinding(bindingConfig);
 						}
-						listDataBinding.bind(dataLists[i]);
-						dataLists[i].simplyData = data[dataPath][dataName];
-						// editor.list.set(dataLists[i], data[dataPath][dataName]);
+						listDataBinding.bind(list);
+						// editor.list.set(list, data[dataPath][dataName]);
 					}
 
 					var hasChild = false;
-					for (var j=0; j<dataLists[i].childNodes.length; j++) {
+					for (var j=0; j<list.childNodes.length; j++) {
 						if (
-							dataLists[i].childNodes[j].nodeType == 1 && 
-							dataLists[i].childNodes[j].getAttribute("data-simply-list-item")
+							list.childNodes[j].nodeType == document.ELEMENT_NODE &&
+							list.childNodes[j].getAttribute("data-simply-list-item")
 						) {
 							hasChild = true;
 						}
 					}
 					if (!hasChild) {
-						if ("classList" in dataLists[i]) {
-							dataLists[i].classList.add("simply-empty");
+						if ("classList" in list) {
+							list.classList.add("simply-empty");
 						} else {
-							dataLists[i].className += " simply-empty";
+							list.className += " simply-empty";
 						}
 					}
 
-					if ("addEventListener" in dataLists[i]) {
-						dataLists[i].addEventListener("keydown", editor.list.keyDownHandler);
+					if ("addEventListener" in list) {
+						list.addEventListener("keydown", editor.list.keyDownHandler);
 					}
+				};
+
+				var dataLists = target.querySelectorAll("[data-simply-list]");
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
+					initList(data, target);
+				}
+				for (var i=0; i<dataLists.length; i++) {
+					initList(data, dataLists[i]);
 				}
 			},
 			fixFirstElementChild : function(clone) {
 				if (!("firstElementChild" in clone)) {
 					for (var l=0; l<clone.childNodes.length; l++) {
-						if (clone.childNodes[l].nodeType == 1) {
+						if (clone.childNodes[l].nodeType == document.ELEMENT_NODE) {
 							clone.firstElementChild = clone.childNodes[l];
 						}
 					}
@@ -496,6 +510,7 @@
 				var e,j,k,l;
 				var dataName;
 				var t, counter;
+				var stashedFields, i, newData, dataPath;
 
 				if (!listData) {
 					listData = [];
@@ -504,10 +519,10 @@
 				var initFields = function(clone, useDataBinding) {
 					var handleFields = function(elm) {
 						dataName = elm.getAttribute("data-simply-field");
-						if (!listData[j][dataName]) {
+						if (listData[j][dataName] === null) {
 							listData[j][dataName] = editor.field.get(elm);
 						}
-						if (listData[j][dataName]) {
+						if (listData[j][dataName] !== null) {
 							if (useDataBinding) {
 								var fieldDataBinding;
 								if (listData[j]._bindings_ && listData[j]._bindings_[dataName]) {
@@ -520,10 +535,10 @@
 									bindingConfig.getter = editor.field.dataBindingGetter;
 									bindingConfig.setter = editor.field.dataBindingSetter;
 									bindingConfig.mode   = "field";
+									bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
 									fieldDataBinding = new dataBinding(bindingConfig);
 								}
 								fieldDataBinding.bind(elm);
-								elm.simplyData = listData[j][dataName];
 							} else {
 								editor.field.set(elm, listData[j][dataName]);
 							}
@@ -545,11 +560,10 @@
 								bindingConfig.getter = editor.list.dataBindingGetter;
 								bindingConfig.setter = editor.list.dataBindingSetter;
 								bindingConfig.mode   = "list";
-								bindingConfig.attributeFilter = ["data-simply-selectable", "class"];
+								bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex", "data-simply-stashed", "contenteditable", "style", "data-simply-list-item"];
 								listDataBinding = new dataBinding(bindingConfig);
 							}
 							listDataBinding.bind(elm);
-							elm.simplyData = listData[j][dataName];
 						} else {
 							editor.list.set(elm, listData[j][dataName]);
 						}
@@ -557,7 +571,7 @@
 						var hasChild = false;
 						for (var m=0; m<elm.childNodes.length; m++) {
 							if (
-								elm.childNodes[m].nodeType == 1 &&
+								elm.childNodes[m].nodeType == document.ELEMENT_NODE &&
 								elm.childNodes[m].getAttribute("data-simply-list-item")
 							) {
 								hasChild = true;
@@ -577,7 +591,7 @@
 					for (k=0; k<dataFields.length; k++) {
 						handleFields(dataFields[k]);
 					}
-					if (clone.nodeType == 1 && clone.getAttribute("data-simply-field")) {
+					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
 						handleFields(clone);
 					}
 
@@ -585,10 +599,18 @@
 					for (k=0; k<dataLists.length; k++) {
 						handleLists(dataLists[k]);
 					}
-					if (clone.nodeType == 1 && clone.getAttribute("data-simply-list")) {
+					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
 						handleLists(clone);
 					}
 				};
+
+				// Remove the list from the DOM, do all the stuff and reinsert it, so we only redraw once for all our modifications.
+				var nextNode = list.nextSibling;
+				var listParent = list.parentNode;
+				list.reattach = function() {
+					listParent.insertBefore(list, nextNode);
+				};
+				listParent.removeChild(list);
 
 				editor.bindingParents.push(list.getAttribute("data-simply-list"));
 				for (j=0; j<listData.length; j++) {
@@ -618,7 +640,7 @@
 						var originalTemplates = list.templates[requestedTemplate].content.querySelectorAll("template");
 						var importedTemplates = clone.querySelectorAll("template");
 
-						for (var i=0; i<importedTemplates.length; i++) {
+						for (i=0; i<importedTemplates.length; i++) {
 							importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
 						}
 
@@ -640,11 +662,25 @@
 
 						clone.firstElementChild.setAttribute("data-simply-list-item", true);
 						clone.firstElementChild.setAttribute("data-simply-selectable", true);
-						clone.firstElementChild.simplyData = listData[j];
 
 						if (list.templateIcons[requestedTemplate]) {
 							clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 						}
+						
+						stashedFields = clone.firstElementChild.querySelectorAll("[data-simply-stashed]");
+						for (i=0; i<stashedFields.length; i++) {
+							stashedFields[i].removeAttribute("data-simply-stashed");
+						}
+
+						newData = editor.list.get(clone.firstElementChild);
+						dataPath = editor.data.getDataPath(clone.firstElementChild);
+						if (clone.firstElementChild.dataBinding) {
+							newData[dataPath] = clone.firstElementChild.dataBinding.get();
+						} else {
+							editor.data.apply(newData, clone.firstElementChild);
+						}
+						clone.firstElementChild.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
+						
 						list.appendChild(clone);
 						editor.list.init(listData[j], clone);
 					} else {
@@ -666,11 +702,23 @@
 							}
 							clone.setAttribute("data-simply-list-item", true);
 							clone.setAttribute("data-simply-selectable", true);
-							clone.simplyData = listData[j];
 							
 							if (list.templateIcons[requestedTemplate]) {
 								clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 							}
+
+							stashedFields = clone.querySelectorAll("[data-simply-stashed]");
+							for (i=0; i<stashedFields.length; i++) {
+								stashedFields[i].removeAttribute("data-simply-stashed");
+							}
+							newData = editor.list.get(clone);
+							dataPath = editor.data.getDataPath(clone);
+							if (clone.dataBinding) {
+								newData[dataPath] = clone.dataBinding.get();
+							} else {
+								editor.data.apply(newData, clone);
+							}
+							clone.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 
 							list.appendChild(clone);
 							editor.list.init(listData[j], clone);
@@ -678,15 +726,17 @@
 					}
 
 					editor.bindingParents.pop();
+					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
 				}
 
 				list.setAttribute("data-simply-selectable", true);
 				editor.bindingParents.pop();
+				editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
 
 				var hasChild = false;
 				for (j=0; j<list.childNodes.length; j++) {
 					if (
-						list.childNodes[j].nodeType == 1 && 
+						list.childNodes[j].nodeType == document.ELEMENT_NODE &&
 						list.childNodes[j].getAttribute("data-simply-list-item")
 					) {
 						hasChild = true;
@@ -705,6 +755,7 @@
 						list.className.replace(/ simply-empty/g, '');
 					}
 				}
+				list.reattach();
 			}
 		},
 		field : {
@@ -713,7 +764,6 @@
 			},
 			dataBindingSetter : function(value) {
 				if (JSON.stringify(editor.field.get(this)) != JSON.stringify(value)) {
-					this.simplyData = value;
 					return editor.field.set(this, value);
 				}
 			},
@@ -723,7 +773,6 @@
 						return editor.field.defaultGetter(field, ["src", "class", "alt", "title"]);
 					},
 					set : function(field, data) {
-						data = JSON.parse(JSON.stringify(data));
 						if (typeof data == "string") {
 							data = {"src" : data};
 						}
@@ -766,12 +815,29 @@
 				},
 				"a" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "name"]);
+						var result = editor.field.defaultGetter(field, ["href", "class", "alt", "title", "innerHTML", "name", "rel", "target"]);
+						if (result.rel == "nofollow") {
+							result.nofollow = true;
+						}
+						if (result.target == "_blank") {
+							result.newwindow = true;
+						}
+						delete result.rel;
+						delete result.target;
+						return result;
 					},
 					set : function(field, data) {
 						if (typeof data.name == "string") {
 							data.id = data.name;
 						}
+						if (data.newwindow) {
+							data.target = "_blank";
+						}
+						if (data.nofollow) {
+							data.rel = "nofollow";
+						}
+						delete data.newwindow;
+						delete data.nofollow;
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
@@ -792,6 +858,29 @@
 					makeEditable : function(field) {
 						field.contentEditable = true;
 					}
+				},
+				"input[type=text]" : {
+					get : function(field) {
+						return field.value;
+					},
+					set : function(field, data) {
+						field.value = data;
+					}
+				},
+				"input[type=checkbox]" : {
+					get : function(field) {
+						if (field.checked) {
+							return 1;
+						}
+						return 0;
+					},
+					set : function(field, data) {
+						if (data) {
+							field.checked = true;
+						} else {
+							field.checked = false;
+						}
+					}
 				}
 			},
 			initHopeEditor : function(field) {
@@ -801,6 +890,10 @@
 					}, 300);
 					return;
 				}
+				if (typeof field.hopeEditor !== "undefined") {
+					return;
+				}
+
 				field.hopeContent = document.createElement("textarea");
 				field.hopeMarkup = document.createElement("textarea");
 				field.hopeRenderedSource = document.createElement("DIV");
@@ -809,7 +902,6 @@
 				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
 					field.hopeEditor.needsUpdate = true;
 				});
-
 				field.addEventListener("slip:beforereorder", function(evt) {
 					var rect = this.getBoundingClientRect();
 					if (
@@ -827,6 +919,9 @@
 				}, false);
 			},
 			initHopeStub : function(field) {
+				if (typeof field.hopeEditor !== "undefined") {
+					return;
+				}
 				field.hopeEditor = {
 					field : field,
 					parseHTML : function(){},
@@ -861,9 +956,9 @@
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
 					if (attr == "innerHTML") {
-						result.innerHTML = field.innerHTML;
+						result.innerHTML = editor.field.getInnerHTML(field);
 					} else {
-						if (field.getAttribute(attr)) {
+						if (field.getAttribute(attr) !== null) {
 							result[attr] = field.getAttribute(attr);
 						}
 					}
@@ -882,9 +977,15 @@
 					if (attr == "innerHTML") {
 						field.innerHTML = data[attr];
 						editor.responsiveImages.init(field);
-
+						if (field.hopeEditor) {
+							field.hopeEditor.needsUpdate = true;
+						}
 					} else {
-						field.setAttribute(attr, data[attr]);
+						if (data[attr] !== null) {
+							field.setAttribute(attr, data[attr]);
+						} else {
+							field.removeAttribute(attr);
+						}
 					}
 				}
 			},
@@ -896,6 +997,12 @@
 				};
 			},
 			set : function(field, data) {
+				if (typeof data === "undefined") {
+					return;
+				}
+				window.setTimeout(function() {
+					editor.fireEvent("selectionchange", document); // fire this after we're done. Using settimeout so it will run afterwards.
+				}, 0);
 				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
@@ -908,6 +1015,26 @@
 					return setter(field, data);
 				}
 				field.innerHTML = data;
+				editor.responsiveImages.init(field);
+				if (field.hopeEditor) {
+					field.hopeEditor.needsUpdate = true;
+				}
+			},
+			getInnerHTML : function(field) {
+				// misc cleanups to revert any changes made by simply edit - this should return a pristine version of the content;
+				if (!field.querySelectorAll("img[data-simply-src]")) {
+					return field.innerHTML;
+				} else {
+					// There are responsive images in the field; clean them up to return to a pristine state and return that;
+					var fieldClone = field.cloneNode(true);
+					var responsiveImages = fieldClone.querySelectorAll("img[data-simply-src]");
+					for (var i=0; i<responsiveImages.length; i++) {
+						responsiveImages[i].removeAttribute("src");
+						responsiveImages[i].removeAttribute("sizes");
+						responsiveImages[i].removeAttribute("srcset");
+					}
+					return fieldClone.innerHTML;
+				}
 			},
 			get : function(field) {
 				var getter;
@@ -922,9 +1049,15 @@
 				if (getter) {
 					return getter(field);
 				}
-				return field.innerHTML;
+				return editor.field.getInnerHTML(field);
 			},
 			makeEditable : function(field) {
+				if (field.dataBinding) {
+					field.dataBinding.pauseListeners(field);
+					window.setTimeout(function() {
+						field.dataBinding.resumeListeners(field);
+					});
+				}
 				var editable;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
@@ -1002,7 +1135,8 @@
 			editor.storage = storage.init(config.endpoint);
 
 			// Add databinding and load data afterwards
-			editor.loadScript(editor.baseURLClean + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
+			// editor.loadScript(editor.baseURLClean + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
+			editor.loadScript(editor.baseURLClean + "simply/databind.js" + "?v=" + editor.version, editor.data.load);
 		},
 		loadScript : function(src, callback) {
 			if (!document.head.querySelector('script[src="'+src+'"]')) {
@@ -1079,6 +1213,8 @@
 						}
 						if (toolbarList.length) {
 							editor.editmode.loadToolbarList(toolbarList);
+						} else {
+							editor.fireEvent("simply-toolbars-loaded", document);
 						}
 					}
 				};
@@ -1155,7 +1291,7 @@
 				document.body.setAttribute("data-simply-edit", true);
 
 				document.body.onbeforeunload = handleBeforeUnload; // Must do it like this, not with addEventListener;
-				
+				editor.fireEvent("simply-editmode", document);	
 				loadToolbars();
 
 			},
@@ -1384,23 +1520,19 @@
 
 				// FIXME: Replacing the element causes a problem for databinding - need to rebind this.
 				var clone = this.cloneNode();
-				this.parentNode.insertBefore(clone, this);
+				this.parentNode.insertBefore(clone, this.nextSibling); // insert the clone after! the current image to keep the selection;
+
 				if (this.dataBinding) {
 					this.dataBinding.rebind(clone);
 				}
 				this.parentNode.removeChild(this);
+				editor.fireEvent("selectionchange", document);
 			},
 			initImage : function(imgEl) {
 				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
 					window.setTimeout(function() {
 						editor.responsiveImages.initImage(imgEl);
 					}, 50);
-					return;
-				}
-
-				if (!imgEl.responsiveImageInitDone) {
-					imgEl.responsiveImageInitDone = true;
-				} else {
 					return;
 				}
 
@@ -1421,6 +1553,9 @@
 					}
 				}
 
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.pauseListeners(imgEl);
+				}
 				imgEl.removeAttribute("srcset");
 				imgEl.removeAttribute("sizes");
 				imgEl.removeAttribute("src");
@@ -1434,6 +1569,10 @@
 				}
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.resumeListeners(imgEl);
+				}
+				editor.fireEvent("selectionchange", document);
 			},
 			getSizeRatio : function(imgEl) {
 				var imageWidth = imgEl.width;
@@ -2046,7 +2185,7 @@
 						});
 					} else {
 						result.folders.push({
-							url : url.replace(/\/[^\/]+$/, '/'),
+							url : editor.storage.endpoint,
 							name : '..'
 						});
 					}
@@ -2183,6 +2322,9 @@
 		if (!filter.context) {
 			filter.context = name;
 		}
+		if (typeof editor.contextFilters[name] !== "undefined") {
+			console.log("Warning: Context filter " + name + " is already defined.");
+		}
 		editor.contextFilters[name] = filter;
 	};
 	editor.addAction = function(name, action) {
@@ -2204,6 +2346,24 @@
 			jQuery.holdReady(true);
 		}
 	}
+
+	document.addEventListener("simply-content-loaded", function(evt) {
+		if ("removeEventListener" in document) {
+			document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
+			window.removeEventListener("load", preventDOMContentLoaded, true);
+		}
+			
+		editor.fireEvent("DOMContentLoaded", document);
+		window.setTimeout(function() {
+			editor.fireEvent("load", window);
+		}, 100);
+
+		if (typeof jQuery !== "undefined") {
+			if (typeof jQuery.holdReady === "function") {
+				jQuery.holdReady(false);
+			}
+		}
+	});
 
 	// Add fake window.console for IE8/9
 	if (!window.console) console = {log: function() {}};
