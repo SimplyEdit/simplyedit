@@ -106,22 +106,7 @@
 				}
 
 				editor.list.init(data, target);
-
-				if ("removeEventListener" in document) {
-					document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-					window.removeEventListener("load", preventDOMContentLoaded, true);
-				}
-				
-				editor.fireEvent("DOMContentLoaded", document);
-				window.setTimeout(function() {
-					editor.fireEvent("load", window);
-				}, 100);
-
-				if (typeof jQuery !== "undefined") {
-					if (typeof jQuery.holdReady === "function") {
-						jQuery.holdReady(false);
-					}
-				}
+				editor.fireEvent("simply-data-applied", target);
 			},
 			get : function(target) {
 				if (target == document && editor.currentData) {
@@ -200,6 +185,7 @@
 					editor.currentData = JSON.parse(data);
 					editor.data.apply(editor.currentData, document);
 					editor.pageData = editor.currentData[document.location.pathname];
+					editor.fireEvent("simply-content-loaded", document);
 
 					var checkEdit = function() {
 						if (document.location.hash == "#simply-edit" && !document.body.getAttribute("data-simply-edit")) {
@@ -1227,6 +1213,8 @@
 						}
 						if (toolbarList.length) {
 							editor.editmode.loadToolbarList(toolbarList);
+						} else {
+							editor.fireEvent("simply-toolbars-loaded", document);
 						}
 					}
 				};
@@ -1303,7 +1291,7 @@
 				document.body.setAttribute("data-simply-edit", true);
 
 				document.body.onbeforeunload = handleBeforeUnload; // Must do it like this, not with addEventListener;
-				
+				editor.fireEvent("simply-editmode", document);	
 				loadToolbars();
 
 			},
@@ -2358,6 +2346,24 @@
 			jQuery.holdReady(true);
 		}
 	}
+
+	document.addEventListener("simply-content-loaded", function(evt) {
+		if ("removeEventListener" in document) {
+			document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
+			window.removeEventListener("load", preventDOMContentLoaded, true);
+		}
+			
+		editor.fireEvent("DOMContentLoaded", document);
+		window.setTimeout(function() {
+			editor.fireEvent("load", window);
+		}, 100);
+
+		if (typeof jQuery !== "undefined") {
+			if (typeof jQuery.holdReady === "function") {
+				jQuery.holdReady(false);
+			}
+		}
+	});
 
 	// Add fake window.console for IE8/9
 	if (!window.console) console = {log: function() {}};
