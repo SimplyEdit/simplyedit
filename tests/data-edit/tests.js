@@ -36,6 +36,7 @@ function setCaretPosition(elem, start, length) {
 		elem.focus();
 	}
 	var newRange = sel.getRangeAt(0);
+	editor.context.skipUpdate = false;
 	editor.context.update();
 }
 function selectImage(img) {
@@ -48,6 +49,7 @@ function selectImage(img) {
 	if (focus in img) {
 		img.focus();
 	}
+	editor.context.skipUpdate = false;
 	editor.context.update();
 }
 
@@ -61,6 +63,7 @@ function setSelectionEnd(elem, offset) {
 	if (focus in elem) {
 		elem.focus();
 	}
+	editor.context.skipUpdate = false;
 	editor.context.update();
 }
 
