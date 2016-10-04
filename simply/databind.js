@@ -83,6 +83,9 @@ dataBinding = function(config) {
 	};
 	var setShadowValue = function(value) {
 		shadowValue = value;
+		if (typeof oldValue !== "undefined" && !isEqual(oldValue, shadowValue)) {
+			binding.config.resolve.call(binding, key, dereference(shadowValue), dereference(oldValue));
+		}
 		//if (typeof shadowValue === "object") {
 		//	shadowValue = dereference(shadowValue);
 		//}
@@ -199,7 +202,6 @@ dataBinding = function(config) {
 		}
 		if (typeof binding.config.resolve === "function") {
 			if (!isEqual(oldValue, shadowValue)) {
-				binding.config.resolve.call(binding, key, dereference(shadowValue), dereference(oldValue));
 				oldValue = dereference(shadowValue);
 			}
 		}
