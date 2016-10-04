@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Linked fields</title>
+	<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+</head>
+<body>
+	<h1 data-simply-field="title">Simply edit, linked fields.</h1>
+	<p data-simply-field="title">This is the twin.</p>
+
+	<div data-simply-list="list">
+		<template>
+			<div><h1 data-simply-field="title">Simply edit, linked list item.</h1></div>
+		</template>
+	</div>
+	<ul data-simply-list="list" data-simply-sortable=true>
+		<template>
+			<li>
+				<p data-simply-field="title">This is the twin.</p>
+			</li>
+		</template>
+	</ul>
+	<ul data-simply-list="outerlist" data-simply-sortable=true>
+		<template>
+			<li>
+				Inner List
+				<ul data-simply-list="innerlist">
+					<template>
+						<li><p data-simply-field="field">This is the twin.</p></li>
+					</template>
+				</ul>
+			</li>
+		</template>
+	</ul>
+	<p data-simply-field="time">Time</p>
+	<script>
+		myCustomSettings = {
+			databind : {
+				init : function() {
+					var binding = this;
+					// Create a connection to your Firebase database
+					binding.firebase = new Firebase("https://simply-databind.firebaseio.com/" + binding.parentKey + binding.key);
+
+					binding.firebase.changeStack = [];
+					binding.firebase.on("value", function(remoteData) {
+						// console.log("value received " + binding.firebase.toString());
+						var val = remoteData.val();
+						// console.log(JSON.stringify(val));
+
+						if (binding.parentKey != '/') {
+							return; // the uppermost parent will also be triggered, and it will handle everything.
+						}
+
+						var seen = false;
+						for (var i=0; i<binding.firebase.changeStack.length; i++) {
+							if (JSON.stringify(binding.firebase.changeStack[i]) == JSON.stringify(val)) {
+								seen = true;
+							}
+						}
+						
+						if (!seen) {
+							// console.log('XXX - setting ' + binding.key);
+							if (editor.plugins.undoRedo) {
+								editor.plugins.undoRedo.undoing = true;
+							}
+							binding.set(val);
+							if (editor.plugins.undoRedo) {
+								editor.plugins.undoRedo.undoing = false;
+							}
+							binding.firebase.changeStack = [];
+						} else {
+							// console.log('seen');
+						}
+					});
+				},
+				resolve : function(key, value, oldValue) {
+					// Save data to firebase;
+					var binding = this;
+
+					binding.firebase.changeStack.push(value);
+//					binding.firebase.set(value);
+
+					binding.firebase.transaction(function(current_value) {
+						if (JSON.stringify(oldValue) == JSON.stringify(current_value)) {
+							return value;
+						}
+						if (current_value === null) {
+							return value;
+						}
+						return;
+					});
+					//console.log("setting value in " + this.firebase.toString());
+					//console.log(value);
+				}
+			}
+		};
+	</script>
+	<script src="/simply-edit/js/simply-edit.js"
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+		data-simply-settings="myCustomSettings"
+	></script>
+	<script>
+/*		setInterval(function() {
+			if (editor.currentData) {
+				var d = new Date();
+
+				var pad = function(num) {
+					if (parseInt(num) < 10) {
+						return "0" + num;
+					}
+					return num;
+				};
+
+				editor.currentData[document.location.pathname].time = "The time is now " + 
+					pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+			}
+		}, 10000);
+*/
+	</script>
+</body>
+</html>

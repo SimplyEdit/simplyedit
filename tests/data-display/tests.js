@@ -1,9 +1,10 @@
+QUnit.config.reorder = false;
+
 QUnit.test( "hello test", function( assert ) {
   assert.ok( 1 == "1", "Passed!" );
 });
 
 QUnit.module("editor field set");
-
 	QUnit.test("field set image", function(assert) {
 		var field = document.createElement("IMG");
 		var data = "http://www.muze.nl/logo.gif";
@@ -334,10 +335,11 @@ QUnit.module("editor data get");
 				]
 			}
 		};
+		var expected = JSON.stringify(data);
 		editor.data.apply(data, target);
 		var result = editor.data.get(target);
 
-		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
+		assert.equal(JSON.stringify(result), expected, "source and result data are the same");
 	});
 
 	QUnit.test("get 2nd degree list", function(assert) {
@@ -357,10 +359,11 @@ QUnit.module("editor data get");
 				]
 			}
 		};
+		var expected = JSON.stringify(data);
 		editor.data.apply(data, target);
 
 		var result = editor.data.get(target);
-		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
+		assert.equal(JSON.stringify(result), expected, "source and result data are the same");
 	});
 
 	QUnit.test("get 2nd degree list deeper structure", function(assert) {
@@ -380,12 +383,13 @@ QUnit.module("editor data get");
 				]
 			}
 		};
+		var expected = JSON.stringify(data);
 		editor.data.apply(data, target);
 
 		var result = editor.data.get(target);
-		assert.equal(JSON.stringify(result), JSON.stringify(data), "source and result data are the same");
+		assert.equal(JSON.stringify(result), expected, "source and result data are the same");
 	});
-
+/*
 QUnit.module("data merge");
 	QUnit.test("simply data merge", function(assert) {
 		var data1 = {
@@ -505,12 +509,13 @@ QUnit.module("data merge");
 		assert.ok(result['/'], "base set found");
 		assert.equal(result['/'].menu.length, 2, "test menu has 2 items");
 	});
+*/
 
 QUnit.module("editor list fixFirstElementChild");
 	QUnit.test("get title", function(assert) {
 		var target = document.querySelector("#testContent");
 		target.innerHTML = "Test 123 <div data-simply-field='title'>Test title</div>";
-		editor.data.list.fixFirstElementChild(target);
+		editor.list.fixFirstElementChild(target);
 		
 		assert.equal(target.firstElementChild.nodeType, 1, "First child is an element");
 		assert.equal(target.firstElementChild.innerHTML, "Test title", "First child innerHTML found");
@@ -564,4 +569,389 @@ QUnit.module("custom field types");
 		assert.equal(target.querySelector("google-map").getAttribute("latitude"), 52);
 		assert.equal(target.querySelector("google-map").getAttribute("longitude"), 6);
 		assert.equal(target.querySelector("google-map").getAttribute("zoom"), 10);
+	});
+
+QUnit.module("databinding");
+	QUnit.test("databinding a div", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-field", "hello");
+		field.innerHTML = "Hello world";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+		
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+		
+		assert.equal(editor.pageData._bindings_.hello.elements[0], field);
+	});
+
+	QUnit.test("databinding set div data", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-field", "hello");
+		field.innerHTML = "Hello world";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+		
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		assert.equal(field.innerHTML, "Hello world", "initial content remains in div");
+		field.dataBinding.resolve(true);
+		assert.equal(editor.pageData.hello, "Hello world", "editor pagedata gets set correctly");
+	});
+
+	QUnit.test("databinding change div data from DOM", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-field", "hello");
+		field.innerHTML = "Hello world";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		field.innerHTML = "Hi world!";
+		stop();
+		window.setTimeout(function() {
+			field.dataBinding.resolve(true);
+			assert.equal(field.innerHTML, "Hi world!", "new content remains in div");
+			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+			start();
+		}, 1);
+	});
+
+	QUnit.test("databinding change div data from data", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-field", "hello");
+		field.innerHTML = "Hello world";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello = "Hey world!";
+		assert.equal(field.innerHTML, "Hey world!", "data is set in div");
+		assert.equal(editor.pageData.hello, "Hey world!", "new content is found in pagedata");
+	});
+
+	QUnit.test("databinding list", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		assert.equal(JSON.stringify(editor.pageData.hello), "[]", "list starts out empty");
+	});
+
+	QUnit.test("databinding list push item", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		field.dataBinding.resolve(true);
+		assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world!"}]), "added item is found in data");
+		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
+	});
+
+	QUnit.test("databinding list push item, then modify in data", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		editor.pageData.hello[0].item = "Hey world!";
+		field.dataBinding.resolve(true);
+		assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hey world!"}]), "modified item is modified in data");
+		assert.equal(field.querySelector("div").innerHTML, "Hey world!", "modified item is modified in DOM");
+	});
+
+	QUnit.test("databinding list push item, then modify in DOM", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		field.dataBinding.resolve(true);
+
+		assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world!"}]), "added item is found in data");
+		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
+
+		field.querySelector("DIV").innerHTML = "Way out there";
+		field.querySelector("DIV").dataBinding.resolve(true);
+		stop();
+		window.setTimeout(function() {
+			field.querySelector("DIV").dataBinding.resolve(true);
+			assert.equal(editor.pageData.hello[0].item, "Way out there", "setting innerHTML does it");
+			assert.equal(field.querySelector("div").innerHTML, "Way out there", "modified item is modified in DOM");
+			start();
+		}, 150);
+	});
+
+	QUnit.test("databinding list push item, clone and append it to the list", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		field.dataBinding.resolve(true);
+
+		assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world!"}]), "added item is found in data");
+		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
+
+		var extraNode = field.querySelector("li").cloneNode(true);
+		field.appendChild(extraNode);
+
+		stop();
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world!"},{item:"Hi world!"}]), "cloned item is found in data");
+			start();
+		}, 300);
+	});
+
+	QUnit.test("databinding change div data from DOM", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-field", "hello");
+		field.innerHTML = "Hello world";
+		var field2 = field.cloneNode(true);
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+		target.appendChild(field2);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		field.innerHTML = "Hi world!";
+		stop();
+		window.setTimeout(function() {
+			field.dataBinding.resolve(true);
+
+			assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
+			assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
+			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+			start();
+		}, 1);
+	});
+
+	QUnit.test("databinding list push 2 items", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		editor.pageData.hello.push({item : "Hi world 2!"});
+		field.dataBinding.resolve(true);
+
+		assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world!"}, {item:"Hi world 2!"}]), "added item is found in data");
+		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
+		assert.equal(field.querySelector("li + li div").innerHTML, "Hi world 2!", "added item is found in DOM");
+	});
+
+	QUnit.test("databinding push 2 items, reorder items in dom", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		editor.pageData.hello.push({item : "Hi world!"});
+		editor.pageData.hello.push({item : "Hi world 2!"});
+		field.dataBinding.resolve(true);
+		field.appendChild(field.querySelector("li"));
+		stop();
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world 2!"}, {item:"Hi world!"}]), "added item is found in data");
+			assert.equal(field.querySelector("div").innerHTML, "Hi world 2!", "added item is found in DOM");
+			assert.equal(field.querySelector("li + li div").innerHTML, "Hi world!", "added item is found in DOM");
+			start();
+		}, 5);
+	});
+
+	QUnit.test("databinding in 2nd degree list", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		assert.ok(document.querySelector("#testContent ul").dataBinding === editor.currentData['/']._bindings_.menu);
+		assert.ok(document.querySelector("#testContent li").dataBinding === editor.currentData['/'].menu[0]._bindings_.items);
+		assert.ok(document.querySelector("#testContent li > span").dataBinding === editor.currentData['/'].menu[0].items[0]._bindings_.item);
+
+		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+	});
+
+	QUnit.test("databinding in 2nd degree list, reorder 2-depth items", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.data.apply(data, document);
+		// editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		// reorder the 2-depth list items;
+		field.querySelector("li").appendChild(field.querySelector("li > span"));
+		field.querySelector("li+li").appendChild(field.querySelector("li + li > span"));
+
+		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+	});
+
+
+	QUnit.test("databinding in 2nd degree list, reorder 1-depth items", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		// editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		// reorder the 1-depth list items;
+		field.appendChild(field.querySelector("li"));
+		assert.equal(document.querySelector("#testContent li").dataBinding.parentKey, "/menu/0/");
+		assert.equal(document.querySelector("#testContent li + li").dataBinding.parentKey, "/menu/1/");
+	});
+
+
+	QUnit.test("databinding in 2nd degree list, reorder 1-depth with children", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<ul data-simply-list="menu" data-simply-path="/"><template><li data-simply-list="items"><template><span data-simply-field="item">Menu item</span></template></li></template></ul>';
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		var field = target.querySelector("ul");
+
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		// editor.pageData = editor.currentData[document.location.pathname];
+		field.dataBinding.resolve(true);
+
+		// reorder the 1-depth list items;
+		field.appendChild(field.querySelector("li"));
+		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
 	});

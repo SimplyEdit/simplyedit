@@ -99,6 +99,96 @@
 				}, 50);
 			}
 		},
+		bindInput : function(data, key, elm) {
+			if (!elm) {
+				console.log("Warning: element for binding does not exist");
+				return;
+			}
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					this.value = value;
+				},
+				getter : function() {
+					return this.value;
+				},
+				resolve : function() {
+					if (!editor.toolbar.updating) {
+						if (this.elements[0]) {
+							muze.event.fire(this.elements[0], "change");
+						}
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		},
+		bindButton : function(data, key, elm) {
+			if (!elm) {
+				console.log("Warning: element for binding does not exist");
+				return;
+			}
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					if (value) {
+						this.classList.add("simply-selected");
+					} else {
+						this.classList.remove("simply-selected");
+					}
+				},
+				getter : function() {
+					return this.classList.contains("simply-selected");
+				},
+				resolve : function(key, value, oldValue) {
+					if (!editor.toolbar.updating && (value != oldValue)) {
+						if (this.elements[0]) {
+							muze.event.fire(this.elements[0], "click");
+						}
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		},
+		bindButtonGroup : function(data, key, elm) {
+			if (!elm) {
+				console.log("Warning: element for binding does not exist");
+				return;
+			}
+			var bindingConfig = {
+				data : data,
+				setter : function(value) {
+					var values = this.querySelectorAll("button");
+					for (var i=0; i<values.length; i++) {
+						values[i].classList.remove("simply-selected");
+						if (values[i].getAttribute("data-value") == value) {
+							values[i].classList.add("simply-selected");
+						}
+					}
+				},
+				getter : function() {
+					var value = this.querySelector("button.simply-selected");
+					if (value) {
+						return value.getAttribute("data-value");
+					} else {
+						return '';
+					}
+				},
+				resolve : function(key, value, oldValue) {
+					if (!editor.toolbar.updating && (value != oldValue)) {
+						if (this.elements[0]) {
+							muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
+						}
+					}
+				},
+				key : key
+			};
+			var binding = new dataBinding(bindingConfig);
+			binding.bind(elm);
+		},
 		init : function(toolbar) {
 			toolbar.addEventListener("click", function(evt) {
 				var el = evt.target;
@@ -107,6 +197,9 @@
 				}
 
 				if ( el.tagName == 'BUTTON' || el.classList.contains("simply-button")) {
+					if (el.getAttribute('disabled')) {
+						return;
+					}
 					switch(el.getAttribute("data-simply-action")) {
 						case null:
 						break;
@@ -348,6 +441,9 @@
 			if ( !target ) {
 				target = el.parentNode;
 			}
+			if (!target) {
+				return;
+			}
 			while (el.firstChild) {
 				target.insertBefore(el.firstChild, el);
 			}
@@ -372,6 +468,7 @@
 	editor.context = {
 		touching : false,
 		skipUpdate : false,
+		explain : {},
 		weigh : function(filter, targets) {
 			var sel = vdSelectionState.get();
 
@@ -382,17 +479,37 @@
 				listBonus = true;
 			}
 
+			if (!filter.context) {
+				filter.context = "parent";
+			}
+
+			if (typeof editor.context.explain[filter.context] === "undefined") {
+				editor.context.explain[filter.context] = [];
+			}
+			editor.context.explain[filter.context].push({
+				"filter" : filter,
+				"targets" : targets
+			});
+
 			while (target) {
 				var tempNode = document.createElement("DIV");
 				tempNode.appendChild(target.cloneNode(false));
+
+				if (typeof editor.context.explain[filter.context] === "undefined") {
+					editor.context.explain[filter.context] = [];
+				}
+
 				var result = 0;
 				if (
 					( (typeof filter.selector !== 'undefined') ? tempNode.querySelectorAll(":scope > " + filter.selector).length : true) && 
 					( (typeof filter["sel-collapsed"] !== 'undefined') ? (sel.collapsed == filter["sel-collapsed"]) : true)
 				) {
+					editor.context.explain[filter.context].push("click depth score, +" + (50 * (targets.length+1)) + " points");
 					result += 50 * (targets.length+1); // tagName weight
 					if (typeof filter.selector !== 'undefined') {
+						editor.context.explain[filter.context].push("class selector bonus, +" + (2*(filter.selector.split(".").length-1)) + " points");
 						result += 2*(filter.selector.split(".").length-1); // Add the number of class selectors;
+						editor.context.explain[filter.context].push("attribute selectors bonus, +" + (2*(filter.selector.split("[").length-1)) + " points");
 						result += 2*(filter.selector.split("[").length-1); // Add the number of attribute selectors
 					}
 
@@ -406,26 +523,34 @@
 						) {
 							// click was in the element; less value for lists and list items;
 							if (target.getAttribute("contenteditable") && filter.context && filter.context.indexOf("simply-list") === 0) {
+								editor.context.explain[filter.context].push("click was in the element, -5 points");
 								result -= 5;
 							}
 						} else {
 							// click was outside the element; more value for lists and list items;
 							if (filter.context && filter.context.indexOf("simply-list") === 0) {
+								editor.context.explain[filter.context].push("click was outside the element, more value for lists and list items; +" + 50 * (targets.length) + " points");
 								result += 50 * (targets.length);
 							}
 						}
 					}
 
 					if (typeof filter["sel-collapsed"] !== 'undefined') {
+						editor.context.explain[filter.context].push("filters on selection collapsed, +1 point");
 						result += 1;
 					}
 					if (typeof filter.parent == 'undefined') {
+						editor.context.explain[filter.context].push("result = " + result);
 						return result;
 					} else {
 						var parentResult = editor.context.weigh(filter.parent, targets);
 						if (parentResult) {
+							editor.context.explain[filter.context].push("has parent filter value, +" + parentResult + " points");
+							editor.context.explain[filter.context].push(editor.context.explain.parent);
+							editor.context.explain[filter.context].push("result = " + parseInt(result + parentResult));
 							return result + parentResult;
 						} else {
+							editor.context.explain[filter.context].push("parent filter did not match, result = 0");
 							return 0;
 						}
 					}
@@ -433,9 +558,12 @@
 				target = targets.shift();
 				listBonus = false;
 			}
+			editor.context.explain[filter.context].push("result = 0");
 			return 0;
 		},
 		get : function() {
+			editor.context.explain = {};
+
 			var sel = vdSelectionState ? vdSelectionState.get() : false;
 
 			if (sel) {
@@ -458,15 +586,20 @@
 								}
 							}
 						}
+						editor.context.explain.validFilters = validFilters;
+
 						return bestFilter;
 					} else {
 						if (sel.collapsed) {
+							editor.context.explain['simply-text-cursor'] = ["cursor is in a contentEditable field and selection is collapsed."];
 							return "simply-text-cursor";
 						} else {
+							editor.context.explain['simply-text-selection'] = ["cursor is in a contentEditable field and selection is not collapsed."];
 							return "simply-text-selection";
 						}
 					}
 				} else {
+					editor.context.explain['simply-no-context'] = ["selection parent is not editable, not selectable and does not have an editable parent"];
 					return "simply-no-context";
 				}
 			}
@@ -482,6 +615,7 @@
 				var rects = range.getClientRects();
 				var parent = vdSelection.getNode(sel);
 				if ( !rects.length ) {
+					muze.event.fire(range.startContainer, "databinding:pause");
 					// insert element at range and get its position, other options aren't exact enough
 					var span = document.createElement('span');
 					if ( span.getClientRects ) {
@@ -498,6 +632,7 @@
 						} catch(e) {
 						}
 					}
+					muze.event.fire(range.startContainer, "databinding:resume");
 				}
 				if ( rects.length ) {
 					ltop = rects[0].top;
@@ -554,22 +689,46 @@
 				}
 				var top = pos.top;
 				var left = pos.left;
-					
 				var activeToolbar = activeSection.querySelector("div.simply-toolbar");
 				top += document.body.offsetTop;
 				var newleft = left - (activeToolbar.offsetWidth/2);
-				if (newleft < 0) {
-					markerLeft = activeToolbar.offsetWidth/2 + newleft;
-					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft+'px';
-					newleft = 0;
-				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth) {
-					var delta = newleft + activeToolbar.offsetWidth - document.body.offsetWidth;
-					markerLeft = activeToolbar.offsetWidth/2 + delta;
-					activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft+'px';
-					newleft = document.body.offsetWidth - activeToolbar.offsetWidth;
+
+				// Recalculate toolbar position if it is off-screen left/right
+				if (newleft < document.body.scrollLeft) {
+					markerLeft = Math.max(activeToolbar.offsetWidth/2 + newleft - document.body.scrollLeft, 20) + "px";
+				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth + document.body.scrollLeft) {
+					var delta = newleft + activeToolbar.offsetWidth - document.body.offsetWidth - document.body.scrollLeft;
+					markerLeft = Math.min(activeToolbar.offsetWidth/2 + delta, activeToolbar.offsetWidth - 20) + "px";
 				} else {
-					activeToolbar.getElementsByClassName("marker")[0].style.left = "50%";
+					markerLeft = "50%";
 				}
+				activeToolbar.getElementsByClassName("marker")[0].style.left = markerLeft;
+
+				// Recalculate toolbar position if it is off-screen left/right
+				if (newleft < document.body.scrollLeft) {
+					newleft = document.body.scrollLeft;
+				} else if (newleft + activeToolbar.offsetWidth > document.body.offsetWidth + document.body.scrollLeft) {
+					newleft = document.body.offsetWidth -  activeToolbar.offsetWidth + document.body.scrollLeft;
+				} else {
+				}
+
+				// Recalculate the toolbar width, the browser messes this up because the buttons are floating;
+				var buttons = activeToolbar.querySelectorAll("ul.simply-buttons > li");
+				var width = activeToolbar.offsetWidth;
+				var newWidth = 0;
+				for (var i=0; i<buttons.length; i++) {
+					newWidth += buttons[i].offsetWidth;
+				}
+
+				// activeToolbar.style.width = newWidth + "px"; // FIXME: This messes up when expanding a section with more items than the top section;
+
+				// hide the marker if no active buttons are left;
+				if (newWidth === 0) {
+					activeToolbar.getElementsByClassName("marker")[0].style.display = "none";
+				} else {
+					activeToolbar.getElementsByClassName("marker")[0].style.display = "block";
+				}
+
 				// Move the toolbar to beneath the top of the selection if the toolbar goes out of view;
 				// check the position 
 				// - if toolbar bottom <= editor pane bottom, no problem
@@ -588,7 +747,7 @@
 					if ( mintop + toolbarRect.height <= editPaneRect.height ) {
 						// toolbar can be repositioned
 						// FIXME: min top should be position of the cursor, not selection
-						top = editPaneRect.height - toolbarRect.height;
+						top = editPaneRect.height - toolbarRect.height - 32; // 32 to allow space for scrollbars;
 					} else {
 						top = mintop;
 						scrollHeight = Math.max(document.body.scrollHeight, document.body.clientHeight);
@@ -599,6 +758,7 @@
 						}
 					}
 				}
+
 				if ( document.body.classList.contains('simply-footer-space') ) {
 					scrollHeight = Math.max(document.body.scrollHeight, document.body.clientHeight);
 					scrollTop    = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
@@ -714,7 +874,9 @@
 			}
 			
 			if (editor.toolbars[context] && editor.toolbars[context].update) {
-				return editor.toolbars[context].update(document.getElementById(context));
+				editor.toolbar.updating = true;
+				editor.toolbars[context].update(document.getElementById(context));
+				editor.toolbar.updating = false;
 			}
 		},
 		fixSelection : function() {
@@ -950,25 +1112,33 @@
 		vdSelectionState.init(window);
 		selectionchange.start(document); // onselectionchange event for Firefox
 
+		editor.selectionChangeTimer = false;
 		muze.event.attach( document, 'selectionchange', function() {
-			var field = editor.node.getEditableField();
-			var hopeEditor = field.hopeEditor;
-			if (hopeEditor) {
-				if (hopeEditor.field == editor.node.getSimplyParent(document.activeElement)) {
-					editor.context.hopeEditor = hopeEditor;
-					hopeEditor.selection.updateRange();
-					var range = hopeEditor.selection.getRange();
-					hopeEditor.currentRange = range;
+			if (editor.selectionChangeTimer) {
+				return;
+			}
+			// throttle selection changed - only execute this once in one loop;
+			editor.selectionChangeTimer = window.setTimeout(function() {
+				editor.selectionChangeTimer = false;
+				var field = editor.node.getEditableField();
+				var hopeEditor = field.hopeEditor;
+				if (hopeEditor) {
+					if (hopeEditor.field == editor.node.getSimplyParent(document.activeElement)) {
+						editor.context.hopeEditor = hopeEditor;
+						hopeEditor.selection.updateRange();
+						var range = hopeEditor.selection.getRange();
+						hopeEditor.currentRange = range;
+					}
 				}
-			}
 
-			if (editor.context.touching) {
-				editor.context.touching = false; // force update when selection changed;
-				editor.context.update();
-				editor.context.touching = true;
-			} else {
-				editor.context.update();
-			}
+				if (editor.context.touching) {
+					editor.context.touching = false; // force update when selection changed;
+					editor.context.update();
+					editor.context.touching = true;
+				} else {
+					editor.context.update();
+				}
+			}, 0);
 		});
 		muze.event.attach( document, 'keyup', function(evt) {
 			editor.context.update();
