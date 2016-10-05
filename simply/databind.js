@@ -97,35 +97,37 @@ dataBinding = function(config) {
 		if (typeof data === "object") {
 			var monitor = function(data, key) {
 				var myvalue = data[key];
+
+				var renumber = function(key, value, parentBinding) {
+					var oldparent, newparent;
+					if (value._bindings_) {
+						for (var subbinding in value._bindings_) {
+							oldparent = value._bindings_[subbinding].parentKey;
+							newparent = parentBinding.parentKey + parentBinding.key + "/" + key + "/";
+							// console.log(oldparent + " => " + newparent);
+							value._bindings_[subbinding].parentKey = newparent;
+							if (value[subbinding] && value[subbinding].length) {
+								for (var i=0; i<value[subbinding].length; i++) {
+									renumber(i, value[subbinding][i], value._bindings_[subbinding]);
+								}
+							}
+						}
+					}
+				};
+
+				renumber(key, myvalue, binding);
+
 				Object.defineProperty(data, key, {
 					set : function(value) {
 						myvalue = value;
+						renumber(key, value, binding);
+
 						// Marker is set by the array function, it will do the resolve after we're done.
 						if (!binding.runningArrayFunction) {
 							newValue = shadowValue;
 							shadowValue = null;
 							binding.set(newValue);
 							binding.resolve();
-						}
-
-						// Renumber parent indexes;
-						var changes = [];
-						for (var subkey in this) {
-							for (var bindingKey in this[subkey]._bindings_) {
-								var index = this[subkey]._bindings_[bindingKey].parentKey.split('/');
-								var oldKey = this[subkey]._bindings_[bindingKey].parentKey;
-								index.pop();
-								index.pop();
-								index.push(subkey);
-								this[subkey]._bindings_[bindingKey].parentKey = index.join("/") + '/';
-								var newKey = this[subkey]._bindings_[bindingKey].parentKey;
-								changes.push({oldKey : oldKey, newKey : newKey});
-							}
-						}
-
-						for (var i=0; i<binding.elements.length; i++) {
-							// send the set of changes to the event listeners, so child nodes can renumber themselves too.
-							fireEvent(document.body, "renumber", changes);
 						}
 					},
 					get : function() {
@@ -309,19 +311,6 @@ dataBinding = function(config) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
 
-		document.body.addEventListener("databind:renumber", function(evt) {
-			var oldParent, newParent;
-			for (var i=0; i<evt.detail.length; i++) {
-				if (binding.parentKey.indexOf(evt.detail[i].oldKey) === 0) {
-					oldParent = evt.detail[i].oldKey;
-					newParent =  evt.detail[i].newKey;
-				}
-			}
-
-			if (oldParent) {
-				binding.parentKey = newParent +  binding.parentKey.substring(oldParent.length, binding.parentKey.length);
-			}
-		});
 	};
 
 	this.rebind = function(element, config) {
