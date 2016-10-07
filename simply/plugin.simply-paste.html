@@ -53,8 +53,10 @@
 
 				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
 				var sel = window.getSelection();
-				var range = sel.getRangeAt(0);
-				var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+				if (sel.rangeCount) {
+					var range = sel.getRangeAt(0);
+					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+				}
 
 				editor.node.unwrap(ev.target);
 				var siblings = parent.childNodes;
@@ -72,10 +74,12 @@
 					}
 				}
 
-				range = document.createRange();
-				range.setStart(caretNode, 0);
-				sel.removeAllRanges();
-				sel.addRange(range);
+				if (caretNode) {
+					range = document.createRange();
+					range.setStart(caretNode, 0);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
 			}, 10);
 		} else if (ev.target.tagName && (ev.target.tagName.toLowerCase() == 'h1')) {
 			window.setTimeout(function() {
@@ -84,8 +88,10 @@
 
 				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
 				var sel = window.getSelection();
-				var range = sel.getRangeAt(0);
-				var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+				if (sel.rangeCount) {
+					var range = sel.getRangeAt(0);
+					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+				}
 
 				var parent = ev.target.parentNode;
 				var nodes = parent.querySelectorAll("h1");
@@ -105,10 +111,12 @@
 					}
 				}
 
-				range = document.createRange();
-				range.setStart(caretNode, 0);
-				sel.removeAllRanges();
-				sel.addRange(range);
+				if (caretNode) {
+					range = document.createRange();
+					range.setStart(caretNode, 0);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
 			}, 10);
 		}
 	};
