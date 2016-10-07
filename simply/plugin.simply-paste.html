@@ -37,13 +37,10 @@
 
 	var divListener = function(ev) {
 		if (
-			ev.target.tagName &&
-			(ev.target.tagName.toLowerCase()=='div' || ev.target.tagName.toLowerCase() == 'h1') 
-			// special case for H1 - we don't want it inserted as a result of an enter key, it should be a paragraph instead;
+			ev.target.tagName && (ev.target.tagName.toLowerCase()=='div')
 		) {
 			window.setTimeout(function() {
 				// allow a bit of time before unwrapping - chrome is still moving elements around at this point
-
 				if (ev.target.innerHTML == '') {
 					ev.target.innerHTML = "<br>";
 				}
@@ -53,10 +50,13 @@
 				if (!parent) {
 					return;
 				}
-				var newNode = ev.target.firstChild;
+
+				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
+				var sel = window.getSelection();
+				var range = sel.getRangeAt(0);
+				var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
 
 				editor.node.unwrap(ev.target);
-
 				var siblings = parent.childNodes;
 				editor.node.unwrap(ev.target);
 
@@ -72,9 +72,41 @@
 					}
 				}
 
+				range = document.createRange();
+				range.setStart(caretNode, 0);
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}, 10);
+		} else if (ev.target.tagName && (ev.target.tagName.toLowerCase() == 'h1')) {
+			window.setTimeout(function() {
+				// special case for H1 - we don't want it inserted as a result of an enter key. The first one should be a H1, the others should be a paragraph.
+				// Firefox inserts the new element in front of the original; Chrome inserts the new H1 behind the original.
+
+				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
 				var sel = window.getSelection();
-				var range = document.createRange();
-				range.setStart(newNode, 0);
+				var range = sel.getRangeAt(0);
+				var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+
+				var parent = ev.target.parentNode;
+				var nodes = parent.querySelectorAll("h1");
+				for (var i=1; i<nodes.length; i++) {
+					editor.node.unwrap(nodes[i]); // Unwrap the other nodes, leave the first H1;
+				}
+				var siblings = parent.childNodes;
+				for (var i=0; i<siblings.length; i++) {
+					if (siblings[i] && siblings[i].nodeType == document.TEXT_NODE) {
+						editor.node.wrap(siblings[i], "p");
+					} else if (
+						siblings[i] &&
+						(siblings[i].nodeType == document.ELEMENT_NODE) &&
+						(hope.render.html.rules.nestingSets['inline'].indexOf(siblings[i].tagName.toLowerCase()) > -1)
+					) {
+						editor.node.wrap(siblings[i], "p");
+					}
+				}
+
+				range = document.createRange();
+				range.setStart(caretNode, 0);
 				sel.removeAllRanges();
 				sel.addRange(range);
 			}, 10);
