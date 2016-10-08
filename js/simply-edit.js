@@ -995,7 +995,10 @@
 				addStyleSheet(editor.baseURL + "simply/css/editor.v9.css");
 
 				// Add font awesome
-				addStyleSheet("//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
+				addStyleSheet( "//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css",{
+					'integrity': 'sha256-k2/8zcNbxVIh5mnQ52A0r3a6jAgMGxFJFE2707UxGCk=',
+					'crossorigin':"anonymous"
+				});
 
 				// Add legacy scripts
 				addScript(editor.baseURL + "simply/scripts.js");
