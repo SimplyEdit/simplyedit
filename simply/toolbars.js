@@ -522,14 +522,14 @@
 							target.clickStart.y > rect.top
 						) {
 							// click was in the element; less value for lists and list items;
-							if (target.getAttribute("contenteditable") && filter.context && filter.context.indexOf("simply-list") === 0) {
-								editor.context.explain[filter.context].push("click was in the element, -5 points");
+							if (target.getAttribute("contenteditable") && filter.context && (typeof filter["list-bonus"] !== 'undefined')) {
+								editor.context.explain[filter.context].push("filter has list-bonus, but click was in the element, -5 points");
 								result -= 5;
 							}
 						} else {
 							// click was outside the element; more value for lists and list items;
-							if (filter.context && filter.context.indexOf("simply-list") === 0) {
-								editor.context.explain[filter.context].push("click was outside the element, more value for lists and list items; +" + 50 * (targets.length) + " points");
+							if (typeof filter["list-bonus"] !== 'undefined') {
+								editor.context.explain[filter.context].push("filter has list-bonus, click was outside the element; +" + 50 * (targets.length) + " points");
 								result += 50 * (targets.length);
 							}
 						}

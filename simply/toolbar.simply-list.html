@@ -242,6 +242,7 @@
 	editor.addToolbar({
 		name: 'simply-list-item',
 		filter:{
+			"list-bonus" : true,
 			"selector" : "[data-simply-list-item]"
 			/*"parent" : {
 				"selector" : "[data-simply-list]"
@@ -331,6 +332,7 @@
 	editor.addToolbar({
 		name: 'simply-list',
 		filter:{
+			"list-bonus" : true,
 			"selector" : "[data-simply-list]"
 			/*"parent" : {
 				"selector" : "[data-simply-list]"
@@ -388,6 +390,7 @@
 	});
 	editor.addContextFilter(
 		"simply-list-and-item", {
+			"list-bonus" : true,
 			"selector" : "[data-simply-list][data-simply-list-item]",
 			"context" : "simply-list" // FIXME: There should be a toolbar that is specific for list-items that double as a list
 		}
