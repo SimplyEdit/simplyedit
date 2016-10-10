@@ -159,7 +159,6 @@ function simulateKeyUp(el, k) {
 	dispatchEvent(el, oEvent);
 }
 
-
 QUnit.module("editor init");
 	QUnit.test("editmode init", function(assert) {
 		assert.ok(vdSelectionState, "vdSelectionState initialized");
@@ -695,7 +694,7 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
-	QUnit.test("text split clean text to two lines", function(assert) {
+	QUnit.test("text split paragraph to two lines", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello world";
 		testContent.hopeEditor.parseHTML();
