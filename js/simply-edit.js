@@ -806,6 +806,7 @@
 							data = {"src" : data};
 						}
 						if (data) {
+							data = JSON.parse(JSON.stringify(data));
 							data['data-simply-src'] = data.src;
 							delete(data.src);
 							editor.field.defaultSetter(field, data);
