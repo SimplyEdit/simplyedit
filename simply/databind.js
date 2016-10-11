@@ -100,7 +100,7 @@ dataBinding = function(config) {
 
 				var renumber = function(key, value, parentBinding) {
 					var oldparent, newparent;
-					if (value._bindings_) {
+					if (value && value._bindings_) {
 						for (var subbinding in value._bindings_) {
 							oldparent = value._bindings_[subbinding].parentKey;
 							newparent = parentBinding.parentKey + parentBinding.key + "/" + key + "/";
