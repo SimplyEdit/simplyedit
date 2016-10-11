@@ -1889,7 +1889,7 @@
 						});
 					} else {
 						result.folders.push({
-							url : url.replace(/\/[^\/]+$/, '/'),
+							url : editor.storage.endpoint,
 							name : '..'
 						});
 					}
