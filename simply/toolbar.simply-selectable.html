@@ -9,7 +9,7 @@
 			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
 			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
 			vdSelectionState.save(sel);
-			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges()
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
 			editor.context.update();
 		};
 
@@ -86,7 +86,7 @@
 					vdSelectionState.remove();
 				});
 			}, 50);
-		}
+		};
 	
 		var bindSelectables = function() {
 			var listItems = document.querySelectorAll("[data-simply-selectable]");
@@ -107,7 +107,7 @@
 					};
 				});
 			}
-		}
+		};
 		
 		document.addEventListener("simply-selectable-inserted", bindSelectables);
 

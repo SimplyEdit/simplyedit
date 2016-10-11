@@ -1,0 +1,2 @@
+--ignore=order-alphabetical,unqualified-attributes,universal-selector,box-sizing,zero-units,fallback-colors,ids,adjoining-classes
+--exclude-list=examples/

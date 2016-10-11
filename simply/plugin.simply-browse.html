@@ -356,6 +356,9 @@
 				if (typeof data.src !== "undefined") {
 					src = data.src;
 				}
+				if (typeof data.name === "undefined") {
+					data.name = src.split("/").pop();
+				}
 
 				var result = "<div class='simply-button simply-image' data-simply-action='simply-browse-insert'>";
 				result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
@@ -574,13 +577,14 @@
 					var url = editor.plugins.browse.currentPath + files[i].name.replace(/[^A-Za-z0-9_\.-]/, "-");
 
 					if (editor.plugins.browse.mode == "images") {
-						(function(targetButton, url) {
+						(function(targetButton, url, name) {
 							editor.storage.file.save(subpath + files[i].name, files[i], function(image) {
 								if (typeof image === "undefined") {
 									image = {
+										name : name,
 										src : url
-									}
-								};
+									};
+								}
 								var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 								var tempNode = document.createElement("div");
 								tempNode.innerHTML = buttonHtml;
@@ -590,7 +594,7 @@
 
 								editor.responsiveImages.init(targetButton);
 							});
-						}(newButton, url));
+						}(newButton, url, files[i].name));
 					} else {
 						(function(targetButton, url, name) {
 							editor.storage.file.save(subpath + files[i].name, files[i], function(file) {
@@ -598,8 +602,8 @@
 									file = {
 										name : name,
 										url : url
-									}
-								};
+									};
+								}
 
 								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(file);
 								var tempNode = document.createElement("div");
@@ -671,7 +675,7 @@
 							targetButton.parentNode.removeChild(targetButton);
 						});
 					}(targetList[i]));
-				};
+				}
 			}
 		}
 	});
