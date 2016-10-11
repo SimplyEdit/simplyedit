@@ -352,7 +352,7 @@ hope.register( 'hope.editor', function() {
 			otherCarets[i].removeAttribute("data-hope-caret");
 		}
 
-		if (selection) {
+		if (selection && document.body.contains(selection.startContainer)) {
 			var htmlSelection = window.getSelection();
 			htmlSelection.removeAllRanges();
 			htmlSelection.addRange(selection);

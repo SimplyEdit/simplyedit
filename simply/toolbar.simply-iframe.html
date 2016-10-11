@@ -10,8 +10,6 @@
 	</div>
 </section>
 <script type="text/javascript">
-	var currentIframe;
-
 	editor.addToolbar({
 		"name" : "simply-iframe",
 		"filter" : {
@@ -27,10 +25,14 @@
 			vdSelectionState.currentSelection = sel;
 			vdSelectionState.currentNode = iframe;
 
-			var src=iframe.getAttribute('src');
-			simply.widgets.properties.set('vdIframeSrc', src);
+			var fieldData = editor.field.get(iframe);
+			toolbar.data.src = (typeof fieldData.src !== "undefined") ? fieldData.src : '';
 		},
 		"init" : function() {
+			toolbar = document.querySelector("#simply-iframe");
+			toolbar.data = {};
+			toolbar.data.src = '';
+			editor.toolbar.bindInput(toolbar.data, 'src', toolbar.querySelector("input[data-simply-action=simply-iframe-src]"));
 		},
 		"actions" : {
 			"simply-iframe-delete" : function() {
@@ -39,7 +41,6 @@
 				iframe.parentNode.removeChild(iframe);
 			},
 			"simply-iframe-src" : function(value) {
-				console.log("src change");
 				if (vdSelectionState.currentNode) {
 					if (value) {
 						vdSelectionState.currentNode.setAttribute("src", value);
