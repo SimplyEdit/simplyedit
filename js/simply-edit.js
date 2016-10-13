@@ -62,7 +62,7 @@
 				}
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
-				var subFields = target.querySelectorAll("[data-simply-list] [data-simply-field]");
+				var subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 
 				if (target == document) {
 					editor.settings.databind.parentKey = '/';
