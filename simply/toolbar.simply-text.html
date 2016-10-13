@@ -314,13 +314,15 @@
 		// Check hyperlink;
 		toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "none";
 
-		var hyperlink = hopeEditor.fragment.has(range, "a");
-		if (hyperlink || (hopeEditor.field.tagName.toLowerCase() === 'a')) {
+		if (typeof toolbar.data.hyperlink !== 'undefined') {
 			toolbar.data.hyperlink.href = '';
 			toolbar.data.hyperlink.title = '';
 			toolbar.data.hyperlink.name = '';
 			toolbar.data.hyperlink.nofollow = false;
 			toolbar.data.hyperlink.newwindow = false;
+		}
+		var hyperlink = hopeEditor.fragment.has(range, "a");
+		if (hyperlink || (hopeEditor.field.tagName.toLowerCase() === 'a')) {
 
 			toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
 
