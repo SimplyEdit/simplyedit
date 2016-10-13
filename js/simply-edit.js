@@ -947,6 +947,21 @@
 						return false;
 					}
 				}, false);
+				field.addEventListener("slip:beforeswipe", function(evt) {
+					var rect = this.getBoundingClientRect();
+					if (
+						this.clickStart &&
+						this.clickStart.x > rect.left &&
+						this.clickStart.x < rect.right &&
+						this.clickStart.y < rect.bottom &&
+						this.clickStart.y > rect.top
+					) {
+						// this will prevent triggering list swiping;
+						// the check of the clientrect will allow a click on the list item marker to continue, because it is positioned out of bounds;
+						evt.preventDefault(); // this will prevent triggering list swiping on text;
+						return false;
+					}
+				}, false);
 			},
 			initHopeStub : function(field) {
 				if (typeof field.hopeEditor !== "undefined") {
@@ -1409,18 +1424,21 @@
 					var sublists = this.querySelectorAll("[data-simply-sortable]");
 					for (var j=0; j<sublists.length; j++) {
 						sublists[j].addEventListener('slip:beforereorder', preventDefault);
+						sublists[j].addEventListener('slip:beforeswipe', preventDefault);
 					}
 				};
 				var removeBeforeOrderEvent = function(e) {
 					var sublists = this.querySelectorAll("[data-simply-sortable]");
 					for (var j=0; j<sublists.length; j++) {
 						sublists[j].removeEventListener('slip:beforereorder', preventDefault);
+						sublists[j].removeEventListener('slip:beforeswipe', preventDefault);
 					}
 					return false;
 				};
 
 				for (var i=0; i<list.length; i++) {
 					list[i].addEventListener('slip:beforereorder', addBeforeOrderEvent, false);
+					list[i].addEventListener('slip:beforeswipe', addBeforeOrderEvent, false);
 					list[i].addEventListener('slip:reorder', function(e) {
 						e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
 						return false;
