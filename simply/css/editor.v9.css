@@ -209,6 +209,7 @@
 			border-radius: 0;
 			transition: inherit;
 		}
+
 		@media (max-width: 480px) {
 			.simply-toolbar button {
 				min-width: 48px;
@@ -368,9 +369,12 @@
 			font-family: inherit;
 			font-size: inherit;
 			display: inline-block;
+			box-sizing: border-box !important;
+			padding: 2px 0 !important;
+			margin: 3px 0 !important;
 		}
 		.simply-toolbar-section select {
-			padding: 4px 0px;
+			padding: 4px 0px !important;
 		}
 		.simply-toolbar button:focus {
 			outline: none;
