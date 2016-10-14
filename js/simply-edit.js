@@ -2496,6 +2496,10 @@
 		}
 	}
 
+	// Backwards compatibility for pre-0.50;
+	editor.data.list = editor.list;
+	editor.data.list.applyTemplates = editor.list.set;
+
 	editor.init({
 		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
 		toolbars : defaultToolbars,
