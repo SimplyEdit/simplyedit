@@ -2275,12 +2275,18 @@
 						files : []
 					};
 					result.folders.push({url : editor.storage.dataEndpoint, name : 'My pages'});
+					var parser = document.createElement("A");
+
 					if (document.querySelector("[data-simply-images]")) {
 						var imagesEndpoint = document.querySelector("[data-simply-images]").getAttribute("data-simply-images");
+						parser.href = imagesEndpoint;
+						imagesEndpoint = parser.href;
 						result.folders.push({url : imagesEndpoint, name : 'My images'});
 					}
 					if (document.querySelector("[data-simply-files]")) {
 						var filesEndpoint = document.querySelector("[data-simply-files]").getAttribute("data-simply-files");
+						parser.href = filesEndpoint;
+						filesEndpoint = parser.href;
 						result.folders.push({url : filesEndpoint, name : 'My files'});
 					}
 					return callback(result);
