@@ -128,21 +128,20 @@
 			var redoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
 
 			if (editor.plugins.undoRedo.canUndo()) {
-				if (undoButton.getAttribute("disabled")) {
+				if (undoButton && undoButton.getAttribute("disabled")) {
 					undoButton.removeAttribute("disabled");
 				}
 			} else {
-				if (!undoButton.getAttribute("disabled")) {
+				if (undoButton && !undoButton.getAttribute("disabled")) {
 					undoButton.setAttribute("disabled", true);
 				}
 			}
-
 			if (editor.plugins.undoRedo.canRedo()) {
-				if (redoButton.getAttribute("disabled")) {
+				if (redoButton && redoButton.getAttribute("disabled")) {
 					redoButton.removeAttribute("disabled");
 				}
 			} else {
-				if (!redoButton.getAttribute("disabled")) {
+				if (redoButton && !redoButton.getAttribute("disabled")) {
 					redoButton.setAttribute("disabled", true);
 				}
 			}
