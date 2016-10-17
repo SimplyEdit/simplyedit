@@ -287,6 +287,9 @@
 
 							if (typeof editor.dataSources[dataSource].get === "function") {
 								data[dataPath][dataName] = editor.dataSources[dataSource].get(list);
+								if (data[dataPath][dataName] === null) {
+									data[dataPath][dataName] = []; // returning null will confuse the databinding;
+								}
 							}
 						}
 					}
@@ -395,6 +398,7 @@
 					}
 				}
 
+				var savedBindingParents = editor.bindingParents;
 				if (this.dataBinding) {
 					editor.bindingParents = this.dataBinding.parentKey.replace(/\/$/,'').split("/");
 				}
@@ -406,6 +410,7 @@
 				}
 				editor.responsiveImages.init(this);
 
+				editor.bindingParents = savedBindingParents;
 				if (document.body.getAttribute("data-simply-edit")) {
 					var list = this;
 					editor.editmode.makeEditable(list);
