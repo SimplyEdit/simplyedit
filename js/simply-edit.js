@@ -2155,6 +2155,8 @@
 					history.pushState(null, null, url + "#simply-edit");
 
 					document.body.innerHTML = editor.data.originalBody.innerHTML;
+					document.body.removeAttribute("data-simply-edit");
+
 					editor.data.load();
 					var openTemplateDialog = function() {
 						if (editor.actions['simply-template']) {
