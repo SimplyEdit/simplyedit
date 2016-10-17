@@ -1192,6 +1192,24 @@ QUnit.module("text hyperlinks");
 		assert.ok(targetInput.classList.contains('simply-selected'), "nofollow init done");
 	});
 
+	QUnit.test("hyperlink toolbar init on linkless", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>He<a href='test/' title='mytitle' name='mylink' rel='nofollow'>llo world</a></p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("a"), 3);
+		editor.context.update();
+		setCaretPosition(testContent.querySelector("p"), 0, 1);
+		var targetInput = document.querySelector("#simply-text-selection #vdHyperlinkHref");
+		assert.equal(targetInput.value, "", "href is emptied");
+
+		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkName");
+		assert.equal(targetInput.value, "", "name is emptied");
+
+		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkTitle");
+		assert.equal(targetInput.value, "", "title is emptied");
+	});
+
 
 QUnit.module("images");
 	QUnit.test("insert image at end of paragraph stays at caret location", function(assert) {

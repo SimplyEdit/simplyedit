@@ -62,7 +62,7 @@
 				}
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
-				var subFields = target.querySelectorAll("[data-simply-list] [data-simply-field]");
+				var subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 
 				if (target == document) {
 					editor.settings.databind.parentKey = '/';
@@ -2275,12 +2275,18 @@
 						files : []
 					};
 					result.folders.push({url : editor.storage.dataEndpoint, name : 'My pages'});
+					var parser = document.createElement("A");
+
 					if (document.querySelector("[data-simply-images]")) {
 						var imagesEndpoint = document.querySelector("[data-simply-images]").getAttribute("data-simply-images");
+						parser.href = imagesEndpoint;
+						imagesEndpoint = parser.href;
 						result.folders.push({url : imagesEndpoint, name : 'My images'});
 					}
 					if (document.querySelector("[data-simply-files]")) {
 						var filesEndpoint = document.querySelector("[data-simply-files]").getAttribute("data-simply-files");
+						parser.href = filesEndpoint;
+						filesEndpoint = parser.href;
 						result.folders.push({url : filesEndpoint, name : 'My files'});
 					}
 					return callback(result);
@@ -2489,6 +2495,10 @@
 			defaultToolbars.push(toolbarUrl);
 		}
 	}
+
+	// Backwards compatibility for pre-0.50;
+	editor.data.list = editor.list;
+	editor.data.list.applyTemplates = editor.list.set;
 
 	editor.init({
 		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,

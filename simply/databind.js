@@ -223,6 +223,11 @@ dataBinding = function(config) {
 			});
 		}
 		data._bindings_[key] = binding;
+		if (binding.mode == "list") {
+			if (data[key] === null) {
+				data[key] = [];
+			}
+		}
 
 		setShadowValue(data[key]);
 		oldValue = dereference(data[key]);
