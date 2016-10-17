@@ -72,7 +72,7 @@
 			}
 		},
 		apply : function() {
-			var pageTemplate = simply.widgets.properties.get("simply-page-template-list");
+			var pageTemplate = document.querySelector("#simply-page-template-list").value;
 			
 			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
 			editor.plugins.dialog.close();
