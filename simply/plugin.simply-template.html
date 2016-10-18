@@ -73,7 +73,6 @@
 		},
 		apply : function() {
 			var pageTemplate = document.querySelector("#simply-page-template-list").value;
-			
 			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
 			editor.plugins.dialog.close();
 			var reloadPage = function() {
@@ -89,18 +88,8 @@
 			editor.data.save();
 		},
 		setMeta : function(name, value) {
-			var metaTag = document.head.querySelector("meta[name=" + name + "]");
-			if (!metaTag) {
-				metaTag = document.createElement("meta");
-				metaTag.setAttribute("name", name);
-				metaTag.setAttribute("data-simply-field", "data-simply-" + name);
-				document.head.appendChild(metaTag);
-			}
-			if (value) {
-				metaTag.setAttribute("content", value);
-			} else {
-				document.head.removeChild(metaTag);
-			}
+			// just set the data, databinding will take care of the rest if needed.
+			editor.currentData[editor.data.getDataPath()]['data-simply-' + name] = value;
 		},
 		init : function(config) {
 			if (
