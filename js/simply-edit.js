@@ -2510,6 +2510,6 @@
 	editor.init({
 		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
 		toolbars : defaultToolbars,
-		profile : 'dev'
+		profile : 'live'
 	});
 }());
