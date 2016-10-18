@@ -12,6 +12,7 @@ unittest:
      - phantomjs tests/runner.js http://localhost/tests/data-edit/ci.html
   tags:
     - docker
+  stage: test
 
 syntaxtest:
   before_script:
@@ -24,4 +25,4 @@ syntaxtest:
     - csslint .
   tags:
     - docker
-
+  stage: test
