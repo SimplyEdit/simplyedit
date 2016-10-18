@@ -2246,6 +2246,13 @@
 					}
 
 					for (var j in sitemap.children) {
+						if (j=="/") {
+							result.files.push({
+								url : url + "/",
+								name : "Home"
+							});
+						}
+
 						if (Object.keys(sitemap.children[j].children).length) {
 							result.folders.push({
 								url : url + "/" + j,
