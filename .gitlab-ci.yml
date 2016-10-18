@@ -1,4 +1,4 @@
-image: muze/phantomjs:latest
+image: muze/phantomjs:v2latest
 
 unittest:
   before_script:
