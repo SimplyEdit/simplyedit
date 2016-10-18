@@ -1204,7 +1204,7 @@
 			var styleTag = document.createElement("LINK");
 			styleTag.setAttribute("rel", "stylesheet");
 			styleTag.setAttribute("type", "text/css");
-			if (typeof attributes != 'undefined'){
+			if (typeof attributes !== 'undefined'){
 				for (var key in attributes) {
 					styleTag.setAttribute(key, attributes[key]);
 				}
