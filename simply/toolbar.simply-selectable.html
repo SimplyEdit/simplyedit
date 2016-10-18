@@ -88,6 +88,15 @@
 			}, 50);
 		};
 	
+		var registerClickStart = function(evt) {
+			var target = this;
+			target.clickStart = {
+				x : evt.clientX,
+				y : evt.clientY,
+				time : (new Date()).getTime()
+			};
+		};
+
 		var bindSelectables = function() {
 			var listItems = document.querySelectorAll("[data-simply-selectable]");
 			for (var i=0; i<listItems.length; i++) {
@@ -98,14 +107,13 @@
 				}
 				listItems[i].addEventListener('click', handleItemSelect);
 				listItems[i].addEventListener('focus', handleItemFocus);
-				listItems[i].addEventListener('mousedown', function(evt) {
-					var target = this;
-					target.clickStart = {
-						x : evt.clientX,
-						y : evt.clientY,
-						time : (new Date()).getTime()
-					};
-				});
+			}
+
+			// Set clickstart on all selectable things and fields; Fields need this to interact with slip correctly.
+			var simplyItems = document.querySelectorAll("[data-simply-selectable], [data-simply-field]");
+			for (var j=0; j<simplyItems.length; j++) {
+				simplyItems[j].removeEventListener('mousedown',registerClickStart);
+				simplyItems[j].addEventListener('mousedown',registerClickStart);
 			}
 		};
 		

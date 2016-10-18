@@ -36,6 +36,7 @@ function setCaretPosition(elem, start, length) {
 		elem.focus();
 	}
 	var newRange = sel.getRangeAt(0);
+	editor.context.skipUpdate = false;
 	editor.context.update();
 }
 function selectImage(img) {
@@ -48,6 +49,7 @@ function selectImage(img) {
 	if (focus in img) {
 		img.focus();
 	}
+	editor.context.skipUpdate = false;
 	editor.context.update();
 }
 
@@ -61,6 +63,7 @@ function setSelectionEnd(elem, offset) {
 	if (focus in elem) {
 		elem.focus();
 	}
+	editor.context.skipUpdate = false;
 	editor.context.update();
 }
 
@@ -155,7 +158,6 @@ function simulateKeyUp(el, k) {
 	oEvent.which = 13;
 	dispatchEvent(el, oEvent);
 }
-
 
 QUnit.module("editor init");
 	QUnit.test("editmode init", function(assert) {
@@ -692,7 +694,7 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
-	QUnit.test("text split clean text to two lines", function(assert) {
+	QUnit.test("text split paragraph to two lines", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello world";
 		testContent.hopeEditor.parseHTML();
@@ -1190,6 +1192,24 @@ QUnit.module("text hyperlinks");
 		assert.ok(targetInput.classList.contains('simply-selected'), "nofollow init done");
 	});
 
+	QUnit.test("hyperlink toolbar init on linkless", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p>He<a href='test/' title='mytitle' name='mylink' rel='nofollow'>llo world</a></p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("a"), 3);
+		editor.context.update();
+		setCaretPosition(testContent.querySelector("p"), 0, 1);
+		var targetInput = document.querySelector("#simply-text-selection #vdHyperlinkHref");
+		assert.equal(targetInput.value, "", "href is emptied");
+
+		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkName");
+		assert.equal(targetInput.value, "", "name is emptied");
+
+		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkTitle");
+		assert.equal(targetInput.value, "", "title is emptied");
+	});
+
 
 QUnit.module("images");
 	QUnit.test("insert image at end of paragraph stays at caret location", function(assert) {
@@ -1229,7 +1249,6 @@ QUnit.module("images");
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		
-		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
 		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 	});
 
@@ -1241,7 +1260,7 @@ QUnit.module("images");
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 
-		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 	});
 
 	QUnit.test("responsive image source gets set", function(assert) {
@@ -1253,6 +1272,7 @@ QUnit.module("images");
 		editor.actions["simply-image-src"]("HelloWorld");
 		
 		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, get src in first image", function(assert) {
@@ -1262,6 +1282,7 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "a");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, get src in second image", function(assert) {
@@ -1271,6 +1292,7 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "b");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, set src in first image", function(assert) {
@@ -1280,7 +1302,8 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
-		assert.equal(testContent.querySelector("img").getAttribute("data-simply-src"), "HelloWorld");
+		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
+		testContent.innerHTML = '';
 	});
 
 	QUnit.test("insert 2 images, set src in second image", function(assert) {
@@ -1290,7 +1313,9 @@ QUnit.module("images");
 		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
+
 		assert.equal(testContent.querySelector("img + img").getAttribute("data-simply-src"), "HelloWorld");
+		testContent.innerHTML = '';
 	});
 
 QUnit.module("lists");
@@ -1349,7 +1374,6 @@ QUnit.module("lists");
 		editor.actions["simply-list-add"](button);
 		editor.actions["simply-list-add"](button);
 
-
 		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
 		
 		editor.context.toolbar.hide = true;
@@ -1359,6 +1383,42 @@ QUnit.module("lists");
 		var context = editor.context.get();
 		assert.equal(context, "simply-list-item");
 	});
+
+	QUnit.test("add list item, databinding", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
+		assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
+		assert.equal(testList.querySelector("[data-simply-field=item]").dataBinding.parentKey, "/testList/0/");
+		assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
+	});
+
+	QUnit.test("add 2 list items, databinding", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
+		assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
+		assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
+
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 2);
+		assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
+		assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
+
+		assert.equal(editor.pageData.testList[1].item, testList.querySelectorAll("[data-simply-field=item]")[1].innerHTML);
+		assert.equal(editor.pageData.testList[1]._bindings_.item, testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding);		
+		assert.equal(testList.querySelectorAll("[data-simply-field=item]")[0].dataBinding.parentKey, "/testList/0/");
+		assert.equal(testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding.parentKey, "/testList/1/");
+	});
+
 
 /* FIXME: Decide how this should work and make it so */
 /*QUnit.module("static link with editable content");

@@ -2,103 +2,60 @@
 	editor.plugins.undoRedo = {
 		currentUndo : -1,
 		undoSet : [],
+		timer : false,
 		isEqual : function(data1, data2) {
+			if (typeof data1 === "undefined" || typeof data2 === "undefined") {
+				return false;
+			}
 			if (JSON.stringify(data1) == JSON.stringify(data2)) {
 				return true;
 			}
+			return false;
 		},
-		storeUndo : function(target, saveCurrent) {
-			var currentData;
-			if (target.getAttribute("data-simply-list")) {
-				var stashedFields = document.querySelectorAll("[data-simply-stashed]");
-				for (i=0; i<stashedFields.length; i++) {
-					stashedFields[i].removeAttribute("data-simply-stashed");
-				}
-
-				currentData = editor.data.get(target);
-				var dataName = target.getAttribute("data-simply-list");
-				var dataPath = editor.data.getDataPath(target);
-				currentData = currentData[dataPath][dataName];
-			} else {
-				currentData = editor.field.get(target);
+		storeUndo : function(undoAction) {
+			if (editor.plugins.undoRedo.undoing) {
+				return;
 			}
-
-			if (saveCurrent) {
-				editor.plugins.undoRedo.undoSet.push({target: target, data: currentData});
-				target.previousData = currentData;
-				target.undoSaved = true;
-			} else if (target.previousData && !editor.plugins.undoRedo.isEqual(target.previousData, currentData)) {
-				editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo + 1);
-				editor.plugins.undoRedo.undoSet.push({target: target, data: target.previousData});
-				editor.plugins.undoRedo.currentUndo = editor.plugins.undoRedo.undoSet.length;
-				target.previousData = currentData;
-			} else if (typeof target.previousData === "undefined") {
-				target.previousData = currentData;
-			}
+			editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo + 1);
+			editor.plugins.undoRedo.undoSet.push(undoAction);
+			editor.plugins.undoRedo.currentUndo++;
 
 			editor.toolbars["simply-undo-redo"].update();
 		},
 		undo : function() {
+			if (!editor.plugins.undoRedo.canUndo()) {
+				return;
+			}
 			editor.plugins.undoRedo.undoing = true;
 			editor.context.toolbar.hide = true;
-			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo - 1];
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
 			if (typeof undoStep !== "undefined") {
-				if (!undoStep.target.undoSaved) {
-					editor.plugins.undoRedo.storeUndo(undoStep.target, true);
-				}
-				if (undoStep.target.getAttribute("data-simply-list")) {
-					var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
-					var items = undoStep.target.querySelectorAll("[data-simply-list-item]");
-					for (var i=0; i<items.length; i++) {
-						items[i].parentNode.removeChild(items[i]);
-					}
-					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
-					editor.editmode.makeEditable(undoStep.target);
-					document.body.scrollTop = currentScroll;
-				} else {
-					editor.field.set(undoStep.target, undoStep.data);
-					if (undoStep.target.hopeEditor) {
-						undoStep.target.hopeEditor.parseHTML();
-						undoStep.target.hopeEditor.update();
-					}
-				}
+				var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
+				undoStep.undo();
+				document.body.scrollTop = currentScroll;
 				editor.plugins.undoRedo.currentUndo--;
 			}
+			editor.plugins.undoRedo.undoing = false;
 			editor.toolbars["simply-undo-redo"].update();
-			window.setTimeout(function() {
-				editor.plugins.undoRedo.undoing = false;
-			}, 300);
 		},
 		redo : function() {
+			if (!editor.plugins.undoRedo.canRedo()) {
+				return;
+			}
 			editor.plugins.undoRedo.undoing = true;
 			editor.context.toolbar.hide = true;
 			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo + 1];
 			if (typeof undoStep !== "undefined") {
-				if (undoStep.target.getAttribute("data-simply-list")) {
-					var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
-					var items = undoStep.target.querySelectorAll("[data-simply-list-item]");
-					for (var i=0; i<items.length; i++) {
-						items[i].parentNode.removeChild(items[i]);
-					}
-					editor.data.list.applyTemplates(undoStep.target, undoStep.data);
-					editor.editmode.makeEditable(undoStep.target);
-					document.body.scrollTop = currentScroll;
-				} else {
-					editor.field.set(undoStep.target, undoStep.data);
-					if (undoStep.target.hopeEditor) {
-						undoStep.target.hopeEditor.parseHTML();
-						undoStep.target.hopeEditor.update();
-					}
-				}
+				var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
+				undoStep.redo();
+				document.body.scrollTop = currentScroll;
 				editor.plugins.undoRedo.currentUndo++;
 			}
+			editor.plugins.undoRedo.undoing = false;
 			editor.toolbars["simply-undo-redo"].update();
-			window.setTimeout(function() {
-				editor.plugins.undoRedo.undoing = false;
-			}, 300);
 		},
 		canUndo : function() {
-			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo - 1];
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
                         if (typeof undoStep !== "undefined") {
 				return true;
 			}
@@ -113,8 +70,35 @@
 		},
 		changeHandler : function(evt) {
 			if (!editor.plugins.undoRedo.undoing) {
-				editor.plugins.undoRedo.storeUndo(this);
-				this.undoSaved = false;
+				var dataBinding = evt.data.dataBinding;
+				var newValue = evt.data.arguments[1];
+				var oldValue = evt.data.arguments[2];
+
+				var dataPath = editor.data.getDataPath(dataBinding.elements[0]);
+
+				var set = function(value) {
+					var targetValue = editor.currentData[dataPath];
+					var subkeys = dataBinding.parentKey.split("/");
+					var subkey;
+					while (subkeys.length) {
+						subkey = subkeys.shift();
+						if (subkey != "") {
+							targetValue = targetValue[subkey];
+						}
+					}
+					targetValue[dataBinding.key] = value;
+					dataBinding.resolve(true);
+				};
+					
+				var undoAction = {
+					undo : function() {
+						set(oldValue);
+					},
+					redo : function() {
+						set(newValue);
+					}
+				};
+				editor.plugins.undoRedo.storeUndo(undoAction);
 			}
 		}
 	};
@@ -125,6 +109,7 @@
 			var listItem = document.createElement("li");
 			var button = document.createElement("button");
 			button.dataset.simplyAction = "simply-undo";
+			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-undo"></i>Undo';
 			listItem.appendChild(button);
 			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
@@ -132,43 +117,31 @@
 			listItem = document.createElement("li");
 			button = document.createElement("button");
 			button.dataset.simplyAction = "simply-redo";
+			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-repeat"></i>Redo';
 			listItem.appendChild(button);
 			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
-
-			var fields = document.querySelectorAll("[data-simply-field], [data-simply-list]");
-			for (var i=0; i<fields.length; i++) {
-				if (!editor.node.hasSimplyParent(fields[i])) {
-					editor.plugins.undoRedo.storeUndo(fields[i]);
-					fields[i].addEventListener("keyup", editor.plugins.undoRedo.changeHandler);
-					fields[i].addEventListener("mouseup", editor.plugins.undoRedo.changeHandler);
-					fields[i].addEventListener("touchend", editor.plugins.undoRedo.changeHandler);
-					fields[i].addEventListener("slip:reorder", editor.plugins.undoRedo.changeHandler);
-				}
-			}
-
-			// FIXME: Add keyboard handlers;
+			document.addEventListener("simply-data-changed", editor.plugins.undoRedo.changeHandler);
 		},
 		update : function() {
 			var undoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
 			var redoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
 
 			if (editor.plugins.undoRedo.canUndo()) {
-				if (undoButton.getAttribute("disabled")) {
+				if (undoButton && undoButton.getAttribute("disabled")) {
 					undoButton.removeAttribute("disabled");
 				}
 			} else {
-				if (!undoButton.getAttribute("disabled")) {
+				if (undoButton && !undoButton.getAttribute("disabled")) {
 					undoButton.setAttribute("disabled", true);
 				}
 			}
-
 			if (editor.plugins.undoRedo.canRedo()) {
-				if (redoButton.getAttribute("disabled")) {
+				if (redoButton && redoButton.getAttribute("disabled")) {
 					redoButton.removeAttribute("disabled");
 				}
 			} else {
-				if (!redoButton.getAttribute("disabled")) {
+				if (redoButton && !redoButton.getAttribute("disabled")) {
 					redoButton.setAttribute("disabled", true);
 				}
 			}
@@ -176,9 +149,11 @@
 		actions : {
 			"simply-undo" : function() {
 				editor.plugins.undoRedo.undo();
+				editor.toolbars["simply-undo-redo"].update();
 			},
 			"simply-redo" : function() {
 				editor.plugins.undoRedo.redo();
+				editor.toolbars["simply-undo-redo"].update();
 			}
 		}
 	});

@@ -332,7 +332,7 @@ window['Slip'] = (function(){
 
 					onMove: function() {
 						var move = this.getAbsoluteMovement();
-				/*
+				
 						if (move.x > 20 && move.y < Math.max(100, this.target.height)) {
 							if (this.dispatch(this.target.originalTarget, 'beforeswipe')) {
 								this.setState(this.states.swipe);
@@ -340,7 +340,7 @@ window['Slip'] = (function(){
 							} else {
 								this.setState(this.states.idle);
 							}
-						}*/
+						}
 						if (move.x > 20) {
 							this.setState(this.states.idle);
 						}
@@ -508,6 +508,10 @@ window['Slip'] = (function(){
 						(window.innerHeight-100)/containerRects.height,
 						(window.innerWidth)/containerRects.width
 					);
+
+					if (this.container.scale < 0.4) {
+						this.container.scale = 0.4;
+					};
 
 					this.container.style[transitionPrefix] = transformProperty + " .3s ease-in-out";
 					this.container.style[transformPrefix + "Origin"] = (this.startPosition.x - containerRects.left) + "px " + (this.startPosition.y - containerRects.top) + "px";

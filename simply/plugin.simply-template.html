@@ -68,11 +68,11 @@
 				} else if (editor.currentData[editor.data.getDataPath()]['data-simply-page-template']) {
 					pageTemplate = editor.currentData[editor.data.getDataPath()]['data-simply-page-template'];
 				}
-				simply.widgets.properties.set("simply-page-template-list", pageTemplate);
+				document.getElementById("simply-page-template-list").value = pageTemplate;
 			}
 		},
 		apply : function() {
-			var pageTemplate = simply.widgets.properties.get("simply-page-template-list");
+			var pageTemplate = document.querySelector("#simply-page-template-list").value;
 			
 			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
 			editor.plugins.dialog.close();
