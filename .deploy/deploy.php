@@ -1,0 +1,106 @@
+<?php
+/*
+ * This file has been generated automatically.
+ * Please change the configuration for correct use deploy.
+ */
+
+//require 'recipe/common.php';
+require __DIR__ . '/vendor/deployphp/recipes/recipes/rsync.php';
+
+// Set configurations
+set('shared_files', []);
+set('shared_dirs', []);
+set('writable_dirs', []);
+set('clear_use_sudo', false);
+set('writable_use_sudo', false);
+set('copy_dirs', []);
+set('default_stage','canary');
+
+env('rsync_src', dirname(__DIR__));
+env('majorversion',getenv('MAJOR'));
+env('rsync_dest','{{deploy_path}}/{{majorversion}}/');
+env('workspace', function() {
+	return runLocally('mktemp -d')->toString();
+});
+
+env('version', function() {
+	$version = getenv('CI_BUILD_REF');
+	writeln("Version: $version");
+	if (empty($version)) {
+		$version = runLocally('git rev-parse HEAD')->toString();
+	}
+
+	return $version;
+});
+
+
+set('rsync',[
+	'exclude'      => [
+		'.git',
+		'.deploy',
+		'.csslintrc',
+		'.gitlab-ci.yml',
+		'examples',
+	    'tests',
+		'attic',
+	],
+	'flags'         => 'rzcE',
+	'options'       => ['delete', 'delete-after', 'force', 'delete-excluded'],
+	'exclude-file' => false,
+	'include'      => [ ],
+	'include-file' => false,
+	'filter'       => [],
+	'filter-file'  => false,
+	'filter-perdir'=> false,
+	'timeout'      => 60,
+]);
+
+// Configure servers
+server('canary', 'helikon.muze.nl')
+	->user('deployer')
+	->forwardAgent()
+	->stage('canary')
+	->env('deploy_path', '/var/www/testdeploy-staging/');
+
+
+task('prepare:workdir', function() {
+	runLocally('git archive --prefix=release/ HEAD | tar -C {{workspace}} -xf -');
+	env('release', '{{workspace}}/release/');
+	env('rsync_src', '{{release}}');
+})->desc('Preparing code for deployment');
+
+task('prepare:pack', function() {
+	runLocally('cd {{release}}/hope && ./pack');
+	runLocally('cd {{release}}/hope && find {{release}}/hope -type f ! -name hope.packed.js -delete ');
+})->desc('Pack hope');
+
+task('prepare:simply-edit', function() {
+	runLocally('cd {{release}} && sed -e "s/@version/{{version}}/" js/simply-edit.js  > simply-edit.js && rm js/simply-edit.js');
+})->desc('Prepare simply-edit.js');
+
+task('prepare:cleanup', function() {
+	runLocally('cd {{release}} && find .  -type d -empty -delete');
+})->desc('Cleanup releasedir');
+/**
+ * Restart php-fpm on success deploy.
+ */
+task('php-fpm:restart', function () {
+	run('sudo service php5-fpm reload');
+})->desc('Restart PHP-FPM service');
+
+task('prepare', [
+	'prepare:workdir',
+	'prepare:pack',
+	'prepare:simply-edit',
+	'prepare:cleanup',
+])->desc('Prepare Release');
+
+/**
+ * Main task
+ */
+task('deploy', [
+	'prepare',
+	'rsync',
+])->desc('Deploy SimplyEdit');
+
+after('deploy', 'php-fpm:restart');
