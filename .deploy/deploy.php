@@ -45,7 +45,7 @@ set('rsync',[
 		'attic',
 	],
 	'flags'         => 'rzcE',
-	'options'       => ['delete', 'delete-after', 'force', 'delete-excluded'],
+	'options'       => ['delete', 'delete-after', 'delay-updates','ignore-times', 'delete-excluded'],
 	'exclude-file' => false,
 	'include'      => [ ],
 	'include-file' => false,
@@ -56,11 +56,11 @@ set('rsync',[
 ]);
 
 // Configure servers
-server('canary', 'helikon.muze.nl')
+server('canary', 'se-cdn.dc.muze.nl')
 	->user('deployer')
 	->forwardAgent()
 	->stage('canary')
-	->env('deploy_path', '/var/www/testdeploy-staging/');
+	->env('deploy_path', '/opt/canary.simplyedit.io/res/');
 
 
 task('prepare:workdir', function() {
@@ -81,12 +81,6 @@ task('prepare:simply-edit', function() {
 task('prepare:cleanup', function() {
 	runLocally('cd {{release}} && find .  -type d -empty -delete');
 })->desc('Cleanup releasedir');
-/**
- * Restart php-fpm on success deploy.
- */
-task('php-fpm:restart', function () {
-	run('sudo service php5-fpm reload');
-})->desc('Restart PHP-FPM service');
 
 task('prepare', [
 	'prepare:workdir',
@@ -102,5 +96,3 @@ task('deploy', [
 	'prepare',
 	'rsync',
 ])->desc('Deploy SimplyEdit');
-
-after('deploy', 'php-fpm:restart');
