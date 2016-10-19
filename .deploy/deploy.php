@@ -70,7 +70,7 @@ task('prepare:workdir', function() {
 })->desc('Preparing code for deployment');
 
 task('prepare:pack', function() {
-	runLocally('cd {{release}}/hope && ./pack');
+	//FOR NOW, no repack runLocally('cd {{release}}/hope && ./pack');
 	runLocally('cd {{release}}/hope && find {{release}}/hope -type f ! -name hope.packed.js -delete ');
 })->desc('Pack hope');
 
