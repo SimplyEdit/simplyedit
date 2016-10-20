@@ -1200,10 +1200,15 @@
 				document.head.appendChild(scriptTag);
 			}
 		},
-		loadStyleSheet : function(src) {
+		loadStyleSheet : function(src, attributes) {
 			var styleTag = document.createElement("LINK");
 			styleTag.setAttribute("rel", "stylesheet");
 			styleTag.setAttribute("type", "text/css");
+			if (typeof attributes !== 'undefined'){
+				for (var key in attributes) {
+					styleTag.setAttribute(key, attributes[key]);
+				}
+			}
 			styleTag.href = src;
 			document.head.appendChild(styleTag);
 		},
@@ -1306,7 +1311,6 @@
 				var testNode = document.importNode(testTemplate.content, true);
 				toolbarsContainer.appendChild(testNode);
 
-
 				// Add slip.js for sortable items;
 				editor.loadScript(editor.baseURL + "simply/slip.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version));
 
@@ -1317,7 +1321,10 @@
 				editor.loadStyleSheet(editor.baseURL + "simply/css/editor.v9.css");
 
 				// Add font awesome
-				editor.loadStyleSheet("//netdna.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css");
+				editor.loadStyleSheet("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css",{
+					'integrity': 'sha256-k2/8zcNbxVIh5mnQ52A0r3a6jAgMGxFJFE2707UxGCk=',
+					'crossorigin':"anonymous"
+				});
 
 				// Add legacy scripts
 				editor.loadScript(editor.baseURL + "simply/scripts.js");
