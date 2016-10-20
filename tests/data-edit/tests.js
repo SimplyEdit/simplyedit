@@ -974,7 +974,7 @@ QUnit.module("editor text selection");
 		testContent.innerHTML = "<p>He<em>llo there</em> world</p>";
 		testContent.hopeEditor.parseHTML();
 
-		setCaretPosition(testContent.querySelector("em"), 3);
+		setCaretPosition(testContent.querySelector("em"), 0, 9);
 		editor.actions['simply-text-italic']();
 
 		assert.equal(testContent.innerHTML, '<p>Hello there world</p>', "EM tag removed");

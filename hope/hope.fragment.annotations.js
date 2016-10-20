@@ -202,26 +202,37 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 			// this is a diff / !intersects algorithm , which should be in hope.range
 			// but that would require an extended range format which supports sequences of simple ranges
-
 			if ( listRange.equals(range) || range.contains(listRange) ) {
 				// range encompasses annotation range
 				list[i] = null;
 				remove.push(i);
 			} else if (listRange.start<range.start && listRange.end>range.end) {
+				newTag = list[i].tag;
+				if (list[i].tag.indexOf("data-hope-caret") > -1) {
+					newTag = newTag.replace(/data-hope-caret="\d+"/, 'data-hope-caret-"' + range.end + '"');
+				}
+				list[i].tag = list[i].tag.replace(/data-hope-caret="\d+"/, '');
 				// range is enclosed entirely in annotation range
 				list[i] = hope.annotation.create(
 					[ listRange.start, range.start ],
-					list[i].tag
+					list[i].tag.replace(/data-hope-caret="\d+"/, '')
 				);
 				add.push( hope.annotation.create(
 					[ range.end, listRange.end ],
-					list[i].tag
+					newTag
 				));
 			} else if ( listRange.start < range.start ) {
+				if (list[i].tag.indexOf("data-hope-caret") > -1) {
+					newTag = 'data-hope-caret-"' + range.end + '"';
+					add.push( hope.annotation.create(
+						[ range.end, listRange.end ],
+						newTag
+					));
+				}
 				// range overlaps annotation to the right
 				list[i] = hope.annotation.create( 
 					[ listRange.start, range.start ], 
-					list[i].tag 
+					list[i].tag.replace(/data-hope-caret="\d+"/, '')
 				);
 			} else if ( listRange.end > range.end ) {
 				// range overlaps annotation to the left

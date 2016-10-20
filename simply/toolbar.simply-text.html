@@ -422,11 +422,54 @@
 
 				var range = hopeEditor.currentRange;
 				var annotation = hopeEditor.fragment.has(range, tag);
+
+				if (range.start === range.end) {
+					var addTag = function(event) {
+						var currentRange = hopeEditor.currentRange;
+						if (currentRange.start === range.start && currentRange.end === range.end) {
+							var rangeLength = event.newValue.length - event.prevValue.length;
+							event.preventDefault();
+
+							event.target.textContent = event.newValue;
+							hopeEditor.parseHTML();
+							hopeEditor.selection.move(rangeLength);
+							var newRange = hope.range.create(range.start, range.start + rangeLength);
+
+							for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
+								if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
+									hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+								} else {
+									hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+								}
+							}
+							hopeEditor.update();
+						}
+						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+						editor.plugins.hope.annotation.tagToggle = [];
+					};
+
+					if (editor.plugins.hope.annotation.tagToggle.length === 0) {
+						hopeEditor.field.addEventListener("DOMCharacterDataModified", addTag);
+						var removeAddTagListener = function() {
+							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+						};
+					}
+				}
+
 				if (annotation) {
 					if ((annotation.range.start === range.start) && (annotation.range.end === range.end)) {
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					} else if (range.start === range.end) {
-						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+						var index = editor.plugins.hope.annotation.tagToggle.indexOf(tag);
+						if (index !== -1) {
+							editor.plugins.hope.annotation.tagToggle.splice(index, 1);
+						} else {
+							editor.plugins.hope.annotation.tagToggle.push(tag);
+						}
+						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
+							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+						}
+						// hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					} else {
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 						var newRange = hope.range.create(annotation.range.start, range.start);
@@ -436,33 +479,6 @@
 					}
 				} else {
 					if (range.start === range.end) {
-						var addTag = function(event) {
-							var currentRange = hopeEditor.currentRange;
-							if (currentRange.start === range.start && currentRange.end === range.end) {
-								var rangeLength = event.newValue.length - event.prevValue.length;
-								event.preventDefault();
-
-								event.target.textContent = event.newValue;
-								hopeEditor.parseHTML();
-								hopeEditor.selection.move(rangeLength);
-								var newRange = hope.range.create(range.start, range.start + rangeLength);
-
-								for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
-									hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
-								}
-								hopeEditor.update();
-							}
-							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
-							editor.plugins.hope.annotation.tagToggle = [];
-						};
-
-						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
-							hopeEditor.field.addEventListener("DOMCharacterDataModified", addTag);
-							var removeAddTagListener = function() {
-								hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
-							};
-						}
-
 						var index = editor.plugins.hope.annotation.tagToggle.indexOf(tag);
 						if (index !== -1) {
 							editor.plugins.hope.annotation.tagToggle.splice(index, 1);
