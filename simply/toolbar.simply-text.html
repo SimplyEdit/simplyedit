@@ -426,24 +426,29 @@
 				if (range.start === range.end) {
 					var addTag = function(event) {
 						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag); // remove it now, setting textContent can trigger it again and mess up;
-						var currentRange = hopeEditor.currentRange;
-						if (currentRange.start === range.start && currentRange.end === range.end) {
-							var rangeLength = event.newValue.length - event.prevValue.length;
-							event.preventDefault();
-							event.target.textContent = event.newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
-							hopeEditor.parseHTML();
-							hopeEditor.selection.move(rangeLength);
-							var newRange = hope.range.create(range.start, range.start + rangeLength);
 
-							for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
-								if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
-									hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
-								} else {
-									hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
-								}
+						var rangeLength = event.newValue.length - event.prevValue.length;
+						event.preventDefault();
+						event.target.textContent = event.newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
+						// ... and messes up the cursor position;
+
+						hopeEditor.parseHTML();
+						hopeEditor.selection.move(rangeLength);
+						var newRange = hope.range.create(range.start, range.start + rangeLength);
+
+						for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
+							if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
+								hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+							} else {
+								hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
 							}
-							hopeEditor.update();
 						}
+						hopeEditor.update();
+
+						// this resets the cursor position to where it was
+						hopeEditor.selection.updateRange(newRange.end, newRange.end);
+						hopeEditor.showCursor();
+
 						editor.plugins.hope.annotation.tagToggle = [];
 					};
 
