@@ -425,12 +425,12 @@
 
 				if (range.start === range.end) {
 					var addTag = function(event) {
+						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag); // remove it now, setting textContent can trigger it again and mess up;
 						var currentRange = hopeEditor.currentRange;
 						if (currentRange.start === range.start && currentRange.end === range.end) {
 							var rangeLength = event.newValue.length - event.prevValue.length;
 							event.preventDefault();
-
-							event.target.textContent = event.newValue;
+							event.target.textContent = event.newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
 							hopeEditor.parseHTML();
 							hopeEditor.selection.move(rangeLength);
 							var newRange = hope.range.create(range.start, range.start + rangeLength);
@@ -444,7 +444,6 @@
 							}
 							hopeEditor.update();
 						}
-						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
 						editor.plugins.hope.annotation.tagToggle = [];
 					};
 
