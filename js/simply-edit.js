@@ -475,10 +475,21 @@
 				};
 
 				var dataLists = target.querySelectorAll("[data-simply-list]");
+				var subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
 					initList(data, target);
 				}
 				for (var i=0; i<dataLists.length; i++) {
+					var isSub = false;
+					for (var a=0; a<subLists.length; a++) {
+						if (dataLists[i] == subLists[a]) {
+							isSub = true;
+						}
+					}
+					if (isSub) {
+						continue;
+					}
 					initList(data, dataLists[i]);
 				}
 			},
