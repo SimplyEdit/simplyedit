@@ -1,4 +1,4 @@
-image: muze/phantomjs:latest
+image: muze/phantomjs:v2latest
 
 unittest:
   before_script:
@@ -12,11 +12,10 @@ unittest:
      - phantomjs tests/runner.js http://localhost/tests/data-edit/ci.html
   tags:
     - docker
+  stage: test
 
 syntaxtest:
   before_script:
-    - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} update
-    - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} --no-install-recommends -y install nodejs-legacy
     - npm -g install jshint
     - npm -g install csslint
   script:
@@ -24,4 +23,4 @@ syntaxtest:
     - csslint .
   tags:
     - docker
-
+  stage: test
