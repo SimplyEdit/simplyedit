@@ -86,6 +86,7 @@
 				var currentField = editor.node.getEditableField();
 				editor.context.hopeEditor = currentField.hopeEditor;
 			}
+			editor.context.targetNode = vdSelection.getNode(vdSelectionState.get());
 
 			if (editor.context.hopeEditor) {
 				editor.context.skipUpdate = true;
@@ -555,8 +556,11 @@
 						}
 					}
 				}
+				if (!(target.tagName == "td" && target.parentNode && target.parentNode.getAttribute("data-simply-list-item"))) {
+					// Special case for td, because the :before for the list item is set on the TD instead of the TR; We need to keep the list bonus one cycle longer;
+					listBonus = false;
+				}
 				target = targets.shift();
-				listBonus = false;
 			}
 			editor.context.explain[filter.context].push("result = 0");
 			return 0;
