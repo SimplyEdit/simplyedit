@@ -62,7 +62,12 @@
 				}
 
 				var dataFields = target.querySelectorAll("[data-simply-field]");
-				var subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+				var subFields;
+				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE) {
+					subFields = target.querySelectorAll("[data-simply-list] [data-simply-field]");
+				} else {
+					subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+				}
 
 				if (target == document) {
 					editor.settings.databind.parentKey = '/';
@@ -475,8 +480,12 @@
 				};
 
 				var dataLists = target.querySelectorAll("[data-simply-list]");
-				var subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
-
+				var subLists;
+				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE) {
+					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list]");
+				} else {
+					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+				}
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
 					initList(data, target);
 				}
