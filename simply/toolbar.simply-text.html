@@ -445,9 +445,11 @@
 						}
 						hopeEditor.update();
 
-						// this resets the cursor position to where it was
-						hopeEditor.selection.updateRange(newRange.end, newRange.end);
-						hopeEditor.showCursor();
+						window.setTimeout(function() {
+							// this resets the cursor position to where it was; Chrome 54 is still busy doing stuff when the update is running, so give it a cycle to get its stuff together;
+							hopeEditor.selection.updateRange(newRange.end, newRange.end);
+							hopeEditor.showCursor();
+						}, 0);
 
 						editor.plugins.hope.annotation.tagToggle = [];
 					};
