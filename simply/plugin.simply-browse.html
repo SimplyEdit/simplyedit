@@ -476,6 +476,7 @@
 				});
 				document.querySelector("#simply-browse input[type='file']").addEventListener("change", function(evt) {
 					editor.plugins.browse.handleFiles(this.files);
+					this.value = '';
 				});
 			} else {
 				var uploadButton = document.querySelector('[data-simply-action="simply-browse-upload"]');
