@@ -23,6 +23,17 @@
 				document.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
 			}, 200);
 		}
+
+		// Chrome remembers that a text was bold or italic, this will remove those tags when they are inserted.
+		if (ev.target.tagName && (ev.target.tagName.toLowerCase()=='b' || ev.target.tagName.toLowerCase()=='i')) {
+			if (ev.target.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
+				editor.node.unwrap(ev.target);
+				var sel = window.getSelection();
+				var range = sel.getRangeAt(0);
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
+		}
 	};
 
 	var noTagsAllowedListener = function(ev) {

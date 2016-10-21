@@ -686,7 +686,6 @@ hope.register( 'hope.fragment.annotations', function() {
 			}
 			// this is a diff / !intersects algorithm , which should be in hope.range
 			// but that would require an extended range format which supports sequences of simple ranges
-
 			if ( listRange.equals(range) || range.contains(listRange) ) {
 				// range encompasses annotation range
 				list[i] = null;
@@ -705,7 +704,7 @@ hope.register( 'hope.fragment.annotations', function() {
 				// range overlaps annotation to the right
 				list[i] = hope.annotation.create( 
 					[ listRange.start, range.start ], 
-					list[i].tag 
+					list[i].tag
 				);
 			} else if ( listRange.end > range.end ) {
 				// range overlaps annotation to the left

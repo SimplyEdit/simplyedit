@@ -745,12 +745,12 @@
 	outline: 2px dashed rgba(128,128,128,0.3);
 	text-align: center;
 }
-[data-simply-field]:empty {
+[data-simply-field]:not(input):not(textarea):empty {
 	min-height: 24px;
 	text-align: center;
 }
 .simply-empty[data-simply-list]:before,
-[data-simply-field]:empty:before {
+[data-simply-field]:not(input):not(textarea):empty:before {
 	text-align: center;
 	font-family: FontAwesome;
 	font-size: 20px;
@@ -785,13 +785,13 @@
 	opacity: 0.3;
 }
 
-[data-simply-field]:empty:not([data-simply-field-icon]):before {
+[data-simply-field]:not(input):not(textarea):empty:not([data-simply-field-icon]):before {
 	content: "\f044"; /* pencil-square-o */
 }
-[data-simply-field][data-simply-field-icon]:empty:not([data-simply-field-icon|="fa"]):before {
+[data-simply-field][data-simply-field-icon]:not(input):not(textarea):empty:not([data-simply-field-icon|="fa"]):before {
 	content: attr(data-simply-field-icon);
 }
-[data-simply-field]:empty:after {
+[data-simply-field]:not(input):not(textarea):empty:after {
 	content: "(Empty)";
 	text-align: center;
 	font-family: arial;
