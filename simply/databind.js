@@ -587,8 +587,8 @@ document.addEventListener("DOMNodeRemoved", function(evt) {
           }
 
           // Find elements against parent node
-          nodeList = oldMethod.call(parentNode, '#'+this.id+' '+query);
-
+          // nodeList = oldMethod.call(parentNode, '#'+this.id+' '+query);
+          nodeList = parentNode[methodName]('#'+this.id+' '+query);
           // Reset the ID
           if (gaveId) {
             this.id = '';
