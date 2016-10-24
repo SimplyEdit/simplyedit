@@ -74,6 +74,12 @@ server('canary', 'se-cdn.dc.muze.nl')
 	->stage('canary')
 	->env('deploy_path', '/opt/canary.simplyedit.io/res/');
 
+// Configure servers
+server('cdn1', 'se-cdn.dc.muze.nl')
+	->user('deployer')
+	->forwardAgent()
+	->stage('cdn')
+	->env('deploy_path', '/opt/cdn.simplyedit.io/res/');
 
 task('prepare:workdir', function() {
 	runLocally('git archive --prefix=release/ HEAD | tar -C {{workspace}} -xf -');
