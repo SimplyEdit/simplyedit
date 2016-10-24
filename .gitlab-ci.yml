@@ -45,4 +45,21 @@ canary:
     - 'NEXT=$((${NEXT:=-1}+1))'
     - 'if [ "${CI_BUILD_REF_NAME}" == "master" ] ; then export MAJOR=${NEXT} ; else export MAJOR=$(echo "${CI_BUILD_REF_NAME}" | tr -d -c "[:digit:]" ) ; fi '
   script:
-    - dep --file=.deploy/deploy.php -vv deploy
+    - dep --file=.deploy/deploy.php -vv deploy canary
+
+deploy-cdn:
+  stage: deploy
+  environment: cdn
+  image: muze/deployer:latest
+  when: on_success
+  only:
+    - tags
+  tags:
+    - dc
+  before_script:
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - composer --working-dir=.deploy/ install --no-scripts
+  script:
+    - dep --file=.deploy/deploy.php -vv release cdn
