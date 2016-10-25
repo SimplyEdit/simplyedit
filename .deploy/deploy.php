@@ -7,6 +7,10 @@
 //require 'recipe/common.php';
 require __DIR__ . '/vendor/deployphp/recipes/recipes/rsync.php';
 
+// allow specification of group of servers
+argument('stage', \Symfony\Component\Console\Input\InputArgument::OPTIONAL, 'Run tasks only on this server or group of servers.');
+
+
 // Set configurations
 set('shared_files', []);
 set('shared_dirs', []);
@@ -24,12 +28,20 @@ env('workspace', function() {
 });
 
 env('version', function() {
-	$version = getenv('CI_BUILD_REF');
-	writeln("Version: $version");
-	if (empty($version)) {
-		$version = runLocally('git rev-parse HEAD')->toString();
+	// if it's a tag, use tag
+	$version = getenv('CI_BUILD_TAG');
+	if (! empty($version)) {
+		return $version;
 	}
 
+	//use build ref
+	$version = getenv('CI_BUILD_REF');
+	if (!empty($version)) {
+		return $version;
+	}
+
+	// local compiles, use git as fallback
+	$version = runLocally('git rev-parse HEAD')->toString();
 	return $version;
 });
 
@@ -62,6 +74,12 @@ server('canary', 'se-cdn.dc.muze.nl')
 	->stage('canary')
 	->env('deploy_path', '/opt/canary.simplyedit.io/res/');
 
+// Configure servers
+server('cdn1', 'se-cdn.dc.muze.nl')
+	->user('deployer')
+	->forwardAgent()
+	->stage('cdn')
+	->env('deploy_path', '/opt/cdn.simplyedit.io/res/');
 
 task('prepare:workdir', function() {
 	runLocally('git archive --prefix=release/ HEAD | tar -C {{workspace}} -xf -');
@@ -89,6 +107,32 @@ task('prepare', [
 	'prepare:cleanup',
 ])->desc('Prepare Release');
 
+/*
+ * cdn supporting tasks
+ */
+
+task('configure-build', function() {
+	$version = env('version');
+	$major = explode('.',$version)[0];
+	if($major != (int)$major ) {
+		throw new RuntimeException('version is not a tag');
+	}
+
+	env('rsync_dest','{{deploy_path}}/res/'.$major.'/{{version}}/');
+	env('major',$major);
+
+})->desc('Configure desination for cdn');
+
+task('cdn-symlink', function(){
+	env('majorpath','{{deploy_path}}/res/{{major}}/');
+	$link = run('if [ -e "{{majorpath}}/latest" ] ; then readlink "{{majorpath}}/latest" ; else echo {{major}}.0 ; fi')->toString();
+	$version = env('version');
+	if(version_compare($version,$link,'>')){
+		run('cd "{{majorpath}}" && ln -sfn {{version}} latest');
+	}
+})->desc('Set Symlink');
+
+
 /**
  * Main task
  */
@@ -96,3 +140,13 @@ task('deploy', [
 	'prepare',
 	'rsync',
 ])->desc('Deploy SimplyEdit');
+
+/**
+ * Main cdn deploy
+ */
+task('release', [
+	'configure-build',
+	'prepare',
+	'rsync',
+	'cdn-symlink',
+])->desc('Deploy Tag to CDN');

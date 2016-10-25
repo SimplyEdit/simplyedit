@@ -34,15 +34,31 @@ canary:
     - master@muze/simple-edit
     - /^master-[0-9]+$/@muze/simple-edit
   tags:
-    - docker
+    - dc
   before_script:
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
-    - '[[ -f /.dockerenv ]] && /bin/echo -e "Host *.dc.muze.nl backup1.intern.muze.nl backup2.intern.muze.nl \n\tProxyCommand ssh muze-fundaments-jump nc -w 120 %h %p 2> /dev/null\n\tForwardAgent yes\t\n\nHost muze-fundaments-jump\n\tHostname shell.muze.nl\n\tUser deployer\n\tControlMaster auto\n\tControlPath ~/.ssh/master-%l-%r@%h:%p\n\tAddressFamily inet\n\tControlPersist 3600\n\n" > ~/.ssh/config'
     - composer --working-dir=.deploy/ install --no-scripts
     - 'NEXT=$(git for-each-ref  --format="%(refname:short)" **/origin/master-* | sort | tr -d -c "[:digit:]\n" | sort -nr | head -n1)'
     - 'NEXT=$((${NEXT:=-1}+1))'
     - 'if [ "${CI_BUILD_REF_NAME}" == "master" ] ; then export MAJOR=${NEXT} ; else export MAJOR=$(echo "${CI_BUILD_REF_NAME}" | tr -d -c "[:digit:]" ) ; fi '
   script:
-    - dep --file=.deploy/deploy.php -vv deploy
+    - dep --file=.deploy/deploy.php -vv deploy canary
+
+deploy-cdn:
+  stage: deploy
+  environment: cdn
+  image: muze/deployer:latest
+  when: on_success
+  only:
+    - tags@muze/simple-edit
+  tags:
+    - dc
+  before_script:
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - composer --working-dir=.deploy/ install --no-scripts
+  script:
+    - dep --file=.deploy/deploy.php -vv release cdn
