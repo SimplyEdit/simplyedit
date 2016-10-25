@@ -239,7 +239,8 @@ dataBinding = function(config) {
 			},
 			get : function() {
 				return shadowValue;
-			}
+			},
+			enumerable: true
 		});
 	};
 	var fireEvent = function(targetNode, eventName, detail) {
