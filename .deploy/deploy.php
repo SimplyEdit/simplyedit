@@ -118,13 +118,13 @@ task('configure-build', function() {
 		throw new RuntimeException('version is not a tag');
 	}
 
-	env('rsync_dest','{{deploy_path}}/res/'.$major.'/{{version}}/');
+	env('rsync_dest','{{deploy_path}}/'.$major.'/{{version}}/');
 	env('major',$major);
 
 })->desc('Configure desination for cdn');
 
 task('cdn-symlink', function(){
-	env('majorpath','{{deploy_path}}/res/{{major}}/');
+	env('majorpath','{{deploy_path}}/{{major}}/');
 	$link = run('if [ -e "{{majorpath}}/latest" ] ; then readlink "{{majorpath}}/latest" ; else echo {{major}}.0 ; fi')->toString();
 	$version = env('version');
 	if(version_compare($version,$link,'>')){
