@@ -66,13 +66,16 @@
 		},
 		afterSaveError : function(result) {
 			window.setTimeout(function() {
-				document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + result.message;
-				if (typeof result.servermessage !== "undefined") {
-					document.querySelector("#simply-save .simply-message").innerHTML += "<br>" + result.servermessage;
+				if (result.error) {
+					var errorEvent = editor.fireEvent("simply-page-save-error", document, result);
+					if (!errorEvent.defaultPrevented) {
+						var message = errorEvent.data.message;
+						document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
+						window.setTimeout(function() {
+							editor.plugins.dialog.close();
+						}, 2000);
+					}
 				}
-				window.setTimeout(function() {
-					editor.plugins.dialog.close();
-				}, 2000);
 			}, 300);
 		}
 	};

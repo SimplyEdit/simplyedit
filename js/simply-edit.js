@@ -168,7 +168,7 @@
 						editor.actions['simply-beforesave']();
 					}
 					editor.storage.save(localStorage.data, function(result) {
-						if (result && result.message) {
+						if (result && result.error) {
 							if (editor.actions['simply-aftersave-error']) {
 								editor.actions['simply-aftersave-error'](result);
 							} else {
@@ -1165,6 +1165,7 @@
 			} else {
 				// target.fireEvent("on" + event.eventType, event);
 			}
+			return event;
 		},
 		loadBaseStyles : function() {
 			var baseStyles = document.createElement("link");
@@ -2089,10 +2090,14 @@
 
 					http.onreadystatechange = function() {//Call a function when the state changes.
 						if(http.readyState == 4) {
+							var saveResult = {};
 							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
-								callback();
 							} else {
-								callback({message : "SAVE FAILED: Could not store.", error: true, servermessage : http.responseText});
+								saveResult = {message : "SAVE FAILED: Could not store.", error: true, response: http.responseText};
+							}
+							var saveEvent = editor.fireEvent("simply-storage-file-saved", document, saveResult);
+							if (!saveEvent.defaultPrevented) {
+								callback(saveEvent.data);
 							}
 						} 
 					};
@@ -2117,11 +2122,14 @@
 
 					http.onreadystatechange = function() {//Call a function when the state changes.
 						if(http.readyState == 4) {
+							var deleteResult = {};
 							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
-								callback();
 							} else {
-								console.log("Warning: delete failed.");
-								callback({message : "DELETE FAILED: Could not delete.", error: true, servermessage: http.responseText});
+								deleteResult = {message : "DELETE FAILED: Could not delete.", error: true, response: http.responseText};
+							}
+							var deleteEvent = editor.fireEvent("simply-storage-file-deleted", document, deleteResult);
+							if (!deleteEvent.defaultPrevented) {
+								callback(deleteEvent.data);
 							}
 						}
 					};

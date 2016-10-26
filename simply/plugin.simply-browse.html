@@ -581,11 +581,11 @@
 						(function(targetButton, url, name) {
 							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
 								if (result.error) {
-									var message = result.message;
-									if (result.servermessage) {
-										message += " (Server told: " + result.servermessage + ")";
+									var errorEvent = editor.fireEvent("simply-image-save-error", document, result);
+									if (!errorEvent.defaultPrevented) {
+										var message = errorEvent.data.message;
+										alert("SAVE FAILED: " + message);
 									}
-									alert("SAVE FAILED: " + message);
 									return;
 								}
 								var image = {
@@ -607,11 +607,11 @@
 						(function(targetButton, url, name) {
 							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
 								if (result.error) {
-									var message = result.message;
-									if (result.servermessage) {
-										message += " (Server told: " + result.servermessage + ")";
+									var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
+									if (!errorEvent.defaultPrevented) {
+										var message = errorEvent.data.message;
+										alert("SAVE FAILED: " + message);
 									}
-									alert("SAVE FAILED: " + message);
 									return;
 								}
 								var file = {
@@ -720,11 +720,11 @@
 			(function(targetButton, url) {
 				editor.storage.file.save(subpath + filename + '/', '', function(result) {
 					if (result.error) {
-						var message = result.message;
-						if (result.servermessage) {
-							message += " (Server told: " + result.servermessage + ")";
+						var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
+						if (!errorEvent.defaultPrevented) {
+							var message = errorEvent.data.message;
+							alert("Add folder failed: " + message);
 						}
-						alert("Add folder failed: " + message);
 						return;
 					}
 					targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
