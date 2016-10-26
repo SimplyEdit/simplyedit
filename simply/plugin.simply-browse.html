@@ -579,13 +579,20 @@
 
 					if (editor.plugins.browse.mode == "images") {
 						(function(targetButton, url, name) {
-							editor.storage.file.save(subpath + files[i].name, files[i], function(image) {
-								if (typeof image === "undefined") {
-									image = {
-										name : name,
-										src : url
-									};
+							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
+								if (result.error) {
+									var message = result.message;
+									if (result.servermessage) {
+										message += " (Server told: " + result.servermessage + ")";
+									}
+									alert("SAVE FAILED: " + message);
+									return;
 								}
+								var image = {
+									name : name,
+									src : url
+								};
+
 								var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 								var tempNode = document.createElement("div");
 								tempNode.innerHTML = buttonHtml;
@@ -598,13 +605,19 @@
 						}(newButton, url, files[i].name));
 					} else {
 						(function(targetButton, url, name) {
-							editor.storage.file.save(subpath + files[i].name, files[i], function(file) {
-								if (typeof file  === "undefined") {
-									file = {
-										name : name,
-										url : url
-									};
+							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
+								if (result.error) {
+									var message = result.message;
+									if (result.servermessage) {
+										message += " (Server told: " + result.servermessage + ")";
+									}
+									alert("SAVE FAILED: " + message);
+									return;
 								}
+								var file = {
+									name : name,
+									url : url
+								};
 
 								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(file);
 								var tempNode = document.createElement("div");
@@ -705,7 +718,15 @@
 			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
 
 			(function(targetButton, url) {
-				editor.storage.file.save(subpath + filename + '/', '', function() {
+				editor.storage.file.save(subpath + filename + '/', '', function(result) {
+					if (result.error) {
+						var message = result.message;
+						if (result.servermessage) {
+							message += " (Server told: " + result.servermessage + ")";
+						}
+						alert("Add folder failed: " + message);
+						return;
+					}
 					targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
 					newButton = targetButton.querySelector("div");
 					targetButton.parentNode.insertBefore(newButton, targetButton);

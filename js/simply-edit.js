@@ -170,7 +170,7 @@
 					editor.storage.save(localStorage.data, function(result) {
 						if (result && result.message) {
 							if (editor.actions['simply-aftersave-error']) {
-								editor.actions['simply-aftersave-error'](result.message);
+								editor.actions['simply-aftersave-error'](result);
 							} else {
 								alert("Error saving: " + result.message);
 							}
@@ -1952,9 +1952,9 @@
 					}
 
 					if (err.error == 401) {
-						return callback({message : "Authorization failed."});
+						return callback({message : "Authorization failed.", error: true});
 					}
-					return callback({message : "SAVE FAILED: Could not store."});
+					return callback({message : "SAVE FAILED: Could not store.", error: true});
 				};
 
 				this.repo.write(this.repoBranch, this.dataFile, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
@@ -2092,7 +2092,7 @@
 							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
 								callback();
 							} else {
-								callback({message : "SAVE FAILED: Could not store."});
+								callback({message : "SAVE FAILED: Could not store.", error: true, servermessage : http.responseText});
 							}
 						} 
 					};
@@ -2121,7 +2121,7 @@
 								callback();
 							} else {
 								console.log("Warning: delete failed.");
-								callback();
+								callback({message : "DELETE FAILED: Could not delete.", error: true, servermessage: http.responseText});
 							}
 						}
 					};
