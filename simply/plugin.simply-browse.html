@@ -583,8 +583,10 @@
 								if (result.error) {
 									var errorEvent = editor.fireEvent("simply-image-save-error", document, result);
 									if (!errorEvent.defaultPrevented) {
-										var message = errorEvent.data.message;
-										alert("SAVE FAILED: " + message);
+										targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+										targetButton.setAttribute("data-simply-action", "simply-browse-error");
+										targetButton.message = "SAVE FAILED: " + errorEvent.data.message;
+										targetButton.classList.add("simply-error");
 									}
 									return;
 								}
@@ -609,8 +611,10 @@
 								if (result.error) {
 									var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
 									if (!errorEvent.defaultPrevented) {
-										var message = errorEvent.data.message;
-										alert("SAVE FAILED: " + message);
+										targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+										targetButton.setAttribute("data-simply-action", "simply-browse-error");
+										targetButton.message = "SAVE FAILED: " + errorEvent.data.message;
+										targetButton.classList.add("simply-error");
 									}
 									return;
 								}
@@ -722,8 +726,10 @@
 					if (result.error) {
 						var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
 						if (!errorEvent.defaultPrevented) {
-							var message = errorEvent.data.message;
-							alert("Add folder failed: " + message);
+							targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+							targetButton.setAttribute("data-simply-action", "simply-browse-error");
+							targetButton.message = "Add folder failed: " + errorEvent.data.message;
+							targetButton.classList.add("simply-error");
 						}
 						return;
 					}
@@ -838,7 +844,11 @@
 			targetList.scrollTop = targetList.scrollHeight; // scroll the new element into view;
 		}, 500);
 	});
-
+	editor.addAction("simply-browse-error", function(el) {
+		if (el.message) {
+			alert(el.message);
+		}
+	});
 	editor.addAction("simply-browse-insert", function(el) {
 		var getTargetUrl = function(el) {
 			if (el.querySelector("img")) {
