@@ -167,28 +167,68 @@
 					if (editor.actions['simply-beforesave']) {
 						editor.actions['simply-beforesave']();
 					}
-					editor.storage.save(localStorage.data, function(result) {
-						if (result && result.error) {
-							if (editor.actions['simply-aftersave-error']) {
-								editor.actions['simply-aftersave-error'](result);
+					editor.storage.load(function(data) {
+						// check if the data is different from the last time;
+						if (data != editor.loadedData) {
+							console.log("Notice: Data on the server changed since we loaded it. Trying to merge...");
+							alert("Data on the server changed since we loaded it. Trying to merge...");
+							var newData = JSON.parse(data);
+
+							// if so, try to replay the undoset on it;
+							if (editor.plugins.undoRedo) {
+								newData = editor.plugins.undoRedo.replay(newData);
 							} else {
-								alert("Error saving: " + result.message);
+								newData = false;
 							}
-						} else {
-							if (editor.actions['simply-aftersave']) {
-								editor.actions['simply-aftersave']();
+
+							if (newData) {
+								// if that works, go ahead and save the replayed version;
+								console.log("Notice: Merge was succesful.");
+								alert("Merge was succesful.");
+								localStorage.data = editor.data.stringify(newData);
 							} else {
-								alert("Saved!");
+								// if not, ask what to do;
+								console.log("Notice: Data on the server changed, and we could not merge the changes.");
+								if (!confirm("Could not merge. Do you want to overwrite the changes?")) {
+									// User declined the overwrite; Skip saving.
+									var result = {
+										error: true,
+										message : "Save cancelled by user."
+									};
+									if (editor.actions['simply-aftersave-error']) {
+										editor.actions['simply-aftersave-error'](result);
+									} else {
+										alert("Save failed: " + result.message);
+									}	
+									return;
+								}
+							}
+						}
+
+						editor.storage.save(localStorage.data, function(result) {
+							if (result && result.error) {
+								if (editor.actions['simply-aftersave-error']) {
+									editor.actions['simply-aftersave-error'](result);
+								} else {
+									alert("Save failed: " + result.message);
+								}
+							} else {
+								if (editor.actions['simply-aftersave']) {
+									editor.actions['simply-aftersave']();
+								} else {
+									alert("Saved!");
+								}
+							}
+						});
+						for (var source in editor.dataSources) {
+							if (editor.dataSources[source].save) {
+								for (var i=0; i<editor.dataSources[source].stash.length; i++) {
+									editor.dataSources[source].save(editor.dataSources[source].stash[i]);
+								}
 							}
 						}
 					});
-					for (var source in editor.dataSources) {
-						if (editor.dataSources[source].save) {
-							for (var i=0; i<editor.dataSources[source].stash.length; i++) {
-								editor.dataSources[source].save(editor.dataSources[source].stash[i]);
-							}
-						}
-					}
+
 				} 
 			},
 			load : function() {
@@ -199,6 +239,7 @@
 						editor.readOnly = true;
 					}
 
+					editor.loadedData = data;
 					editor.currentData = JSON.parse(data);
 					editor.data.apply(editor.currentData, document);
 					editor.pageData = editor.currentData[document.location.pathname];

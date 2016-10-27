@@ -17,10 +17,60 @@
 				return;
 			}
 			editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo + 1);
+
+			var currentStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
+
+			// check if the previous step has the same keys, we are still changing the same thing; maybe we can make the changeset smaller;
+			if (
+				(currentStep) && 
+				(currentStep.meta.dataPath == undoAction.meta.dataPath) &&
+				(currentStep.meta.key == undoAction.meta.key) &&
+				(currentStep.meta.parentKey == undoAction.meta.parentKey)
+			) {
+				// check if the previous step has the same oldvalue, in that case the databinding hasn't resolved yet; just save the last one.
+				if (
+					JSON.stringify(currentStep.meta.oldValue) == JSON.stringify(undoAction.meta.oldValue) // contents can be objects that do not compare well, so stringify them;
+				) {
+					editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo);
+					editor.plugins.undoRedo.currentUndo--;
+				}
+			}
+
 			editor.plugins.undoRedo.undoSet.push(undoAction);
 			editor.plugins.undoRedo.currentUndo++;
 
 			editor.toolbars["simply-undo-redo"].update();
+		},
+		explain : function() {
+			var undoSet = editor.plugins['undoRedo'].undoSet;
+			for (var i=0; i<undoSet.length; i++) {
+				console.log("Step " + i + ": ");
+				console.log("Set " + undoSet[i].meta.key + " from " + undoSet[i].meta.oldValue + " to " + undoSet[i].meta.newValue + " on " + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey);
+			}
+		},
+		replay : function(data) {
+			var undoSet = editor.plugins['undoRedo'].undoSet;
+			for (var i=0; i<undoSet.length; i++) {
+				var targetValue = data[undoSet[i].meta.dataPath];
+				var key = undoSet[i].meta.key;
+				var subkeys = undoSet[i].meta.parentKey.split("/");
+
+				var subkey;
+				while (subkeys.length) {
+					subkey = subkeys.shift();
+					if (subkey != "") {
+						targetValue = targetValue[subkey];
+					}
+				}
+
+				if (JSON.stringify(targetValue[key]) == JSON.stringify(undoSet[i].meta.oldValue)) {
+					targetValue[key] = undoSet[i].meta.newValue;
+				} else {
+					console.log("Unexpected value " + targetValue[key] + " in " + ":" + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey + ":" + undoSet[i].meta.key + " (expected: " + undoSet[i].meta.oldValue + ")");
+					return false;
+				}
+			}
+			return data;
 		},
 		undo : function() {
 			if (!editor.plugins.undoRedo.canUndo()) {
@@ -96,6 +146,13 @@
 					},
 					redo : function() {
 						set(newValue);
+					},
+					meta : {
+						dataPath : dataPath,
+						parentKey : dataBinding.parentKey,
+						key : dataBinding.key,
+						oldValue : oldValue,
+						newValue : newValue
 					}
 				};
 				editor.plugins.undoRedo.storeUndo(undoAction);
