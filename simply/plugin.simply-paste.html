@@ -210,6 +210,11 @@
 					case 8:		// backspace
 					case 46: 	// delete
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+
+						// empty the field if only a newline remains;
+						if (event.target.innerText == "\n") {
+							event.target.innerHTML = "";
+						}
 					break;
 					case 13:	// enter
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
