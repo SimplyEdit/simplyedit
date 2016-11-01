@@ -212,7 +212,10 @@
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
 
 						// empty the field if only a newline remains;
-						if (event.target.innerText == "\n") {
+						if (
+							(event.target.innerText == "\n") &&
+							(event.target.childNodes.length == 1) // only do this when the newline-text-node is our only node;
+						) {
 							event.target.innerHTML = "";
 						}
 					break;
