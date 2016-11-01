@@ -257,7 +257,7 @@
 			var tagName1 = blockAnnotation.tag.split(/ /, 2)[0].toLowerCase();
 			var tagName2 = sel.startContainer.tagName;
 			if (!tagName2) {
-				tagName2 = sel.startContainer.parentElement.tagName;
+				tagName2 = sel.startContainer.parentNode.tagName;
 			}
 
 			tagName2 = tagName2.toLowerCase();
