@@ -97,6 +97,11 @@
 				// special case for H1 - we don't want it inserted as a result of an enter key. The first one should be a H1, the others should be a paragraph.
 				// Firefox inserts the new element in front of the original; Chrome inserts the new H1 behind the original.
 
+				var parent = ev.target.parentNode;
+				if (!parent) {
+					return;
+				}
+
 				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
 				var sel = window.getSelection();
 				if (sel.rangeCount) {
@@ -104,7 +109,6 @@
 					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
 				}
 
-				var parent = ev.target.parentNode;
 				var nodes = parent.querySelectorAll("h1");
 				for (var i=1; i<nodes.length; i++) {
 					editor.node.unwrap(nodes[i]); // Unwrap the other nodes, leave the first H1;
@@ -210,6 +214,14 @@
 					case 8:		// backspace
 					case 46: 	// delete
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+
+						// empty the field if only a newline remains;
+						if (
+							(event.target.innerText == "\n") &&
+							(event.target.childNodes.length == 1) // only do this when the newline-text-node is our only node;
+						) {
+							event.target.innerHTML = "";
+						}
 					break;
 					case 13:	// enter
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);

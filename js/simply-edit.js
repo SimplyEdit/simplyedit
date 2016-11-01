@@ -1716,21 +1716,14 @@
 		init : function(endpoint) {
 			var result;
 
-			if (document.querySelector("[data-simply-storage]")) {
-				var storageName = document.querySelector("[data-simply-storage]").getAttribute("data-simply-storage");
-				if (window[storageName]) {
-					result = window[storageName];
-				} else {
-					console.log("Warning: custom storage not found");
-				}
-			}
+			var storageType = storage.getType(endpoint);
 
-			if (!result) {
-				var storageType = storage.getType(endpoint);
-				if (!storage[storageType]) {
-					storageType = "default";
-				}
+			if (storage[storageType]) {
 				result = storage[storageType];
+			} else if (window[storageType]) {
+				result = window[storageType];
+			} else {
+				console.log("Warning: custom storage not found");
 			}
 
 			if (typeof result.init === "function") {

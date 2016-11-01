@@ -65,7 +65,7 @@
 
 			if (this.value.length > 2) {
 				var result = search(this.value);
-				editor.data.list.applyTemplates(list, result);
+				editor.list.set(list, result);
 			}
 		});
 
@@ -74,7 +74,7 @@
 			var result = search(this.querySelector("input[name='search']").value);
 			var list = document.querySelector("UL");
 			list.innerHTML = '';
-			editor.data.list.applyTemplates(list, result);
+			editor.list.set(list, result);
 		});
 	</script>
 </body>

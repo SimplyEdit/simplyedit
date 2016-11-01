@@ -257,7 +257,7 @@
 			var tagName1 = blockAnnotation.tag.split(/ /, 2)[0].toLowerCase();
 			var tagName2 = sel.startContainer.tagName;
 			if (!tagName2) {
-				tagName2 = sel.startContainer.parentElement.tagName;
+				tagName2 = sel.startContainer.parentNode.tagName;
 			}
 
 			tagName2 = tagName2.toLowerCase();
@@ -426,10 +426,10 @@
 				if (range.start === range.end) {
 					var addTag = function(event) {
 						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag); // remove it now, setting textContent can trigger it again and mess up;
-
-						var rangeLength = event.newValue.length - event.prevValue.length;
+						var newValue = event.newValue.replace(/ $/, "\xa0"); // replace ending space with nbsp;
+						var rangeLength = newValue.length - event.prevValue.length;
 						event.preventDefault();
-						event.target.textContent = event.newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
+						event.target.textContent = newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
 						// ... and messes up the cursor position;
 
 						hopeEditor.parseHTML();
