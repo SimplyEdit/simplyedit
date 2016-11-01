@@ -1876,7 +1876,7 @@
 					endpoint = document.location.href.replace(document.location.hash, "");
 				}
 				var script = document.createElement("SCRIPT");
-				script.src = baseURLClean + "github.js";
+				script.src = editor.baseURLClean + "github.js";
 				document.head.appendChild(script);
 
 				var repoInfo = this.getRepoInfo(endpoint);
