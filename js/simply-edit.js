@@ -1203,6 +1203,7 @@
 
 			editor.profile = config.profile;
 			editor.storage = storage.init(config.endpoint);
+			editor.fireEvent("simply-storage-init", document);
 
 			// Add databinding and load data afterwards
 			// editor.loadScript(editor.baseURLClean + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
