@@ -81,8 +81,38 @@ dataBinding = function(config) {
 	var isEqual = function(value1, value2) {
 		return JSON.stringify(value1) == JSON.stringify(value2);
 	};
+	this.setData = function(newdata) {
+		data = newdata;
+	};
+
 	var setShadowValue = function(value) {
+		var valueBindings;
+		if (shadowValue && shadowValue._bindings_) {
+			valueBindings = shadowValue._bindings_;
+		}
+
 		shadowValue = value;
+		if (valueBindings && (typeof shadowValue === "object")) {
+			if (!shadowValue.hasOwnProperty("_bindings_")) {
+				var bindings = {};
+
+				Object.defineProperty(shadowValue, "_bindings_", {
+					get : function() {
+						return bindings;
+					},
+					set : function(value) {
+						bindings[key] = binding;
+					}
+				});
+			}
+
+			for (var i in valueBindings) {
+				shadowValue._bindings_[i] = valueBindings[i];
+				valueBindings[i].set(shadowValue[i]);
+				valueBindings[i].resolve();
+			}
+		}
+
 		if (typeof oldValue !== "undefined" && !isEqual(oldValue, shadowValue)) {
 			binding.config.resolve.call(binding, key, dereference(shadowValue), dereference(oldValue));
 		}
@@ -94,8 +124,29 @@ dataBinding = function(config) {
 	var monitorChildData = function(data) {
 		// Watch for changes in our child data, because these also need to register as changes in the databound data/elements;
 		// This allows the use of simple data structures (1 key deep) as databound values and still resolve changes on a specific entry;
+		var parentData = data;
+
 		if (typeof data === "object") {
 			var monitor = function(data, key) {
+				if (!data.hasOwnProperty("_parentBindings_")) {
+					var bindings = {};
+
+					Object.defineProperty(data, "_parentBindings_", {
+						get : function() {
+							return bindings;
+						},
+						set : function(value) {
+							bindings[key] = binding;
+						}
+					});
+					Object.defineProperty(data, "_parentData_", {
+						get : function() {
+							return parentData;
+						}
+					});
+				}
+				data._parentBindings_[key] = binding;
+
 				var myvalue = data[key];
 
 				var renumber = function(key, value, parentBinding) {
@@ -122,6 +173,11 @@ dataBinding = function(config) {
 						myvalue = value;
 						renumber(key, value, binding);
 
+						if (parentData._bindings_ && parentData._bindings_[key]) {
+							parentData._bindings_[key].set(value);
+							parentData._bindings_[key].resolve();
+						}
+
 						// Marker is set by the array function, it will do the resolve after we're done.
 						if (!binding.runningArrayFunction) {
 							newValue = shadowValue;
@@ -131,6 +187,9 @@ dataBinding = function(config) {
 						}
 					},
 					get : function() {
+						if (parentData._bindings_ && parentData._bindings_[key]) {
+							return parentData._bindings_[key].get();
+						}
 						return myvalue;
 					}
 				});
@@ -202,6 +261,9 @@ dataBinding = function(config) {
 				binding.resumeListeners(binding.elements[i]);
 			}
 		}
+		if (data._parentBindings_ && data._parentBindings_[key] && data._parentBindings_[key] !== this) {
+			data[key] = shadowValue; 
+		}
 		if (typeof binding.config.resolve === "function") {
 			if (!isEqual(oldValue, shadowValue)) {
 				oldValue = dereference(shadowValue);
@@ -236,6 +298,10 @@ dataBinding = function(config) {
 			set : function(value) {
 				binding.set(value);
 				binding.resolve(true);
+				if (data._parentBindings_ && data._parentBindings_[key]) {
+					data._parentBindings_[key].set(value);
+					data._parentBindings_[key].resolve(value);
+				}
 			},
 			get : function() {
 				return shadowValue;

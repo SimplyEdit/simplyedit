@@ -75,7 +75,10 @@
 					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
 				}
 
+				var savedParentKey = editor.settings.databind.parentKey;
 				for (var i=0; i<dataFields.length; i++) {
+					editor.settings.databind.parentKey = savedParentKey;
+
 					// Only handle datafields that are our direct descendants, list descendants will be handled by the list;
 					var isSub = false;
 					for (var a=0; a<subFields.length; a++) {
@@ -87,42 +90,16 @@
 						continue;
 					}
 
-					var dataName = dataFields[i].getAttribute("data-simply-field");
 					var dataPath = editor.data.getDataPath(dataFields[i]);
-
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
-					if (!data[dataPath][dataName] && !Object.keys(data[dataPath]).length) {
-						data[dataPath][dataName] = editor.field.get(dataFields[i]);
-					}
-					if (data[dataPath]) {
-						if (dataFields[i].dataBinding) {
-							dataFields[i].dataBinding.set(data[dataPath][dataName]);
-							dataFields[i].dataBinding.resolve(true);
-						} else {
-							var fieldDataBinding;
-							if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
-								fieldDataBinding = data[dataPath]._bindings_[dataName];
-							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-								bindingConfig.data   = data[dataPath];
-								bindingConfig.key    = dataName;
-								bindingConfig.getter = editor.field.dataBindingGetter;
-								bindingConfig.setter = editor.field.dataBindingSetter;
-								bindingConfig.mode   = "field";
-								bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
 
-								fieldDataBinding = new dataBinding(bindingConfig);
-							}
-							fieldDataBinding.bind(dataFields[i]);
-						}
-
-						// editor.field.set(dataFields[i], data[dataPath][dataName]);
-					}
+					editor.field.init(dataFields[i], data[dataPath], true);
 				}
 
-				editor.list.init(data, target);
+				editor.settings.databind.parentKey = savedParentKey;
+				editor.list.initLists(data, target);
 				editor.fireEvent("simply-data-applied", target);
 			},
 			get : function(target) {
@@ -462,62 +439,18 @@
 					editor.editmode.makeEditable(list);
 				}
 			},
-			init : function(data, target) {
+			initLists : function(data, target) {
 				var initList = function(data, list) {
-					var dataName, dataPath;
 					editor.list.parseTemplates(list);
-					dataName = list.getAttribute("data-simply-list");
-					dataPath = editor.data.getDataPath(list);
+					var dataPath = editor.data.getDataPath(list);
 
 					if (!data[dataPath]) {
 						data[dataPath] = {};
 					}
-					if (!data[dataPath][dataName]) {
-						data[dataPath][dataName] = [];
-					}
-					if (data[dataPath] && data[dataPath][dataName]) {
-						if (list.dataBinding) {
-							list.dataBinding.set(data[dataPath][dataName]);
-							list.dataBinding.resolve(true);
-						} else {
-							var listDataBinding;
-							if (data[dataPath]._bindings_ && data[dataPath]._bindings_[dataName]) {
-								listDataBinding = data[dataPath]._bindings_[dataName];
-							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-								bindingConfig.data   = data[dataPath];
-								bindingConfig.key    = dataName;
-								bindingConfig.getter = editor.list.dataBindingGetter;
-								bindingConfig.setter = editor.list.dataBindingSetter;
-								bindingConfig.mode   = "list";
-								bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex", "data-simply-stashed", "contenteditable", "style", "data-simply-list-item"];
-								listDataBinding = new dataBinding(bindingConfig);
-							}
-							listDataBinding.bind(list);
-						}
-						// editor.list.set(list, data[dataPath][dataName]);
-					}
 
-					var hasChild = false;
-					for (var j=0; j<list.childNodes.length; j++) {
-						if (
-							list.childNodes[j].nodeType == document.ELEMENT_NODE &&
-							list.childNodes[j].getAttribute("data-simply-list-item")
-						) {
-							hasChild = true;
-						}
-					}
-					if (!hasChild) {
-						if ("classList" in list) {
-							list.classList.add("simply-empty");
-						} else {
-							list.className += " simply-empty";
-						}
-					}
-
-					if ("addEventListener" in list) {
-						list.addEventListener("keydown", editor.list.keyDownHandler);
-					}
+					var savedParentKey = editor.settings.databind.parentKey;
+					editor.list.init(list, data[dataPath], true);
+					editor.settings.databind.parentKey = savedParentKey;
 				};
 
 				var dataLists = target.querySelectorAll("[data-simply-list]");
@@ -526,9 +459,6 @@
 					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list]");
 				} else {
 					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
-				}
-				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
-					initList(data, target);
 				}
 				for (var i=0; i<dataLists.length; i++) {
 					var isSub = false;
@@ -540,7 +470,11 @@
 					if (isSub) {
 						continue;
 					}
+
 					initList(data, dataLists[i]);
+				}
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
+					initList(data, target);
 				}
 			},
 			fixFirstElementChild : function(clone) {
@@ -594,56 +528,36 @@
 					templates[0].parentNode.removeChild(templates[0]);
 				}
 			},
-			set : function(list, listData) {
-				var e,j,k,l;
-				var dataName;
-				var t, counter;
-				var stashedFields, i, newData, dataPath;
+			init : function(list, dataParent, useDataBinding) {
+				editor.list.parseTemplates(list);
+				var dataName = list.getAttribute("data-simply-list");
 
-				if (!listData) {
-					listData = [];
+				var dataKeys = dataName.split(".");
+				dataName = dataKeys.pop();
+				for (var j=0; j<dataKeys.length; j++) {
+					if (!dataParent[dataKeys[j]]) {
+						dataParent[dataKeys[j]] = {};
+					}
+					dataParent = dataParent[dataKeys[j]];
+					editor.settings.databind.parentKey += dataKeys[j] + "/";
 				}
 
-				var initFields = function(clone, useDataBinding, listDataItem) {
-					var handleFields = function(elm) {
-						dataName = elm.getAttribute("data-simply-field");
-						if (listDataItem[dataName] === null) {
-							listDataItem[dataName] = editor.field.get(elm);
-						}
-						if (listDataItem[dataName] !== null) {
-							if (useDataBinding) {
-								var fieldDataBinding;
-								if (listDataItem._bindings_ && listDataItem._bindings_[dataName]) {
-									fieldDataBinding = listDataItem._bindings_[dataName];
-								} else {
-									var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
-									// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
-									bindingConfig.data   = listDataItem;
-									bindingConfig.key    = dataName;
-									bindingConfig.getter = editor.field.dataBindingGetter;
-									bindingConfig.setter = editor.field.dataBindingSetter;
-									bindingConfig.mode   = "field";
-									bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
-									fieldDataBinding = new dataBinding(bindingConfig);
-								}
-								fieldDataBinding.bind(elm);
-							} else {
-								editor.field.set(elm, listDataItem[dataName]);
-							}
-						}
-					};
-
-					var handleLists = function(elm) {
-						editor.list.parseTemplates(elm);
-						dataName = elm.getAttribute("data-simply-list");
-
-						if (useDataBinding) {
-							if (listDataItem._bindings_ && listDataItem._bindings_[dataName]) {
-								listDataBinding = listDataItem._bindings_[dataName];
+				if (!dataParent[dataName]) {
+					dataParent[dataName] = [];
+				}
+				if (dataParent && dataParent[dataName]) {
+					if (useDataBinding) {
+						if (list.dataBinding) {
+							list.dataBinding.set(dataParent[dataName]);
+							list.dataBinding.resolve(true);
+						} else {
+							var listDataBinding;
+							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
+								listDataBinding = dataParent._bindings_[dataName];
 							} else {
 								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
-								bindingConfig.data   = listDataItem;
+								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
 								bindingConfig.getter = editor.list.dataBindingGetter;
 								bindingConfig.setter = editor.list.dataBindingSetter;
@@ -651,43 +565,56 @@
 								bindingConfig.attributeFilter = ["data-simply-selectable", "class", "tabindex", "data-simply-stashed", "contenteditable", "style", "data-simply-list-item"];
 								listDataBinding = new dataBinding(bindingConfig);
 							}
-							listDataBinding.bind(elm);
-						} else {
-							editor.list.set(elm, listDataItem[dataName]);
+							listDataBinding.bind(list);
 						}
+					} else {
+						editor.list.set(list, dataParent[dataName]);
+					}
+				}
 
-						var hasChild = false;
-						for (var m=0; m<elm.childNodes.length; m++) {
-							if (
-								elm.childNodes[m].nodeType == document.ELEMENT_NODE &&
-								elm.childNodes[m].getAttribute("data-simply-list-item")
-							) {
-								hasChild = true;
-							}
-						}
-						if (!hasChild) {
-							if ("classList" in elm) {
-								elm.classList.add("simply-empty");
-							} else {
-								elm.className += " simply-empty";
-							}
-						}
-					};
-					var dataName;
+				var hasChild = false;
+				for (var m=0; m<list.childNodes.length; m++) {
+					if (
+						list.childNodes[m].nodeType == document.ELEMENT_NODE &&
+						list.childNodes[m].getAttribute("data-simply-list-item")
+					) {
+						hasChild = true;
+					}
+				}
+				if (!hasChild) {
+					if ("classList" in list) {
+						list.classList.add("simply-empty");
+					} else {
+						list.className += " simply-empty";
+					}
+				}
+
+				list.addEventListener("keydown", editor.list.keyDownHandler);
+			},
+			set : function(list, listData) {
+				var e,j,k,l;
+				var t, counter;
+				var stashedFields, i, newData, dataPath;
+
+				if (!listData) {
+					listData = [];
+				}
+
+				var initListItem = function(clone, useDataBinding, listDataItem) {
 					var dataFields = clone.querySelectorAll("[data-simply-field]");
 					for (k=0; k<dataFields.length; k++) {
-						handleFields(dataFields[k]);
+						editor.field.init(dataFields[k], listDataItem, useDataBinding);
 					}
 					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
-						handleFields(clone);
+						editor.field.init(clone, listDataItem, useDataBinding);
 					}
 
 					var dataLists = clone.querySelectorAll("[data-simply-list]");
 					for (k=0; k<dataLists.length; k++) {
-						handleLists(dataLists[k]);
+						editor.list.init(dataLists[k], listDataItem, useDataBinding);
 					}
 					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
-						handleLists(clone);
+						editor.list.init(clone, listDataItem, useDataBinding);
 					}
 				};
 
@@ -739,9 +666,9 @@
 						}
 
 						if (list.getAttribute("data-simply-data")) {
-							initFields(clone, false, listData[j]);
+							initListItem(clone, false, listData[j]);
 						} else {
-							initFields(clone, true, listData[j]);
+							initListItem(clone, true, listData[j]);
 						}
 
 						editor.list.fixFirstElementChild(clone);
@@ -777,14 +704,14 @@
 						clone.firstElementChild.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 						
 						list.appendChild(clone);
-						editor.list.init(listData[j], clone);
+						editor.list.initLists(listData[j], clone);
 					} else {
 						for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
 							clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
 							if (list.getAttribute("data-simply-data")) {
-								initFields(clone, false, listData[j]);
+								initListItem(clone, false, listData[j]);
 							} else {
-								initFields(clone, true, listData[j]);
+								initListItem(clone, true, listData[j]);
 							}
 							editor.list.fixFirstElementChild(clone);
 
@@ -816,7 +743,7 @@
 							clone.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 
 							list.appendChild(clone);
-							editor.list.init(listData[j], clone);
+							editor.list.initLists(listData[j], clone);
 						}
 					}
 
@@ -1185,6 +1112,49 @@
 					field.setAttribute("data-simply-selectable", true);
 				} else {
 					editor.field.initHopeEditor(field);
+				}
+			},
+			init : function(field, dataParent, useDataBinding) {
+				var dataName = field.getAttribute("data-simply-field");
+
+				var dataKeys = dataName.split(".");
+				dataName = dataKeys.pop();
+				for (var j=0; j<dataKeys.length; j++) {
+					if (!dataParent[dataKeys[j]]) {
+						dataParent[dataKeys[j]] = {};
+					}
+					dataParent = dataParent[dataKeys[j]];
+					editor.settings.databind.parentKey += dataKeys[j] + "/";
+				}
+
+				if ((!dataParent[dataName] && !Object.keys(dataParent).length) || dataParent[dataName] === null) {
+					dataParent[dataName] = editor.field.get(field);
+				}
+				if (dataParent[dataName] !== null) {
+					if (useDataBinding) {
+						if (field.dataBinding) {
+							field.dataBinding.set(dataParent[dataName]);
+							field.dataBinding.resolve(true);
+						} else {
+							var fieldDataBinding;
+							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
+								fieldDataBinding = dataParent._bindings_[dataName];
+							} else {
+								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
+								bindingConfig.data   = dataParent;
+								bindingConfig.key    = dataName;
+								bindingConfig.getter = editor.field.dataBindingGetter;
+								bindingConfig.setter = editor.field.dataBindingSetter;
+								bindingConfig.mode   = "field";
+								bindingConfig.attributeFilter = ["data-simply-selectable", "tabindex", "data-simply-stashed", "contenteditable", "data-simply-list-item"];
+								fieldDataBinding = new dataBinding(bindingConfig);
+							}
+							fieldDataBinding.bind(field);
+						}
+					} else {
+						editor.field.set(field, dataParent[dataName]);
+					}
 				}
 			}
 		},
