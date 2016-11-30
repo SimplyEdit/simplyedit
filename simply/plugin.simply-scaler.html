@@ -199,13 +199,11 @@
 			};
 
 			(function(reader, file) {
-				normalSave.call(storageScope, subpath + file.name, file, function(image) {
+				normalSave.call(storageScope, subpath + file.name, file, function() {
 					reader.readAsDataURL(file);
-					if (typeof image === "undefined") {
-						image = {
-							src : editor.plugins.browse.currentPath + file.name.replace(/[^A-Za-z0-9_\.-]/, "-")
-						};
-					}
+					var image = {
+						src : editor.plugins.browse.currentPath + file.name.replace(/[^A-Za-z0-9_\.-]/, "-")
+					};
 					var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 					var tempNode = document.createElement("div");
 					tempNode.innerHTML = buttonHtml;

@@ -579,13 +579,22 @@
 
 					if (editor.plugins.browse.mode == "images") {
 						(function(targetButton, url, name) {
-							editor.storage.file.save(subpath + files[i].name, files[i], function(image) {
-								if (typeof image === "undefined") {
-									image = {
-										name : name,
-										src : url
-									};
+							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
+								if (result.error) {
+									var errorEvent = editor.fireEvent("simply-image-save-error", document, result);
+									if (!errorEvent.defaultPrevented) {
+										targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+										targetButton.setAttribute("data-simply-action", "simply-browse-error");
+										targetButton.message = "SAVE FAILED: " + errorEvent.data.message;
+										targetButton.classList.add("simply-error");
+									}
+									return;
 								}
+								var image = {
+									name : name,
+									src : url
+								};
+
 								var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 								var tempNode = document.createElement("div");
 								tempNode.innerHTML = buttonHtml;
@@ -598,13 +607,21 @@
 						}(newButton, url, files[i].name));
 					} else {
 						(function(targetButton, url, name) {
-							editor.storage.file.save(subpath + files[i].name, files[i], function(file) {
-								if (typeof file  === "undefined") {
-									file = {
-										name : name,
-										url : url
-									};
+							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
+								if (result.error) {
+									var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
+									if (!errorEvent.defaultPrevented) {
+										targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+										targetButton.setAttribute("data-simply-action", "simply-browse-error");
+										targetButton.message = "SAVE FAILED: " + errorEvent.data.message;
+										targetButton.classList.add("simply-error");
+									}
+									return;
 								}
+								var file = {
+									name : name,
+									url : url
+								};
 
 								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(file);
 								var tempNode = document.createElement("div");
@@ -705,7 +722,17 @@
 			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
 
 			(function(targetButton, url) {
-				editor.storage.file.save(subpath + filename + '/', '', function() {
+				editor.storage.file.save(subpath + filename + '/', '', function(result) {
+					if (result.error) {
+						var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
+						if (!errorEvent.defaultPrevented) {
+							targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+							targetButton.setAttribute("data-simply-action", "simply-browse-error");
+							targetButton.message = "Add folder failed: " + errorEvent.data.message;
+							targetButton.classList.add("simply-error");
+						}
+						return;
+					}
 					targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
 					newButton = targetButton.querySelector("div");
 					targetButton.parentNode.insertBefore(newButton, targetButton);
@@ -817,7 +844,11 @@
 			targetList.scrollTop = targetList.scrollHeight; // scroll the new element into view;
 		}, 500);
 	});
-
+	editor.addAction("simply-browse-error", function(el) {
+		if (el.message) {
+			alert(el.message);
+		}
+	});
 	editor.addAction("simply-browse-insert", function(el) {
 		var getTargetUrl = function(el) {
 			if (el.querySelector("img")) {

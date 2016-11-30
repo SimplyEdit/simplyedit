@@ -17,6 +17,25 @@
 				return;
 			}
 			editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo + 1);
+
+			var currentStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
+
+			// check if the previous step has the same keys, we are still changing the same thing; maybe we can make the changeset smaller;
+			if (
+				(currentStep) && 
+				(currentStep.meta.dataPath == undoAction.meta.dataPath) &&
+				(currentStep.meta.key == undoAction.meta.key) &&
+				(currentStep.meta.parentKey == undoAction.meta.parentKey)
+			) {
+				// check if the previous step has the same oldvalue, in that case the databinding hasn't resolved yet; just save the last one.
+				if (
+					JSON.stringify(currentStep.meta.oldValue) == JSON.stringify(undoAction.meta.oldValue) // contents can be objects that do not compare well, so stringify them;
+				) {
+					editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo);
+					editor.plugins.undoRedo.currentUndo--;
+				}
+			}
+
 			editor.plugins.undoRedo.undoSet.push(undoAction);
 			editor.plugins.undoRedo.currentUndo++;
 
@@ -143,6 +162,13 @@
 					},
 					redo : function() {
 						set(newValue);
+					},
+					meta : {
+						dataPath : dataPath,
+						parentKey : dataBinding.parentKey,
+						key : dataBinding.key,
+						oldValue : oldValue,
+						newValue : newValue
 					}
 				};
 				editor.plugins.undoRedo.storeUndo(undoAction);
