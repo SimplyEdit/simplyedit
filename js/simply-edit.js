@@ -183,6 +183,8 @@
 						}
 
 						editor.storage.save(localStorage.data, function(result) {
+							editor.loadedData = localStorage.data;
+
 							if (result && result.error) {
 								if (editor.actions['simply-aftersave-error']) {
 									editor.actions['simply-aftersave-error'](result);
