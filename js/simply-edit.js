@@ -178,7 +178,27 @@
 							if (editor.actions['simply-aftersave']) {
 								editor.actions['simply-aftersave']();
 							} else {
-								alert("Saved!");
+								// if not, ask what to do;
+								console.log("Notice: Data on the server changed, and we could not merge the changes.");
+								if (!confirm("Could not merge. Do you want to overwrite the changes?")) {
+									if (editor.plugins.undoRedo && confirm("Do you want to merge field-by-field? (" + editor.plugins.undoRedo.mergeErrors + " conflicts to resolve.)")) {
+										newData = JSON.parse(data);
+										newData = editor.plugins.undoRedo.replay(newData, true);
+										localStorage.data = editor.data.stringify(newData);
+									} else {
+										// User declined the overwrite; Skip saving.
+										result = {
+											error: true,
+											message : "Save cancelled by user."
+										};
+										if (editor.actions['simply-aftersave-error']) {
+											editor.actions['simply-aftersave-error'](result);
+										} else {
+											alert("Save failed: " + result.message);
+										}	
+										return;
+									}
+								}
 							}
 						}
 					});

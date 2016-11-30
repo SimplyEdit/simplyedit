@@ -22,6 +22,53 @@
 
 			editor.toolbars["simply-undo-redo"].update();
 		},
+		explain : function() {
+			var undoSet = editor.plugins['undoRedo'].undoSet;
+			for (var i=0; i<undoSet.length; i++) {
+				console.log("Step " + i + ": ");
+				console.log("Set " + undoSet[i].meta.key + " from " + undoSet[i].meta.oldValue + " to " + undoSet[i].meta.newValue + " on " + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey);
+			}
+		},
+		replay : function(data, interactive) {
+			var undoSet = editor.plugins['undoRedo'].undoSet;
+			var mergeErrors = 0;
+			for (var i=0; i<undoSet.length; i++) {
+				var targetValue = data[undoSet[i].meta.dataPath];
+				var myValue = editor.currentData[undoSet[i].meta.dataPath];
+
+				var key = undoSet[i].meta.key;
+				var subkeys = undoSet[i].meta.parentKey.split("/");
+
+				var subkey;
+				while (subkeys.length) {
+					subkey = subkeys.shift();
+					if (subkey != "") {
+						targetValue = targetValue[subkey];
+						myValue = myValue[subkey];
+					}
+				}
+
+				if (JSON.stringify(targetValue[key]) == JSON.stringify(undoSet[i].meta.oldValue)) {
+					targetValue[key] = undoSet[i].meta.newValue;
+				} else {
+					console.log("Unexpected value " + targetValue[key] + " in " + ":" + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey + ":" + undoSet[i].meta.key + " (expected: " + undoSet[i].meta.oldValue + ")");
+					mergeErrors++;
+
+					if (interactive) {
+						alert("Could not merge changes to this value: " + undoSet[i].meta.newValue);
+						if (!confirm("Discard your changes and set this field to the server value? (" + targetValue[key] + ")")) {
+							targetValue[key] = undoSet[i].meta.newValue;
+						}
+						mergeErrors--;
+					}
+				}
+			}
+			if (mergeErrors > 0) {
+				editor.plugins.undoRedo.mergeErrors = mergeErrors;
+				return false;
+			}
+			return data;
+		},
 		undo : function() {
 			if (!editor.plugins.undoRedo.canUndo()) {
 				return;
