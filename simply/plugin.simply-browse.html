@@ -430,6 +430,12 @@
 						}
 					}
 
+					if (editor.plugins.browse.currentPath == editor.storage.endpoint) {
+						// In sitemap overview; disable upload button;
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+					}
 					if (editor.plugins.browse.currentPath && (editor.plugins.browse.currentPath.indexOf("data.json") > -1)) {
 						// In data.json browsing mode; disable upload button;
 						if (uploadButton) {
