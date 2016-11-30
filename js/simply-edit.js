@@ -2127,7 +2127,7 @@
 					http.upload.onprogress = function (event) {
 						if (event.lengthComputable) {
 							var complete = (event.loaded / event.total * 100 | 0);
-							var progress = document.querySelector("progress[data-simply-progress='" + path + "']");
+							var progress = document.querySelector("progress[data-simply-progress='" + path.replace(/[^A-Za-z0-9_\.-]/g, "-") + "']");
 							if (progress) {
 								progress.value = progress.innerHTML = complete;
 							}

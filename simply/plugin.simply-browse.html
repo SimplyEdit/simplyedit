@@ -573,9 +573,9 @@
 					newButton.setAttribute("data-simply-action", "simply-browse-uploading");
 					newButton.innerHTML = "Uploading<br><progress value=0 max=100></progress><br>" + files[i].name;
 					targetList.appendChild(newButton);
-					newButton.querySelector("progress").setAttribute("data-simply-progress", subpath + files[i].name);
+					newButton.querySelector("progress").setAttribute("data-simply-progress", (subpath + files[i].name).replace(/[^A-Za-z0-9_\.-]/g, "-"));
 
-					var url = editor.plugins.browse.currentPath + files[i].name.replace(/[^A-Za-z0-9_\.-]/, "-");
+					var url = editor.plugins.browse.currentPath + files[i].name.replace(/[^A-Za-z0-9_\.-]/g, "-");
 
 					if (editor.plugins.browse.mode == "images") {
 						(function(targetButton, url, name) {
@@ -704,7 +704,7 @@
 		var filename = el.parentNode.querySelector("input").value;
 		if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
 			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.dataEndpoint, "");
-			var url = editor.plugins.browse.currentPath + "/" + filename.replace(/[^A-Za-z0-9_\.-]/, "-");
+			var url = editor.plugins.browse.currentPath + "/" + filename.replace(/[^A-Za-z0-9_\.-]/g, "-");
 
 			(function(targetButton, url) {
 				targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
@@ -718,7 +718,7 @@
 			}(el.parentNode, url));
 
 		} else {
-			var url = editor.plugins.browse.currentPath + filename.replace(/[^A-Za-z0-9_\.-]/, "-") + '/';
+			var url = editor.plugins.browse.currentPath + filename.replace(/[^A-Za-z0-9_\.-]/g, "-") + '/';
 			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
 
 			(function(targetButton, url) {
