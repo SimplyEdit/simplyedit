@@ -1053,6 +1053,16 @@ QUnit.module("editor text selection");
 		assert.equal(testContent.innerHTML, "H<ul><li>ello</li></ul> world");
 	});
 
+	QUnit.test("converting h2 to h3 on same line", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<h2>Foo</h2><p>bar</p>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 0, 0, 3);
+		editor.actions['simply-text-blockstyle']('h3');
+		assert.equal(testContent.innerHTML, "<h3>Foo</h3><p>bar</p>");
+	});
+
 QUnit.module("custom text settings");
 	QUnit.test("settings without p don't break", function(assert) {
 		var testContent = document.querySelector("#testContent");
