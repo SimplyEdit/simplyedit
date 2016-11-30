@@ -120,7 +120,11 @@
 		tidy : function(html) {
 			var d = document.createElement('div');
 			d.innerHTML = html;
-			return d.innerHTML;
+			if (d.querySelector("iframe")) {
+				return d.innerHTML.replace(/&amp;/g, "&");
+			} else {
+				return d.innerHTML;
+			}
 		},
 		insert : function() {
 			var source = document.getElementById('insertHTMLSource').value;
