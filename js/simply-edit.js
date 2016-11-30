@@ -512,6 +512,11 @@
 				for (var t=0; t<templates.length; t++) {
 					var templateName = templates[t].getAttribute("data-simply-template") ? templates[t].getAttribute("data-simply-template") : t;
 
+					// Allow the 'rel' attribute to point to the contents of another (global) template;
+					var sourceTemplate = templates[t].getAttribute("rel");
+					if (sourceTemplate && document.getElementById(sourceTemplate)) {
+						list.templates[templateName] = document.getElementById(sourceTemplate);
+					}
 					list.templates[templateName] = templates[t];
 					if (!("content" in list.templates[templateName])) {
 						var fragment = document.createDocumentFragment();
