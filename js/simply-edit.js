@@ -380,6 +380,7 @@
 			},
 			applyDataSource : function (list, dataSource, listData) {
 				if (editor.dataSources[dataSource]) {
+					editor.fireEvent("databinding:pause", list);
 					if (typeof editor.dataSources[dataSource].set === "function") {
 						editor.dataSources[dataSource].set(list, listData);
 					}
@@ -397,6 +398,11 @@
 							editor.editmode.makeEditable(list);
 						}
 					}
+					// set again, in case we wanted to set data using the result of the load;
+					if (typeof editor.dataSources[dataSource].set === "function") {
+						editor.dataSources[dataSource].set(list, listData);
+					}
+					editor.fireEvent("databinding:resume", list);
 				} else {
 					window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
 				}
