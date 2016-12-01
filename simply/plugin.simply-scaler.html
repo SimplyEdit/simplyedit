@@ -199,17 +199,15 @@
 			};
 
 			(function(reader, file) {
-				normalSave.call(storageScope, subpath + file.name, file, function(image) {
+				normalSave.call(storageScope, subpath + file.name, file, function() {
 					reader.readAsDataURL(file);
-					if (typeof image === "undefined") {
-						image = {
-							src : editor.plugins.browse.currentPath + file.name.replace(/[^A-Za-z0-9_\.-]/, "-")
-						};
-					}
+					var image = {
+						src : editor.plugins.browse.currentPath + file.name.replace(/[^A-Za-z0-9_\.-]/g, "-")
+					};
 					var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
 					var tempNode = document.createElement("div");
 					tempNode.innerHTML = buttonHtml;
-					var progress = document.querySelector("progress[data-simply-progress='" + subpath + file.name + "']");
+					var progress = document.querySelector("progress[data-simply-progress='" + (subpath + file.name).replace(/[^A-Za-z0-9_\.-]/g, "-") + "']");
 					var targetButton = progress.parentNode;
 					targetButton.innerHTML = "Scaling<br><progress value=0 max=100></progress><br>" + file.name;
 					reader.progressBar = targetButton.querySelector("progress");

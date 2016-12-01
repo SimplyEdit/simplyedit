@@ -64,12 +64,18 @@
 				}, 800);
 			}, 300);
 		},
-		afterSaveError : function(message) {
+		afterSaveError : function(result) {
 			window.setTimeout(function() {
-				document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
-				window.setTimeout(function() {
-					editor.plugins.dialog.close();
-				}, 2000);
+				if (result.error) {
+					var errorEvent = editor.fireEvent("simply-page-save-error", document, result);
+					if (!errorEvent.defaultPrevented) {
+						var message = errorEvent.data.message;
+						document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
+						window.setTimeout(function() {
+							editor.plugins.dialog.close();
+						}, 2000);
+					}
+				}
 			}, 300);
 		}
 	};
