@@ -1750,6 +1750,10 @@
 				console.log("Warning: custom storage not found");
 			}
 
+			if (!result.escape) {
+				result.escape = storage.default.escape;
+			}
+
 			if (typeof result.init === "function") {
 				result.init(endpoint);
 			}
@@ -1765,6 +1769,7 @@
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 				this.disconnect = storage.default.disconnect;
+				this.escape = storage.default.escape;
 				this.page = storage.default.page;
 
 				this.endpoint = endpoint;
@@ -1908,6 +1913,7 @@
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 				this.page = storage.default.page;
+				this.escape = storage.default.escape;
 
 				if (editor.responsiveImages) {
 					if (
@@ -2103,6 +2109,9 @@
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
 			},
+			escape : function(path) {
+				return path.replace(/[^A-Za-z0-9_\.-]/g, "-");
+			},
 			file : {
 				save : function(path, data, callback) {
 					var http = new XMLHttpRequest();
@@ -2127,7 +2136,7 @@
 					http.upload.onprogress = function (event) {
 						if (event.lengthComputable) {
 							var complete = (event.loaded / event.total * 100 | 0);
-							var progress = document.querySelector("progress[data-simply-progress='" + path.replace(/[^A-Za-z0-9_\.-]/g, "-") + "']");
+							var progress = document.querySelector("progress[data-simply-progress='" + editor.storage.escape(path) + "']");
 							if (progress) {
 								progress.value = progress.innerHTML = complete;
 							}
