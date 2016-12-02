@@ -536,17 +536,19 @@
 						blocks.push(blockAnnotation);
 					} else {
 						var sel = window.getSelection();
-						range = window.getSelection().getRangeAt(0);
-						range.setStart(sel.focusNode,0);
-						range.setEnd(sel.focusNode, sel.focusNode.length);
-						window.getSelection().removeAllRanges();
-						sel.addRange(range);
-						hopeEditor.selection.updateRange();
-						range = hopeEditor.selection.getRange();
-						blocks.push({
-							range : range,
-							tag : ""
-						});
+						if (sel.rangeCount) {
+							range = sel.getRangeAt(0);
+							range.setStart(sel.focusNode,0);
+							range.setEnd(sel.focusNode, sel.focusNode.length);
+							sel.removeAllRanges();
+							sel.addRange(range);
+							hopeEditor.selection.updateRange();
+							range = hopeEditor.selection.getRange();
+							blocks.push({
+								range : range,
+								tag : ""
+							});
+						}
 					}
 				}
 				return blocks;
