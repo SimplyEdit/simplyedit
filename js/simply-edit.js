@@ -121,6 +121,10 @@
 			},
 			stash : function() {
 				localStorage.data = editor.data.stringify(editor.currentData);
+				var dataSources = document.querySelectorAll("[data-simply-data]");
+				for (var i=0; i<dataSources.length; i++) {
+					editor.list.get(dataSources[i]);
+				}
 			},
 			stringify : function(data) {
 				var jsonData = JSON.stringify(data, null, "\t");
@@ -272,8 +276,18 @@
 						data[dataPath] = {};
 					}
 
-					if (!data[dataPath][dataName]) {
-						data[dataPath][dataName] = [];
+					var dataParent = data[dataPath];
+					var dataKeys = dataName.split(".");
+					dataName = dataKeys.pop();
+					for (var j=0; j<dataKeys.length; j++) {
+						if (!dataParent[dataKeys[j]]) {
+							dataParent[dataKeys[j]] = {};
+						}
+						dataParent = dataParent[dataKeys[j]];
+					}
+
+					if (!dataParent[dataName]) {
+						dataParent[dataName] = [];
 					}
 
 					listItems = list.querySelectorAll("[data-simply-list-item]");
@@ -283,20 +297,20 @@
 							continue;
 						}
 
-						if (!data[dataPath][dataName][counter]) {
-							data[dataPath][dataName][counter] = {};
+						if (!dataParent[dataName][counter]) {
+							dataParent[dataName][counter] = {};
 						}
 						var subData = editor.list.get(listItems[j]);
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
 								console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
 							}
-							data[dataPath][dataName][counter] = subData[subPath];
+							dataParent[dataName][counter] = subData[subPath];
 						}
 
-						// data[dataPath][dataName][counter] = editor.data.get(listItems[j]);
+						// dataParent[dataName][counter] = editor.data.get(listItems[j]);
 						if (listItems[j].getAttribute("data-simply-template")) {
-							data[dataPath][dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");
+							dataParent[dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");
 						}
 						counter++;
 					}
@@ -313,13 +327,13 @@
 								list : list,
 								dataPath : dataPath,
 								dataName : dataName,
-								data : data[dataPath][dataName]
+								data : dataParent[dataName]
 							});
 
 							if (typeof editor.dataSources[dataSource].get === "function") {
-								data[dataPath][dataName] = editor.dataSources[dataSource].get(list);
-								if (data[dataPath][dataName] === null) {
-									data[dataPath][dataName] = []; // returning null will confuse the databinding;
+								dataParent[dataName] = editor.dataSources[dataSource].get(list);
+								if (dataParent[dataName] === null) {
+									dataParent[dataName] = []; // returning null will confuse the databinding;
 								}
 							}
 						}
@@ -338,7 +352,17 @@
 						data[dataPath] = {};
 					}
 
-					data[dataPath][dataName] = editor.field.get(field);
+					var dataParent = data[dataPath];
+					var dataKeys = dataName.split(".");
+					dataName = dataKeys.pop();
+					for (var j=0; j<dataKeys.length; j++) {
+						if (!dataParent[dataKeys[j]]) {
+							dataParent[dataKeys[j]] = {};
+						}
+						dataParent = dataParent[dataKeys[j]];
+					}
+
+					dataParent[dataName] = editor.field.get(field);
 					field.setAttribute("data-simply-stashed", 1);
 				};
 
@@ -388,6 +412,9 @@
 			},
 			applyDataSource : function (list, dataSource, listData) {
 				if (editor.dataSources[dataSource]) {
+					if (list.dataSourceTimer) { // just in case we already have a timer running, don't do things twice;
+						window.clearTimeout(list.dataSourceTimer);
+					}
 					editor.fireEvent("databinding:pause", list);
 					if (typeof editor.dataSources[dataSource].set === "function") {
 						editor.dataSources[dataSource].set(list, listData);
@@ -412,7 +439,7 @@
 					}
 					editor.fireEvent("databinding:resume", list);
 				} else {
-					window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
+					list.dataSourceTimer = window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
 				}
 			},
 			dataBindingGetter : function() {
