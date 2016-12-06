@@ -1374,7 +1374,6 @@ QUnit.module("lists");
 
 		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
 
-		vdSelectionState.remove();
 		editor.context.toolbar.hide = true;
 		editor.context.update();
 		editor.context.toolbar.hide = false;
@@ -1394,7 +1393,6 @@ QUnit.module("lists");
 
 		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
 		
-		vdSelectionState.remove();
 		editor.context.toolbar.hide = true;
 		editor.context.update();
 		editor.context.toolbar.hide = false;
