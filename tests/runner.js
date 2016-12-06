@@ -390,6 +390,10 @@ console output.
 
 
     var page = require('webpage').create();
+    page.viewportSize = {
+      width: 800,
+      height: 600
+    };
 
     function setupCallbacks() {
         window.document.addEventListener('DOMContentLoaded', function() {
