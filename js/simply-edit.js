@@ -591,9 +591,13 @@
 				if (!dataParent[dataName]) {
 					dataParent[dataName] = [];
 				}
+				if (list.dataBinding && list.dataBinding.mode == "field") {
+					useDataBinding = false; // this list is already bound as a field, skip dataBinding
+				}
+
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
-						if (list.dataBinding) {
+						if (list.dataBinding && (list.dataBinding.config.data == dataParent)) {
 							list.dataBinding.set(dataParent[dataName]);
 							list.dataBinding.resolve(true);
 						} else {
@@ -601,7 +605,10 @@
 							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
 								listDataBinding = dataParent._bindings_[dataName];
 							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								var bindingConfig    = {};
+								for (var i in editor.settings.databind) {
+									bindingConfig[i] = editor.settings.databind[i];
+								}
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
 								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
@@ -614,7 +621,7 @@
 							listDataBinding.bind(list);
 						}
 					} else {
-						editor.list.set(list, dataParent[dataName]);
+						editor.list.dataBindingSetter.call(list, dataParent[dataName]);
 					}
 				}
 
@@ -1178,7 +1185,7 @@
 				}
 				if (dataParent[dataName] !== null) {
 					if (useDataBinding) {
-						if (field.dataBinding) {
+						if (field.dataBinding && (field.dataBinding.config.data == dataParent)) {
 							field.dataBinding.set(dataParent[dataName]);
 							field.dataBinding.resolve(true);
 						} else {
@@ -1186,7 +1193,10 @@
 							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
 								fieldDataBinding = dataParent._bindings_[dataName];
 							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								var bindingConfig    = {};
+								for (var i in editor.settings.databind) {
+									bindingConfig[i] = editor.settings.databind[i];
+								}
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
 								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
