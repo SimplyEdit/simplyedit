@@ -19,6 +19,10 @@
     }
 
     page = require('webpage').create();
+    page.viewportSize = {
+      width: 800,
+      height: 600
+    };
 
     if (args[3] !== undefined) {
         try {
