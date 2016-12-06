@@ -121,6 +121,10 @@
 			},
 			stash : function() {
 				localStorage.data = editor.data.stringify(editor.currentData);
+				var dataSources = document.querySelectorAll("[data-simply-data]");
+				for (var i=0; i<dataSources.length; i++) {
+					editor.list.get(dataSources[i]);
+				}
 			},
 			stringify : function(data) {
 				var jsonData = JSON.stringify(data, null, "\t");
@@ -272,8 +276,18 @@
 						data[dataPath] = {};
 					}
 
-					if (!data[dataPath][dataName]) {
-						data[dataPath][dataName] = [];
+					var dataParent = data[dataPath];
+					var dataKeys = dataName.split(".");
+					dataName = dataKeys.pop();
+					for (var j=0; j<dataKeys.length; j++) {
+						if (!dataParent[dataKeys[j]]) {
+							dataParent[dataKeys[j]] = {};
+						}
+						dataParent = dataParent[dataKeys[j]];
+					}
+
+					if (!dataParent[dataName]) {
+						dataParent[dataName] = [];
 					}
 
 					listItems = list.querySelectorAll("[data-simply-list-item]");
@@ -283,20 +297,20 @@
 							continue;
 						}
 
-						if (!data[dataPath][dataName][counter]) {
-							data[dataPath][dataName][counter] = {};
+						if (!dataParent[dataName][counter]) {
+							dataParent[dataName][counter] = {};
 						}
 						var subData = editor.list.get(listItems[j]);
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
 								console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
 							}
-							data[dataPath][dataName][counter] = subData[subPath];
+							dataParent[dataName][counter] = subData[subPath];
 						}
 
-						// data[dataPath][dataName][counter] = editor.data.get(listItems[j]);
+						// dataParent[dataName][counter] = editor.data.get(listItems[j]);
 						if (listItems[j].getAttribute("data-simply-template")) {
-							data[dataPath][dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");
+							dataParent[dataName][counter]['data-simply-template'] = listItems[j].getAttribute("data-simply-template");
 						}
 						counter++;
 					}
@@ -313,13 +327,13 @@
 								list : list,
 								dataPath : dataPath,
 								dataName : dataName,
-								data : data[dataPath][dataName]
+								data : dataParent[dataName]
 							});
 
 							if (typeof editor.dataSources[dataSource].get === "function") {
-								data[dataPath][dataName] = editor.dataSources[dataSource].get(list);
-								if (data[dataPath][dataName] === null) {
-									data[dataPath][dataName] = []; // returning null will confuse the databinding;
+								dataParent[dataName] = editor.dataSources[dataSource].get(list);
+								if (dataParent[dataName] === null) {
+									dataParent[dataName] = []; // returning null will confuse the databinding;
 								}
 							}
 						}
@@ -338,7 +352,17 @@
 						data[dataPath] = {};
 					}
 
-					data[dataPath][dataName] = editor.field.get(field);
+					var dataParent = data[dataPath];
+					var dataKeys = dataName.split(".");
+					dataName = dataKeys.pop();
+					for (var j=0; j<dataKeys.length; j++) {
+						if (!dataParent[dataKeys[j]]) {
+							dataParent[dataKeys[j]] = {};
+						}
+						dataParent = dataParent[dataKeys[j]];
+					}
+
+					dataParent[dataName] = editor.field.get(field);
 					field.setAttribute("data-simply-stashed", 1);
 				};
 
@@ -388,6 +412,9 @@
 			},
 			applyDataSource : function (list, dataSource, listData) {
 				if (editor.dataSources[dataSource]) {
+					if (list.dataSourceTimer) { // just in case we already have a timer running, don't do things twice;
+						window.clearTimeout(list.dataSourceTimer);
+					}
 					editor.fireEvent("databinding:pause", list);
 					if (typeof editor.dataSources[dataSource].set === "function") {
 						editor.dataSources[dataSource].set(list, listData);
@@ -412,7 +439,7 @@
 					}
 					editor.fireEvent("databinding:resume", list);
 				} else {
-					window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
+					list.dataSourceTimer = window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
 				}
 			},
 			dataBindingGetter : function() {
@@ -564,9 +591,13 @@
 				if (!dataParent[dataName]) {
 					dataParent[dataName] = [];
 				}
+				if (list.dataBinding && list.dataBinding.mode == "field") {
+					useDataBinding = false; // this list is already bound as a field, skip dataBinding
+				}
+
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
-						if (list.dataBinding) {
+						if (list.dataBinding && (list.dataBinding.config.data == dataParent)) {
 							list.dataBinding.set(dataParent[dataName]);
 							list.dataBinding.resolve(true);
 						} else {
@@ -574,7 +605,10 @@
 							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
 								listDataBinding = dataParent._bindings_[dataName];
 							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								var bindingConfig    = {};
+								for (var i in editor.settings.databind) {
+									bindingConfig[i] = editor.settings.databind[i];
+								}
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
 								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
@@ -587,7 +621,7 @@
 							listDataBinding.bind(list);
 						}
 					} else {
-						editor.list.set(list, dataParent[dataName]);
+						editor.list.dataBindingSetter.call(list, dataParent[dataName]);
 					}
 				}
 
@@ -1151,7 +1185,7 @@
 				}
 				if (dataParent[dataName] !== null) {
 					if (useDataBinding) {
-						if (field.dataBinding) {
+						if (field.dataBinding && (field.dataBinding.config.data == dataParent)) {
 							field.dataBinding.set(dataParent[dataName]);
 							field.dataBinding.resolve(true);
 						} else {
@@ -1159,7 +1193,10 @@
 							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
 								fieldDataBinding = dataParent._bindings_[dataName];
 							} else {
-								var bindingConfig    = editor.settings.databind ? editor.settings.databind : {};
+								var bindingConfig    = {};
+								for (var i in editor.settings.databind) {
+									bindingConfig[i] = editor.settings.databind[i];
+								}
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
 								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
@@ -1758,6 +1795,10 @@
 				console.log("Warning: custom storage not found");
 			}
 
+			if (!result.escape) {
+				result.escape = storage.default.escape;
+			}
+
 			if (typeof result.init === "function") {
 				result.init(endpoint);
 			}
@@ -1773,6 +1814,7 @@
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 				this.disconnect = storage.default.disconnect;
+				this.escape = storage.default.escape;
 				this.page = storage.default.page;
 
 				this.endpoint = endpoint;
@@ -1916,6 +1958,7 @@
 				this.sitemap = storage.default.sitemap;
 				this.listSitemap = storage.default.listSitemap;
 				this.page = storage.default.page;
+				this.escape = storage.default.escape;
 
 				if (editor.responsiveImages) {
 					if (
@@ -2111,6 +2154,9 @@
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
 			},
+			escape : function(path) {
+				return path.replace(/[^A-Za-z0-9_\.-]/g, "-");
+			},
 			file : {
 				save : function(path, data, callback) {
 					var http = new XMLHttpRequest();
@@ -2135,7 +2181,7 @@
 					http.upload.onprogress = function (event) {
 						if (event.lengthComputable) {
 							var complete = (event.loaded / event.total * 100 | 0);
-							var progress = document.querySelector("progress[data-simply-progress='" + path.replace(/[^A-Za-z0-9_\.-]/g, "-") + "']");
+							var progress = document.querySelector("progress[data-simply-progress='" + editor.storage.escape(path) + "']");
 							if (progress) {
 								progress.value = progress.innerHTML = complete;
 							}
