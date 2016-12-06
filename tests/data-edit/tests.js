@@ -68,6 +68,7 @@ function setSelectionEnd(elem, offset) {
 }
 
 var simulateClick = function(target, offsetTop, offsetLeft) {
+	window.scrollTo(0,0);
 	var rect = target.getBoundingClientRect();
 	if (typeof offsetTop === "undefined") {
 		offsetTop = 0;
@@ -79,6 +80,12 @@ var simulateClick = function(target, offsetTop, offsetLeft) {
 	var targetLeft = parseInt(rect.left) + parseInt(offsetLeft);
 	
 	var targetEl = document.elementFromPoint(targetLeft, targetTop);
+	while (targetEl === null) {
+		// Sometimes the point we want to click on is not in view; scroll the page until it is.
+		window.scrollBy(0, 10);
+		targetEl = document.elementFromPoint(targetLeft, targetTop - window.pageYOffset);
+	}
+
 	var evt = mouseEvent("mousedown", targetLeft, targetTop, targetLeft, targetTop);
 	dispatchEvent(targetEl, evt);
 	evt = mouseEvent("click", targetLeft, targetTop, targetLeft, targetTop);
@@ -1367,6 +1374,7 @@ QUnit.module("lists");
 
 		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
 
+		vdSelectionState.remove();
 		editor.context.toolbar.hide = true;
 		editor.context.update();
 		editor.context.toolbar.hide = false;
@@ -1386,6 +1394,7 @@ QUnit.module("lists");
 
 		var target = testList.querySelectorAll("[data-simply-list-item]")[1];
 		
+		vdSelectionState.remove();
 		editor.context.toolbar.hide = true;
 		editor.context.update();
 		editor.context.toolbar.hide = false;
