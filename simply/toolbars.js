@@ -453,9 +453,29 @@
 			}
 		},
 		wrap : function(node, element) {
+			var sel = window.getSelection();
+			var range, savedRange;
+			if (sel.rangeCount) {
+				range = sel.getRangeAt(0);
+				if (range.startContainer == node) {
+					savedRange = {
+						startContainer : range.startContainer,
+						endContainer : range.endContainer,
+						startOffset : range.startOffset,
+						endOffset : range.endOffset
+					};
+				}
+			}
+
 			var el = document.createElement(element);
 			node.parentNode.insertBefore(el, node);
 			el.appendChild(node);
+			if (savedRange) {
+				range.setStart(savedRange.startContainer, savedRange.startOffset);
+				range.setEnd(savedRange.endContainer, savedRange.endOffset);
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
 		},
 		escapeHtml : function(text) {
 			return text.replace(/&/g, "&amp;")
