@@ -457,7 +457,7 @@
 			var range, savedRange;
 			if (sel.rangeCount) {
 				range = sel.getRangeAt(0);
-				if (range.startContainer == node) {
+				if (range.startContainer == node || range.endContainer == node) {
 					savedRange = {
 						startContainer : range.startContainer,
 						endContainer : range.endContainer,
