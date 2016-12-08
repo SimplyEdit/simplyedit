@@ -72,19 +72,7 @@
 				editor.node.unwrap(ev.target);
 				var siblings = parent.childNodes;
 				editor.node.unwrap(ev.target);
-
-				for (var i=0; i<siblings.length; i++) {
-					if (siblings[i] && siblings[i].nodeType == document.TEXT_NODE) {
-						editor.node.wrap(siblings[i], "p");
-					} else if (
-						siblings[i] &&
-						(siblings[i].nodeType == document.ELEMENT_NODE) &&
-						(hope.render.html.rules.nestingSets['inline'].indexOf(siblings[i].tagName.toLowerCase()) > -1)
-					) {
-						editor.node.wrap(siblings[i], "p");
-					}
-				}
-
+				addParagraphs(siblings);
 				if (caretNode) {
 					range = document.createRange();
 					range.setStart(caretNode, 0);
@@ -114,18 +102,7 @@
 					editor.node.unwrap(nodes[i]); // Unwrap the other nodes, leave the first H1;
 				}
 				var siblings = parent.childNodes;
-				for (var i=0; i<siblings.length; i++) {
-					if (siblings[i] && siblings[i].nodeType == document.TEXT_NODE) {
-						editor.node.wrap(siblings[i], "p");
-					} else if (
-						siblings[i] &&
-						(siblings[i].nodeType == document.ELEMENT_NODE) &&
-						(hope.render.html.rules.nestingSets['inline'].indexOf(siblings[i].tagName.toLowerCase()) > -1)
-					) {
-						editor.node.wrap(siblings[i], "p");
-					}
-				}
-
+				addParagraphs(siblings);
 				if (caretNode) {
 					range = document.createRange();
 					range.setStart(caretNode, 0);
@@ -158,7 +135,7 @@
 		return tempNode.innerHTML.trim();
 	};
 
-	var unwrap = function(pastedHtml) {
+	var unwrapPastedHtml = function(pastedHtml) {
 		var tempNode = document.createElement("DIV");
 		tempNode.innerHTML = pastedHtml;
 		if (tempNode.childNodes.length == 1) {
@@ -195,6 +172,22 @@
 		return true;
 	};
 
+	var addParagraphs = function(nodes) {
+		for (var i=0; i<nodes.length; i++) {
+			if (nodes[i] && nodes[i].nodeType == document.TEXT_NODE) {
+				if (nodes[i].nodeValue !== "") {
+					editor.node.wrap(nodes[i], "p");
+				}
+			} else if (
+				nodes[i] && 
+				(nodes[i].nodeType == document.ELEMENT_NODE) &&
+				(hope.render.html.rules.nestingSets['inline'].indexOf(nodes[i].tagName.toLowerCase()) > -1)
+			) {
+				editor.node.wrap(nodes[i], "p");
+			}
+		}
+	};
+
 	editor.addToolbar({
 		name : 'simply-paste-handler',
 		init : function() {
@@ -224,6 +217,8 @@
 						}
 					break;
 					case 13:	// enter
+						// this forces the text into structured paragraphs/headings, so that firefox will behave more sanely with inserting breaks
+						addParagraphs(event.target.childNodes);
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
 					break;
 				}
@@ -263,7 +258,7 @@
 
 				pastedHtml = cleanPastedHtml(pastedHtml, event.target);
 				while (pastedHtml && (!pasteAllowed(pastedHtml, targetField))) {
-					pastedHtml = unwrap(pastedHtml);
+					pastedHtml = unwrapPastedHtml(pastedHtml);
 				}
 
 				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);

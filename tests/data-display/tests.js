@@ -228,12 +228,41 @@ QUnit.module("editor data apply");
 		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data simply field set correctly");
 	});
 
+	QUnit.test("apply title from a subkey", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<div data-simply-field='page.title'>Wrong content</div>";
+		var data = {};
+		data[location.pathname] = {
+			"page" : {
+				"title" : "Test title"
+			}
+		};
+		editor.data.apply(data, target);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data simply field set correctly");
+	});
+
 	QUnit.test("apply title with path", function(assert) {
 		var target = document.querySelector("#testContent");
 		target.innerHTML = "<div data-simply-field='title' data-simply-path='/'>Wrong content</div>";
 		var data = {
 			"/" : {
 				"title" : "Test title"
+			}
+		};
+		editor.data.apply(data, target);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data simply field set correctly");
+	});
+
+	QUnit.test("apply title with path and subkey", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<div data-simply-field='page.title' data-simply-path='/'>Wrong content</div>";
+		var data = {
+			"/" : {
+				"page" : {
+					"title" : "Test title"
+				}
 			}
 		};
 		editor.data.apply(data, target);
@@ -250,6 +279,25 @@ QUnit.module("editor data apply");
 					{"item" : "Home"},
 					{"item" : "Second item"}
 				]
+			}
+		};
+		editor.data.apply(data, target);
+		assert.notOk(document.querySelector("#testContent ul").className.match(/simply-empty/), "simply-empty is set on empty list");
+		assert.equal(document.querySelector("#testContent ul > li").innerHTML, "Home", "Home item was found");
+		assert.equal(document.querySelector("#testContent ul > li + li").innerHTML, "Second item", "Second item was found");
+	});
+
+	QUnit.test("apply list from subkey", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<ul data-simply-list='page.menu' data-simply-path='/'><template><li data-simply-field='item'>Menu item</li></template></ul>";
+		var data = {
+			"/" : {
+				"page" : {
+					"menu" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]
+				}
 			}
 		};
 		editor.data.apply(data, target);
@@ -604,6 +652,23 @@ QUnit.module("databinding");
 		assert.equal(editor.pageData.hello, "Hello world", "editor pagedata gets set correctly");
 	});
 
+	QUnit.test("databinding set div data with subkey", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-field", "page.hello");
+		field.innerHTML = "Hello world";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		assert.equal(field.innerHTML, "Hello world", "initial content remains in div");
+		field.dataBinding.resolve(true);
+		assert.equal(editor.pageData.page.hello, "Hello world", "editor pagedata gets set correctly");
+	});
+
 	QUnit.test("databinding change div data from DOM", function(assert) {
 		var field = document.createElement("DIV");
 		field.setAttribute("data-simply-field", "hello");
@@ -656,6 +721,21 @@ QUnit.module("databinding");
 		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(JSON.stringify(editor.pageData.hello), "[]", "list starts out empty");
+	});
+
+	QUnit.test("databinding list with subkey", function(assert) {
+		var field = document.createElement("ul");
+		field.setAttribute("data-simply-list", "page.hello");
+		field.innerHTML = "<template><li><div data-simply-field='item'>Hello world</div></li></template>";
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = editor.currentData[document.location.pathname];
+
+		assert.equal(JSON.stringify(editor.pageData.page.hello), "[]", "list starts out empty");
 	});
 
 	QUnit.test("databinding list push item", function(assert) {
