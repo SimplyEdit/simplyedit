@@ -2559,7 +2559,17 @@
 */
 	window.editor = editor;
 	editor.storageConnectors = storage;
-	editor.settings = document.querySelector("[data-simply-settings]") ? window[document.querySelector("[data-simply-settings]").getAttribute("data-simply-settings")] : {};
+
+	editor.settings = {};
+	// Find custom settings if they are set;
+	if (scriptEl.hasAttribute("data-simply-settings")) {
+		var customSettings = window[scriptEl.getAttribute("data-simply-settings")];
+		if (customSettings) {
+			editor.settings = customSettings;
+		} else {
+			console.log("Warning: data-simply-settings was set, but no settings were found. Starting without them...");
+		}
+	}
 
 	if (!editor.settings.databind) {
 		editor.settings.databind = {};
