@@ -255,6 +255,18 @@ QUnit.module("editor data apply");
 		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data simply field set correctly");
 	});
 
+	QUnit.test("incompatible field types don't error out", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<div data-simply-field='title'>Test title</div><a data-simply-field='title' href='#'>Foo</a>";
+		var data = {};
+		data[location.pathname] = {
+			"title" : "Test title"
+		};
+		editor.data.apply(data, target);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Test title", "simple data simply field set correctly");
+	});
+
 	QUnit.test("apply title with path and subkey", function(assert) {
 		var target = document.querySelector("#testContent");
 		target.innerHTML = "<div data-simply-field='page.title' data-simply-path='/'>Wrong content</div>";

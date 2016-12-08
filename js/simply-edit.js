@@ -1061,6 +1061,11 @@
 				return result;
 			},
 			defaultSetter : function(field, data) {
+				if (typeof data === "string") {
+					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
+					return;
+				}
+
 				if (field.getAttribute("data-simply-content") == "fixed") {
 					delete data.innerHTML;
 				}
