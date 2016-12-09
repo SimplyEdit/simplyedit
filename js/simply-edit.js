@@ -597,7 +597,7 @@
 
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
-						if (list.dataBinding && (list.dataBinding.config.data == dataParent)) {
+						if (list.dataBinding) {
 							list.dataBinding.set(dataParent[dataName]);
 							list.dataBinding.resolve(true);
 						} else {
@@ -1190,7 +1190,7 @@
 				}
 				if (dataParent[dataName] !== null) {
 					if (useDataBinding) {
-						if (field.dataBinding && (field.dataBinding.config.data == dataParent)) {
+						if (field.dataBinding) {
 							field.dataBinding.set(dataParent[dataName]);
 							field.dataBinding.resolve(true);
 						} else {
