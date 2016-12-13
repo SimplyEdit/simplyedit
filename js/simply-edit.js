@@ -597,7 +597,7 @@
 
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
-						if (list.dataBinding && (list.dataBinding.config.data == dataParent)) {
+						if (list.dataBinding) {
 							list.dataBinding.set(dataParent[dataName]);
 							list.dataBinding.resolve(true);
 						} else {
@@ -1061,6 +1061,11 @@
 				return result;
 			},
 			defaultSetter : function(field, data) {
+				if (typeof data === "string") {
+					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
+					return;
+				}
+
 				if (field.getAttribute("data-simply-content") == "fixed") {
 					delete data.innerHTML;
 				}
@@ -1185,7 +1190,7 @@
 				}
 				if (dataParent[dataName] !== null) {
 					if (useDataBinding) {
-						if (field.dataBinding && (field.dataBinding.config.data == dataParent)) {
+						if (field.dataBinding) {
 							field.dataBinding.set(dataParent[dataName]);
 							field.dataBinding.resolve(true);
 						} else {
@@ -2559,7 +2564,17 @@
 */
 	window.editor = editor;
 	editor.storageConnectors = storage;
-	editor.settings = document.querySelector("[data-simply-settings]") ? window[document.querySelector("[data-simply-settings]").getAttribute("data-simply-settings")] : {};
+
+	editor.settings = {};
+	// Find custom settings if they are set;
+	if (scriptEl.hasAttribute("data-simply-settings")) {
+		var customSettings = window[scriptEl.getAttribute("data-simply-settings")];
+		if (customSettings) {
+			editor.settings = customSettings;
+		} else {
+			console.log("Warning: data-simply-settings was set, but no settings were found. Starting without them...");
+		}
+	}
 
 	if (!editor.settings.databind) {
 		editor.settings.databind = {};
