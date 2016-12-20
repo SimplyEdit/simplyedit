@@ -83,6 +83,7 @@ dataBinding = function(config) {
 	};
 	this.setData = function(newdata) {
 		data = newdata;
+		initBindings(data, key);
 	};
 
 	var setShadowValue = function(value) {
@@ -260,6 +261,7 @@ dataBinding = function(config) {
 				binding.elements[i].setter(shadowValue);
 				binding.resumeListeners(binding.elements[i]);
 			}
+			fireEvent(binding.elements[i], "elementresolved");
 		}
 		if (data._parentBindings_ && data._parentBindings_[key] && data._parentBindings_[key] !== this) {
 			data[key] = shadowValue; 
@@ -294,20 +296,22 @@ dataBinding = function(config) {
 		setShadowValue(data[key]);
 		oldValue = dereference(data[key]);
 
-		Object.defineProperty(data, key, { 
-			set : function(value) {
-				binding.set(value);
-				binding.resolve(true);
-				if (data._parentBindings_ && data._parentBindings_[key]) {
-					data._parentBindings_[key].set(value);
-					data._parentBindings_[key].resolve(value);
-				}
-			},
-			get : function() {
-				return shadowValue;
-			},
-			enumerable: true
-		});
+//		if (!data.hasOwnProperty(key)) { // FIXME: checking this skips lists
+			Object.defineProperty(data, key, {
+				set : function(value) {
+					binding.set(value);
+					binding.resolve(true);
+					if (data._parentBindings_ && data._parentBindings_[key]) {
+						data._parentBindings_[key].set(value);
+						data._parentBindings_[key].resolve(value);
+					}
+				},
+				get : function() {
+					return shadowValue;
+				},
+				enumerable: true
+			});
+//		}
 	};
 	var fireEvent = function(targetNode, eventName, detail) {
 		var event = document.createEvent('CustomEvent');
