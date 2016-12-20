@@ -296,22 +296,20 @@ dataBinding = function(config) {
 		setShadowValue(data[key]);
 		oldValue = dereference(data[key]);
 
-//		if (!data.hasOwnProperty(key)) { // FIXME: checking this skips lists
-			Object.defineProperty(data, key, {
-				set : function(value) {
-					binding.set(value);
-					binding.resolve(true);
-					if (data._parentBindings_ && data._parentBindings_[key]) {
-						data._parentBindings_[key].set(value);
-						data._parentBindings_[key].resolve(value);
-					}
-				},
-				get : function() {
-					return shadowValue;
-				},
-				enumerable: true
-			});
-//		}
+		Object.defineProperty(data, key, {
+			set : function(value) {
+				binding.set(value);
+				binding.resolve(true);
+				if (data._parentBindings_ && data._parentBindings_[key]) {
+					data._parentBindings_[key].set(value);
+					data._parentBindings_[key].resolve(value);
+				}
+			},
+			get : function() {
+				return shadowValue;
+			},
+			enumerable: true
+		});
 	};
 	var fireEvent = function(targetNode, eventName, detail) {
 		var event = document.createEvent('CustomEvent');
