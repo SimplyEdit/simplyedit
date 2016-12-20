@@ -412,6 +412,9 @@
 			},
 			applyDataSource : function (list, dataSource, listData) {
 				if (editor.dataSources[dataSource]) {
+					if (editor.dataSources[dataSource].applyOnce && list.dataSourceApplied) {
+						return;
+					}
 					if (list.dataSourceTimer) { // just in case we already have a timer running, don't do things twice;
 						window.clearTimeout(list.dataSourceTimer);
 					}
@@ -438,6 +441,7 @@
 						editor.dataSources[dataSource].set(list, listData);
 					}
 					editor.fireEvent("databinding:resume", list);
+					list.dataSourceApplied = true;
 				} else {
 					list.dataSourceTimer = window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
 				}
