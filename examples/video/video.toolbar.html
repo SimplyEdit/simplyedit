@@ -97,36 +97,36 @@
 				toolbar.querySelector("input.cue-end").removeAttribute("disabled");
 
 				var cueText = activeCue.text;
-				simply.widgets.properties.set(toolbar.querySelector("textarea.cue"), cueText);
-				simply.widgets.properties.set(toolbar.querySelector("input.cue-start"), activeCue.startTime);
-				simply.widgets.properties.set(toolbar.querySelector("input.cue-end"), activeCue.endTime);
+				toolbar.querySelector("textarea.cue").value = cueText;
+				toolbar.querySelector("input.cue-start").value = activeCue.startTime;
+				toolbar.querySelector("input.cue-end").value = activeCue.endTime;
 			} else {
-				simply.widgets.properties.set(toolbar.querySelector("textarea.cue"), "");
-				simply.widgets.properties.set(toolbar.querySelector("input.cue-start"), "");
-				simply.widgets.properties.set(toolbar.querySelector("input.cue-end"), "");
+				toolbar.querySelector("textarea.cue").value = "";
+				toolbar.querySelector("input.cue-start").value = "";
+				toolbar.querySelector("input.cue-end").value = "";
 				toolbar.querySelector("textarea.cue").setAttribute("disabled", true);
 				toolbar.querySelector("input.cue-start").setAttribute("disabled", true);
 				toolbar.querySelector("input.cue-end").setAttribute("disabled", true);
 			}
 
 			if (video.querySelector("source[type='video/mp4']")) {
-				simply.widgets.properties.set(toolbar.querySelector("input.mp4"), video.querySelector("source[type='video/mp4']").getAttribute("src"));
+				toolbar.querySelector("input.mp4").value = video.querySelector("source[type='video/mp4']").getAttribute("src");
 			} else {
-				simply.widgets.properties.set(toolbar.querySelector("input.mp4"), '');
+				toolbar.querySelector("input.mp4").value = '';
 			}
 
 			if (video.querySelector("source[type='video/webm']")) {
-				simply.widgets.properties.set(toolbar.querySelector("input.webm"), video.querySelector("source[type='video/webm']").getAttribute("src"));
+				toolbar.querySelector("input.webm").value = video.querySelector("source[type='video/webm']").getAttribute("src");
 			} else {
-				simply.widgets.properties.set(toolbar.querySelector("input.webm"), '');
+				toolbar.querySelector("input.webm").value = '';
 			}
 
 			var langs = ["en", "de", "es"];
 			for (var i=0; i<langs.length; i++) {
 				if (video.querySelector("track[srclang='" + langs[i] + "']")) {
-					simply.widgets.properties.set(toolbar.querySelector("input.track-" + langs[i]), video.querySelector("track[srclang='" + langs[i] + "']").getAttribute("src"));
+					toolbar.querySelector("input.track-" + langs[i]).value = video.querySelector("track[srclang='" + langs[i] + "']").getAttribute("src");
 				} else {
-					simply.widgets.properties.set(toolbar.querySelector("input.track-" + langs[i]), '');
+					toolbar.querySelector("input.track-" + langs[i]).value = '';
 				}
 			}
 
@@ -147,9 +147,9 @@
 
 				var activeCue = getActiveCue(video);
 				if (activeCue) {
-					var cueText = simply.widgets.properties.get(document.querySelector("#simply-video textarea.cue"));
-					var cueStart = simply.widgets.properties.get(document.querySelector("#simply-video input.cue-start"));
-					var cueEnd = simply.widgets.properties.get(document.querySelector("#simply-video input.cue-end"));
+					var cueText = document.querySelector("#simply-video textarea.cue").value;
+					var cueStart = document.querySelector("#simply-video input.cue-start").value;
+					var cueEnd = document.querySelector("#simply-video input.cue-end").value;
 
 					activeCue.text = cueText;
 					if (cueStart != activeCue.startTime) {
@@ -163,7 +163,9 @@
 						video.currentTime = 0;
 						video.currentTime = currentTime;
 					}
+					editor.fireEvent("databinding:valuechanged", video);
 				}
+
 			},
 			"simply-cue-next" : function() {
 				var video = vdSelectionState.currentNode;
@@ -187,6 +189,8 @@
 				var message = "...";
 				var newCue = new VTTCue(startTime, endTime, message);
 				track.addCue(newCue);
+				editor.fireEvent("databinding:valuechanged", video);
+
 				video.currentTime = startTime;
 			},
 			"simply-cue-prev" : function() {
