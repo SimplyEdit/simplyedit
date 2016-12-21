@@ -274,6 +274,11 @@ dataBinding = function(config) {
 		fireEvent(document, "resolved");
 	};
 	var initBindings = function(data, key) {
+		if (typeof data != "object") {
+			console.log("Attempted to bind on non-object data for " + key);
+			return;
+		}
+
 		if (!data.hasOwnProperty("_bindings_")) {
 			var bindings = {};
 
