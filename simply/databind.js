@@ -83,6 +83,7 @@ dataBinding = function(config) {
 	};
 	this.setData = function(newdata) {
 		data = newdata;
+		initBindings(data, key);
 	};
 
 	var setShadowValue = function(value) {
@@ -260,6 +261,7 @@ dataBinding = function(config) {
 				binding.elements[i].setter(shadowValue);
 				binding.resumeListeners(binding.elements[i]);
 			}
+			fireEvent(binding.elements[i], "elementresolved");
 		}
 		if (data._parentBindings_ && data._parentBindings_[key] && data._parentBindings_[key] !== this) {
 			data[key] = shadowValue; 
@@ -272,6 +274,11 @@ dataBinding = function(config) {
 		fireEvent(document, "resolved");
 	};
 	var initBindings = function(data, key) {
+		if (typeof data != "object") {
+			console.log("Attempted to bind on non-object data for " + key);
+			return;
+		}
+
 		if (!data.hasOwnProperty("_bindings_")) {
 			var bindings = {};
 
@@ -294,7 +301,7 @@ dataBinding = function(config) {
 		setShadowValue(data[key]);
 		oldValue = dereference(data[key]);
 
-		Object.defineProperty(data, key, { 
+		Object.defineProperty(data, key, {
 			set : function(value) {
 				binding.set(value);
 				binding.resolve(true);

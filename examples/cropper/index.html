@@ -79,6 +79,7 @@
 					boundary: { width: width, height: height },
 					showZoomer: false,
 					update : function() {
+						editor.fireEvent("databinding:valuechanged", field);
 						if (editor.toolbars['simply-cropper']) {
 							editor.toolbars['simply-cropper'].update(document.getElementById("simply-cropper"));
 						}

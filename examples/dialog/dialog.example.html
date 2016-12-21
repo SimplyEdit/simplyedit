@@ -80,9 +80,9 @@
 				var description = "Example description";
 				var author = "Example author";
 
-				simply.widgets.properties.set("simply-example-title", title);
-				simply.widgets.properties.set("simply-example-description", description);
-				simply.widgets.properties.set("simply-example-author", author);
+				document.querySelector("#simply-example-title").value = title;
+				document.querySelector("#simply-example-description").value = description;
+				document.querySelector("#simply-example-author").value = author;
 			}
 		},
 		apply : function() {

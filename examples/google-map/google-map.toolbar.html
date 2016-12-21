@@ -55,9 +55,9 @@
 			vdSelectionState.currentSelection = sel;
 			vdSelectionState.currentNode = map;
 
-			simply.widgets.properties.set(toolbar.querySelector("input.latitude"), map.latitude);
-			simply.widgets.properties.set(toolbar.querySelector("input.longitude"), map.longitude);
-			simply.widgets.properties.set(toolbar.querySelector("input.zoom"), map.zoom);
+			toolbar.querySelector("input.latitude").value = map.latitude;
+			toolbar.querySelector("input.longitude").value = map.longitude;
+			toolbar.querySelector("input.zoom").value = map.zoom;
 
 			toolbar.querySelector("input.latitude").setAttribute('step', stepsize(map.zoom));
 			toolbar.querySelector("input.longitude").setAttribute('step', stepsize(map.zoom));
@@ -68,9 +68,9 @@
 			"simply-googlemap-coordinates" : function() {
 				var sel = vdSelectionState.get();
 				var map = vdSelection.getNode(sel);
-				map.setAttribute("latitude", simply.widgets.properties.get(document.querySelector("#simply-googlemap input.latitude")));
-				map.setAttribute("longitude", simply.widgets.properties.get(document.querySelector("#simply-googlemap input.longitude")));
-				map.setAttribute("zoom", simply.widgets.properties.get(document.querySelector("#simply-googlemap input.zoom")));
+				map.setAttribute("latitude", document.querySelector("#simply-googlemap input.latitude").value);
+				map.setAttribute("longitude", document.querySelector("#simply-googlemap input.longitude").value);
+				map.setAttribute("zoom", document.querySelector("#simply-googlemap input.zoom").value);
 
 				var toolbar = document.getElementById("simply-googlemap");
 				toolbar.querySelector("input.latitude").setAttribute('step', stepsize(map.zoom));

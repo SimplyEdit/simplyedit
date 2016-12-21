@@ -120,6 +120,7 @@
 				}
 			},
 			stash : function() {
+				editor.fireEvent("simply-stash", document);
 				localStorage.data = editor.data.stringify(editor.currentData);
 				var dataSources = document.querySelectorAll("[data-simply-data]");
 				for (var i=0; i<dataSources.length; i++) {
@@ -412,6 +413,9 @@
 			},
 			applyDataSource : function (list, dataSource, listData) {
 				if (editor.dataSources[dataSource]) {
+					if (editor.dataSources[dataSource].applyOnce && list.dataSourceApplied) {
+						return;
+					}
 					if (list.dataSourceTimer) { // just in case we already have a timer running, don't do things twice;
 						window.clearTimeout(list.dataSourceTimer);
 					}
@@ -438,6 +442,7 @@
 						editor.dataSources[dataSource].set(list, listData);
 					}
 					editor.fireEvent("databinding:resume", list);
+					list.dataSourceApplied = true;
 				} else {
 					list.dataSourceTimer = window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
 				}
@@ -455,12 +460,6 @@
 				return data[dataPath][dataName];
 			},
 			dataBindingSetter : function(value) {
-				var children = this.querySelectorAll("[data-simply-list-item]");
-				for (var i=0; i<children.length; i++) {
-					if (children[i].parentNode == this) {
-						this.removeChild(children[i]);
-					}
-				}
 
 				var savedBindingParents = editor.bindingParents;
 				if (this.dataBinding) {
@@ -598,6 +597,7 @@
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
 						if (list.dataBinding) {
+							list.dataBinding.setData(dataParent);
 							list.dataBinding.set(dataParent[dataName]);
 							list.dataBinding.resolve(true);
 						} else {
@@ -612,6 +612,7 @@
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
 								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
+								bindingConfig.dataPath = editor.data.getDataPath(list);
 								bindingConfig.getter = editor.list.dataBindingGetter;
 								bindingConfig.setter = editor.list.dataBindingSetter;
 								bindingConfig.mode   = "list";
@@ -684,6 +685,14 @@
 					list.reattach = function() {
 						editor.fireEvent("simply-selectable-inserted", document);
 					};
+				}
+
+				// Remove the current list items to replace them with the new data;
+				var children = list.querySelectorAll("[data-simply-list-item]");
+				for (i=0; i<children.length; i++) {
+					if (children[i].parentNode == list) {
+						list.removeChild(children[i]);
+					}
 				}
 
 				editor.bindingParents.push(list.getAttribute("data-simply-list"));
@@ -845,7 +854,12 @@
 			fieldTypes : {
 				"img" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["src", "class", "alt", "title"]);
+						var result = editor.field.defaultGetter(field, ["src", "class", "alt", "title", ["data-simply-src"]]);
+						if (result['data-simply-src']) {
+							result.src = result['data-simply-src'];
+							delete result['data-simply-src'];
+						}
+						return result;
 					},
 					set : function(field, data) {
 						if (typeof data == "string") {
@@ -1184,13 +1198,17 @@
 					dataParent = dataParent[dataKeys[j]];
 					editor.settings.databind.parentKey += dataKeys[j] + "/";
 				}
-
-				if ((!dataParent[dataName] && !Object.keys(dataParent).length) || dataParent[dataName] === null) {
+				if (
+					(typeof dataParent[dataName] === "undefined") ||
+					(!dataParent[dataName] && !Object.keys(dataParent).length) ||
+					(dataParent[dataName] === null)
+				) {
 					dataParent[dataName] = editor.field.get(field);
 				}
 				if (dataParent[dataName] !== null) {
 					if (useDataBinding) {
 						if (field.dataBinding) {
+							field.dataBinding.setData(dataParent);
 							field.dataBinding.set(dataParent[dataName]);
 							field.dataBinding.resolve(true);
 						} else {
@@ -1205,6 +1223,7 @@
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
 								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
+								bindingConfig.dataPath = editor.data.getDataPath(field);
 								bindingConfig.getter = editor.field.dataBindingGetter;
 								bindingConfig.setter = editor.field.dataBindingSetter;
 								bindingConfig.mode   = "field";

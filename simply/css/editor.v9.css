@@ -745,12 +745,12 @@
 	outline: 2px dashed rgba(128,128,128,0.3);
 	text-align: center;
 }
-[data-simply-field]:not(input):not(textarea):empty {
+[data-simply-field]:not(input):not(textarea):not(img):empty {
 	min-height: 24px;
 	text-align: center;
 }
 .simply-empty[data-simply-list]:before,
-[data-simply-field]:not(input):not(textarea):empty:before {
+[data-simply-field]:not(input):not(textarea):not(img):empty:before {
 	text-align: center;
 	font-family: FontAwesome;
 	font-size: 20px;

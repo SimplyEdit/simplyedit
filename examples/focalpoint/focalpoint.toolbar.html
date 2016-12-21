@@ -1,0 +1,169 @@
+<section id="simply-focalpoint" class="simply-section">
+	<h1>HTML Image Toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<!-- li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li -->
+			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
+			<li><button data-simply-section="simply-focalpoint-properties" class="simply-expands"><i class="fa fa-dot-circle-o"></i>Focal point</button></li>
+			<li><button data-simply-action="simply-focalpoint-browse"><i class="fa fa-folder"></i>Browse</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-image-class">
+		</div>
+		<div class="simply-toolbar-section simply-image-properties">
+			<div><label>URL<button data-simply-action="simply-focalpoint-browse"><i class="fa fa-folder"></i></button></label><input type="text" class="simply-focalpoint-src" data-simply-action="simply-focalpoint-src"></div>
+			<div><label>Alt</label><input type="text" class="simply-focalpoint-alt" data-simply-action="simply-focalpoint-alt"></div>
+			<div><label>Title</label><input type="text" class="simply-focalpoint-title" data-simply-action="simply-focalpoint-title"></div>
+		</div>
+		<div class="simply-toolbar-section simply-focalpoint-properties">
+			<!-- div><label>Zoom</label><input type="number" step="0.05" class="simply-focalpoint-zoom" data-simply-action="simply-focalpoint-zoom"></div -->
+			<div><label>X</label><input type="number" max=6 min=-6 step="1" class="simply-focalpoint-x" data-simply-action="simply-focalpoint-x"></div>
+			<div><label>Y</label><input type="number" max=6 min=-6 step="1" class="simply-focalpoint-y" data-simply-action="simply-focalpoint-y"></div>
+		</div>
+	</div>
+</section>
+
+<script type="text/javascript">
+	var currentImage;
+	var currentLink;
+
+	var getFocalPoint = function(field) {
+		var attributes = {};
+
+		var classInfo = field.className.split(" ");
+		for (var i=0; i<classInfo.length; i++) {
+			var locationInfo = classInfo[i].split("-");
+			switch(locationInfo[0]) {
+				case "right":
+					attributes.x = locationInfo[1];
+				break;
+				case "left":
+					attributes.x = -locationInfo[1];
+				break;
+				case "up":
+					attributes.y = -locationInfo[1];
+				break;
+				case "down":
+					attributes.y = locationInfo[1];
+				break;
+			}
+		}
+		return attributes;
+	};
+
+	editor.addToolbar({
+		"name" : "simply-focalpoint",
+		"filter" : {
+			"selector" : "[data-simply-focalpoint]",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"actions" : {
+			"simply-focalpoint-browse" : function(el) {
+				var savedFunction = editor.actions['simply-image-src'];
+				editor.actions['simply-image-src'] = (function(previousFunc) {
+					return function(value) {
+						editor.actions['simply-image-src'] = previousFunc;
+						editor.actions['simply-focalpoint-src'](value);
+					};
+				}(savedFunction));
+				editor.actions['simply-browse-images'](el);
+			},
+			"simply-focalpoint-x" : function(value) {
+				var sel = vdSelectionState.get();
+				var field = vdSelection.getNode(sel);
+				field.className = field.className.replace(/ (left|right)-\d/, '');
+				if (value > 0) {
+					field.className += " right-" + value;
+				} else {
+					field.className += " left-" + (value * -1);
+				}
+			},
+			"simply-focalpoint-y" : function(value) {
+				var sel = vdSelectionState.get();
+				var field = vdSelection.getNode(sel);
+				field.className = field.className.replace(/ (up|down)-\d/, "");
+				if (value > 0) {
+					field.className += " down-" + value;
+				} else {
+					field.className += " up-" + (value * -1);
+				}
+			},				
+			"simply-focalpoint-src" : function(value) {
+				if (value) {
+					var sel = vdSelectionState.get();
+					var field = vdSelection.getNode(sel);
+
+					field.querySelector("img").setAttribute("data-simply-src", value);
+					editor.responsiveImages.init(field);
+				}
+			},
+			"simply-focalpoint-alt" : function(value) {
+				if (value) {
+					var sel = vdSelectionState.get();
+					var field = vdSelection.getNode(sel);
+					field.querySelector("img").setAttribute("alt", value);
+				}
+			},
+			"simply-focalpoint-title" : function(value) {
+				if (value) {
+					var sel = vdSelectionState.get();
+					var field = vdSelection.getNode(sel);
+					field.querySelector("img").setAttribute("title", value);
+				}
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var field = vdSelection.getNode(sel);
+
+			var image = field.querySelector("img");
+
+			var alt=image.getAttribute('alt');
+			toolbar.querySelector('.simply-focalpoint-alt').value = alt;
+
+			var title=image.getAttribute('title');
+			toolbar.querySelector('.simply-focalpoint-title').value = title;
+
+			var src = image.getAttribute('data-simply-src');
+			toolbar.querySelector('.simply-focalpoint-src').value = src;
+
+			var points = getFocalPoint(field);
+			toolbar.querySelector('.simply-focalpoint-x').value = points.x;
+			toolbar.querySelector('.simply-focalpoint-y').value = points.y;
+		},
+		"init" : function(config) {
+			var toolbar = document.querySelector("#" + this.name);
+			if (typeof config === "object" && toolbar) {
+				// Init block classes
+				if (config.class) {
+					var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-image-class');
+					if (classSection) {
+						if (config.class.length) {
+							classSection.innerHTML = '';
+							for (var i=0; i<config.class.length; i++) {
+								if (config.class[i].length) {
+									var classList = config.class[i].slice();
+									classList.push({class: "none", name: "Default", icon: "fa-times"});
+									var list = document.createElement("UL");
+									list.setAttribute("data-type", "simply-buttongroup-radio");
+									for (var j=0; j<classList.length; j++) {
+										var item = document.createElement("li");
+										var button = document.createElement("button");
+										button.setAttribute("data-value", classList[j].class);
+										button.setAttribute("data-simply-action", "simply-image-class");
+										button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+										item.appendChild(button);
+										list.appendChild(item);
+									}
+
+									classSection.appendChild(list);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+</script>
