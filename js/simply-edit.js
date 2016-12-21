@@ -1197,8 +1197,11 @@
 					dataParent = dataParent[dataKeys[j]];
 					editor.settings.databind.parentKey += dataKeys[j] + "/";
 				}
-
-				if ((!dataParent[dataName] && !Object.keys(dataParent).length) || dataParent[dataName] === null) {
+				if (
+					(!dataParent[dataName] && !Object.keys(dataParent).length) ||
+					(dataParent[dataName] === null) ||
+					(typeof dataParent[dataName] === "undefined")
+				) {
 					dataParent[dataName] = editor.field.get(field);
 				}
 				if (dataParent[dataName] !== null) {
