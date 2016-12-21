@@ -120,6 +120,7 @@
 				}
 			},
 			stash : function() {
+				editor.fireEvent("simply-stash", document);
 				localStorage.data = editor.data.stringify(editor.currentData);
 				var dataSources = document.querySelectorAll("[data-simply-data]");
 				for (var i=0; i<dataSources.length; i++) {
