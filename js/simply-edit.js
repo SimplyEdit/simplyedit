@@ -853,7 +853,12 @@
 			fieldTypes : {
 				"img" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["src", "class", "alt", "title"]);
+						var result = editor.field.defaultGetter(field, ["src", "class", "alt", "title", ["data-simply-src"]]);
+						if (result['data-simply-src']) {
+							result.src = result['data-simply-src'];
+							delete result['data-simply-src'];
+						}
+						return result;
 					},
 					set : function(field, data) {
 						if (typeof data == "string") {
