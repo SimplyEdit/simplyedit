@@ -65,7 +65,7 @@
 						event.element.attr("data-quail-message", message);
 					},
 					complete: function(event) {
-						if (event.totals.severe + event.totals.moderate == 0) {
+						if (parseInt(event.totals.severe) + parseInt(event.totals.moderate) == 0) {
 							alert("All tests done, nothing severe or moderate.");
 						}
 					}

@@ -277,7 +277,7 @@
 				if (parent.parentNode.getAttribute && parent.parentNode.getAttribute("data-simply-field")) {
 					return true;
 				}
-				if (parent.parentNode.className && parent.parentNode.className.match(/\beditable\b/)) {
+				if (typeof parent.parentNode.className === "string" && parent.parentNode.className.match(/\beditable\b/)) {
 					return true;
 				}
 				parent = parent.parentNode;
@@ -324,10 +324,10 @@
 		hasToolbarParent : function(checkParent) {
 			var parent = checkParent;
 			while (parent && parent.parentNode) {
-				if (parent.parentNode.className && parent.parentNode.className.match(/\bsimply-toolbar\b/)) {
+				if (typeof parent.parentNode.className  === "string" && parent.parentNode.className.match(/\bsimply-toolbar\b/)) {
 					return true;
 				}
-				if (parent.parentNode.className && parent.parentNode.className.match(/\bsimply-dialog\b/)) {
+				if (typeof parent.parentNode.className  === "string" && parent.parentNode.className.match(/\bsimply-dialog\b/)) {
 					return true;
 				}
 				parent = parent.parentNode;
@@ -337,9 +337,9 @@
 		getUneditableParent : function(checkParent) {
 			var parent = checkParent;
 			while (parent) {
-				if (parent.className && parent.className.match(/\buneditable\b/)) {
+				if (typeof parent.className === "string" && parent.className.match(/\buneditable\b/)) {
 					return parent;
-				} else if (parent.className && parent.className.match(/\beditable\b/)) {
+				} else if (typeof parent.className === "string" && parent.className.match(/\beditable\b/)) {
 					return false;
 				}
 				parent = parent.parentNode;
@@ -377,7 +377,7 @@
 			var parent = vdSelection.getNode(sel);
 			if (sel) {
 				while(parent && parent != document) {
-					if (parent.className && parent.className.match(/\beditable\b/)) {
+					if (typeof parent.className === "string" && parent.className.match(/\beditable\b/)) {
 						return parent;
 					} else if (parent.getAttribute("data-simply-field")) {
 						return parent;
