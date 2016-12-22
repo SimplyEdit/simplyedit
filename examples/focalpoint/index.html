@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="focal-point.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		body[data-simply-edit] [data-simply-focalpoint] {
+			position: relative;
+		}
+		body[data-simply-edit] [data-simply-focalpoint]:before {
+			position: absolute;
+			width: 40px;
+			height: 40px;
+			left: 50%;
+			top: 50%;
+			content: "\f192"; /* dot-circle-o */
+			font-family: FontAwesome;
+			z-index: 10;
+			border-radius: 0px;
+			background-color: white;
+			border: 2px solid #999;
+			border-radius: 40px;
+			text-align: center;
+			vertical-align: middle;
+			line-height: 40px;
+			opacity: 0.7;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].left-6:before {
+			left: 0;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].left-5:before {
+			left: 8.3%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].left-4:before {
+			left: 16.6%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].left-3:before {
+			left: 25%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].left-2:before {
+			left: 33.3%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].left-1:before {
+			left: 41.6%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].left-0:before {
+			left: 50%;
+			margin-left: -22px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].right-6:before {
+			left: 100%;
+			margin-left: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].right-5:before {
+			left: 91.7%;
+			margin-left: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].right-4:before {
+			left: 83.3%;
+			margin-left: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].right-3:before {
+			left: 75%;
+			margin-left: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].right-2:before {
+			left: 66.6%;
+			margin-left: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].right-1:before {
+			left: 58.3%;
+			margin-left: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].up-6:before {
+			top: 0;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].up-5:before {
+			top: 8.3%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].up-4:before {
+			top: 16.6%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].up-3:before {
+			top: 25%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].up-2:before {
+			top: 33.3%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].up-1:before {
+			top: 41.6%;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].up-0:before {
+			top: 50%;
+			margin-top: -22px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].down-6:before {
+			top: 100%;
+			margin-top: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].down-5:before {
+			top: 91.7%;
+			margin-top: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].down-4:before {
+			top: 83.3%;
+			margin-top: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].down-3:before {
+			top: 75%;
+			margin-top: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].down-2:before {
+			top: 66.6%;
+			margin-top: -44px;
+		}
+		body[data-simply-edit] [data-simply-focalpoint].down-1:before {
+			top: 58.3%;
+			margin-top: -44px;
+		}
+	</style>
+</head>
+<body>
+	<div data-simply-focalpoint data-simply-field="image" class="focal-point right-6 up-6">
+		<div>
+			<img src="cat.jpg">
+		</div>
+	</div>
+        <script src="/simply-edit/js/simply-edit.js"
+                data-api-key="muze"
+		data-simply-endpoint="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/"
+		data-simply-images="http://yvo.muze.nl/ariadne/loader.php/system/users/yvo/simply-store/img/"
+        ></script>
+	<script>
+		(function() {
+			var focalPointGetter = function(field) {
+				var attr;
+				var attributes = {};
+				var classInfo = field.className.split(" ");
+
+				for (var i=0; i<classInfo.length; i++) {
+					locationInfo = classInfo[i].split("-");
+					switch(locationInfo[0]) {
+						case "right":
+							attributes.x = locationInfo[1];
+						break;
+						case "left":
+							attributes.x = -locationInfo[1];
+						break;
+						case "up":
+							attributes.y = -locationInfo[1];
+						break;
+						case "down":
+							attributes.y = locationInfo[1];
+						break;
+					}
+				}
+				if (field.querySelector('img')) {
+					attributes.src = field.querySelector('img').getAttribute('data-simply-src');
+					attributes.alt = field.querySelector('img').getAttribute('alt');
+					attributes.title = field.querySelector('img').getAttribute('title');
+				}
+				return attributes;
+			};
+
+			var focalPointSetter = function(field, data) {
+				for (i=0; i<7; i++) {
+					field.className = field.className.replace("up-" + i, "");
+					field.className = field.className.replace("left-" + i, "");
+					field.className = field.className.replace("down-" + i, "");
+					field.className = field.className.replace("right-" + i, "");
+				}
+
+				if (typeof data.x !== "undefined") {
+					if (parseInt(data.x) > 0) {
+						field.className += " right-" + parseInt(data.x);
+					} else {
+						field.className += " left-" + (parseInt(data.x) * -1);
+					}
+				}
+				if (typeof data.y !== "undefined") {
+					if (parseInt(data.y) > 0) {
+						field.className += " down-" + parseInt(data.y);
+					} else {
+						field.className += " up-" + (parseInt(data.y) * -1);
+					}
+				}
+
+				if (data.src) {
+					field.querySelector("img").setAttribute("data-simply-src", data.src);
+				}
+				if (data.alt) {
+					field.querySelector("img").setAttribute("alt", data.alt);
+				}
+				if (data.title) {
+					field.querySelector("img").setAttribute("title", data.title);
+				}
+				editor.responsiveImages.init(field);
+			};
+
+			var focalPointEditable = function(field) {
+				field.setAttribute("data-simply-selectable", true);
+			};
+
+			editor.field.registerType("[data-simply-focalpoint]", focalPointGetter, focalPointSetter, focalPointEditable);
+			editor.loadToolbar("focalpoint.toolbar.html");
+		})();
+	</script>
+</body>
+</html>
