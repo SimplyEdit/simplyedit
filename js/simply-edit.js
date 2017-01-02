@@ -653,7 +653,7 @@
 				if (!listData) {
 					listData = [];
 				}
-
+				editor.fireEvent("databinding:pause", list);
 				var initListItem = function(clone, useDataBinding, listDataItem) {
 					var dataFields = clone.querySelectorAll("[data-simply-field]");
 					for (k=0; k<dataFields.length; k++) {
@@ -840,6 +840,7 @@
 					}
 				}
 				list.reattach();
+				editor.fireEvent("databinding:resume", list);
 			}
 		},
 		field : {
