@@ -653,7 +653,7 @@
 				if (!listData) {
 					listData = [];
 				}
-
+				editor.fireEvent("databinding:pause", list);
 				var initListItem = function(clone, useDataBinding, listDataItem) {
 					var dataFields = clone.querySelectorAll("[data-simply-field]");
 					for (k=0; k<dataFields.length; k++) {
@@ -840,6 +840,7 @@
 					}
 				}
 				list.reattach();
+				editor.fireEvent("databinding:resume", list);
 			}
 		},
 		field : {
@@ -1902,6 +1903,10 @@
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
 						if ((http.status > 199) && (http.status < 300) && http.responseText.length) { // accept any 2xx http status as 'OK';
+							if (http.responseText === "") {
+								console.log("Warning: data file found, but empty");
+								return callback("{}");
+							}
 							callback(http.responseText.replace(/data-vedor/g, "data-simply"));
 						} else {
 							console.log("Could not load data, starting empty.");
@@ -2068,6 +2073,10 @@
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
 						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+							if (http.responseText === "") {
+								console.log("Warning: data file found, but empty");
+								return callback("{}");
+							}
 							callback(http.responseText);
 						} else {
 							console.log("No data found, starting with empty dataset");
@@ -2251,6 +2260,10 @@
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
 						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+							if (http.responseText === "") {
+								console.log("Warning: data file found, but empty");
+								return callback("{}");
+							}
 							callback(http.responseText);
 						} else {
 							callback("{}");
