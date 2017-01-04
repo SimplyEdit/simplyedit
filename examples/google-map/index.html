@@ -18,6 +18,14 @@
 			height: 200px;
 			width: 300px;
 		}
+		google-map-marker {
+			display: block;
+			z-index: -1;
+			position: absolute;
+			bottom: 0px;
+			left: 50%;
+			width: 0;
+		}
 	</style>
 </head>
 <body>
@@ -103,18 +111,33 @@
 			};
 
 			var googleMapMarkerEditable = function(field) {
+				document.addEventListener("simply-stash", function() {
+					editor.fireEvent("databinding:valuechanged", field);
+				});
+
 				field.setAttribute("data-simply-selectable", true);
 				field.setAttribute("draggable", true);
 				field.setAttribute("click-events", true);
 				field.setAttribute("mouse-events", true);
+				field.setAttribute("drag-events", true);
 				field.setAttribute("notify", true);
+				field.dragEvents = true;
 
 				field.addEventListener("google-map-marker-click", function(evt) {
 					editor.context.toolbar.hide = true;
+
 					window.setTimeout(function() {
+						console.log(field);
+						console.log(field.latitude);
+						console.log(field.title);
 						editor.context.toolbar.hide = false;
-						muze.event.fire(field, "click"); // Allows data-simply-selectable to work;
-					}, 1);
+						field.clickStart = { // allows data-simply-selectable to work
+							x : 200,
+							y : 200,
+							time : 0
+						};
+						editor.fireEvent("click", field);
+					}, 10);
 				}, true);
 			};
 
@@ -185,6 +208,10 @@
 			};
 
 			var googleMapPolyEditable = function(field) {
+				document.addEventListener("simply-stash", function() {
+					editor.fireEvent("databinding:valuechanged", field);
+				});
+
 				field.setAttribute("data-simply-selectable", true);
 				field.setAttribute("editable", true);
 			};

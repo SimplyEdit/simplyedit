@@ -26,7 +26,7 @@
 				vdSelectionState.currentNode = target;
 
 				var feedUrl = target.getAttribute('data-simply-feed');
-				simply.widgets.properties.set(toolbar.querySelector("input"), feedUrl);
+				toolbar.querySelector("input").value = feedUrl;
 			},
 			"init" : function() {
 			},
