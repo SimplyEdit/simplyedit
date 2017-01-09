@@ -597,6 +597,7 @@
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
 						if (list.dataBinding) {
+							editor.list.dataBindingSetter.call(list, dataParent[dataName]);
 							list.dataBinding.setData(dataParent);
 							list.dataBinding.set(dataParent[dataName]);
 							list.dataBinding.resolve(true);
