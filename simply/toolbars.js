@@ -587,7 +587,7 @@
 						}
 					}
 				}
-				if (!(target.tagName == "td" && target.parentNode && target.parentNode.getAttribute("data-simply-list-item"))) {
+				if (!(target.tagName.toLowerCase() == "td" && target.parentNode && target.parentNode.getAttribute("data-simply-list-item"))) {
 					// Special case for td, because the :before for the list item is set on the TD instead of the TR; We need to keep the list bonus one cycle longer;
 					listBonus = false;
 				}
