@@ -537,6 +537,10 @@
 				list.innerHTML = list.innerHTML; // reset innerHTML to make sure templates are recognized;
 				var templates = list.getElementsByTagName("template");
 
+				if (templates.length === 0) {
+					console.log("Warning: no list templates found for " + dataName);
+				}
+
 				if (typeof list.templates === "undefined") {
 					list.templates = {};
 				}
