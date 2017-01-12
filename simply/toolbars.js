@@ -114,11 +114,24 @@
 					return this.value;
 				},
 				resolve : function() {
+					return;
+
+					// FIXME: if the value is changed
+					// from the data object (instead of
+					// the DOM element), the
+					// corresponding toolbar action is
+					// not fired because no change was
+					// detected. Firing a change event
+					// here will cause problems too
+					// because the change event will
+					// then fire twice;
+					/*
 					if (!editor.toolbar.updating) {
 						if (this.elements[0]) {
 							muze.event.fire(this.elements[0], "change");
 						}
 					}
+					*/
 				},
 				key : key
 			};
