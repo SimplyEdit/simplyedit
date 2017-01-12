@@ -373,7 +373,7 @@ hope.register( 'hope.editor', function() {
 
 	hopeEditor.prototype.isBlockTag = function( tag ) {
 		tag = hope.annotation.stripTag(tag);
-		return ['h1','h2','h3','p','li'].includes(tag);
+		return (hope.render.html.rules.nestingSets.block.includes(tag)); // FIXME: this should not know about hope.render.html
 	};
 
 	hopeEditor.prototype.getNextBlockTag = function( tag ) {
