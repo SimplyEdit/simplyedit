@@ -32,7 +32,7 @@ hope.register( 'hope.annotation', function() {
 	};
 
 	hopeAnnotation.prototype.isBlock = function() {
-		return ( ['h1','h2','h3','p','li'].indexOf(hope.annotation.stripTag(this.tag)) != -1 );
+		return (hope.render.html.rules.nestingSets.block.indexOf(hope.annotation.stripTag(this.tag)) != -1 ); // FIXME: this should not know about hope.render.html;
 	};
 
 	this.create = function( range, tag ) {
