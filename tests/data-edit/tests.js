@@ -1454,7 +1454,30 @@ QUnit.module("lists");
 		assert.equal(testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding.parentKey, "/testList/1/");
 	});
 
-
+	QUnit.test("databinding in list", function(assert) {
+		var target = document.querySelector("#testContent");
+		var list = document.createElement('div');
+		list.innerHTML = '<div data-simply-list="menu" data-simply-path="/"><template><div><div data-simply-list="items"><template><span><span data-simply-field="item">Menu item</span></span></template></div></div></template></div>';
+		target.parentNode.insertBefore(list, target);
+		var data = {
+			"/" : {
+				"menu" : [
+					{"items" : [
+						{"item" : "Home"},
+						{"item" : "Second item"}
+					]},
+					{"items" : [
+						{"item" : "2Home"},
+						{"item" : "2Second item"}
+					]}
+				]
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.pageData = editor.currentData['/'];
+		assert.equal(editor.pageData.menu[0].items[0]._bindings_.item, list.querySelector("[data-simply-field=item]").dataBinding);
+	});
 /* FIXME: Decide how this should work and make it so */
 /*QUnit.module("static link with editable content");
 	QUnit.test("click on link", function(assert) {
