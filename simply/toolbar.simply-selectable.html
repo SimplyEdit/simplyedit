@@ -38,14 +38,21 @@
 			}
 
 			var target = muze.event.target(event);
-
-			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
-				target = target.parentNode;
-			}
-
 			if (target.getAttribute("contenteditable")) {
 				return; // the click was in an editable field, so just leave it there.
 			}
+
+			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
+				if (target.getAttribute("contenteditable")) {
+					return; // the click was in an editable field, so just leave it there.
+				}
+				target = target.parentNode;
+			}
+			// FIXME: This is the third time for this check so this could be written in a better way;
+			if (target.getAttribute("contenteditable")) {
+				return; // the click was in an editable field, so just leave it there.
+			}
+
 			selectTarget(target);
 		
 			window.setTimeout(function() {

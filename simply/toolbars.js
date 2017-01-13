@@ -640,7 +640,7 @@
 			}
 		},
 		toolbar : {
-			getPosition : function(sel) {
+			getPosition : function(sel, useCursor) {
 				var ltop, lleft, rleft, rtop, top, left;
 
 				var range = sel; //.getRangeAt(0);
@@ -649,7 +649,7 @@
 				}
 				var rects = range.getClientRects();
 				var parent = vdSelection.getNode(sel);
-				if ( !rects.length ) {
+				if ( !rects.length || useCursor) {
 					muze.event.fire(range.startContainer, "databinding:pause");
 					// insert element at range and get its position, other options aren't exact enough
 					var span = document.createElement('span');
@@ -675,7 +675,7 @@
 					rleft = rects[rects.length-1].right;
 					rtop = rects[rects.length-1].bottom; 
 				}
-				if ( !rects.length || parent.getAttribute("data-simply-selectable") ) {
+				if ( !rects.length || (parent.getAttribute("data-simply-selectable") && !useCursor) ) {
 					pos = parent && parent.getBoundingClientRect ? parent.getBoundingClientRect() : { left: 0, top: 0, right: 0, bottom: 0};
 					lleft = pos.left;
 					ltop = pos.top;
@@ -715,9 +715,12 @@
 
 				var sel = vdSelectionState.get();
 				var currentContext = editor.context.get();
-
 				var activeSection = document.getElementById(currentContext);
-				var pos = editor.context.toolbar.getPosition(sel);
+				var useCursor = false;
+				if (currentContext == "simply-text-cursor" || currentContext == "simply-text-selection") {
+					useCursor = true;
+				}
+				var pos = editor.context.toolbar.getPosition(sel, useCursor);
 				if ( !pos || !activeSection ) {
 					// editor.context.toolbar.hide = true;
 					return;
