@@ -747,10 +747,10 @@
 }
 [data-simply-field]:not(input):not(textarea):not(img):empty {
 	min-height: 24px;
-	text-align: center;
+	text-align: left;
 }
 .simply-empty[data-simply-list]:before,
-[data-simply-field]:not(input):not(textarea):not(img):empty:before {
+[data-simply-field]:not(input):not(textarea):not(img):not([data-simply-list-item]):empty:before {
 	text-align: center;
 	font-family: FontAwesome;
 	font-size: 20px;
@@ -780,15 +780,15 @@
 	padding-bottom: 5px;
 	margin-left: 4px;
 }
-[data-simply-field]:empty:hover:before,
-[data-simply-field]:empty:hover:after {
+[data-simply-field]:not([data-simply-list-item]):empty:hover:before,
+[data-simply-field]:not([data-simply-list-item]):empty:hover:after {
 	opacity: 0.3;
 }
 
-[data-simply-field]:not(input):not(textarea):empty:not([data-simply-field-icon]):before {
+[data-simply-field]:not(input):not(textarea):empty:not([data-simply-field-icon]):not([data-simply-list-item]):before {
 	content: "\f044"; /* pencil-square-o */
 }
-[data-simply-field][data-simply-field-icon]:not(input):not(textarea):empty:not([data-simply-field-icon|="fa"]):before {
+[data-simply-field][data-simply-field-icon]:not(input):not(textarea):empty:not([data-simply-field-icon|="fa"]):not([data-simply-list-item]):before {
 	content: attr(data-simply-field-icon);
 }
 [data-simply-field]:not(input):not(textarea):empty:after {
@@ -805,7 +805,6 @@
 	opacity: 1;
 	transition: 0.6s opacity ease;
 }
-
 /* plain view */
 body.simply-plain [data-simply-field],
 body.simply-plain [data-simply-list],
