@@ -1088,6 +1088,24 @@ QUnit.module("custom text settings");
 		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, '');
 	});
+
+	QUnit.test("blockquote setting is found and selected", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<blockquote>Hello world<blockquote>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'blockquote', name: 'Blockquote'}
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+		editor.toolbars['simply-text-selection'].init(textSettings);
+
+		setCaretPosition(testContent.querySelector("blockquote"), 2, 0);
+		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		assert.equal(currentStyle, 'blockquote');
+	});
 /*
 	// FIXME: Decide if this is breaking 'by design';
 	QUnit.test("paragraph with class is found", function(assert) {

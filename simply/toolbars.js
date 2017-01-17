@@ -114,11 +114,24 @@
 					return this.value;
 				},
 				resolve : function() {
+					return;
+
+					// FIXME: if the value is changed
+					// from the data object (instead of
+					// the DOM element), the
+					// corresponding toolbar action is
+					// not fired because no change was
+					// detected. Firing a change event
+					// here will cause problems too
+					// because the change event will
+					// then fire twice;
+					/*
 					if (!editor.toolbar.updating) {
 						if (this.elements[0]) {
 							muze.event.fire(this.elements[0], "change");
 						}
 					}
+					*/
 				},
 				key : key
 			};
@@ -574,7 +587,7 @@
 						}
 					}
 				}
-				if (!(target.tagName == "td" && target.parentNode && target.parentNode.getAttribute("data-simply-list-item"))) {
+				if (!(target.tagName.toLowerCase() == "td" && target.parentNode && target.parentNode.getAttribute("data-simply-list-item"))) {
 					// Special case for td, because the :before for the list item is set on the TD instead of the TR; We need to keep the list bonus one cycle longer;
 					listBonus = false;
 				}
@@ -627,7 +640,7 @@
 			}
 		},
 		toolbar : {
-			getPosition : function(sel) {
+			getPosition : function(sel, useCursor) {
 				var ltop, lleft, rleft, rtop, top, left;
 
 				var range = sel; //.getRangeAt(0);
@@ -662,7 +675,7 @@
 					rleft = rects[rects.length-1].right;
 					rtop = rects[rects.length-1].bottom; 
 				}
-				if ( !rects.length || parent.getAttribute("data-simply-selectable") ) {
+				if ( !rects.length || (parent.getAttribute("data-simply-selectable") ) ) {
 					pos = parent && parent.getBoundingClientRect ? parent.getBoundingClientRect() : { left: 0, top: 0, right: 0, bottom: 0};
 					lleft = pos.left;
 					ltop = pos.top;
@@ -702,7 +715,6 @@
 
 				var sel = vdSelectionState.get();
 				var currentContext = editor.context.get();
-
 				var activeSection = document.getElementById(currentContext);
 				var pos = editor.context.toolbar.getPosition(sel);
 				if ( !pos || !activeSection ) {

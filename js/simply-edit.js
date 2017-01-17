@@ -537,6 +537,10 @@
 				list.innerHTML = list.innerHTML; // reset innerHTML to make sure templates are recognized;
 				var templates = list.getElementsByTagName("template");
 
+				if (templates.length === 0) {
+					console.log("Warning: no list templates found for " + dataName);
+				}
+
 				if (typeof list.templates === "undefined") {
 					list.templates = {};
 				}
@@ -757,14 +761,12 @@
 							stashedFields[i].removeAttribute("data-simply-stashed");
 						}
 
-						newData = editor.list.get(clone.firstElementChild);
-						dataPath = editor.data.getDataPath(clone.firstElementChild);
-						if (clone.firstElementChild.dataBinding) {
-							newData[dataPath] = clone.firstElementChild.dataBinding.get();
-						} else {
+						if (!listData[j]._bindings_) {
+							newData = editor.list.get(clone.firstElementChild);
+							dataPath = editor.data.getDataPath(clone.firstElementChild);
 							editor.data.apply(newData, clone.firstElementChild);
+							clone.firstElementChild.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 						}
-						clone.firstElementChild.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 						
 						list.appendChild(clone);
 						editor.list.initLists(listData[j], clone);
@@ -796,14 +798,13 @@
 							for (i=0; i<stashedFields.length; i++) {
 								stashedFields[i].removeAttribute("data-simply-stashed");
 							}
-							newData = editor.list.get(clone);
-							dataPath = editor.data.getDataPath(clone);
-							if (clone.dataBinding) {
-								newData[dataPath] = clone.dataBinding.get();
-							} else {
+
+							if (!listData[j]._bindings_) {
+								newData = editor.list.get(clone);
+								dataPath = editor.data.getDataPath(clone);
 								editor.data.apply(newData, clone);
+								clone.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 							}
-							clone.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 
 							list.appendChild(clone);
 							editor.list.initLists(listData[j], clone);

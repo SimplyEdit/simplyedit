@@ -365,7 +365,7 @@ hope.register( 'hope.range', function() {
 	};
 
 	hopeAnnotation.prototype.isBlock = function() {
-		return ( ['h1','h2','h3','p','li'].indexOf(hope.annotation.stripTag(this.tag)) != -1 );
+		return (hope.render.html.rules.nestingSets.block.indexOf(hope.annotation.stripTag(this.tag)) != -1 ); // FIXME: this should not know about hope.render.html;
 	};
 
 	this.create = function( range, tag ) {
@@ -1894,7 +1894,7 @@ hope.register( 'hope.fragment.annotations', function() {
 
 	hopeEditor.prototype.isBlockTag = function( tag ) {
 		tag = hope.annotation.stripTag(tag);
-		return ['h1','h2','h3','p','li'].includes(tag);
+		return (hope.render.html.rules.nestingSets.block.includes(tag)); // FIXME: this should not know about hope.render.html
 	};
 
 	hopeEditor.prototype.getNextBlockTag = function( tag ) {

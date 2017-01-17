@@ -62,7 +62,10 @@
 				// FIXME: register change stond hier;
 			},
 			mogrify : function(el) {
-				var mogrifyData = currentList.mogrifyData ? currentList.mogrifyData : {};
+				var mogrifyData = {};
+				if (currentList.mogrifyItem == currentListItem && currentList.mogrifyData) {
+					mogrifyData = currentList.mogrifyData;
+				}
 				var currentData = editor.list.get(currentListItem);
 
 				// Accumulate the data in mogrifyData so we don't lose any data while switching around;
@@ -79,7 +82,6 @@
 				editor.plugins.list.item.add(el);
 				var newItem = currentListItem.nextElementSibling;
 
-
 				// skip this update for the undo/redo plugin;
 				if (editor.plugins.undoRedo) {
 					editor.plugins.undoRedo.undoing = true;
@@ -95,6 +97,7 @@
 
 				currentListItem = newItem;
 				currentList.mogrifyData = mogrifyData;
+				currentList.mogrifyItem = currentListItem;
 
 				newItem.focus();
 				editor.context.update();
