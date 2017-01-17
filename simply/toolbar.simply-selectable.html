@@ -50,7 +50,6 @@
 					return;
 				}
 			}
-
 			var target = muze.event.target(event);
 			if (target.getAttribute("contenteditable")) {
 				if (clickedInside(target)) {
@@ -61,7 +60,13 @@
 
 			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
 				if (target.getAttribute("contenteditable")) {
-					return; // the click was in an editable field, so just leave it there.
+					if (target.tagName.toLowerCase() == "td") {
+						if (clickedInside(target.parentNode)) {
+							return; // the click was in an editable field, so just leave it there.
+						}
+					} else {
+						return;
+					}
 				}
 				target = target.parentNode;
 			}
