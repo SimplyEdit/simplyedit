@@ -1170,7 +1170,7 @@
 					editor.context.update();
 					editor.context.touching = true;
 				} else {
-					editor.context.update();
+				//	editor.context.update(); // removed; the update will be triggered by the mouseup/keyup events;
 				}
 			}, 0);
 		});
