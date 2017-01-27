@@ -152,8 +152,8 @@
 					editor.storage.load(function(data) {
 						// check if the data is different from the last time;
 						if (data != editor.loadedData) {
-							console.log("Notice: Data on the server changed since we loaded it. Trying to merge...");
-							alert("Data on the server changed since we loaded it. Trying to merge...");
+							console.log("Notice: Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
+							alert("Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
 							var newData = JSON.parse(data);
 
 							// if so, try to replay the undoset on it;
@@ -194,7 +194,9 @@
 						}
 
 						editor.storage.save(localStorage.data, function(result) {
-							editor.loadedData = localStorage.data;
+							result.newData = localStorage.data;
+							var savedEvent = editor.fireEvent("simply-data-saved", document, result);
+							editor.loadedData = result.newData;
 
 							if (result && result.error) {
 								if (editor.actions['simply-aftersave-error']) {
@@ -2204,8 +2206,9 @@
 						if(http.readyState == 4) {
 							var saveResult = {};
 							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+								saveResult = {path : path, response: http.responseText};
 							} else {
-								saveResult = {message : "SAVE FAILED: Could not store.", error: true, response: http.responseText};
+								saveResult = {path : path, message : "SAVE FAILED: Could not store.", error: true, response: http.responseText};
 							}
 							var saveEvent = editor.fireEvent("simply-storage-file-saved", document, saveResult);
 							if (!saveEvent.defaultPrevented) {
@@ -2236,8 +2239,9 @@
 						if(http.readyState == 4) {
 							var deleteResult = {};
 							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+								deleteResult = {path : path, response: http.responseText};
 							} else {
-								deleteResult = {message : "DELETE FAILED: Could not delete.", error: true, response: http.responseText};
+								deleteResult = {path : path, message : "DELETE FAILED: Could not delete.", error: true, response: http.responseText};
 							}
 							var deleteEvent = editor.fireEvent("simply-storage-file-deleted", document, deleteResult);
 							if (!deleteEvent.defaultPrevented) {
