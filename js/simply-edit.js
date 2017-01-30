@@ -1921,6 +1921,10 @@
 				http.send();
 			},
 			connect : function() {
+				var url = editor.storage.url + "login";
+				var http = new XMLHttpRequest();
+				http.open("POST", url, true);
+				http.send();
 				return true;
 			}
 		},
@@ -2280,6 +2284,10 @@
 				http.send();
 			},
 			connect : function() {
+				var http = new XMLHttpRequest();
+				var url = editor.storage.url + "login";
+				http.open("POST", url, true);
+				http.send();
 				return true;
 			},
 			disconnect : function(callback) {
