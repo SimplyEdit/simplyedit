@@ -1566,14 +1566,21 @@
 					return false;
 				};
 
+				var removeSelection = function() {
+					vdSelectionState.remove();
+					window.getSelection().removeAllRanges();
+					editor.context.update();
+				};
+				var slipReorderHandler = function(e) {
+					e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
+					window.setTimeout(removeSelection, 1);
+					return false;
+				};
+
 				for (var i=0; i<list.length; i++) {
 					list[i].addEventListener('slip:beforereorder', addBeforeOrderEvent, false);
 					list[i].addEventListener('slip:beforeswipe', addBeforeOrderEvent, false);
-					list[i].addEventListener('slip:reorder', function(e) {
-						e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
-						return false;
-					});
-
+					list[i].addEventListener('slip:reorder', slipReorderHandler);
 					new Slip(list[i]);
 				}
 
