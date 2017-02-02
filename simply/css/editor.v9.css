@@ -805,6 +805,14 @@
 	opacity: 1;
 	transition: 0.6s opacity ease;
 }
+body[data-simply-edit] [data-simply-collapsed] {
+  display: inline-block;
+}
+body[data-simply-edit] [data-simply-hope] {
+  min-height: 1.2em;
+  min-width: 1.2em;
+}
+
 /* plain view */
 body.simply-plain [data-simply-field],
 body.simply-plain [data-simply-list],

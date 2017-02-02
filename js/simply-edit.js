@@ -989,6 +989,15 @@
 					return;
 				}
 
+				// This allows us to handle empty-ish fields better; data-simply-hope will get a min-width and min-height, collapsed will get inline-block;
+				field.setAttribute('data-simply-hope', true);
+				if (getComputedStyle(field).display == "inline" && field.offsetWidth === 0) {
+					field.setAttribute('data-simply-collapsed', true);
+				}
+				if (field.innerHTML.trim() === "") {
+					field.innerHTML = "";
+				}
+
 				field.hopeContent = document.createElement("textarea");
 				field.hopeMarkup = document.createElement("textarea");
 				field.hopeRenderedSource = document.createElement("DIV");
