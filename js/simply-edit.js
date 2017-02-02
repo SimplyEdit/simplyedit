@@ -1543,6 +1543,9 @@
 				// FIXME: Have a way to now init plugins as well;
 				editor.editmode.sortable(target);
 				editor.editmode.textonly(target);
+
+				// Disable object resizing for Firefox;
+				document.execCommand("enableObjectResizing", false, false);
 			},
 			sortable : function(target) {
 				if (!window.Slip) {
