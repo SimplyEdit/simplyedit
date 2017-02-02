@@ -44,7 +44,22 @@
 		text-align: center;
 		box-sizing: border-box;
 		padding-top: 30px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.2em;
 	}
+
+	#simply-browse .simply-button:after {
+		display: block;
+		content: "";
+		bottom: 0;
+		background-image: -webkit-gradient( linear, left top, left bottom, from(rgba(255,255,255,0.1)), to(rgba(2550,255,255,1)) );
+		width: 100%;
+		height: 20px;
+		z-index: 10;
+		position: absolute;
+	}
+
 	#simply-browse .simply-add-folder,
 	#simply-browse .simply-add-page {
 		box-sizing: border-box;
@@ -212,12 +227,15 @@
 	#simply-browse.simply-listmode .simply-add-folder,
 	#simply-browse.simply-listmode .simply-add-page {
 		height: 40px;
-		width: 50%;
+		width: 100%;
 		padding: 7px;
 		padding-right: 40px;
 		text-align: left;
+		white-space: nowrap;
 	}
-	
+	#simply-browse.simply-listmode .simply-button:after {
+		display: none;
+	}
 	#simply-browse.simply-listmode .simply-dialog-body > button i,
 	#simply-browse.simply-listmode .simply-dialog-body > .simply-button i,
 	#simply-browse.simply-listmode .simply-add-folder > i,
@@ -360,7 +378,7 @@
 					data.name = src.split("/").pop();
 				}
 
-				var result = "<div class='simply-button simply-image' data-simply-action='simply-browse-insert'>";
+				var result = "<div class='simply-button simply-image' data-simply-action='simply-browse-insert' title='" + editor.node.escapeHtml(data.name) + "'>";
 				result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
 				if (data.thumb) {
 					result += " src='" + data.thumb + "'";
@@ -379,14 +397,12 @@
 				return result;
 			},
 			getFileButtonHtml : function(data) {
-				var result = "<div class='simply-button' data-simply-action='simply-browse-insert' data-value='" + data.url + "'>";
+				var result = "<div class='simply-button' data-simply-action='simply-browse-insert' data-value='" + data.url + "' title='" + editor.node.escapeHtml(data.name) + "'>";
 				result += "<i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + data.name + "</div>";
-
 				return result;
 			},
 			getFolderButtonHtml : function(data) {
-				var result = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + data.url + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + data.name + "</div>";
-
+				var result = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + data.url + "' title='" + editor.node.escapeHtml(data.name) + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + data.name + "</div>";
 				return result;
 			},
 			update : function() {
