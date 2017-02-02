@@ -717,10 +717,23 @@
 				var currentContext = editor.context.get();
 				var activeSection = document.getElementById(currentContext);
 				var pos = editor.context.toolbar.getPosition(sel);
+
 				if ( !pos || !activeSection ) {
 					// editor.context.toolbar.hide = true;
 					return;
 				}
+
+				// skip repositioning if the element is
+				// returning all 0 values, this happens when
+				// the selection element is no longer in
+				// view (for instance, pulldown menu element
+				// which is no longer active). It is better
+				// to leave the toolbar where it is in this
+				// case;
+				if (pos.top === 0 && pos.left === 0 && pos.ltop === 0 && pos.lleft === 0 && pos.rtop === 0 && pos.rleft === 0) {
+					return;
+				}
+
 				var top = pos.top;
 				var left = pos.left;
 				var activeToolbar = activeSection.querySelector("div.simply-toolbar");
