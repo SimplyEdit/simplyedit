@@ -280,7 +280,7 @@ hope.register( 'hope.editor', function() {
 					offset += node.textContent.length;
 				}
 			}			
-		} while ( offset < start && node );
+		} while ( start >= offset && node );
 		if ( !node ) {
 			if (lastNode) {
 				if (lastNode.nodeType == document.ELEMENT_NODE) {
