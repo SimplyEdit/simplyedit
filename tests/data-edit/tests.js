@@ -1338,6 +1338,7 @@ QUnit.module("images");
 		editor.context.update();
 		editor.actions["simply-image-src"]("HelloWorld");
 		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
+		assert.equal(testContent.querySelector("img").getAttribute("src"), "HelloWorld");
 		testContent.innerHTML = '';
 	});
 
@@ -1350,6 +1351,8 @@ QUnit.module("images");
 		editor.actions["simply-image-src"]("HelloWorld");
 
 		assert.equal(testContent.querySelector("img + img").getAttribute("data-simply-src"), "HelloWorld");
+		assert.equal(testContent.querySelector("img + img").getAttribute("src"), "HelloWorld");
+
 		testContent.innerHTML = '';
 	});
 
