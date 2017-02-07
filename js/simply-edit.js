@@ -652,33 +652,7 @@
 
 				list.addEventListener("keydown", editor.list.keyDownHandler);
 			},
-			set : function(list, listData) {
-				var e,j,k,l;
-				var t, counter;
-				var stashedFields, i, newData, dataPath;
-
-				if (!listData) {
-					listData = [];
-				}
-				editor.fireEvent("databinding:pause", list);
-				var initListItem = function(clone, useDataBinding, listDataItem) {
-					var dataFields = clone.querySelectorAll("[data-simply-field]");
-					for (k=0; k<dataFields.length; k++) {
-						editor.field.init(dataFields[k], listDataItem, useDataBinding);
-					}
-					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
-						editor.field.init(clone, listDataItem, useDataBinding);
-					}
-
-					var dataLists = clone.querySelectorAll("[data-simply-list]");
-					for (k=0; k<dataLists.length; k++) {
-						editor.list.init(dataLists[k], listDataItem, useDataBinding);
-					}
-					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
-						editor.list.init(clone, listDataItem, useDataBinding);
-					}
-				};
-
+			detach : function(list) {
 				// Remove the list from the DOM, do all the stuff and reinsert it, so we only redraw once for all our modifications.
 				var nextNode = list.nextSibling;
 				var listParent = list.parentNode;
@@ -693,14 +667,46 @@
 						editor.fireEvent("simply-selectable-inserted", document);
 					};
 				}
-
+			},
+			clear : function(list) {
 				// Remove the current list items to replace them with the new data;
 				var children = list.querySelectorAll("[data-simply-list-item]");
-				for (i=0; i<children.length; i++) {
+				for (var i=0; i<children.length; i++) {
 					if (children[i].parentNode == list) {
 						list.removeChild(children[i]);
 					}
 				}
+			},
+			initListItem : function(clone, useDataBinding, listDataItem) {
+				var k;
+				var dataFields = clone.querySelectorAll("[data-simply-field]");
+				for (k=0; k<dataFields.length; k++) {
+					editor.field.init(dataFields[k], listDataItem, useDataBinding);
+				}
+				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
+					editor.field.init(clone, listDataItem, useDataBinding);
+				}
+
+				var dataLists = clone.querySelectorAll("[data-simply-list]");
+				for (k=0; k<dataLists.length; k++) {
+					editor.list.init(dataLists[k], listDataItem, useDataBinding);
+				}
+				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
+					editor.list.init(clone, listDataItem, useDataBinding);
+				}
+			},
+			set : function(list, listData) {
+				var e,j,l;
+				var t, counter;
+				var stashedFields, i, newData, dataPath;
+
+				if (!listData) {
+					listData = [];
+				}
+				editor.fireEvent("databinding:pause", list);
+
+				editor.list.detach(list);
+				editor.list.clear(list);
 
 				editor.bindingParents.push(list.getAttribute("data-simply-list"));
 				for (j=0; j<listData.length; j++) {
@@ -735,9 +741,9 @@
 						}
 
 						if (list.getAttribute("data-simply-data")) {
-							initListItem(clone, false, listData[j]);
+							editor.list.initListItem(clone, false, listData[j]);
 						} else {
-							initListItem(clone, true, listData[j]);
+							editor.list.initListItem(clone, true, listData[j]);
 						}
 
 						editor.list.fixFirstElementChild(clone);
@@ -776,9 +782,9 @@
 						for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
 							clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
 							if (list.getAttribute("data-simply-data")) {
-								initListItem(clone, false, listData[j]);
+								editor.list.initListItem(clone, false, listData[j]);
 							} else {
-								initListItem(clone, true, listData[j]);
+								editor.list.initListItem(clone, true, listData[j]);
 							}
 							editor.list.fixFirstElementChild(clone);
 
