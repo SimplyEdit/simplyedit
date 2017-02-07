@@ -296,11 +296,18 @@ hope.register( 'hope.editor', function() {
 		}
 
 		var preOffset = offset - (node.nodeType == document.TEXT_NODE ? node.textContent.length : 1);
+		var nextNode;
 		if (node.nodeType == document.ELEMENT_NODE) {
-			range.setStart(node, 0);
+			nextNode = treeWalker.nextNode();
+			treeWalker.previousNode();
+			if (nextNode) {
+				range.setStartBefore(nextNode);
+			} else {
+				range.setStartAfter(node);
+			}
 		} else {
 			if (start-preOffset == node.textContent.length) {
-				var nextNode = treeWalker.nextNode();
+				nextNode = treeWalker.nextNode();
 				treeWalker.previousNode();
 				if (nextNode) {
 					range.setStartBefore(nextNode);
