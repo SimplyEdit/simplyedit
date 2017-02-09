@@ -1435,6 +1435,19 @@ QUnit.module("lists");
 		assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
 	});
 
+	QUnit.test("add list item (list item is field), databinding", function(assert) {
+		var testList2 = document.querySelector("#testList2");
+		currentList = testList2;
+		testList2.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		assert.equal(testList2.querySelectorAll("[data-simply-list-item]").length, 1);
+		assert.equal(editor.pageData.testList2[0].item, testList2.querySelector("[data-simply-field=item]").innerHTML);
+		assert.equal(testList2.querySelector("[data-simply-field=item]").dataBinding.parentKey, "/testList2/0/");
+		assert.equal(editor.pageData.testList2[0]._bindings_.item, testList2.querySelector("[data-simply-field=item]").dataBinding);
+	});
+
 	QUnit.test("add 2 list items, databinding", function(assert) {
 		var testList = document.querySelector("#testList");
 		currentList = testList;
@@ -1456,6 +1469,7 @@ QUnit.module("lists");
 		assert.equal(testList.querySelectorAll("[data-simply-field=item]")[0].dataBinding.parentKey, "/testList/0/");
 		assert.equal(testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding.parentKey, "/testList/1/");
 	});
+
 
 	QUnit.test("databinding in list", function(assert) {
 		var target = document.querySelector("#testContent");
