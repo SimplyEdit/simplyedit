@@ -2005,6 +2005,16 @@
 					result.repoBranch = "gh-pages";
 				}
 
+				if (document.querySelector("[data-simply-repo-branch]")) {
+					result.repoBranch = document.querySelector("[data-simply-repo-branch]").getAttribute("data-simply-repo-branch");
+				}
+				if (document.querySelector("[data-simply-repo-name]")) {
+					result.repoBranch = document.querySelector("[data-simply-repo-name]").getAttribute("data-simply-repo-name");
+				}
+				if (document.querySelector("[data-simply-repo-user]")) {
+					result.repoBranch = document.querySelector("[data-simply-repo-user]").getAttribute("data-simply-repo-user");
+				}
+
 				var repoPath = pathInfo.join("/");
 				repoPath = repoPath.replace(/\/$/, '');
 
