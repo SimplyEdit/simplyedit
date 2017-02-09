@@ -601,6 +601,28 @@ QUnit.module("github storage");
 		assert.equal(repoInfo.repoUser, "ylebre");
 	});
 
+	QUnit.test("get repo info with explicit branch", function(assert) {
+		document.body.setAttribute("data-simply-repo-branch", "foo");
+		var url = "http://github.com/ylebre/simply-edit/data.json";
+		var repoInfo = editor.storageConnectors.github.getRepoInfo(url);
+		assert.equal(repoInfo.repoName, "simply-edit");
+		assert.equal(repoInfo.repoBranch, "foo");
+		assert.equal(repoInfo.repoPath, "data.json");
+		assert.equal(repoInfo.repoUser, "ylebre");
+		document.body.removeAttribute("data-simply-repo-branch");
+	});
+
+	QUnit.test("get repo info for gh-pages with explicit branch", function(assert) {
+		document.body.setAttribute("data-simply-repo-branch", "foo");
+		var url = "http://ylebre.github.io/simply-edit/data.json";
+		var repoInfo = editor.storageConnectors.github.getRepoInfo(url);
+		assert.equal(repoInfo.repoName, "simply-edit");
+		assert.equal(repoInfo.repoBranch, "foo");
+		assert.equal(repoInfo.repoPath, "data.json");
+		assert.equal(repoInfo.repoUser, "ylebre");
+		document.body.removeAttribute("data-simply-repo-branch");
+	});
+
 QUnit.module("custom field types");
 	QUnit.test("custom getter", function(assert) {
 		var stubGetter = function() {return "foo";};
