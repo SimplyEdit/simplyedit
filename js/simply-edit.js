@@ -61,7 +61,12 @@
 					editor.data.originalBody = document.body.cloneNode(true);
 				}
 
-				var dataFields = target.querySelectorAll("[data-simply-field]");
+				var dataFields;
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
+					dataFields = [target];
+				} else {
+					dataFields = target.querySelectorAll("[data-simply-field]");
+				}
 				var subFields;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE) {
 					subFields = target.querySelectorAll("[data-simply-list] [data-simply-field]");
@@ -194,6 +199,9 @@
 						}
 
 						editor.storage.save(localStorage.data, function(result) {
+							if (!result) {
+								result = {};
+							}
 							result.newData = localStorage.data;
 							var savedEvent = editor.fireEvent("simply-data-saved", document, result);
 							editor.loadedData = result.newData;
@@ -232,7 +240,13 @@
 					}
 
 					editor.loadedData = data;
-					editor.currentData = JSON.parse(data);
+					try {
+						editor.currentData = JSON.parse(data);
+					} catch(e) {
+						editor.currentData = {};
+						console.log("Warning: Not able to parse JSON data.");
+					}
+
 					editor.data.apply(editor.currentData, document);
 					editor.pageData = editor.currentData[document.location.pathname];
 					editor.fireEvent("simply-content-loaded", document);
@@ -652,33 +666,7 @@
 
 				list.addEventListener("keydown", editor.list.keyDownHandler);
 			},
-			set : function(list, listData) {
-				var e,j,k,l;
-				var t, counter;
-				var stashedFields, i, newData, dataPath;
-
-				if (!listData) {
-					listData = [];
-				}
-				editor.fireEvent("databinding:pause", list);
-				var initListItem = function(clone, useDataBinding, listDataItem) {
-					var dataFields = clone.querySelectorAll("[data-simply-field]");
-					for (k=0; k<dataFields.length; k++) {
-						editor.field.init(dataFields[k], listDataItem, useDataBinding);
-					}
-					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
-						editor.field.init(clone, listDataItem, useDataBinding);
-					}
-
-					var dataLists = clone.querySelectorAll("[data-simply-list]");
-					for (k=0; k<dataLists.length; k++) {
-						editor.list.init(dataLists[k], listDataItem, useDataBinding);
-					}
-					if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
-						editor.list.init(clone, listDataItem, useDataBinding);
-					}
-				};
-
+			detach : function(list) {
 				// Remove the list from the DOM, do all the stuff and reinsert it, so we only redraw once for all our modifications.
 				var nextNode = list.nextSibling;
 				var listParent = list.parentNode;
@@ -693,22 +681,67 @@
 						editor.fireEvent("simply-selectable-inserted", document);
 					};
 				}
-
+			},
+			clear : function(list) {
 				// Remove the current list items to replace them with the new data;
 				var children = list.querySelectorAll("[data-simply-list-item]");
-				for (i=0; i<children.length; i++) {
+				for (var i=0; i<children.length; i++) {
 					if (children[i].parentNode == list) {
 						list.removeChild(children[i]);
 					}
 				}
+			},
+			initListItem : function(clone, useDataBinding, listDataItem) {
+				var k;
+				var dataFields = clone.querySelectorAll("[data-simply-field]");
+				for (k=0; k<dataFields.length; k++) {
+					editor.field.init(dataFields[k], listDataItem, useDataBinding);
+				}
+				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
+					editor.field.init(clone, listDataItem, useDataBinding);
+				}
 
-				editor.bindingParents.push(list.getAttribute("data-simply-list"));
+				var dataLists = clone.querySelectorAll("[data-simply-list]");
+				for (k=0; k<dataLists.length; k++) {
+					editor.list.init(dataLists[k], listDataItem, useDataBinding);
+				}
+				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
+					editor.list.init(clone, listDataItem, useDataBinding);
+				}
+			},
+			set : function(list, listData) {
+				editor.list.clear(list);
+				editor.list.append(list, listData);
+			},
+			append : function(list, listData) {
+				var e,j,l;
+				var t, counter;
+				var stashedFields, i, newData, dataPath;
+
+				if (!listData) {
+					listData = [];
+				}
+				editor.fireEvent("databinding:pause", list);
+
+				editor.list.detach(list);
+
+				if (list.dataBinding) {
+					editor.bindingParents = [list.dataBinding.parentKey + list.dataBinding.key];
+				} else {
+					editor.bindingParents.push(list.getAttribute("data-simply-list"));
+				}
+
+				var listIndex = list.querySelectorAll(":scope > [data-simply-list-item]");
+
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
 						continue;
 					}
 
-					editor.bindingParents.push(j);
+					editor.bindingParents.push(j + listIndex.length);
+					if (list.dataBinding.get() != listData) {
+						list.dataBinding.get().push(listData[j]);
+					}
 
 					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
 
@@ -735,9 +768,9 @@
 						}
 
 						if (list.getAttribute("data-simply-data")) {
-							initListItem(clone, false, listData[j]);
+							editor.list.initListItem(clone, false, listData[j]);
 						} else {
-							initListItem(clone, true, listData[j]);
+							editor.list.initListItem(clone, true, listData[j]);
 						}
 
 						editor.list.fixFirstElementChild(clone);
@@ -769,16 +802,19 @@
 							editor.data.apply(newData, clone.firstElementChild);
 							clone.firstElementChild.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 						}
-						
+						if (document.body.getAttribute("data-simply-edit")) {
+							editor.editmode.makeEditable(clone);
+						}
+
 						list.appendChild(clone);
 						editor.list.initLists(listData[j], clone);
 					} else {
 						for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
 							clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
 							if (list.getAttribute("data-simply-data")) {
-								initListItem(clone, false, listData[j]);
+								editor.list.initListItem(clone, false, listData[j]);
 							} else {
-								initListItem(clone, true, listData[j]);
+								editor.list.initListItem(clone, true, listData[j]);
 							}
 							editor.list.fixFirstElementChild(clone);
 
@@ -806,6 +842,10 @@
 								dataPath = editor.data.getDataPath(clone);
 								editor.data.apply(newData, clone);
 								clone.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
+							}
+
+							if (document.body.getAttribute("data-simply-edit")) {
+								editor.editmode.makeEditable(clone);
 							}
 
 							list.appendChild(clone);
@@ -1972,6 +2012,16 @@
 					result.repoUser = parser.hostname.split(".")[0];
 					result.repoName = pathInfo.shift();
 					result.repoBranch = "gh-pages";
+				}
+
+				if (document.querySelector("[data-simply-repo-branch]")) {
+					result.repoBranch = document.querySelector("[data-simply-repo-branch]").getAttribute("data-simply-repo-branch");
+				}
+				if (document.querySelector("[data-simply-repo-name]")) {
+					result.repoBranch = document.querySelector("[data-simply-repo-name]").getAttribute("data-simply-repo-name");
+				}
+				if (document.querySelector("[data-simply-repo-user]")) {
+					result.repoBranch = document.querySelector("[data-simply-repo-user]").getAttribute("data-simply-repo-user");
 				}
 
 				var repoPath = pathInfo.join("/");
