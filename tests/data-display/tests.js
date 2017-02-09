@@ -593,7 +593,7 @@ QUnit.module("github storage");
 	});
 
 	QUnit.test("get repo info for gh-pages", function(assert) {
-		var url = "http://ylebre.gihub.io/simply-edit/data.json";
+		var url = "http://ylebre.github.io/simply-edit/data.json";
 		var repoInfo = editor.storageConnectors.github.getRepoInfo(url);
 		assert.equal(repoInfo.repoName, "simply-edit");
 		assert.equal(repoInfo.repoBranch, "gh-pages");
