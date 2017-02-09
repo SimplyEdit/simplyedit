@@ -199,6 +199,9 @@
 						}
 
 						editor.storage.save(localStorage.data, function(result) {
+							if (!result) {
+								result = {};
+							}
 							result.newData = localStorage.data;
 							var savedEvent = editor.fireEvent("simply-data-saved", document, result);
 							editor.loadedData = result.newData;
@@ -237,7 +240,13 @@
 					}
 
 					editor.loadedData = data;
-					editor.currentData = JSON.parse(data);
+					try {
+						editor.currentData = JSON.parse(data);
+					} catch(e) {
+						editor.currentData = {};
+						console.log("Warning: Not able to parse JSON data.");
+					}
+
 					editor.data.apply(editor.currentData, document);
 					editor.pageData = editor.currentData[document.location.pathname];
 					editor.fireEvent("simply-content-loaded", document);
