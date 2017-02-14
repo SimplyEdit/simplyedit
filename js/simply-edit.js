@@ -570,8 +570,9 @@
 					var sourceTemplate = templates[t].getAttribute("rel");
 					if (sourceTemplate && document.getElementById(sourceTemplate)) {
 						list.templates[templateName] = document.getElementById(sourceTemplate);
+					} else {
+						list.templates[templateName] = templates[t];
 					}
-					list.templates[templateName] = templates[t];
 					if (!("content" in list.templates[templateName])) {
 						var fragment = document.createDocumentFragment();
 						var fragmentNode = document.createElement("FRAGMENT");
