@@ -464,13 +464,17 @@ dataBinding.prototype.addListeners = function(element) {
 	element.addEventListener("databinding:resume", function() {
 		this.dataBinding.resumeListeners(this);
 	});
-	element.dataBindingPaused = false;
+	element.dataBindingPaused = 0;
 };
 dataBinding.prototype.resumeListeners = function(element) {
-	element.dataBindingPaused = false;
+	element.dataBindingPaused--;
+	if (element.dataBindingPaused < 0) {
+		console.log("Warning: resume called of non-paused databinding");
+		element.dataBindingPaused = 0;
+	}
 };
 dataBinding.prototype.pauseListeners = function(element) {
-	element.dataBindingPaused = true;
+	element.dataBindingPaused++;
 };
 dataBinding.prototype.removeListeners = function(element) {
 	if (this.mode == "field") {

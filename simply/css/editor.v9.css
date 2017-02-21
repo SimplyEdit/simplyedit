@@ -13,6 +13,9 @@
 			background-color: rgba(128,128,128,0.2);
 		}
 
+		*[data-simply-field][data-simply-content=template] {
+			outline: 0px;
+		}
 		*[data-simply-htmlsource] {
 			outline: 1px dashed rgba(0, 0, 255, 0.3);
 		}
@@ -148,6 +151,7 @@
 		.simply-toolbar > ul {
 			background: linear-gradient(to bottom, white 0%, #FFF 95%, #DDD 100%);
 			width: 100%;
+			line-height: 0px;
 		}
 		.simply-toolbar > ul,
 		.simply-toolbar > ul > li,

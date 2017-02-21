@@ -156,7 +156,7 @@
 					}
 					editor.storage.load(function(data) {
 						// check if the data is different from the last time;
-						if (data != editor.loadedData) {
+						if (data != editor.loadedData && editor.plugins.undoRedo) {
 							console.log("Notice: Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
 							alert("Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
 							var newData = JSON.parse(data);
@@ -512,9 +512,9 @@
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				var subLists;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE) {
-					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list]");
+					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field] [data-simply-list]");
 				} else {
-					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field] [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
 				for (var i=0; i<dataLists.length; i++) {
 					var isSub = false;
@@ -695,8 +695,11 @@
 			initListItem : function(clone, useDataBinding, listDataItem) {
 				var k;
 				var dataFields = clone.querySelectorAll("[data-simply-field]");
+				var savedParentKey = editor.settings.databind.parentKey;
+
 				for (k=0; k<dataFields.length; k++) {
 					editor.field.init(dataFields[k], listDataItem, useDataBinding);
+					editor.settings.databind.parentKey = savedParentKey;
 				}
 				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-field")) {
 					editor.field.init(clone, listDataItem, useDataBinding);
@@ -711,8 +714,31 @@
 				}
 			},
 			set : function(list, listData) {
+				editor.fireEvent("databinding:pause", list);
 				editor.list.clear(list);
 				editor.list.append(list, listData);
+				editor.fireEvent("databinding:resume", list);
+			},
+			cloneTemplate : function(template) {
+				var clone;
+				if ("importNode" in document) {
+					clone = document.importNode(template.content, true);
+
+					// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
+					var originalTemplates = template.content.querySelectorAll("template");
+					var importedTemplates = clone.querySelectorAll("template");
+
+					for (i=0; i<importedTemplates.length; i++) {
+						importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
+					}
+				} else {
+					clone = document.createElement("DIV");
+					for (e=0; e<template.contentNode.childNodes.length; e++) {
+						clonedNode = template.contentNode.childNodes[e].cloneNode(true);
+						clone.appendChild(clonedNode);
+					}
+				}
+				return clone;
 			},
 			append : function(list, listData) {
 				var e,j,l;
@@ -740,8 +766,16 @@
 					}
 
 					editor.bindingParents.push(j + listIndex.length);
-					if (list.dataBinding.get() != listData) {
-						list.dataBinding.get().push(listData[j]);
+					var currentBinding = list.dataBinding;
+					if (typeof currentBinding !== "undefined") {
+						if (currentBinding.mode == "list") {
+							if (currentBinding.get() != listData) {
+								currentBinding.get().push(listData[j]);
+							//	console.log("Appending items to existing data");
+							}
+						} else {
+							console.log("Warning: Can't append list items to a field databinding");
+						}
 					}
 
 					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
@@ -905,10 +939,14 @@
 							result.src = result['data-simply-src'];
 							delete result['data-simply-src'];
 						}
+						if (field.simplyString) {
+							return result.src;
+						}
 						return result;
 					},
 					set : function(field, data) {
 						if (typeof data == "string") {
+							field.simplyString = true;
 							data = {"src" : data};
 						}
 						if (data) {
@@ -926,10 +964,15 @@
 				},
 				"iframe" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["src"]);
+						var result = editor.field.defaultGetter(field, ["src"]);
+						if (field.simplyString) {
+							return result.src;
+						}
+						return result;
 					},
 					set : function(field, data) {
 						if (typeof data == "string") {
+							field.simplyString = true;
 							data = {"src" : data};
 						}
 						return editor.field.defaultSetter(field, data);
@@ -960,9 +1003,16 @@
 						}
 						delete result.rel;
 						delete result.target;
+						if (field.simplyString) {
+							return result.href;
+						}
 						return result;
 					},
 					set : function(field, data) {
+						if (typeof data == "string") {
+							field.simplyString = true;
+							return editor.field.defaultSetter(field, {href : data});
+						}
 						if (typeof data.name == "string") {
 							data.id = data.name;
 						}
@@ -1016,6 +1066,24 @@
 						} else {
 							field.checked = false;
 						}
+					}
+				},
+				"[data-simply-content='template']" : {
+					get : function(field) {
+						return field.storedData;
+					},
+					set : function(field, data) {
+						editor.list.parseTemplates(field);
+						field.innerHTML = '';
+						if (field.templates[data]) {
+							var clone = editor.list.cloneTemplate(field.templates[data]);
+							field.appendChild(clone);
+							editor.data.apply(editor.currentData, field.firstElementChild);
+						}
+						field.storedData = data;
+					},
+					makeEditable : function(field) {
+						return true;
 					}
 				}
 			},
