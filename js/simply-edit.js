@@ -743,7 +743,7 @@
 				} else {
 					clone = document.createElement("DIV");
 					for (e=0; e<template.contentNode.childNodes.length; e++) {
-						clonedNode = template.contentNode.childNodes[e].cloneNode(true);
+						var clonedNode = template.contentNode.childNodes[e].cloneNode(true);
 						clone.appendChild(clonedNode);
 					}
 				}
