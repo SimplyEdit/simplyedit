@@ -618,6 +618,13 @@
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
 						if (list.dataBinding) {
+							// Check if the existing dataBinding is still for the same path - if not, unbind it;
+							if (list.dataBinding.config.dataPath != editor.data.getDataPath(list)) {
+								list.dataBinding.unbind(list);
+								list.dataBinding = false;
+							}
+						}
+						if (list.dataBinding) {
 							editor.list.dataBindingSetter.call(list, dataParent[dataName]);
 							list.dataBinding.setData(dataParent);
 							list.dataBinding.set(dataParent[dataName]);
@@ -684,6 +691,7 @@
 				}
 			},
 			clear : function(list) {
+				editor.fireEvent("databinding:pause", list);
 				// Remove the current list items to replace them with the new data;
 				var children = list.querySelectorAll("[data-simply-list-item]");
 				for (var i=0; i<children.length; i++) {
@@ -691,6 +699,7 @@
 						list.removeChild(children[i]);
 					}
 				}
+				editor.fireEvent("databinding:resume", list);
 			},
 			initListItem : function(clone, useDataBinding, listDataItem) {
 				var k;
@@ -1045,7 +1054,7 @@
 						field.contentEditable = true;
 					}
 				},
-				"input[type=text]" : {
+				"input[type=text],input:not([type]),input[type=hidden],textarea" : {
 					get : function(field) {
 						return field.value;
 					},
@@ -1330,6 +1339,14 @@
 				}
 				if (dataParent[dataName] !== null) {
 					if (useDataBinding) {
+						if (field.dataBinding) {
+							// Check if the existing dataBinding is still for the same path - if not, unbind it;
+							if (field.dataBinding.config.dataPath != editor.data.getDataPath(field)) {
+								field.dataBinding.unbind(field);
+								field.dataBinding = false;
+							}
+						}
+
 						if (field.dataBinding) {
 							field.dataBinding.setData(dataParent);
 							field.dataBinding.set(dataParent[dataName]);
@@ -1836,9 +1853,11 @@
 			},
 			initImage : function(imgEl) {
 				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
-					window.setTimeout(function() {
-						editor.responsiveImages.initImage(imgEl);
-					}, 50);
+					if (!imgEl.simplyResponsiveImageTimer) {
+						imgEl.simplyResponsiveImageTimer = window.setTimeout(function() {
+							editor.responsiveImages.initImage(imgEl);
+						}, 50);
+					}
 					return;
 				}
 
