@@ -1079,7 +1079,9 @@
 				},
 				"[data-simply-content='template']" : {
 					get : function(field) {
-						return field.storedData;
+						if (editor.data.getDataPath(field) == field.storedPath) {
+							return field.storedData;
+						}
 					},
 					set : function(field, data) {
 						editor.list.parseTemplates(field);
@@ -1089,6 +1091,7 @@
 							field.appendChild(clone);
 							editor.data.apply(editor.currentData, field.firstElementChild);
 						}
+						field.storedPath = editor.data.getDataPath(field);
 						field.storedData = data;
 					},
 					makeEditable : function(field) {
@@ -1901,13 +1904,25 @@
 				editor.fireEvent("selectionchange", document);
 			},
 			getSizeRatio : function(imgEl) {
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.pauseListeners(imgEl);
+				}
 				var storedAlt = imgEl.getAttribute("alt");
-				imgEl.removeAttribute("alt");
+				var storedSrc = imgEl.getAttribute("src");
 
+				imgEl.setAttribute("alt", "");
+				imgEl.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // transparent 1x1 gif, this forces a redraw of the image thus recalculating its width;
+				if (storedSrc) {
+					imgEl.setAttribute("src", storedSrc);
+				} else {
+					imgEl.removeAttribute("src");
+				}
 				var imageWidth = imgEl.width;
-
 				if (storedAlt) {
 					imgEl.setAttribute("alt", storedAlt);
+				}
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.resumeListeners(imgEl);
 				}
 
 				if (imgEl.simplyComputedWidth || imageWidth === 0) {
