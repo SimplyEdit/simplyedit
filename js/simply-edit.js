@@ -1894,13 +1894,22 @@
 				}
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
+
 				if (imgEl.dataBinding) {
 					imgEl.dataBinding.resumeListeners(imgEl);
 				}
 				editor.fireEvent("selectionchange", document);
 			},
 			getSizeRatio : function(imgEl) {
+				var storedAlt = imgEl.getAttribute("alt");
+				imgEl.removeAttribute("alt");
+
 				var imageWidth = imgEl.width;
+
+				if (storedAlt) {
+					imgEl.setAttribute("alt", storedAlt);
+				}
+
 				if (imgEl.simplyComputedWidth || imageWidth === 0) {
 					imgEl.simplyComputedWidth = true;
 					var computed = getComputedStyle(imgEl);
