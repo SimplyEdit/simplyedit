@@ -1069,3 +1069,11 @@ QUnit.module("databinding");
 		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
 		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
 	});
+
+QUnit.module("responsive images");
+	QUnit.test("responsive image width from ALT tag is ignored", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<img data-simply-src="bogus" alt="This is an alt tag">';
+		assert.equal(editor.responsiveImages.getSizeRatio(document.querySelector("#testContent img")), 0);
+	});
+ 
