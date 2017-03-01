@@ -649,12 +649,19 @@
 								listDataBinding = new dataBinding(bindingConfig);
 							}
 							listDataBinding.bind(list);
+							list.addEventListener("databind:elementresolved", function(evt) {
+								editor.list.emptyClass(this);
+							});
 						}
 					} else {
 						editor.list.dataBindingSetter.call(list, dataParent[dataName]);
 					}
 				}
 
+				editor.list.emptyClass(list);
+				list.addEventListener("keydown", editor.list.keyDownHandler);
+			},
+			emptyClass : function(list) {
 				var hasChild = false;
 				for (var m=0; m<list.childNodes.length; m++) {
 					if (
@@ -671,8 +678,6 @@
 						list.className += " simply-empty";
 					}
 				}
-
-				list.addEventListener("keydown", editor.list.keyDownHandler);
 			},
 			detach : function(list) {
 				// Remove the list from the DOM, do all the stuff and reinsert it, so we only redraw once for all our modifications.
@@ -726,6 +731,7 @@
 				editor.fireEvent("databinding:pause", list);
 				editor.list.clear(list);
 				editor.list.append(list, listData);
+				editor.list.emptyClass(list);
 				editor.fireEvent("databinding:resume", list);
 			},
 			cloneTemplate : function(template) {
