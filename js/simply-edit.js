@@ -1860,6 +1860,18 @@
 				this.parentNode.removeChild(this);
 				editor.fireEvent("selectionchange", document);
 			},
+			isInEndpoint : function(imageSrc) {
+				if (imageSrc) {
+					var parser = document.createElement("A");
+					parser.href = imageSrc;
+					imageSrc = parser.href;
+				}
+				var imagesPath = this.getEndpoint();
+				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
+					return true;
+				}
+				return false;
+			},
 			initImage : function(imgEl) {
 				if (editor.responsiveImages.isInDocumentFragment(imgEl)) { // The image is still in the document fragment from the template, and not part of our document yet. This means we can't calculate any styles on it.
 					if (!imgEl.simplyResponsiveImageTimer) {
@@ -1879,8 +1891,7 @@
 					return;
 				}
 				var srcSet = [];
-				var imagesPath = this.getEndpoint();
-				if (imagesPath && (imageSrc.indexOf(imagesPath) === 0)) {
+				if (editor.responsiveImages.isInEndpoint(imageSrc)) {
 					var sizes = editor.responsiveImages.sizes(imageSrc);
 					for (var size in sizes) {
 						srcSet.push(sizes[size] + " " + size);
