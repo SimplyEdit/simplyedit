@@ -61,6 +61,8 @@
 					editor.data.originalBody = document.body.cloneNode(true);
 				}
 
+				editor.responsiveImages.init(target); // FIXME: should this be more defensive and skip images within fields/lists?
+
 				var dataFields;
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
 					dataFields = [target];
