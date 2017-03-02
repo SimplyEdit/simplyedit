@@ -649,12 +649,19 @@
 								listDataBinding = new dataBinding(bindingConfig);
 							}
 							listDataBinding.bind(list);
+							list.addEventListener("databind:elementresolved", function(evt) {
+								editor.list.emptyClass(this);
+							});
 						}
 					} else {
 						editor.list.dataBindingSetter.call(list, dataParent[dataName]);
 					}
 				}
 
+				editor.list.emptyClass(list);
+				list.addEventListener("keydown", editor.list.keyDownHandler);
+			},
+			emptyClass : function(list) {
 				var hasChild = false;
 				for (var m=0; m<list.childNodes.length; m++) {
 					if (
@@ -671,8 +678,6 @@
 						list.className += " simply-empty";
 					}
 				}
-
-				list.addEventListener("keydown", editor.list.keyDownHandler);
 			},
 			detach : function(list) {
 				// Remove the list from the DOM, do all the stuff and reinsert it, so we only redraw once for all our modifications.
@@ -726,6 +731,7 @@
 				editor.fireEvent("databinding:pause", list);
 				editor.list.clear(list);
 				editor.list.append(list, listData);
+				editor.list.emptyClass(list);
 				editor.fireEvent("databinding:resume", list);
 			},
 			cloneTemplate : function(template) {
@@ -1079,7 +1085,9 @@
 				},
 				"[data-simply-content='template']" : {
 					get : function(field) {
-						return field.storedData;
+						if (editor.data.getDataPath(field) == field.storedPath) {
+							return field.storedData;
+						}
 					},
 					set : function(field, data) {
 						editor.list.parseTemplates(field);
@@ -1089,6 +1097,7 @@
 							field.appendChild(clone);
 							editor.data.apply(editor.currentData, field.firstElementChild);
 						}
+						field.storedPath = editor.data.getDataPath(field);
 						field.storedData = data;
 					},
 					makeEditable : function(field) {
@@ -1894,13 +1903,34 @@
 				}
 				imgEl.setAttribute("srcset", srcSet.join(", "));
 				imgEl.setAttribute("src", imageSrc);
+
 				if (imgEl.dataBinding) {
 					imgEl.dataBinding.resumeListeners(imgEl);
 				}
 				editor.fireEvent("selectionchange", document);
 			},
 			getSizeRatio : function(imgEl) {
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.pauseListeners(imgEl);
+				}
+				var storedAlt = imgEl.getAttribute("alt");
+				var storedSrc = imgEl.getAttribute("src");
+
+				imgEl.setAttribute("alt", "");
+				imgEl.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // transparent 1x1 gif, this forces a redraw of the image thus recalculating its width;
+				if (storedSrc) {
+					imgEl.setAttribute("src", storedSrc);
+				} else {
+					imgEl.removeAttribute("src");
+				}
 				var imageWidth = imgEl.width;
+				if (storedAlt) {
+					imgEl.setAttribute("alt", storedAlt);
+				}
+				if (imgEl.dataBinding) {
+					imgEl.dataBinding.resumeListeners(imgEl);
+				}
+
 				if (imgEl.simplyComputedWidth || imageWidth === 0) {
 					imgEl.simplyComputedWidth = true;
 					var computed = getComputedStyle(imgEl);
