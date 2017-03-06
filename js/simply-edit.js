@@ -507,7 +507,13 @@
 					}
 
 					var savedParentKey = editor.settings.databind.parentKey;
-					editor.list.init(list, data[dataPath], true);
+
+					if (list.getAttribute("data-simply-data")) {
+						editor.list.init(list, data[dataPath], false);
+					} else {
+						editor.list.init(list, data[dataPath], true);
+					}
+
 					editor.settings.databind.parentKey = savedParentKey;
 				};
 
