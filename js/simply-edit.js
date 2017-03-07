@@ -2,7 +2,7 @@
 	Simply edit the Web
 
 	Written by Yvo Brevoort
-	Copyright Muze 2015-2016, all rights reserved.
+	Copyright Muze 2015-2017, all rights reserved.
 */
 (function() {
 	if (window.editor) {
@@ -60,6 +60,8 @@
 				if (typeof editor.data.originalBody === "undefined") {
 					editor.data.originalBody = document.body.cloneNode(true);
 				}
+
+				editor.responsiveImages.init(target); // FIXME: should this be more defensive and skip images within fields/lists?
 
 				var dataFields;
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
@@ -505,7 +507,13 @@
 					}
 
 					var savedParentKey = editor.settings.databind.parentKey;
-					editor.list.init(list, data[dataPath], true);
+
+					if (list.getAttribute("data-simply-data")) {
+						editor.list.init(list, data[dataPath], false);
+					} else {
+						editor.list.init(list, data[dataPath], true);
+					}
+
 					editor.settings.databind.parentKey = savedParentKey;
 				};
 
