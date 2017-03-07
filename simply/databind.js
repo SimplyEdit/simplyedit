@@ -633,7 +633,7 @@ document.addEventListener("DOMNodeRemoved", function(evt) {
   }
   catch (e) {
     // Match usage of scope
-    var scopeRE = /^\s*:scope/gi;
+    var scopeRE = /\s*:scope/gi;
 
     // Overrides
     function overrideNodeMethod(prototype, methodName) {
