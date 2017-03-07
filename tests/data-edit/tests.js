@@ -1398,7 +1398,7 @@ QUnit.module("lists");
 		editor.context.toolbar.hide = true;
 		editor.context.update();
 		editor.context.toolbar.hide = false;
-		simulateClick(target, 5, 5);
+		simulateClick(target.querySelector("p"), 5, 5);
 		var context = editor.context.get();
 		assert.equal(context, "simply-text-cursor");
 	});
