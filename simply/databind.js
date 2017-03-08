@@ -197,7 +197,9 @@ dataBinding = function(config) {
 			};
 
 			for (var key in data) {
-				monitor(data, key);
+				if (typeof data[key] !== "function") { // IE11 has a function 'includes' for arrays;
+					monitor(data, key);
+				}
 			}
 		}
 
