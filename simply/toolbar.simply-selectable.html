@@ -6,8 +6,6 @@
 		var selectTarget = function(target) {
 			var sel = vdSelectionState.get();
 			sel.selectNode(target);
-			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
-			sel.startContainer.ownerDocument.defaultView.getSelection().addRange(sel);
 			vdSelectionState.save(sel);
 			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
 			editor.context.update();
@@ -77,6 +75,9 @@
 					return;
 				}
 			}
+
+			event.stopPropagation();
+			event.cancelBubble = true;
 
 			selectTarget(target);
 		
