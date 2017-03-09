@@ -287,7 +287,7 @@ QUnit.module("hope editor behaviour");
 		assert.equal(node1, node2);
 	});
 
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items, paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>		<p>abcdef</p>		</div>		";
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
@@ -299,7 +299,7 @@ QUnit.module("hope editor behaviour");
 		assert.equal(annotation.tag.split(" ")[0], 'p');
 	});
 
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items with image", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
 		testContent.hopeEditor.parseHTML();
@@ -312,7 +312,7 @@ QUnit.module("hope editor behaviour");
 		assert.equal(annotation.tag.split(" ")[0], 'img');
 	});
 
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items, image and characters", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>		a	b<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
@@ -326,7 +326,7 @@ QUnit.module("hope editor behaviour");
 		assert.equal(annotation.tag.split(" ")[0], 'img');
 	});
 
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items, less tabs", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>abc<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
@@ -341,16 +341,16 @@ QUnit.module("hope editor behaviour");
 	QUnit.test("offset calculation works for nested items", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>ab<img src='frop'>		</div>";
-		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.parseHTML();
 		testContent.hopeEditor.update();
 		editor.context.update();
+		setCaretPosition(testContent.querySelector("div"), 2, 0);
 		testContent.hopeEditor.selection.updateRange();
 		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
 		assert.equal(img.tag, 'img src="frop"');
 	});
 
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items, tabs and image", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		// testContent.style.whiteSpace = "pre";
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
@@ -363,7 +363,7 @@ QUnit.module("hope editor behaviour");
 		var img = testContent.hopeEditor.fragment.has(hopeEditor.currentRange, "img");
 		assert.equal(img.tag, 'img src="frop"');
 	});
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items spaces", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		//testContent.style.whiteSpace = "pre";
 		testContent.innerHTML = "  <div>  <img src='frop'>  </div>";
@@ -376,7 +376,7 @@ QUnit.module("hope editor behaviour");
 		assert.equal(img.tag, 'img src="frop"');
 	});
 
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items, image and tabs", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		//testContent.style.whiteSpace = "pre";
 		testContent.innerHTML = "		<div>		<img src='frop'>		</div>";
@@ -391,7 +391,7 @@ QUnit.module("hope editor behaviour");
 
 
 
-	QUnit.test("offset calculation works for nested items", function(assert) {
+	QUnit.test("offset calculation works for nested items, char before img", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "		<div>		a<img src='frop'>		</div>";
 		setCaretPosition(testContent.querySelector("div"), 2, 0);
