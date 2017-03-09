@@ -649,9 +649,6 @@ document.addEventListener("DOMNodeRemoved", function(evt) {
             gaveContainer = false;
 
         if (query.match(scopeRE)) {
-          // Remove :scope
-          query = query.replace(scopeRE, '');
-
           if (!this.parentNode) {
             // Add to temporary container
             container.appendChild(this);
@@ -666,9 +663,12 @@ document.addEventListener("DOMNodeRemoved", function(evt) {
             gaveId = true;
           }
 
+          // Remove :scope
+          query = query.replace(scopeRE, '#' + this.id + " ");
+
           // Find elements against parent node
           // nodeList = oldMethod.call(parentNode, '#'+this.id+' '+query);
-          nodeList = parentNode[methodName]('#'+this.id+' '+query);
+          nodeList = parentNode[methodName](query);
           // Reset the ID
           if (gaveId) {
             this.id = '';
