@@ -40,7 +40,7 @@
 					var images = [];
 
 					for (var i=0; i < result.images.length; i++) {
-						// scrub the resizes images from the list;
+						// scrub the resized images from the list;
 						if (!isSizedImageUrl(result.images[i].url)) {
 							images.push(result.images[i]);
 						}
@@ -179,7 +179,7 @@
 						ctx.drawImage(img, 0, 0, targetsize.width, targetsize.height);
 
 						if (extension) {
-							var dataBlob = dataURItoBlob(canvas.toDataURL(mime), 1);
+							var dataBlob = dataURItoBlob(canvas.toDataURL(mime, 1));
 							var url = editor.responsiveImages.sizes(subpath + reader.filename)[size + "w"];
 							if (url) {
 								normalSave.call(storageScope, url, dataBlob, function(image) {
