@@ -204,7 +204,6 @@
 				}
 			}
 
-			var hyperlink = hopeEditor.fragment.has(range, "a");
 			toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "none";
 
 			toolbar.data.hyperlink.href = '';
@@ -212,10 +211,16 @@
 			toolbar.data.hyperlink.name = '';
 			toolbar.data.hyperlink.nofollow = false;
 			toolbar.data.hyperlink.newwindow = false;
-			if (hyperlink) {
-				toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
-				var linkNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
 
+			var linkNode;
+			var hyperlink = hopeEditor.fragment.has(range, "a");
+			if (hyperlink) {
+				linkNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+			} else if (hopeEditor.field.tagName.toLowerCase() === "a") {
+				linkNode = hopeEditor.field;
+			}
+			if (linkNode) {
+				toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
 				var hyperlinkData = editor.field.get(linkNode);
 				for (var key in toolbar.data.hyperlink) {
 					toolbar.data.hyperlink[key] = (typeof hyperlinkData[key] !== "undefined") ? hyperlinkData[key] : '';
