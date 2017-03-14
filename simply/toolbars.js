@@ -1090,37 +1090,20 @@
 
 	editor.context.toolbar.hide = false;
 
-	if( window.getSelection ) {
-		var selection = document.defaultView.getSelection();
-		if( selection && selection.setBaseAndExtent ) { // broken webkit
-			document.addEventListener("click", function(event) {
-				var target = muze.event.target(event);
-				if( target.tagName == 'IMG' ) {
-					var selection = document.defaultView.getSelection();
-					selection.setBaseAndExtent(target, 0, target, 1);
-					vdEditPane_DisplayChanged();
-				}
-			});
-		}
-	}
-
-	function registerChange(field) {
-	}
-
-	var updateHtmlTimer;
-	function vdEditPane_DisplayChanged() {
-		if (updateHtmlTimer) {
-			window.clearTimeout(updateHtmlTimer);
-		}
-		updateHtmlTimer = window.setTimeout(function() {
+	document.addEventListener("click", function(event) {
+		var target = muze.event.target(event);
+		if( target.tagName.toLowerCase() === 'img' ) {
+			var range = document.createRange();
+			range.selectNode(target);
+			var sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+			if (focus in target) {
+				target.focus();
+			}
 			editor.context.update();
-		}, 100);
-
-		return true;
-	}
-
-	function vdStoreUndo() {
-	}
+		}
+	});
 
 	function monitorIframe() {
 		// monitor for iframes that get focus;

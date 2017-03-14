@@ -158,7 +158,7 @@
 					}
 					editor.storage.load(function(data) {
 						// check if the data is different from the last time;
-						if (data != editor.loadedData && editor.plugins.undoRedo) {
+						if ((data != editor.loadedData) && editor.plugins.undoRedo) {
 							console.log("Notice: Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
 							alert("Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
 							var newData = JSON.parse(data);
@@ -230,7 +230,6 @@
 							}
 						}
 					});
-
 				} 
 			},
 			load : function() {
@@ -1760,7 +1759,7 @@
 			isDirty : function() {
 				editor.data.stash();
 				var newData = localStorage.data;
-				var oldData = editor.data.stringify(editor.currentData);
+				var oldData = editor.data.stringify(JSON.parse(editor.loadedData));
 				if (newData != oldData) {
 					return true;
 				}
