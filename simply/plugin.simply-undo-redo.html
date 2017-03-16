@@ -70,7 +70,7 @@
 				if (typeof targetValue[key] !== 'undefined' && JSON.stringify(targetValue[key]) == JSON.stringify(undoSet[i].meta.oldValue)) {
 					targetValue[key] = undoSet[i].meta.newValue;
 				} else {
-					console.log("Unexpected value " + targetValue[key] + " in " + ":" + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey + ":" + undoSet[i].meta.key + " (expected: " + undoSet[i].meta.oldValue + ")");
+					console.log("Modified value " + targetValue[key] + " in " + ":" + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey + ":" + undoSet[i].meta.key + " (we had: " + undoSet[i].meta.oldValue + ")");
 					mergeErrors++;
 
 					if (interactive) {
