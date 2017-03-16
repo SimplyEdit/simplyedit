@@ -115,7 +115,9 @@
 			}
 		},
 		insertTemplate : function(list, templateName, targetNode) {
-			editor.bindingParents = [list.dataBinding.parentKey + list.dataBinding.key];
+			if (list.dataBinding) {
+				editor.bindingParents = [list.dataBinding.parentKey + list.dataBinding.key];
+			}
 			var template = list.templates[templateName];
 
 			if (template) {
@@ -166,8 +168,10 @@
 					listIndex = 0;
 				}
 
-				editor.bindingParents.push(listIndex);
-				editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
+				if (list.dataBinding) {
+					editor.bindingParents.push(listIndex);
+					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
+				}
 				editor.data.apply(newData, newListItem);
 				var dataPath = editor.data.getDataPath(newListItem);
 				newListItem.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
@@ -183,8 +187,10 @@
 				muze.event.fire(document, "simply-selectable-inserted");
 
 				editor.editmode.makeEditable(newListItem);
-				editor.bindingParents.pop();
-				editor.bindingParents.pop();
+				if (list.dataBinding) {
+					editor.bindingParents.pop();
+					editor.bindingParents.pop();
+				}
 				list.classList.remove("simply-empty");
 			}
 		}
