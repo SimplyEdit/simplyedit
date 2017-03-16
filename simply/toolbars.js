@@ -1074,6 +1074,7 @@
 				button.classList.add("simply-selected");
 				dialog.classList.add("fullscreen");
 			}
+			editor.fireEvent("resize", document);
 		},
 		getDialogEl : function(el) {
 			while ( el && el.tagName!='div' && !/\bsimply-dialog\b/.test(el.className) ) {
