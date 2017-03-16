@@ -1520,8 +1520,8 @@
 
 							for (i=0; i<scriptTags.length; i++) {
 								var newNode = document.createElement("SCRIPT");
-								if (scriptTags[i].src) {
-									newNode.src = scriptTags[i].src;
+								if (scriptTags[i].getAttribute('src')) {
+									newNode.src = scriptTags[i].getAttribute('src');
 								}
 								if (scriptTags[i].innerHTML) {
 									newNode.innerHTML = scriptTags[i].innerHTML;
