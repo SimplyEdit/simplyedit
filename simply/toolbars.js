@@ -1030,10 +1030,12 @@
 
 			var hopeEditor = editor.plugins.dialog.currentField.hopeEditor;
 			if (hopeEditor) {
+				editor.fireEvent("databinding:pause", editor.plugins.dialog.currentField);
 				hopeEditor.parseHTML();
 				hopeEditor.update();
 				hopeEditor.selection.updateRange(hopeEditor.currentRange.start, hopeEditor.currentRange.end);
 				hopeEditor.showCursor();
+				editor.fireEvent("databinding:resume", editor.plugins.dialog.currentField);
 			} else {
 				vdSelectionState.restore(vdSelectionState.get());
 				if (editor.plugins.dialog.selectionIsCollapsed) {
