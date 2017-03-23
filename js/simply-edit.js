@@ -2647,29 +2647,35 @@
 						files : []
 					};
 
-					var images = iframe.contentDocument.body.querySelectorAll("a");
-					for (var i=0; i<images.length; i++) {
-						href = images[i].getAttribute("href");
-						if (href.substring(0, 1) === "?") {
-							continue;
-						}
+					try {
+						var images = iframe.contentDocument.body.querySelectorAll("a");
+						for (var i=0; i<images.length; i++) {
+							href = images[i].getAttribute("href");
+							if (href.substring(0, 1) === "?") {
+								continue;
+							}
 
-						var targetUrl = images[i].href;
-						if (href.substring(href.length-1, href.length) === "/") {
-							result.folders.push({url : targetUrl, name : images[i].innerHTML});
-						} else {
-							if (targetUrl === editor.storage.dataEndpoint) {
-								result.folders.push({url : targetUrl, name: "My pages"});
+							var targetUrl = images[i].href;
+							if (href.substring(href.length-1, href.length) === "/") {
+								result.folders.push({url : targetUrl, name : images[i].innerHTML});
 							} else {
-								result.files.push({url : targetUrl, name : images[i].innerHTML});
-								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
-									result.images.push({url : targetUrl, name : images[i].innerHTML});
+								if (targetUrl === editor.storage.dataEndpoint) {
+									result.folders.push({url : targetUrl, name: "My pages"});
+								} else {
+									result.files.push({url : targetUrl, name : images[i].innerHTML});
+									if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
+										result.images.push({url : targetUrl, name : images[i].innerHTML});
+									}
 								}
 							}
 						}
+
+						document.body.removeChild(iframe);
+					} catch(e) {
+						console.log("The target endpoint could not be accessed.");
+						console.log(e);
 					}
 
-					document.body.removeChild(iframe);
 					callback(result);
 				});
 				document.body.appendChild(iframe);
