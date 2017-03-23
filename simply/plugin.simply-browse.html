@@ -452,6 +452,23 @@
 							uploadButton.parentNode.style.display = "none";
 						}
 					}
+					if (editor.plugins.browse.currentPath && editor.plugins.browse.currentPath.indexOf(editor.storage.endpoint) == -1) {
+						console.log("Notice: this endpoint is outside storage endpoint, disabling action buttons.");
+						// The image endpoint is not within our storage endpoint, so we can't upload anything;
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "none";
+						}
+						if (addFolderButton) {
+							addFolderButton.parentNode.style.display = "none";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "none";
+						}
+					}
+
 					if (editor.plugins.browse.currentPath && (editor.plugins.browse.currentPath.indexOf("data.json") > -1)) {
 						// In data.json browsing mode; disable upload button;
 						if (uploadButton) {
