@@ -2841,6 +2841,7 @@
 		editor.baseURL + "simply/plugin.simply-paste.html",
 		editor.baseURL + "simply/plugin.simply-undo-redo.html",
 		editor.baseURL + "simply/plugin.simply-keyboard.html",
+		editor.baseURL + "simply/plugin.simply-diff.html",
 		editor.baseURL + "simply/plugin.simply-about.html"
 	];
 
