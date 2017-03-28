@@ -137,18 +137,7 @@
 	editor.addToolbar({
 		name : 'simply-diff',
 		init : function() {
-			editor.loadScript(editor.baseURLClean + "simply/databind.js" + "?v=" + editor.version);
-
-			/*
-				editor.plugins.diff.serverData = editor.loadedData;
-
-				var listItem = document.createElement("li");
-				var button = document.createElement("button");
-				button.dataset.simplyAction = "simply-diff";
-				button.innerHTML = '<i class="fa fa-list"></i>Diff';
-				listItem.appendChild(button);
-				document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
-			*/
+			editor.loadScript(editor.baseURLClean + "simply/diff_match_patch.js" + "?v=" + editor.version);
 		},
 		actions : {
 			"simply-diff" : editor.plugins.diff.dialog.open,
@@ -218,28 +207,53 @@
 	#simply-diff #diff .theirs,
 	#simply-diff #diff .mine {
 		background-color: white;
-		padding: 10px;
-		border: 1px solid #888;
 		box-sizing: border-box;
+		box-shadow: 0 0 5px #ccc;
 		width: 48%;
 		display: inline-block;
 		vertical-align: top;
-		color: #888;
+		color: #555;
 		white-space: pre-wrap;
 		position: relative;
 		margin-left: 1%;
 		margin-right: 1%;
+	}
+	#simply-diff #diff span,
+	#simply-diff #diff ins,
+	#simply-diff #diff del {
+		font-family: monospace;
 		font-size: initial;
 	}
+	#simply-diff #diff .theirs:before,
+	#simply-diff #diff .mine:before {
+		content: "Mine";
+		position: absolute;
+		display: block;
+		height: 30px;
+		line-height: 30px;
+		vertical-align: middle;
+		text-align: center;
+		margin-top: -30px;
+		width: 100%;
+		font-size: initial;
+	}
+	#simply-diff #diff .theirs:before {
+		content: "Theirs (server version)";
+	}
+
 	
 	#simply-diff #diff .theirs ins,
 	#simply-diff #diff .mine del {
-		xdisplay: none;
-		width: 0;
-		overflow: hidden;
-		display: inline-block;
-		line-height: 0;
-		vertical-align: top;
+		color: transparent;
+		letter-spacing: -20px;
+		/*
+			xdisplay: none;
+			width: 0;
+			overflow: hidden;
+			display: inline-block;
+			line-height: 0;
+			vertical-align: top;
+		*/
 	}
 	#simply-diff #diff del.selected:before,
 	#simply-diff #diff ins.selected:before {
@@ -247,14 +261,23 @@
 		position: absolute;
 		left: 0px;
 		right: 0px;
-		background-color: rgba(173, 173,255, 0.3);
-		line-height: 1em;
+		box-shadow: 0 0 2px #ccc;
+
+		background-color: rgba(25, 25 ,255, 0.1);
+		line-height: 1.2em;
 	}
 
 	#simply-diff #diff .theirs del,
 	#simply-diff #diff .mine ins {
-		background-color: pink !important;
+		background-color: #ffc0cb;
 		color: black;
 		text-decoration: none;
 	}
+	#simply-diff #diff .theirs del.selected,
+	#simply-diff #diff .mine ins.selected,
+	#simply-diff #diff .theirs ins.selected + del,
+	#simply-diff #diff .mine del.selected + ins {
+		background-color: #c2eeff;
+	}
+
 </style>
