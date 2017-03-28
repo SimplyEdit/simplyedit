@@ -137,7 +137,7 @@
 	editor.addToolbar({
 		name : 'simply-diff',
 		init : function() {
-			editor.loadScript(editor.baseURLClean + "simply/diff_match_patch.js" + "?v=" + editor.version);
+			editor.loadScript(editor.baseURL + "simply/diff_match_patch.js" + "?v=" + editor.version);
 		},
 		actions : {
 			"simply-diff" : editor.plugins.diff.dialog.open,
