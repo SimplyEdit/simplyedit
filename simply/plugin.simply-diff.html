@@ -1,5 +1,3 @@
-<!-- script src="diff_match_patch.js"></script -->
-<script src="http://gerhobbelt.github.io/google-diff-match-patch/javascript/diff_match_patch.js"></script>
 <script type="text/javascript">
 	var mergeAndSave = function(callback) {
 		editor.storage.load(function(data) {
@@ -84,8 +82,8 @@
 			editor.plugins.diff.patches = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.lhs, editor.plugins.diff.rhs);
 			editor.plugins.diff.patchesReversed = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.rhs, editor.plugins.diff.lhs);
 
-			document.querySelector("#diff .theirs").innerHTML = editor.plugins.diff.dmp.diff_prettyHtml(diff);
-			document.querySelector("#diff .mine").innerHTML = editor.plugins.diff.dmp.diff_prettyHtml(diff);
+			document.querySelector("#diff .theirs").innerHTML = editor.plugins.diff.prettyHtml(diff);
+			document.querySelector("#diff .mine").innerHTML = document.querySelector("#diff .theirs").innerHTML;
 			if (editor.plugins.diff.patches == 0) {
 				document.querySelector("[data-simply-action='simply-diff-save']").removeAttribute("disabled");
 			} else {
@@ -104,19 +102,53 @@
 
 			editor.plugins.diff.diff();
 			editor.plugins.diff.select(editor.plugins.diff.selected);
+		},
+		prettyHtml : function(diffs) {
+			/**
+			 * Convert a diff array into a pretty HTML report.
+			 * @param {!Array.<!diff_match_patch.Diff>} diffs Array of diff tuples.
+			 * @return {string} HTML representation.
+			 */
+			var html = [];
+			var pattern_amp = /&/g;
+			var pattern_lt = /</g;
+			var pattern_gt = />/g;
+			var pattern_para = /\n/g;
+			for (var x = 0; x < diffs.length; x++) {
+				var op = diffs[x][0];		// Operation (insert, delete, equal)
+				var data = diffs[x][1];	// Text of change.
+				var text = data.replace(pattern_amp, '&amp;').replace(pattern_lt, '&lt;')
+						.replace(pattern_gt, '&gt;').replace(pattern_para, '<br>');
+				switch (op) {
+					case DIFF_INSERT:
+						html[x] = '<ins>' + text + '</ins>';
+						break;
+					case DIFF_DELETE:
+						html[x] = '<del>' + text + '</del>';
+						break;
+					case DIFF_EQUAL:
+						html[x] = '<span>' + text + '</span>';
+						break;
+				}
+			}
+			return html.join('');
 		}
 	};
 	editor.addToolbar({
 		name : 'simply-diff',
 		init : function() {
-		/*
-			var listItem = document.createElement("li");
-			var button = document.createElement("button");
-			button.dataset.simplyAction = "simply-diff";
-			button.innerHTML = '<i class="fa fa-list"></i>Diff';
-			listItem.appendChild(button);
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
-		*/
+			editor.loadScript(editor.baseURLClean + "simply/databind.js" + "?v=" + editor.version);
+
+			/*
+				editor.plugins.diff.serverData = editor.loadedData;
+
+				var listItem = document.createElement("li");
+				var button = document.createElement("button");
+				button.dataset.simplyAction = "simply-diff";
+				button.innerHTML = '<i class="fa fa-list"></i>Diff';
+				listItem.appendChild(button);
+				document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+			*/
 		},
 		actions : {
 			"simply-diff" : editor.plugins.diff.dialog.open,
@@ -162,12 +194,12 @@
 			<div class="mine">Mine</div>
 		</div>
 	</div>
-        <div class="simply-toolbar">
-                <ul class="simply-buttons">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
 			<li class='message'>Review the differences and choose which of them to use.</li>
-                        <li class='simply-right'><button disabled data-simply-action="simply-diff-save"><i class="fa fa-check"></i>Save merged</button></li>
-                </ul>
-        </div>
+			<li class='simply-right'><button disabled data-simply-action="simply-diff-save"><i class="fa fa-check"></i>Save merged</button></li>
+		</ul>
+	</div>
 </section>
 <style>
 	#simply-diff .message {
@@ -179,6 +211,10 @@
 	#simply-diff .simply-dialog-body {
 		padding-top: 30px;
 	}
+	#simply-diff #diff {
+		font-size: 0px;
+	}
+
 	#simply-diff #diff .theirs,
 	#simply-diff #diff .mine {
 		background-color: white;
@@ -191,6 +227,9 @@
 		color: #888;
 		white-space: pre-wrap;
 		position: relative;
+		margin-left: 1%;
+		margin-right: 1%;
+		font-size: initial;
 	}
 	
 	#simply-diff #diff .theirs ins,
