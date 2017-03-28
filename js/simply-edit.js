@@ -156,72 +156,33 @@
 					if (editor.actions['simply-beforesave']) {
 						editor.actions['simply-beforesave']();
 					}
-					editor.storage.load(function(data) {
-						// check if the data is different from the last time;
-						if ((data != editor.loadedData) && editor.plugins.undoRedo) {
-							console.log("Notice: Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
-							alert("Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
-							var newData = JSON.parse(data);
 
-							// if so, try to replay the undoset on it;
-							if (editor.plugins.undoRedo) {
-								newData = editor.plugins.undoRedo.replay(newData);
+					var saveCallback = function(result) {
+						if (!result) {
+							result = {};
+						}
+						result.newData = localStorage.data;
+						var savedEvent = editor.fireEvent("simply-data-saved", document, result);
+						editor.loadedData = result.newData;
+
+						if (result && result.error) {
+							if (editor.actions['simply-aftersave-error']) {
+								editor.actions['simply-aftersave-error'](result);
 							} else {
-								newData = false;
+								alert("Save failed: " + result.message);
 							}
-
-							if (newData) {
-								// if that works, go ahead and save the replayed version;
-								console.log("Notice: Merge was succesful.");
-								alert("Merge was succesful.");
-								localStorage.data = editor.data.stringify(newData);
+						} else {
+							if (editor.actions['simply-aftersave']) {
+								editor.actions['simply-aftersave']();
 							} else {
-								// if not, ask what to do;
-								console.log("Notice: Data on the server changed, and we could not merge the changes.");
-								if (!confirm("Could not merge. Do you want to overwrite the changes?")) {
-									if (editor.plugins.undoRedo && confirm("Do you want to merge field-by-field? (" + editor.plugins.undoRedo.mergeErrors + " conflicts to resolve.)")) {
-										newData = JSON.parse(data);
-										newData = editor.plugins.undoRedo.replay(newData, true);
-										localStorage.data = editor.data.stringify(newData);
-									} else {
-										// User declined the overwrite; Skip saving.
-										result = {
-											error: true,
-											message : "Save cancelled by user."
-										};
-										if (editor.actions['simply-aftersave-error']) {
-											editor.actions['simply-aftersave-error'](result);
-										} else {
-											alert("Save failed: " + result.message);
-										}	
-										return;
-									}
-								}
+								alert("Saved!");
 							}
 						}
+					};
 
-						editor.storage.save(localStorage.data, function(result) {
-							if (!result) {
-								result = {};
-							}
-							result.newData = localStorage.data;
-							var savedEvent = editor.fireEvent("simply-data-saved", document, result);
-							editor.loadedData = result.newData;
+					var executeSave = function() {
+						editor.storage.save(localStorage.data, saveCallback);
 
-							if (result && result.error) {
-								if (editor.actions['simply-aftersave-error']) {
-									editor.actions['simply-aftersave-error'](result);
-								} else {
-									alert("Save failed: " + result.message);
-								}
-							} else {
-								if (editor.actions['simply-aftersave']) {
-									editor.actions['simply-aftersave']();
-								} else {
-									alert("Saved!");
-								}
-							}
-						});
 						for (var source in editor.dataSources) {
 							if (editor.dataSources[source].save) {
 								for (var i=0; i<editor.dataSources[source].stash.length; i++) {
@@ -229,7 +190,13 @@
 								}
 							}
 						}
-					});
+					};
+
+					if (editor.actions['simply-executesave']) {
+						editor.actions['simply-executesave'](executeSave);
+					} else {
+						executeSave();
+					}
 				} 
 			},
 			load : function() {
@@ -2680,29 +2647,35 @@
 						files : []
 					};
 
-					var images = iframe.contentDocument.body.querySelectorAll("a");
-					for (var i=0; i<images.length; i++) {
-						href = images[i].getAttribute("href");
-						if (href.substring(0, 1) === "?") {
-							continue;
-						}
+					try {
+						var images = iframe.contentDocument.body.querySelectorAll("a");
+						for (var i=0; i<images.length; i++) {
+							href = images[i].getAttribute("href");
+							if (href.substring(0, 1) === "?") {
+								continue;
+							}
 
-						var targetUrl = images[i].href;
-						if (href.substring(href.length-1, href.length) === "/") {
-							result.folders.push({url : targetUrl, name : images[i].innerHTML});
-						} else {
-							if (targetUrl === editor.storage.dataEndpoint) {
-								result.folders.push({url : targetUrl, name: "My pages"});
+							var targetUrl = images[i].href;
+							if (href.substring(href.length-1, href.length) === "/") {
+								result.folders.push({url : targetUrl, name : images[i].innerHTML});
 							} else {
-								result.files.push({url : targetUrl, name : images[i].innerHTML});
-								if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
-									result.images.push({url : targetUrl, name : images[i].innerHTML});
+								if (targetUrl === editor.storage.dataEndpoint) {
+									result.folders.push({url : targetUrl, name: "My pages"});
+								} else {
+									result.files.push({url : targetUrl, name : images[i].innerHTML});
+									if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
+										result.images.push({url : targetUrl, name : images[i].innerHTML});
+									}
 								}
 							}
 						}
+
+						document.body.removeChild(iframe);
+					} catch(e) {
+						console.log("The target endpoint could not be accessed.");
+						console.log(e);
 					}
 
-					document.body.removeChild(iframe);
 					callback(result);
 				});
 				document.body.appendChild(iframe);
@@ -2868,6 +2841,7 @@
 		editor.baseURL + "simply/plugin.simply-paste.html",
 		editor.baseURL + "simply/plugin.simply-undo-redo.html",
 		editor.baseURL + "simply/plugin.simply-keyboard.html",
+		editor.baseURL + "simply/plugin.simply-diff.html",
 		editor.baseURL + "simply/plugin.simply-about.html"
 	];
 
