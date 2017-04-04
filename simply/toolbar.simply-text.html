@@ -105,6 +105,16 @@
 		</div>
 	</div>
 </section>
+<style>
+	.simply-toolbar-section > ul > li.simply-label {
+		height: 40px;
+		line-height: 40px;
+		font-weight: bold;
+		padding-left: 5px;
+		padding-right: 5px;
+		min-width: 60px;
+	}
+</style>
 <script type="text/javascript">
 	window.setTimeout(function() {
 		editor.plugins.text = {};
@@ -164,12 +174,23 @@
 				var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-text-class');
 				if (classSection) {
 					if (config.class.length) {
-						classSection.innerHTML = '';
 						for (var i=0; i<config.class.length; i++) {
-							if (config.class[i].length) {
-								var classList = config.class[i].slice();
-								classList.push({class: "none", name: "Default", icon: "fa-times"});
+							var groupConfig = config.class[i];
+							if (groupConfig instanceof Array) {
+								groupConfig = {
+									classes : groupConfig,
+									description : "Block"
+								};
+							}
+
+							if (groupConfig.classes.length) {
+								var classList = groupConfig.classes.slice();
+								// classList.push({class: "none", name: "Default", icon: "fa-times"});
+
 								var list = document.createElement("UL");
+								list.config = config.class[i];
+								list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
+
 								list.setAttribute("data-type", "simply-buttongroup-radio");
 								for (var j=0; j<classList.length; j++) {
 									var item = document.createElement("li");
@@ -231,6 +252,29 @@
 		}
 	};
 
+	var findNode = function(node, selector) {
+		// Helper function to find the node for a class selector;
+		if (node == editor.node.getEditableField()) {
+			return false;
+		}
+
+		if (!selector) {
+			selector = hope.render.html.rules.nestingSets.block.join(","); // default to blocks only
+		}
+
+		// traverse up to see if we have a parent node that matches this selector; return that node if we do;
+		var tempNode = document.createElement("DIV");
+		tempNode.appendChild(node.cloneNode(true));
+
+		if (tempNode.querySelector(":scope > " + selector)) {
+			return node;
+		} else if (node.parentNode && (node.parentNode != editor.node.getEditableField())) {
+			return findNode(node.parentNode, selector);
+		}
+		return false;
+	};
+
+
 	var updateTextToolbar = function(toolbar) {
 		if (toolbar === null) {
 			return;
@@ -252,6 +296,7 @@
 		hopeEditor.currentRange = range;
 
 		var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+		var hyperlink = hopeEditor.fragment.has(range, "a");
 
 		if (blockAnnotation && (blockAnnotation.range.end == range.start)) {
 			var tagName1 = blockAnnotation.tag.split(/ /, 2)[0].toLowerCase();
@@ -288,12 +333,6 @@
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
 		}
 
-		if (blockAnnotation && toolbar.querySelector(".simply-toolbar-section.simply-text-class ul")) {
-			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "block";
-		} else {
-			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "none";
-		}
-
 
 		// Check inline styles;
 		var inlineStyles = toolbar.querySelectorAll("[data-simply-action='simply-text-inline']");
@@ -321,7 +360,6 @@
 			toolbar.data.hyperlink.nofollow = false;
 			toolbar.data.hyperlink.newwindow = false;
 		}
-		var hyperlink = hopeEditor.fragment.has(range, "a");
 		if (hyperlink || (hopeEditor.field.tagName.toLowerCase() === 'a')) {
 
 			toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
@@ -379,18 +417,34 @@
 		}
 
 
+		var showClasses = false;
 		var textClasses = toolbar.querySelectorAll(".simply-text-class [data-type=simply-buttongroup-radio]");
-		if (blockAnnotation && textClasses) {
-			var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
+
+		if (textClasses) {
 			for (var i=0; i<textClasses.length; i++) {
-				toolbar.data.class[i] = '';
-				var buttons = textClasses[i].querySelectorAll("[data-value]");
-				for (var j=0; j<buttons.length; j++) {
-					if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
-						toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+				var selector = textClasses[i].config.selector;
+				var node = findNode(parent, selector);
+				if (node) {
+					textClasses[i].style.display = "block";
+					showClasses = true;
+
+					toolbar.data.class[i] = '';
+					var buttons = textClasses[i].querySelectorAll("[data-value]");
+					for (var j=0; j<buttons.length; j++) {
+						if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
+							toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+						}
 					}
+				} else {
+					textClasses[i].style.display = "none";
 				}
 			}
+		}
+
+		if (showClasses) {
+			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "block";
+		} else {
+			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "none";
 		}
 
 		return true;
@@ -576,31 +630,31 @@
 			'simply-text-class' : function(el) {
 				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
-				var range = hopeEditor.currentRange;
-				var blocks = editor.plugins.hope.annotation.blocks(range);
-				while (blocks.length) {
-					block = blocks.shift();
-					var tempNode = editor.plugins.hope.annotation.explode(block.tag);
-					if (tempNode.classList.contains(el.getAttribute("data-value"))) {
-						tempNode.classList.remove(el.getAttribute("data-value"));
-					} else {
-						var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
-						for (var i=0; i<buttons.length; i++) {
-							tempNode.classList.remove(buttons[i].getAttribute("data-value"));
-						}
-						if (el.getAttribute("data-value") !== "none") {
-							tempNode.classList.add(el.getAttribute("data-value"));
-						}
-					}
-				
-					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+				var sel = vdSelectionState.get();
+				var parent = vdSelection.getNode(sel);
 
-					if (block.tag != "") {
-						hopeEditor.fragment = hopeEditor.fragment.remove(block.range, block.tag);
-					}
-					hopeEditor.fragment = hopeEditor.fragment.apply(block.range, newValue);
+				selector = hope.render.html.rules.nestingSets.block.join(","); // default to blocks only
+				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
+					selector = el.parentNode.parentNode.config.selector;
 				}
-				hopeEditor.update();
+
+				var targetNode = findNode(parent, selector);
+				if (targetNode.classList.contains(el.getAttribute("data-value"))) {
+					targetNode.classList.remove(el.getAttribute("data-value"));
+				} else {
+					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
+					for (var i=0; i<buttons.length; i++) {
+						targetNode.classList.remove(buttons[i].getAttribute("data-value"));
+					}
+					if (el.getAttribute("data-value") !== "none") {
+						targetNode.classList.add(el.getAttribute("data-value"));
+					}
+				}
+				if (targetNode.className == "") {
+					targetNode.removeAttribute("class");
+				}
+				hopeEditor.parseHTML();
+				editor.context.show();
 			},
 			'simply-text-inline' : function(el) {
 				editor.plugins.hope.annotation.apply(el.getAttribute("data-value"));
