@@ -27,6 +27,10 @@
 		.lowlight {
 			background-color: #ccc;
 		}
+		a.red.inverted {
+			background-color: red;
+			color: white;
+		}	
 	</style>
 </head>
 <body>
@@ -76,6 +80,13 @@
 						{class : 'green', name : 'Green', icon : 'fa-paint-brush'},
 						{class : 'blue', name : 'Blue', icon : 'fa-paint-brush'}
 					]
+				},
+				{
+					"description" : "Red hyperlinks",
+					"selector" : "a.red",
+					"classes" : [
+						{class : 'inverted', name : 'Invert', icon : 'fa-paint-brush'},
+					]
 				}
 			]
 		};
@@ -94,9 +105,12 @@
 				{name : "Groot", value : "$1/view.large.jpg"}
 			],
 			'class' : [
-				[
-					{class : 'shadow', name : 'Shadow', icon : 'fa-moon-o'}
-				]
+				{
+					"description" : "Shadows",
+					"classes" : [
+						{class : 'shadow', name : 'Shadow', icon : 'fa-moon-o'}
+					]
+				}
 			]
 		};
 		var myCustomSettings = {
