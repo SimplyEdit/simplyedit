@@ -174,6 +174,7 @@
 				var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-text-class');
 				if (classSection) {
 					if (config.class.length) {
+						classSection.innerHTML = '';
 						for (var i=0; i<config.class.length; i++) {
 							var groupConfig = config.class[i];
 							if (groupConfig instanceof Array) {
@@ -182,13 +183,15 @@
 									description : "Block"
 								};
 							}
-
+							if (!groupConfig.selector) {
+								groupConfig.selector = hope.render.html.rules.nestingSets.block.join(","); // default to blocks only
+							}
 							if (groupConfig.classes.length) {
 								var classList = groupConfig.classes.slice();
 								// classList.push({class: "none", name: "Default", icon: "fa-times"});
 
 								var list = document.createElement("UL");
-								list.config = config.class[i];
+								list.config = groupConfig;
 								list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
 
 								list.setAttribute("data-type", "simply-buttongroup-radio");
@@ -265,8 +268,8 @@
 		// traverse up to see if we have a parent node that matches this selector; return that node if we do;
 		var tempNode = document.createElement("DIV");
 		tempNode.appendChild(node.cloneNode(true));
-
-		if (tempNode.querySelector(":scope > " + selector)) {
+		var query = ":scope > " + selector.replace(/,/, ', :scope >');
+		if (tempNode.querySelector(query)) {
 			return node;
 		} else if (node.parentNode && (node.parentNode != editor.node.getEditableField())) {
 			return findNode(node.parentNode, selector);
@@ -632,8 +635,7 @@
 				var hopeEditor = field.hopeEditor;
 				var sel = vdSelectionState.get();
 				var parent = vdSelection.getNode(sel);
-
-				selector = hope.render.html.rules.nestingSets.block.join(","); // default to blocks only
+				var selector;
 				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
 					selector = el.parentNode.parentNode.config.selector;
 				}
@@ -654,6 +656,7 @@
 					targetNode.removeAttribute("class");
 				}
 				hopeEditor.parseHTML();
+				editor.fireEvent("databinding:valuechanged", field);
 				editor.context.show();
 			},
 			'simply-text-inline' : function(el) {

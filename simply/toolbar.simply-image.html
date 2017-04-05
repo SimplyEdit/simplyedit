@@ -158,30 +158,33 @@
 			toolbar.data.title = (typeof imageData.title !== "undefined") ? imageData.title : '';
 			toolbar.data.src = ((typeof imageData.src == "undefined") || (imageData.src == editor.plugins.image.placeholder())) ? "" : imageData.src;
 
-			if (toolbar.querySelector(".simply-toolbar-section.simply-image-class ul")) {
+			var showClasses = false;
+			var imageClasses = toolbar.querySelectorAll(".simply-image-class [data-type=simply-buttongroup-radio]");
+			if (imageClasses) {
+				for (var i=0; i<imageClasses.length; i++) {
+					var selector = imageClasses[i].config.selector;
+					var node = findNode(image, selector);
+					if (node) {
+						imageClasses[i].style.display = "block";
+						showClasses = true;
+
+						var buttons = imageClasses[i].querySelectorAll("[data-value]");
+						toolbar.data.class[i] = '';
+						for (var j=0; j<buttons.length; j++) {
+							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
+								toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+							}
+						}
+					} else {
+						imageClasses[i].style.display = "none";
+					}
+				}
+			}
+
+			if (showClasses) {
 				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
 			} else {
 				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "none";
-			}
-
-			var imageClasses = toolbar.querySelectorAll(".simply-image-class [data-type=simply-buttongroup-radio]");
-			if (imageClasses) {
-				var tempNode;
-				if (annotation) {
-					tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
-				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
-					tempNode = hopeEditor.field;
-				}
-
-				for (var i=0; i<imageClasses.length; i++) {
-					var buttons = imageClasses[i].querySelectorAll("[data-value]");
-					toolbar.data.class[i] = '';
-					for (var j=0; j<buttons.length; j++) {
-						if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
-							toolbar.data.class[i] = buttons[j].getAttribute("data-value");
-						}
-					}
-				}
 			}
 
 			var alignClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
@@ -254,6 +257,8 @@
 					icons[i].className = currentIcon.className;
 				}
 			}
+
+
 		},
 		"init" : function(config) {
 			var toolbar = document.querySelector("#" + this.name);
@@ -265,10 +270,23 @@
 						if (config.class.length) {
 							classSections[i].innerHTML = '';
 							for (var j=0; j<config.class.length; j++) {
-								if (config.class[j].length) {
-									var classList = config.class[j].slice();
-									classList.push({class: "none", name: "Default", icon: "fa-times"});
+								var groupConfig = config.class[j];
+								if (groupConfig instanceof Array) {
+									groupConfig = {
+										classes : groupConfig,
+										description: "Image",
+										selector : ["img"]
+									};
+								}
+								if (!groupConfig.selector) {
+									groupConfig.selector = ["img"];
+								}
+								if (groupConfig.classes.length) {
+									var classList = groupConfig.classes.slice();
+									// classList.push({class: "none", name: "Default", icon: "fa-times"});
 									var list = document.createElement("UL");
+									list.config = groupConfig;
+									list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
 									list.setAttribute("data-type", "simply-buttongroup-radio");
 									for (var k=0; k<classList.length; k++) {
 										var item = document.createElement("li");
@@ -337,50 +355,40 @@
 		},
 		"actions" : {
 			'simply-image-class' : function(el) {
+				var sel = vdSelectionState.get();
+				var parent = vdSelection.getNode(sel);
 				var field = editor.context.hopeEditor.field;
 				var hopeEditor = field.hopeEditor;
+				var selector;
+				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
+					selector = el.parentNode.parentNode.config.selector;
+				} else {
+					selector = ["img"];
+				}
 
-				var range = hopeEditor.currentRange;
-				var annotation = hopeEditor.fragment.has(range, "img");
-				if (annotation) {
-					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
-					if (tempNode.classList.contains(el.getAttribute("data-value"))) {
-						tempNode.classList.remove(el.getAttribute("data-value"));
-					} else {
-						var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
-						for (var i=0; i<buttons.length; i++) {
-							tempNode.classList.remove(buttons[i].getAttribute("data-value"));
-						}
-						if (el.getAttribute("data-value") !== "none") {
-							tempNode.classList.add(el.getAttribute("data-value"));
-						}
-					}
-				
-					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+				var targetNode = findNode(parent, selector);
 
-					if (annotation.tag != "") {
-						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
-					}
-					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, newValue);
-					hopeEditor.update();
-					var imageNode = editor.plugins.image.reselect();
-					if (imageNode) {
-						editor.responsiveImages.initImage(imageNode);
-					}
-				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+				if (targetNode.classList.contains(el.getAttribute("data-value"))) {
+					targetNode.classList.remove(el.getAttribute("data-value"));
+				} else {
 					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
 					for (var i=0; i<buttons.length; i++) {
-						hopeEditor.field.classList.remove(buttons[i].getAttribute("data-value"));
+						targetNode.classList.remove(buttons[i].getAttribute("data-value"));
 					}
 					if (el.getAttribute("data-value") !== "none") {
-						hopeEditor.field.classList.add(el.getAttribute("data-value"));
+						targetNode.classList.add(el.getAttribute("data-value"));
 					}
-					editor.responsiveImages.initImage(hopeEditor.field);
-					hopeEditor.update();
-					hopeEditor.field.focus();
-					editor.plugins.image.reselect();
-					editor.context.update();
 				}
+				if (targetNode.className == "") {
+					targetNode.removeAttribute("class");
+				}
+				hopeEditor.parseHTML();
+				var imageNode = editor.plugins.image.reselect();
+				if (imageNode) {
+					editor.responsiveImages.initImage(imageNode);
+				}
+				editor.fireEvent("databinding:valuechanged", field);
+				editor.context.show();
 			},
 			"simply-image-delete" : function() {
 				var field = editor.context.hopeEditor.field;
@@ -513,14 +521,37 @@
 			toolbar.data.title = (typeof imageData.title !== "undefined") ? imageData.title : '';
 			toolbar.data.src = ((typeof imageData.src == "undefined") || (imageData.src == editor.plugins.image.placeholder())) ? "" : imageData.src;
 
-			if (toolbar.querySelector(".simply-toolbar-section.simply-image-class ul")) {
+			var showClasses = false;
+			var imageClasses = toolbar.querySelectorAll(".simply-image-class [data-type=simply-buttongroup-radio]");
+			if (imageClasses) {
+				for (var i=0; i<imageClasses.length; i++) {
+					var selector = imageClasses[i].config.selector;
+					var node = findNode(image, selector);
+					if (node) {
+						imageClasses[i].style.display = "block";
+						showClasses = true;
+
+						var buttons = imageClasses[i].querySelectorAll("[data-value]");
+						toolbar.data.class[i] = '';
+						for (var j=0; j<buttons.length; j++) {
+							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
+								toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+							}
+						}
+					} else {
+						imageClasses[i].style.display = "none";
+					}
+				}
+			}
+
+			if (showClasses) {
 				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
 			} else {
 				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "none";
 			}
 
-			var imageClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio], .simply-image-class [data-type=simply-buttongroup-radio]");
-			if (imageClasses) {
+			var alignClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
+			if (alignClasses) {
 				var tempNode;
 				if (annotation) {
 					tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
@@ -528,18 +559,16 @@
 					tempNode = hopeEditor.field;
 				}
 
-				for (var i=0; i<imageClasses.length; i++) {
-					toolbar.data.class[i] = '';
-					var buttons = imageClasses[i].querySelectorAll("[data-value]");
-					toolbar.data.class[i] = '';
+				for (var i=0; i<alignClasses.length; i++) {
+					var buttons = alignClasses[i].querySelectorAll("[data-value]");
+					toolbar.data.align[i] = '';
 					for (var j=0; j<buttons.length; j++) {
 						if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
-							toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+							toolbar.data.align[i] = buttons[j].getAttribute("data-value");
 						}
 					}
 				}
 			}
-
 
 			// Set the parent icon for alignment as well;
 			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
