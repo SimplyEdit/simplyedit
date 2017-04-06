@@ -219,6 +219,10 @@
 					case 13:	// enter
 						// this forces the text into structured paragraphs/headings, so that firefox will behave more sanely with inserting breaks
 						addParagraphs(event.target.childNodes);
+						var simplyParent = editor.node.getSimplyParent(event.target);
+						if (simplyParent && simplyParent.hopeEditor) {
+							simplyParent.hopeEditor.needsUpdate = true;
+						}
 						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
 					break;
 				}

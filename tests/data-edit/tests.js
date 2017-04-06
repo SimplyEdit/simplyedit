@@ -1106,6 +1106,33 @@ QUnit.module("custom text settings");
 		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, 'blockquote');
 	});
+	QUnit.test("deprecated class config still works", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<p class='red highlight'>Hello world<p>";
+		testContent.hopeEditor.parseHTML();
+		var textSettings={
+			'block': [
+				{tag: 'h1', name: 'Heading 1'},
+				{tag: 'p', name: 'Paragraph'},
+			],
+			'class' : [
+				[
+					{class : 'highlight', name : 'Highlight', icon : 'fa-sun-o'},
+					{class : 'lowlight', name : 'Lowlight', icon : 'fa-moon-o'}
+				],
+				[
+					{class : 'red', name : 'Red', icon : 'fa-paint-brush'},
+					{class : 'green', name : 'Green', icon : 'fa-paint-brush'},
+					{class : 'blue', name : 'Blue', icon : 'fa-paint-brush'}
+				]
+			]
+		};
+		editor.toolbars['simply-text-cursor'].init(textSettings);
+
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+		var redButton = document.querySelector("#simply-text-cursor button[data-simply-action='simply-text-class'][data-value='red']");
+		assert.ok(redButton.className.indexOf("simply-selected") > -1, "red class button is pressed");
+	});
 /*
 	// FIXME: Decide if this is breaking 'by design';
 	QUnit.test("paragraph with class is found", function(assert) {
