@@ -133,6 +133,7 @@
 				for (var i=0; i<dataSources.length; i++) {
 					editor.list.get(dataSources[i]);
 				}
+				editor.fireEvent("simply-stashed", document);
 			},
 			stringify : function(data) {
 				var jsonData = JSON.stringify(data, null, "\t");
