@@ -1226,9 +1226,12 @@
 				if (typeof data === "undefined") {
 					return;
 				}
-				window.setTimeout(function() {
-					editor.fireEvent("selectionchange", document); // fire this after we're done. Using settimeout so it will run afterwards.
-				}, 0);
+				if (!editor.selectionchangeTimer) {
+					editor.selectionchangeTimer = window.setTimeout(function() {
+						editor.fireEvent("selectionchange", document); // fire this after we're done. Using settimeout so it will run afterwards.
+						editor.selectionchangeTimer = false;
+					}, 0);
+				}
 				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
