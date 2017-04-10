@@ -265,7 +265,7 @@
 			if (typeof config === "object" && toolbar) {
 				// Init block classes
 				if (config.class) {
-					var classSections = document.querySelectorAll('div.simply-toolbar-section.simply-image-class');
+					var classSections = toolbar.querySelectorAll('div.simply-toolbar-section.simply-image-class');
 					for (var i=0; i<classSections.length; i++) {
 						if (config.class.length) {
 							classSections[i].innerHTML = '';
@@ -587,27 +587,39 @@
 			if (typeof config === "object" && toolbar) {
 				// Init block classes
 				if (config.class) {
-					var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-image-class');
-					if (classSection) {
+					var classSections = toolbar.querySelectorAll('div.simply-toolbar-section.simply-image-class');
+					for (var i=0; i<classSections.length; i++) {
 						if (config.class.length) {
-							classSection.innerHTML = '';
-							for (var i=0; i<config.class.length; i++) {
-								if (config.class[i].length) {
-									var classList = config.class[i].slice();
-									classList.push({class: "none", name: "Default", icon: "fa-times"});
+							classSections[i].innerHTML = '';
+							for (var j=0; j<config.class.length; j++) {
+								var groupConfig = config.class[j];
+								if (groupConfig instanceof Array) {
+									groupConfig = {
+										classes : groupConfig,
+										description: "Image",
+										selector : ["img"]
+									};
+								}
+								if (!groupConfig.selector) {
+									groupConfig.selector = ["img"];
+								}
+								if (groupConfig.classes.length) {
+									var classList = groupConfig.classes.slice();
+									// classList.push({class: "none", name: "Default", icon: "fa-times"});
 									var list = document.createElement("UL");
+									list.config = groupConfig;
+									list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
 									list.setAttribute("data-type", "simply-buttongroup-radio");
-									for (var j=0; j<classList.length; j++) {
+									for (var k=0; k<classList.length; k++) {
 										var item = document.createElement("li");
 										var button = document.createElement("button");
-										button.setAttribute("data-value", classList[j].class);
+										button.setAttribute("data-value", classList[k].class);
 										button.setAttribute("data-simply-action", "simply-image-class");
-										button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+										button.innerHTML = "<i class='fa " + classList[k].icon + "'></i>" + classList[k].name;
 										item.appendChild(button);
 										list.appendChild(item);
 									}
-
-									classSection.appendChild(list);
+									classSections[i].appendChild(list);
 								}
 							}
 						}
