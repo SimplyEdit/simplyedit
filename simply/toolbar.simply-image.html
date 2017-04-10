@@ -163,7 +163,7 @@
 			if (imageClasses) {
 				for (var i=0; i<imageClasses.length; i++) {
 					var selector = imageClasses[i].config.selector;
-					var node = findNode(image, selector);
+					var node = editor.node.findClassNode(image, selector);
 					if (node) {
 						imageClasses[i].style.display = "block";
 						showClasses = true;
@@ -366,7 +366,7 @@
 					selector = ["img"];
 				}
 
-				var targetNode = findNode(parent, selector);
+				var targetNode = editor.node.findClassNode(parent, selector);
 
 				if (targetNode.classList.contains(el.getAttribute("data-value"))) {
 					targetNode.classList.remove(el.getAttribute("data-value"));

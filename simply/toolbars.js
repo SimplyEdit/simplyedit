@@ -494,6 +494,29 @@
 				.replace(/>/g, "&gt;")
 				.replace(/"/g, "&quot;")
 				.replace(/'/g, "&#039;");
+		},
+		findClassNode : function(node, selector) {
+			// Helper function to find the node for a class
+			// selector; It searches starting on the given node
+			// and goes upwards to find the specific node; Only
+			// parents of the starting node are valid results;
+
+			if (!selector) {
+				selector = hope.render.html.rules.nestingSets.block.join(","); // default to blocks only
+			}
+			var parents = editor.node.parents(node);
+			var query = ":scope > " + selector.replace(/,/, ', :scope >');
+			for (var i=0; i<parents.length; i++) {
+				if (!(parents[i].isSimplyParent && parents[i].hasSimplyParent)) {
+					var targets = parents[i].querySelectorAll(query);
+					for (var j=0; j<targets.length; j++) {
+						if (parents.indexOf(targets[j]) > -1) {
+							return targets[j];
+						}
+					}
+				}
+			}
+			return false;
 		}
 	};
 
