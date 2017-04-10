@@ -224,7 +224,7 @@
 							if (editor.storage.connect()) {
 								editor.editmode.init();
 								var checkHope = function() {
-									if (typeof hope !== "undefined") {
+									if (typeof hope !== "undefined" && document.getElementById("simply-main-toolbar")) {
 										editor.editmode.makeEditable(document);
 									} else {
 										window.setTimeout(checkHope, 100);
@@ -1463,6 +1463,10 @@
 				}
 
 				http.open("GET", url, true);
+				http.onerror = function() {
+					alert("Unable to load SimplyEdit, please check that your API key is valid for this domain.");
+				};
+
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
 						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
@@ -1499,6 +1503,13 @@
 							for (i=0; i<newToolbars.length; i++) {
 								editor.toolbar.init(newToolbars[i]);
 							}
+						} else if (http.status === 0) {
+							console.log("Toolbar load got status 0, XHR probably failed because of an invalid API key.");
+							var editorCss = document.head.querySelector("link[href='" + editor.baseURL + "simply/css/editor.v9.css" + "']");
+							if (editorCss) {
+								editorCss.parentNode.removeChild(editorCss);
+							}
+							return;
 						} else {
 							console.log("Warning: toolbar did not load.");
 						}
