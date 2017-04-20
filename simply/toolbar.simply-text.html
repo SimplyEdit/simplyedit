@@ -2,13 +2,13 @@
 	<h1>*HTML Toolbar for Text Cursor*</h1>
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
-			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
-			<li><button data-simply-section="simply-text-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
+			<li><button data-simply-section="simply-text-textstyle" class="simply-expands"><i class="fa fa-magic"></i>Text</button></li>
+			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
 			<li><button data-simply-section="simply-text-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-insert" class="simply-expands"><i class="fa fa-plus"></i>Insert</button></li>
 			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
 		</ul>
-		<div class="simply-toolbar-section simply-text-style">
+		<div class="simply-toolbar-section simply-text-textstyle">
 			<ul>
 				<li class="simply-text-format"><select data-simply-action="simply-text-blockstyle">
 					<option value="h1">Heading 1</option>
@@ -27,7 +27,7 @@
 				<li><button data-simply-action="simply-text-inline" data-value="code"><i class="fa fa-code"></i>[Code]</button></li>
 			</ul>
 		</div>
-		<div class="simply-toolbar-section simply-text-class">
+		<div class="simply-toolbar-section simply-text-style">
 		</div>
 		<div class="simply-toolbar-section simply-text-align">
 			<ul data-type="simply-buttongroup-radio">
@@ -50,14 +50,14 @@
 	<h1>*HTML Toolbar for Text Selection*</h1>
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
-			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-magic"></i>Style</button></li>
-			<li><button data-simply-section="simply-text-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
+			<li><button data-simply-section="simply-text-textstyle" class="simply-expands"><i class="fa fa-magic"></i>Text</button></li>
+			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
 			<li><button data-simply-section="simply-text-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
 			<li><button data-simply-section="simply-insert" class="simply-expands"><i class="fa fa-plus"></i>Insert</button></li>
 			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
 		</ul>
-		<div class="simply-toolbar-section simply-text-style">
+		<div class="simply-toolbar-section simply-text-textstyle">
 			<ul>
 				<li class="simply-text-format"><select data-simply-action="simply-text-blockstyle">
 					<option value="h1">Heading 1</option>
@@ -76,7 +76,7 @@
 				<li><button data-simply-action="simply-text-inline" data-value="code"><i class="fa fa-code"></i>[Code]</button></li>
 			</ul>
 		</div>
-		<div class="simply-toolbar-section simply-text-class">
+		<div class="simply-toolbar-section simply-text-style">
 		</div>
 		<div class="simply-toolbar-section simply-hyperlink">
 			<div><label>URL</label><input type="text" id="vdHyperlinkHref" data-simply-action="simply-hyperlink-href"></div>
@@ -169,43 +169,61 @@
 				}
 			}
 
-			// Init block classes
-			if (config.class) {
-				var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-text-class');
-				if (classSection) {
-					if (config.class.length) {
-						classSection.innerHTML = '';
-						for (var i=0; i<config.class.length; i++) {
-							var groupConfig = config.class[i];
+			// Backwards compatibility for classes/styles
+			if (config.class && !config.style) {
+				console.log("Warning: the classes configuration was changed in version 1.15; Please update your configuration.");
+				config.style = config.class;
+				if (config.style.length) {
+					for (var i=0; i<config.style.length; i++) {
+						if (config.style[i].classes) {
+							config.style[i].styles = config.style[i].classes;
+						}
+					}
+				}
+			}
+
+			// Init block styles
+			if (config.style) {
+				var styleSection = toolbar.querySelector('div.simply-toolbar-section.simply-text-style');
+				if (styleSection) {
+					if (config.style.length) {
+						styleSection.innerHTML = '';
+						for (var i=0; i<config.style.length; i++) {
+							var groupConfig = config.style[i];
 							if (groupConfig instanceof Array) {
 								groupConfig = {
-									classes : groupConfig,
+									styles : groupConfig,
 									description : "Block"
 								};
 							}
 							if (!groupConfig.selector) {
 								groupConfig.selector = hope.render.html.rules.nestingSets.block.join(","); // default to blocks only
 							}
-							if (groupConfig.classes.length) {
-								var classList = groupConfig.classes.slice();
-								// classList.push({class: "none", name: "Default", icon: "fa-times"});
+							if (groupConfig.styles.length) {
+								var styleList = groupConfig.styles.slice();
+								// styleList.push({class: "none", name: "Default", icon: "fa-times"});
 
 								var list = document.createElement("UL");
 								list.config = groupConfig;
 								list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
 
 								list.setAttribute("data-type", "simply-buttongroup-radio");
-								for (var j=0; j<classList.length; j++) {
+								for (var j=0; j<styleList.length; j++) {
 									var item = document.createElement("li");
 									var button = document.createElement("button");
-									button.setAttribute("data-value", classList[j].class);	
-									button.setAttribute("data-simply-action", "simply-text-class");
-									button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+									if (styleList[j].class) {
+										button.setAttribute("data-value", styleList[j].class);
+										button.setAttribute("data-simply-action", "simply-text-class");
+									} else if (styleList[j].attribute) {
+										button.setAttribute("data-value", Object.keys(styleList[j].attribute)[0]);
+										button.attributeValue = styleList[j].attribute;
+										button.setAttribute("data-simply-action", "simply-text-attribute");
+									}
+									button.innerHTML = "<i class='fa " + styleList[j].icon + "'></i>" + styleList[j].name;
 									item.appendChild(button);
 									list.appendChild(item);
 								}
-
-								classSection.appendChild(list);
+								styleSection.appendChild(list);
 							}
 						}
 					}
@@ -231,11 +249,11 @@
 		toolbar.data.align = '';
 		editor.toolbar.bindButtonGroup(toolbar.data, 'align', toolbar.querySelector("div.simply-text-align [data-type=simply-buttongroup-radio]"));
 
-		// Classes
-		toolbar.data.class = [];
-		var classGroups = toolbar.querySelectorAll("div.simply-text-class [data-type=simply-buttongroup-radio]");
-		for (var i=0; i<classGroups.length; i++) {
-			editor.toolbar.bindButtonGroup(toolbar.data.class, i, classGroups[i]);
+		// Styles
+		toolbar.data.style = [];
+		var styleGroups = toolbar.querySelectorAll("div.simply-text-style [data-type=simply-buttongroup-radio]");
+		for (var i=0; i<styleGroups.length; i++) {
+			editor.toolbar.bindButtonGroup(toolbar.data.style, i, styleGroups[i]);
 		}
 
 		toolbar.data.hyperlink = {
@@ -268,7 +286,7 @@
 		if (!hopeEditor) {
 			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
 
-			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "none";
+			toolbar.querySelector("[data-simply-section='simply-text-textstyle']").parentNode.style.display = "none";
 			toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "none";
 			if (toolbar.querySelector("[data-simply-section='simply-hyperlink']")) {
 				toolbar.querySelector("[data-simply-section='simply-hyperlink']").parentNode.style.display = "none";
@@ -329,10 +347,10 @@
 
 			// Check fixed content;
 			if (field.getAttribute("data-simply-content") == "fixed") {
-				toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "none";
+				toolbar.querySelector("[data-simply-section='simply-text-textstyle']").parentNode.style.display = "none";
 				toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "none";
 			} else {
-				toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "block";
+				toolbar.querySelector("[data-simply-section='simply-text-textstyle']").parentNode.style.display = "block";
 				toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "block";
 			}
 
@@ -403,33 +421,42 @@
 			}
 		}
 
-		var showClasses = false;
-		var textClasses = toolbar.querySelectorAll(".simply-text-class [data-type=simply-buttongroup-radio]");
-		if (textClasses) {
-			for (var i=0; i<textClasses.length; i++) {
-				var selector = textClasses[i].config.selector;
+		var showStyles = false;
+		var textStyles = toolbar.querySelectorAll(".simply-text-style [data-type=simply-buttongroup-radio]");
+		if (textStyles) {
+			for (var i=0; i<textStyles.length; i++) {
+				var selector = textStyles[i].config.selector;
 				var node = editor.node.findClassNode(parent, selector);
 				if (node) {
-					textClasses[i].style.display = "block";
-					showClasses = true;
+					textStyles[i].style.display = "block";
+					showStyles = true;
 
-					toolbar.data.class[i] = '';
-					var buttons = textClasses[i].querySelectorAll("[data-value]");
+					toolbar.data.style[i] = '';
+					var buttons = textStyles[i].querySelectorAll("[data-value]");
 					for (var j=0; j<buttons.length; j++) {
-						if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
-							toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+						if (buttons[j].getAttribute("data-simply-action") == "simply-text-class") {
+							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
+								toolbar.data.style[i] = buttons[j].getAttribute("data-value");
+							}
+						} else if (buttons[j].getAttribute("data-simply-action") == "simply-text-attribute") {
+							var attrName = buttons[j].getAttribute("data-value");
+							var attrValue = buttons[j].attributeValue[attrName];
+
+							if (node.getAttribute(attrName) == attrValue) {
+								toolbar.data.style[i] = buttons[j].attributeValue; // buttons[j].getAttribute("data-value");
+							}
 						}
 					}
 				} else {
-					textClasses[i].style.display = "none";
+					textStyles[i].style.display = "none";
 				}
 			}
 		}
 
-		if (showClasses) {
-			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "block";
+		if (showStyles) {
+			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "block";
 		} else {
-			toolbar.querySelector("[data-simply-section='simply-text-class']").parentNode.style.display = "none";
+			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "none";
 		}
 
 		return true;
@@ -636,6 +663,35 @@
 				}
 				if (targetNode.className == "") {
 					targetNode.removeAttribute("class");
+				}
+				hopeEditor.parseHTML();
+				editor.fireEvent("databinding:valuechanged", field);
+				editor.context.show();
+			},
+			'simply-text-attribute' : function(el) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				var sel = vdSelectionState.get();
+				var parent = vdSelection.getNode(sel);
+				var selector;
+				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
+					selector = el.parentNode.parentNode.config.selector;
+				}
+
+				var targetNode = editor.node.findClassNode(parent, selector);
+				var attrName = el.getAttribute("data-value");
+				var attrValue = el.attributeValue[attrName];
+
+				if (targetNode.getAttribute(attrName) == attrValue) {
+					targetNode.removeAttribute(el.getAttribute("data-value"));
+				} else {
+					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
+					for (var i=0; i<buttons.length; i++) {
+						targetNode.removeAttribute(attrName);
+					}
+					if (el.getAttribute(attrName) !== "none") {
+						targetNode.setAttribute(attrName, attrValue);
+					}
 				}
 				hopeEditor.parseHTML();
 				editor.fireEvent("databinding:valuechanged", field);

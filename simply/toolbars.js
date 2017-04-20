@@ -178,15 +178,25 @@
 					var values = this.querySelectorAll("button");
 					for (var i=0; i<values.length; i++) {
 						values[i].classList.remove("simply-selected");
-						if (values[i].getAttribute("data-value") == value) {
-							values[i].classList.add("simply-selected");
+						if (values[i].attributeValue) {
+							if (JSON.stringify(values[i].attributeValue) == JSON.stringify(value)) {
+								values[i].classList.add("simply-selected");
+							}
+						} else {
+							if (values[i].getAttribute("data-value") == value) {
+								values[i].classList.add("simply-selected");
+							}
 						}
 					}
 				},
 				getter : function() {
 					var value = this.querySelector("button.simply-selected");
 					if (value) {
-						return value.getAttribute("data-value");
+						if (value.attributeValue) {
+							return value.attributeValue;
+						} else {
+							return value.getAttribute("data-value");
+						}
 					} else {
 						return '';
 					}
@@ -194,7 +204,9 @@
 				resolve : function(key, value, oldValue) {
 					if (!editor.toolbar.updating && (value != oldValue)) {
 						if (this.elements[0]) {
-							muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
+							if (this.elements[0].querySelector("button.simply-selected")) {
+								muze.event.fire(this.elements[0].querySelector("button.simply-selected"), "click");
+							}
 						}
 					}
 				},
