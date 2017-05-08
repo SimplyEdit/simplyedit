@@ -1038,12 +1038,29 @@
 						field.contentEditable = true;
 					}
 				},
-				"input[type=text],input:not([type]),input[type=hidden],textarea" : {
+				"input[type=text],input:not([type]),input[type=hidden],textarea,input[type=number]" : {
 					get : function(field) {
 						return field.value;
 					},
 					set : function(field, data) {
 						field.value = data;
+					}
+				},
+				"input[type=radio]" : {
+					get : function(field) {
+						if (field.checked) {
+							return field.value;
+						} else {
+							return field.simplyData;
+						}
+					},
+					set : function(field, data) {
+						if (data == field.value) {
+							field.checked = true;
+						} else {
+							field.checked = false;
+						}
+						field.simplyData = data;
 					}
 				},
 				"input[type=checkbox]" : {
@@ -1058,6 +1075,63 @@
 							field.checked = true;
 						} else {
 							field.checked = false;
+						}
+					}
+				},
+				"select:not([multiple])" : {
+					get : function(field) {
+						return field.value;
+					},
+					set : function(field, data) {
+						field.simplyValue = data; // keep the value, for async options that are loaded via dataSources;
+						field.value = data;
+						var options = field.querySelectorAll("option");
+						for (var i=0; i<options.length; i++) {
+							if (options[i].value == field.value) {
+								options[i].selected = true;
+								options[i].setAttribute("selected", true);
+							} else {
+								options[i].selected = false;
+								options[i].removeAttribute("selected");
+							}
+						}
+					}
+				},
+				"select[multiple]" : {
+					get : function(field) {
+						var result = [];
+						var selected = field.selectedOptions;
+						for (var i=0; i<selected.length; i++) {
+							result.push(selected[i].value);
+						}
+						return result;
+					},
+					set : function(field, data) {
+						field.simplyValue = data; // keep the value, for async options that are loaded via dataSources;
+						var options = field.querySelectorAll("option");
+						for (var i=0; i<options.length; i++) {
+							if (data.indexOf(options[i].value) > -1) {
+								options[i].selected = true;
+								options[i].setAttribute("selected", true);
+							} else {
+								options[i].selected = false;
+								options[i].removeAttribute("selected");
+							}
+						}
+					}
+				},
+				"option" : {
+					get : function(field) {
+						return field.value;
+					},
+					set : function(field, data) {
+						if (typeof data === "string") {
+							if (field.getAttribute("data-simply-content") != "fixed") {
+								field.innerHTML = data;
+							}
+							field.value = data;
+						} else {
+							editor.field.defaultSetter(field, data);
 						}
 					}
 				},
