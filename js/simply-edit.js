@@ -136,6 +136,7 @@
 				for (var i=0; i<dataSources.length; i++) {
 					editor.list.get(dataSources[i]);
 				}
+				editor.fireEvent("simply-stashed", document);
 			},
 			stringify : function(data) {
 				var jsonData = JSON.stringify(data, null, "\t");
@@ -227,7 +228,7 @@
 							if (editor.storage.connect()) {
 								editor.editmode.init();
 								var checkHope = function() {
-									if (typeof hope !== "undefined") {
+									if (typeof hope !== "undefined" && document.getElementById("simply-main-toolbar")) {
 										editor.editmode.makeEditable(document);
 									} else {
 										window.setTimeout(checkHope, 100);
@@ -489,9 +490,9 @@
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				var subLists;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE || !target.parentNode) {
-					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field] [data-simply-list]");
+					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content^='attributes:']) [data-simply-list]");
 				} else {
-					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field] [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content^='attributes:']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
 				for (var i=0; i<dataLists.length; i++) {
 					var isSub = false;
@@ -1037,12 +1038,29 @@
 						field.contentEditable = true;
 					}
 				},
-				"input[type=text],input:not([type]),input[type=hidden],textarea" : {
+				"input[type=text],input:not([type]),input[type=hidden],textarea,input[type=number]" : {
 					get : function(field) {
 						return field.value;
 					},
 					set : function(field, data) {
 						field.value = data;
+					}
+				},
+				"input[type=radio]" : {
+					get : function(field) {
+						if (field.checked) {
+							return field.value;
+						} else {
+							return field.simplyData;
+						}
+					},
+					set : function(field, data) {
+						if (data == field.value) {
+							field.checked = true;
+						} else {
+							field.checked = false;
+						}
+						field.simplyData = data;
 					}
 				},
 				"input[type=checkbox]" : {
@@ -1057,6 +1075,63 @@
 							field.checked = true;
 						} else {
 							field.checked = false;
+						}
+					}
+				},
+				"select:not([multiple])" : {
+					get : function(field) {
+						return field.value;
+					},
+					set : function(field, data) {
+						field.simplyValue = data; // keep the value, for async options that are loaded via dataSources;
+						field.value = data;
+						var options = field.querySelectorAll("option");
+						for (var i=0; i<options.length; i++) {
+							if (options[i].value == field.value) {
+								options[i].selected = true;
+								options[i].setAttribute("selected", true);
+							} else {
+								options[i].selected = false;
+								options[i].removeAttribute("selected");
+							}
+						}
+					}
+				},
+				"select[multiple]" : {
+					get : function(field) {
+						var result = [];
+						var selected = field.selectedOptions;
+						for (var i=0; i<selected.length; i++) {
+							result.push(selected[i].value);
+						}
+						return result;
+					},
+					set : function(field, data) {
+						field.simplyValue = data; // keep the value, for async options that are loaded via dataSources;
+						var options = field.querySelectorAll("option");
+						for (var i=0; i<options.length; i++) {
+							if (data.indexOf(options[i].value) > -1) {
+								options[i].selected = true;
+								options[i].setAttribute("selected", true);
+							} else {
+								options[i].selected = false;
+								options[i].removeAttribute("selected");
+							}
+						}
+					}
+				},
+				"option" : {
+					get : function(field) {
+						return field.value;
+					},
+					set : function(field, data) {
+						if (typeof data === "string") {
+							if (field.getAttribute("data-simply-content") != "fixed") {
+								field.innerHTML = data;
+							}
+							field.value = data;
+						} else {
+							editor.field.defaultSetter(field, data);
 						}
 					}
 				},
@@ -1079,6 +1154,29 @@
 					},
 					makeEditable : function(field) {
 						return true;
+					}
+				},
+				"[data-simply-content^='attributes:']" : {
+					get : function(field) {
+						var attributes = field.getAttribute("data-simply-content").split(":")[1].split(",");
+						var result = editor.field.defaultGetter(field, attributes);
+						if (field.simplyString && (attributes.length === 1)) {
+							return result[attributes[0]];
+						}
+						return result;
+					},
+					set : function(field, data) {
+						var attributes = field.getAttribute("data-simply-content").split(":")[1].split(",");
+						if (typeof data == "string") {
+							field.simplyString = true;
+							var value = {};
+							value[attributes[0]] = data;
+							data = value;
+						}
+						return editor.field.defaultSetter(field, data);
+					},
+					makeEditable : function(field) {
+						field.setAttribute("data-simply-selectable", true);
 					}
 				}
 			},
@@ -1228,9 +1326,12 @@
 				if (typeof data === "undefined") {
 					return;
 				}
-				window.setTimeout(function() {
-					editor.fireEvent("selectionchange", document); // fire this after we're done. Using settimeout so it will run afterwards.
-				}, 0);
+				if (!editor.selectionchangeTimer) {
+					editor.selectionchangeTimer = window.setTimeout(function() {
+						editor.fireEvent("selectionchange", document); // fire this after we're done. Using settimeout so it will run afterwards.
+						editor.selectionchangeTimer = false;
+					}, 0);
+				}
 				var setter;
 				for (var i in editor.field.fieldTypes) {
 					if (editor.field.matches(field, i)) {
@@ -1466,6 +1567,10 @@
 				}
 
 				http.open("GET", url, true);
+				http.onerror = function() {
+					alert("Unable to load SimplyEdit, please check that your API key is valid for this domain.");
+				};
+
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
 						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
@@ -1502,6 +1607,13 @@
 							for (i=0; i<newToolbars.length; i++) {
 								editor.toolbar.init(newToolbars[i]);
 							}
+						} else if (http.status === 0) {
+							console.log("Toolbar load got status 0, XHR probably failed because of an invalid API key.");
+							var editorCss = document.head.querySelector("link[href='" + editor.baseURL + "simply/css/editor.v9.css" + "']");
+							if (editorCss) {
+								editorCss.parentNode.removeChild(editorCss);
+							}
+							return;
 						} else {
 							console.log("Warning: toolbar did not load.");
 						}

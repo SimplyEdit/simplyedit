@@ -2,14 +2,14 @@
 	<h1>HTML Image Toolbar</h1>
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
-			<li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
+			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
 			<li><button data-simply-section="simply-image-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
 			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
 			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
 			<li><button data-simply-section="simply-code" data-simply-action="simply-edit-source"><i class="fa fa-code"></i>Code</button></li>
 			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
 		</ul>
-		<div class="simply-toolbar-section simply-image-class">
+		<div class="simply-toolbar-section simply-image-style">
 		</div>
 		<div class="simply-toolbar-section simply-image-align">
 			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
@@ -45,10 +45,10 @@
 	<h1>HTML Image Toolbar</h1>
 	<div class="simply-toolbar">
 		<ul class="simply-buttons">
-			<li><button data-simply-section="simply-image-class" class="simply-expands"><i class="fa fa-paint-brush"></i>Class</button></li>
+			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
 			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
 		</ul>
-		<div class="simply-toolbar-section simply-image-class">
+		<div class="simply-toolbar-section simply-image-style">
 		</div>
 		<div class="simply-toolbar-section simply-image-properties">
 			<div><label>URL</label><input type="text" class="simply-image-src" data-simply-action="simply-image-src"></div>
@@ -158,33 +158,33 @@
 			toolbar.data.title = (typeof imageData.title !== "undefined") ? imageData.title : '';
 			toolbar.data.src = ((typeof imageData.src == "undefined") || (imageData.src == editor.plugins.image.placeholder())) ? "" : imageData.src;
 
-			var showClasses = false;
-			var imageClasses = toolbar.querySelectorAll(".simply-image-class [data-type=simply-buttongroup-radio]");
-			if (imageClasses) {
-				for (var i=0; i<imageClasses.length; i++) {
-					var selector = imageClasses[i].config.selector;
-					var node = findNode(image, selector);
+			var showStyles = false;
+			var imageStyles = toolbar.querySelectorAll(".simply-image-style [data-type=simply-buttongroup-radio]");
+			if (imageStyles) {
+				for (var i=0; i<imageStyles.length; i++) {
+					var selector = imageStyles[i].config.selector;
+					var node = editor.node.findClassNode(image, selector);
 					if (node) {
-						imageClasses[i].style.display = "block";
-						showClasses = true;
+						imageStyles[i].style.display = "block";
+						showStyles = true;
 
-						var buttons = imageClasses[i].querySelectorAll("[data-value]");
-						toolbar.data.class[i] = '';
+						var buttons = imageStyles[i].querySelectorAll("[data-value]");
+						toolbar.data.style[i] = '';
 						for (var j=0; j<buttons.length; j++) {
 							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
-								toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+								toolbar.data.style[i] = buttons[j].getAttribute("data-value");
 							}
 						}
 					} else {
-						imageClasses[i].style.display = "none";
+						imageStyles[i].style.display = "none";
 					}
 				}
 			}
 
-			if (showClasses) {
-				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
+			if (showStyles) {
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "block";
 			} else {
-				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "none";
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "none";
 			}
 
 			var alignClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
@@ -263,41 +263,54 @@
 		"init" : function(config) {
 			var toolbar = document.querySelector("#" + this.name);
 			if (typeof config === "object" && toolbar) {
-				// Init block classes
-				if (config.class) {
-					var classSections = document.querySelectorAll('div.simply-toolbar-section.simply-image-class');
-					for (var i=0; i<classSections.length; i++) {
-						if (config.class.length) {
-							classSections[i].innerHTML = '';
-							for (var j=0; j<config.class.length; j++) {
-								var groupConfig = config.class[j];
+				// Backwards compatibility for classes/styles
+				if (config.class && !config.style) {
+					console.log("Warning: the classes configuration was changed in version 1.15; Please update your configuration.");
+					config.style = config.class;
+					if (config.style.length) {
+						for (var i=0; i<config.style.length; i++) {
+							if (config.style[i].classes) {
+								config.style[i].styles = config.style[i].classes;
+							}
+						}
+					}
+				}
+
+				// Init block styles
+				if (config.style) {
+					var styleSections = toolbar.querySelectorAll('div.simply-toolbar-section.simply-image-style');
+					for (var i=0; i<styleSections.length; i++) {
+						if (config.style.length) {
+							styleSections[i].innerHTML = '';
+							for (var j=0; j<config.style.length; j++) {
+								var groupConfig = config.style[j];
 								if (groupConfig instanceof Array) {
 									groupConfig = {
-										classes : groupConfig,
+										styles : groupConfig,
 										description: "Image",
-										selector : ["img"]
+										selector : "img"
 									};
 								}
 								if (!groupConfig.selector) {
-									groupConfig.selector = ["img"];
+									groupConfig.selector = "img";
 								}
-								if (groupConfig.classes.length) {
-									var classList = groupConfig.classes.slice();
-									// classList.push({class: "none", name: "Default", icon: "fa-times"});
+								if (groupConfig.styles.length) {
+									var styleList = groupConfig.styles.slice();
+									// styleList.push({class: "none", name: "Default", icon: "fa-times"});
 									var list = document.createElement("UL");
 									list.config = groupConfig;
 									list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
 									list.setAttribute("data-type", "simply-buttongroup-radio");
-									for (var k=0; k<classList.length; k++) {
+									for (var k=0; k<styleList.length; k++) {
 										var item = document.createElement("li");
 										var button = document.createElement("button");
-										button.setAttribute("data-value", classList[k].class);
+										button.setAttribute("data-value", styleList[k].class);
 										button.setAttribute("data-simply-action", "simply-image-class");
-										button.innerHTML = "<i class='fa " + classList[k].icon + "'></i>" + classList[k].name;
+										button.innerHTML = "<i class='fa " + styleList[k].icon + "'></i>" + styleList[k].name;
 										item.appendChild(button);
 										list.appendChild(item);
 									}
-									classSections[i].appendChild(list);
+									styleSections[i].appendChild(list);
 								}
 							}
 						}
@@ -325,11 +338,11 @@
 			editor.toolbar.bindInput(toolbar.data, "alt", toolbar.querySelector(".simply-image-alt"));
 			editor.toolbar.bindInput(toolbar.data, "title", toolbar.querySelector(".simply-image-title"));
 
-			// Classes
-			toolbar.data.class = [];
-			var classGroups = toolbar.querySelectorAll("div.simply-image-class [data-type=simply-buttongroup-radio]");
-			for (var i=0; i<classGroups.length; i++) {
-				editor.toolbar.bindButtonGroup(toolbar.data.class, i, classGroups[i]);
+			// Styles
+			toolbar.data.style = [];
+			var styleGroups = toolbar.querySelectorAll("div.simply-image-style [data-type=simply-buttongroup-radio]");
+			for (var i=0; i<styleGroups.length; i++) {
+				editor.toolbar.bindButtonGroup(toolbar.data.style, i, styleGroups[i]);
 			}
 
 			// Align
@@ -363,10 +376,10 @@
 				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
 					selector = el.parentNode.parentNode.config.selector;
 				} else {
-					selector = ["img"];
+					selector = "img";
 				}
 
-				var targetNode = findNode(parent, selector);
+				var targetNode = editor.node.findClassNode(parent, selector);
 
 				if (targetNode.classList.contains(el.getAttribute("data-value"))) {
 					targetNode.classList.remove(el.getAttribute("data-value"));
@@ -521,33 +534,33 @@
 			toolbar.data.title = (typeof imageData.title !== "undefined") ? imageData.title : '';
 			toolbar.data.src = ((typeof imageData.src == "undefined") || (imageData.src == editor.plugins.image.placeholder())) ? "" : imageData.src;
 
-			var showClasses = false;
-			var imageClasses = toolbar.querySelectorAll(".simply-image-class [data-type=simply-buttongroup-radio]");
-			if (imageClasses) {
-				for (var i=0; i<imageClasses.length; i++) {
-					var selector = imageClasses[i].config.selector;
-					var node = findNode(image, selector);
+			var showStyles = false;
+			var imageStyles = toolbar.querySelectorAll(".simply-image-style [data-type=simply-buttongroup-radio]");
+			if (imageStyles) {
+				for (var i=0; i<imageStyles.length; i++) {
+					var selector = imageStyles[i].config.selector;
+					var node = editor.node.findClassNode(image, selector);
 					if (node) {
-						imageClasses[i].style.display = "block";
-						showClasses = true;
+						imageStyles[i].style.display = "block";
+						showStyles = true;
 
-						var buttons = imageClasses[i].querySelectorAll("[data-value]");
-						toolbar.data.class[i] = '';
+						var buttons = imageStyles[i].querySelectorAll("[data-value]");
+						toolbar.data.style[i] = '';
 						for (var j=0; j<buttons.length; j++) {
 							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
-								toolbar.data.class[i] = buttons[j].getAttribute("data-value");
+								toolbar.data.style[i] = buttons[j].getAttribute("data-value");
 							}
 						}
 					} else {
-						imageClasses[i].style.display = "none";
+						imageStyles[i].style.display = "none";
 					}
 				}
 			}
 
-			if (showClasses) {
-				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "block";
+			if (showStyles) {
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "block";
 			} else {
-				toolbar.querySelector("[data-simply-section='simply-image-class']").parentNode.style.display = "none";
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "none";
 			}
 
 			var alignClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
@@ -585,29 +598,54 @@
 		"init" : function(config) {
 			var toolbar = document.querySelector("#" + this.name);
 			if (typeof config === "object" && toolbar) {
-				// Init block classes
-				if (config.class) {
-					var classSection = toolbar.querySelector('div.simply-toolbar-section.simply-image-class');
-					if (classSection) {
-						if (config.class.length) {
-							classSection.innerHTML = '';
-							for (var i=0; i<config.class.length; i++) {
-								if (config.class[i].length) {
-									var classList = config.class[i].slice();
-									classList.push({class: "none", name: "Default", icon: "fa-times"});
+				// Backwards compatibility for classes/styles
+				if (config.class && !config.style) {
+					console.log("Warning: the classes configuration was changed in version 1.15; Please update your configuration.");
+					config.style = config.class;
+					if (config.style.length) {
+						for (var i=0; i<config.style.length; i++) {
+							if (config.style[i].classes) {
+								config.style[i].styles = config.style[i].classes;
+							}
+						}
+					}
+				}
+
+				// Init block styles
+				if (config.style) {
+					var styleSections = toolbar.querySelectorAll('div.simply-toolbar-section.simply-image-style');
+					for (var i=0; i<styleSections.length; i++) {
+						if (config.style.length) {
+							styleSections[i].innerHTML = '';
+							for (var j=0; j<config.style.length; j++) {
+								var groupConfig = config.style[j];
+								if (groupConfig instanceof Array) {
+									groupConfig = {
+										styles : groupConfig,
+										description: "Image",
+										selector : "img"
+									};
+								}
+								if (!groupConfig.selector) {
+									groupConfig.selector = "img";
+								}
+								if (groupConfig.styles.length) {
+									var styleList = groupConfig.styles.slice();
+									// styleList.push({class: "none", name: "Default", icon: "fa-times"});
 									var list = document.createElement("UL");
+									list.config = groupConfig;
+									list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
 									list.setAttribute("data-type", "simply-buttongroup-radio");
-									for (var j=0; j<classList.length; j++) {
+									for (var k=0; k<styleList.length; k++) {
 										var item = document.createElement("li");
 										var button = document.createElement("button");
-										button.setAttribute("data-value", classList[j].class);
+										button.setAttribute("data-value", styleList[k].class);
 										button.setAttribute("data-simply-action", "simply-image-class");
-										button.innerHTML = "<i class='fa " + classList[j].icon + "'></i>" + classList[j].name;
+										button.innerHTML = "<i class='fa " + styleList[k].icon + "'></i>" + styleList[k].name;
 										item.appendChild(button);
 										list.appendChild(item);
 									}
-
-									classSection.appendChild(list);
+									styleSections[i].appendChild(list);
 								}
 							}
 						}
@@ -624,11 +662,11 @@
 			editor.toolbar.bindInput(toolbar.data, "alt", toolbar.querySelector(".simply-image-alt"));
 			editor.toolbar.bindInput(toolbar.data, "title", toolbar.querySelector(".simply-image-title"));
 
-			// Classes
-			toolbar.data.class = [];
-			var classGroups = toolbar.querySelectorAll("div.simply-image-class [data-type=simply-buttongroup-radio]");
-			for (var i=0; i<classGroups.length; i++) {
-				editor.toolbar.bindButtonGroup(toolbar.data.class, i, classGroups[i]);
+			// Styles
+			toolbar.data.style = [];
+			var styleGroups = toolbar.querySelectorAll("div.simply-image-style [data-type=simply-buttongroup-radio]");
+			for (var i=0; i<styleGroups.length; i++) {
+				editor.toolbar.bindButtonGroup(toolbar.data.style, i, styleGroups[i]);
 			}
 		}
 	});

@@ -106,10 +106,22 @@
 					}
 				};
 
-				document.head.querySelector("title").dataBinding.bind(document.getElementById("simply-meta-title"));
-				document.head.querySelector("meta[name=description]").dataBinding.bind(document.getElementById("simply-meta-description"), metaBindingConfig);
-				document.head.querySelector("meta[name=author]").dataBinding.bind(document.getElementById("simply-meta-author"), metaBindingConfig);
-				document.head.querySelector("meta[name=robots]").dataBinding.bind(document.getElementById("simply-meta-robots"), metaRobotsBindingConfig);
+				var titleElm = document.head.querySelector("title");
+				var descElm = document.head.querySelector("meta[name=description]");
+				var authorElm = document.head.querySelector("meta[name=author]");
+				var robotsElm = document.head.querySelector("meta[name=robots]");
+				if (titleElm && titleElm.dataBinding) {
+					titleElm.dataBinding.bind(document.getElementById("simply-meta-title"));
+				}
+				if (descElm && descElm.dataBinding) {
+					descElm.dataBinding.bind(document.getElementById("simply-meta-description"), metaBindingConfig);
+				}
+				if (authorElm && authorElm.dataBinding) {
+					authorElm.dataBinding.bind(document.getElementById("simply-meta-author"), metaBindingConfig);
+				}
+				if (robotsElm && robotsElm.dataBinding) {
+					robotsElm.dataBinding.bind(document.getElementById("simply-meta-robots"), metaRobotsBindingConfig);
+				}
 			}
 		},
 		apply : function() {
