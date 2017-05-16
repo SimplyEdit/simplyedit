@@ -213,6 +213,68 @@ QUnit.module("editor field get");
 		assert.notOk(result.innerHTML, "innerHTML should not be returned");
 	});
 
+	QUnit.test("field get attributes data", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-content", "attributes");
+		field.setAttribute("hello", "world");
+		field.setAttribute("color", "blue");
+		field.setAttribute("data-simply-selectable", "true");
+		field.innerHTML = "Hello world";
+
+		var data = {
+			hello : "world",
+			color : "blue"
+		};
+		var result = editor.field.get(field);
+		assert.ok(result, "got result");
+		assert.equal(data.hello, result.hello, "Returned data matches expected data");
+		assert.equal(data.color, result.color, "Returned data matches expected data");
+		assert.notOk(result['data-simply-selectable'], "data-simply-selectable is not returned");
+	});
+
+	QUnit.test("field get attributes data after setting", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-content", "attributes");
+		field.setAttribute("hello", "world");
+		field.setAttribute("color", "blue");
+		field.setAttribute("data-simply-selectable", "true");
+		field.innerHTML = "Hello world";
+
+		var data = {
+			hello : "worlds",
+			color : "pink"
+		};
+		editor.field.set(field, data);
+
+		var result = editor.field.get(field);
+		assert.ok(result, "got result");
+		assert.equal(data.hello, result.hello, "Returned data matches expected data");
+		assert.equal(data.color, result.color, "Returned data matches expected data");
+		assert.notOk(result['data-simply-selectable'], "data-simply-selectable is not returned");
+	});
+
+	QUnit.test("field get attributes data", function(assert) {
+		var field = document.createElement("DIV");
+		field.setAttribute("data-simply-content", "attributes");
+		field.setAttribute("data-simply-attributes", "hello color");
+		field.setAttribute("hello", "world");
+		field.setAttribute("color", "blue");
+		field.setAttribute("another", "dummy");
+
+		field.setAttribute("data-simply-selectable", "true");
+		field.innerHTML = "Hello world";
+
+		var data = {
+			hello : "world",
+			color : "blue"
+		};
+		var result = editor.field.get(field);
+		assert.ok(result, "got result");
+		assert.equal(data.hello, result.hello, "Returned data matches expected data");
+		assert.equal(data.color, result.color, "Returned data matches expected data");
+		assert.notOk(result['data-simply-selectable'], "data-simply-selectable is not returned");
+		assert.notOk(result.another, "another attribute is not returned");
+	});
 
 QUnit.module("editor data apply");
 
