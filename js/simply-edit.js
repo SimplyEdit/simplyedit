@@ -490,9 +490,9 @@
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				var subLists;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE || !target.parentNode) {
-					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content^='attributes:']) [data-simply-list]");
+					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]");
 				} else {
-					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content^='attributes:']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
 				for (var i=0; i<dataLists.length; i++) {
 					var isSub = false;
@@ -1156,9 +1156,20 @@
 						return true;
 					}
 				},
-				"[data-simply-content^='attributes:']" : {
+				"[data-simply-content='attributes']" : {
 					get : function(field) {
-						var attributes = field.getAttribute("data-simply-content").split(":")[1].split(",");
+						var attributes = field.getAttribute("data-simply-attributes");
+						if (attributes) {
+							attributes = attributes.split(" ");
+						} else {
+							// If none were set, default to all the non-simply-attributes;
+							attributes = [];
+							for (var i=0; i<field.attributes.length; i++) {
+								if (!field.attributes[i].nodeName.match(/^data-simply/)) {
+									attributes.push(field.attributes[i].nodeName);
+								}
+							}
+						}
 						var result = editor.field.defaultGetter(field, attributes);
 						if (field.simplyString && (attributes.length === 1)) {
 							return result[attributes[0]];
@@ -1166,13 +1177,6 @@
 						return result;
 					},
 					set : function(field, data) {
-						var attributes = field.getAttribute("data-simply-content").split(":")[1].split(",");
-						if (typeof data == "string") {
-							field.simplyString = true;
-							var value = {};
-							value[attributes[0]] = data;
-							data = value;
-						}
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
