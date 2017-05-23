@@ -2565,7 +2565,7 @@
 								console.log("Warning: data file found, but empty");
 								return callback("{}");
 							}
-							callback(http.responseText);
+							callback(http.responseText.replace(/\0+$/, ''));
 						} else {
 							callback("{}");
 							console.log("Warning: no data found. Starting with empty set");
