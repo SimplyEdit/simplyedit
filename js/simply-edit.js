@@ -185,8 +185,6 @@
 					};
 
 					var executeSave = function() {
-						editor.storage.save(localStorage.data, saveCallback);
-
 						for (var source in editor.dataSources) {
 							if (editor.dataSources[source].save) {
 								for (var i=0; i<editor.dataSources[source].stash.length; i++) {
@@ -194,6 +192,8 @@
 								}
 							}
 						}
+
+						editor.storage.save(localStorage.data, saveCallback);
 					};
 
 					if (editor.actions['simply-executesave']) {
