@@ -1817,6 +1817,19 @@
 					evt.preventDefault();
 				};
 				
+				var hideToolbar = function() {
+					if (editor.context.toolbar.hide) {
+						return;
+					}
+					editor.context.toolbar.hide = true;
+					editor.context.show();
+				};
+				var showToolbar = function() {
+					editor.context.toolbar.hide = false;
+				};
+				document.addEventListener("slip:beforereorder", hideToolbar);
+				document.addEventListener("slip:reorder", showToolbar);
+
 				var addBeforeOrderEvent = function(e) {
 					var sublists = this.querySelectorAll("[data-simply-sortable]");
 					for (var j=0; j<sublists.length; j++) {
