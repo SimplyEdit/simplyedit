@@ -1707,6 +1707,23 @@
 
 				document.body.setAttribute("data-simply-edit", true);
 
+				/* Prevent tap-hold contextmenu for chrome/chromebook */
+				(function() {
+					var touching = false;
+
+					document.addEventListener("touchstart", function(evt) {
+						touching = true;
+					});
+					document.addEventListener("touchend", function(evt) {
+						touching = false;
+					});
+					window.addEventListener("contextmenu", function(evt) {
+						if (touching) {
+							evt.preventDefault();
+						}
+					});
+				}());
+
 				document.body.onbeforeunload = handleBeforeUnload; // Must do it like this, not with addEventListener;
 				editor.fireEvent("simply-editmode", document);	
 				loadToolbars();
