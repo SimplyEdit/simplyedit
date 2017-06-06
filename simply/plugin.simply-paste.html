@@ -27,6 +27,15 @@
 		// Chrome remembers that a text was bold or italic, this will remove those tags when they are inserted.
 		if (ev.target.tagName && (ev.target.tagName.toLowerCase()=='b' || ev.target.tagName.toLowerCase()=='i')) {
 			if (ev.target.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
+				// replace 'b' tags with 'strong; 'i' tags with 'em'; doing this on the childNodes so that the selection doesn't break for safari;
+				for (var i=ev.target.childNodes.length-1; i > -1; i--) {
+					if (ev.target.tagName.toLowerCase()=='b') {
+						editor.node.wrap(ev.target.childNodes[i], "strong");
+					} else if (ev.target.tagName.toLowerCase()=='i') {
+						editor.node.wrap(ev.target.childNodes[i], "em");
+					}
+				}
+
 				editor.node.unwrap(ev.target);
 				var sel = window.getSelection();
 				var range = sel.getRangeAt(0);
