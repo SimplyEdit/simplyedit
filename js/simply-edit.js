@@ -1020,6 +1020,11 @@
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
+						field.addEventListener("click", function(evt) {
+							evt.preventDefault();
+						}, true);
+						field.addEventListener("dblclick", editor.editmode.followLink);
+
 						if (field.getAttribute("data-simply-content") == "fixed") {
 							editor.field.initHopeStub(field);
 							field.setAttribute("data-simply-selectable", true);
@@ -1707,6 +1712,31 @@
 				loadToolbars();
 
 			},
+			followLink : function(evt) {
+				var target = evt.target;
+				if (target.tagName !== "a") {
+					target = this;
+				}
+
+				if (
+					target.pathname
+				) {
+					var pathname = target.pathname;
+					var hostname = target.hostname;
+					var extraCheck = true;
+					if (typeof editor.storage.checkJail === "function") {
+						extraCheck = editor.storage.checkJail(target.href);
+					}
+						
+					if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[target.pathname] == "undefined")) {
+						editor.storage.page.save(target.href);
+						evt.preventDefault();
+					} else {
+						// FIXME: check for dirty fields and stash/save the changes
+						document.location.href = target.href + "#simply-edit";
+					}
+				}
+			},
 			makeEditable : function(target) {
 				var i;
 
@@ -1727,33 +1757,13 @@
 					dataLists[i].setAttribute("data-simply-selectable", true);
 				}
 
-				var handleDblClick = function(evt) {
-					if (
-						evt.target.pathname
-					) {
-						var pathname = evt.target.pathname;
-						var hostname = evt.target.hostname;
-						var extraCheck = true;
-						if (typeof editor.storage.checkJail === "function") {
-							extraCheck = editor.storage.checkJail(evt.target.href);
-						}
-							
-						if (extraCheck && (hostname == document.location.hostname) && (typeof editor.currentData[evt.target.pathname] == "undefined")) {
-							editor.storage.page.save(evt.target.href);
-							evt.preventDefault();
-						} else {
-							// FIXME: check for dirty fields and stash/save the changes
-							document.location.href = evt.target.href + "#simply-edit";
-						}
-					}
-				};
 				var handleClick = function(event) {
 					event.preventDefault();
 				};
 
 				target.addEventListener("dblclick", function(event) {
 					if (event.target.tagName.toLowerCase() === "a") {
-						handleDblClick(event);
+						editor.editmode.followLink(event);
 					}
 				}, true);
 
