@@ -592,6 +592,9 @@
 				if (list.dataBinding && list.dataBinding.mode == "field") {
 					useDataBinding = false; // this list is already bound as a field, skip dataBinding
 				}
+				if (list.getAttribute("data-simply-data")) {
+					useDataBinding = false; // this list uses a datasource, skip databinding
+				}
 
 				if (dataParent && dataParent[dataName]) {
 					if (useDataBinding) {
