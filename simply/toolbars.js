@@ -490,7 +490,11 @@
 				};
 			}
 
-			var el = document.createElement(element);
+			var el = element;
+			if (typeof el === "string") {
+				el = document.createElement(el);
+			}
+
 			node.parentNode.insertBefore(el, node);
 			el.appendChild(node);
 			if (savedRange) {
