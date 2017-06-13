@@ -78,6 +78,11 @@
 					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
 				}
 
+				if (parent.tagName.toLowerCase() =='p') { // replace the div with a 'br' element when we are in a paragraph
+					var breakEl = document.createElement("BR");
+					ev.target.parentNode.insertBefore(breakEl, ev.target);
+				}
+
 				editor.node.unwrap(ev.target);
 				var siblings = parent.childNodes;
 				editor.node.unwrap(ev.target);
@@ -182,17 +187,26 @@
 	};
 
 	var addParagraphs = function(nodes) {
+		nodes = [].slice.call(nodes);
+
+		var previousNode = "p";
+		if (nodes[0] && nodes[0].parentNode.tagName.toLowerCase() === "p") {
+			return;
+		}
+
 		for (var i=0; i<nodes.length; i++) {
 			if (nodes[i] && nodes[i].nodeType == document.TEXT_NODE) {
 				if (nodes[i].nodeValue !== "") {
-					editor.node.wrap(nodes[i], "p");
+					editor.node.wrap(nodes[i], previousNode);
+					previousNode = nodes[i].parentNode;
 				}
 			} else if (
 				nodes[i] && 
 				(nodes[i].nodeType == document.ELEMENT_NODE) &&
 				(hope.render.html.rules.nestingSets['inline'].indexOf(nodes[i].tagName.toLowerCase()) > -1)
 			) {
-				editor.node.wrap(nodes[i], "p");
+				editor.node.wrap(nodes[i], previousNode);
+				previousNode = nodes[i].parentNode;
 			}
 		}
 	};
@@ -228,6 +242,7 @@
 					case 13:	// enter
 						// this forces the text into structured paragraphs/headings, so that firefox will behave more sanely with inserting breaks
 						addParagraphs(event.target.childNodes);
+
 						var simplyParent = editor.node.getSimplyParent(event.target);
 						if (simplyParent && simplyParent.hopeEditor) {
 							simplyParent.hopeEditor.needsUpdate = true;
