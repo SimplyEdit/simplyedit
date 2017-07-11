@@ -1155,7 +1155,11 @@
 						if (field.templates[data]) {
 							var clone = editor.list.cloneTemplate(field.templates[data]);
 							field.appendChild(clone);
-							editor.data.apply(editor.currentData, field.firstElementChild);
+							for (var i=0; i<field.childNodes.length; i++) {
+								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
+									editor.data.apply(editor.currentData, field.childNodes[i]);
+								}
+							}
 						}
 						field.storedPath = editor.data.getDataPath(field);
 						field.storedData = data;
