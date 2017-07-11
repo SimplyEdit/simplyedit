@@ -490,7 +490,7 @@
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				var subLists;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE || !target.parentNode) {
-					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]");
+					subLists = target.querySelectorAll("template [data-simply-list], [data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]");
 				} else {
 					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
