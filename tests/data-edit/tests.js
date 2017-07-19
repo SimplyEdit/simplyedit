@@ -154,15 +154,15 @@ function dispatchEvent (el, evt) {
 function simulateKeyDown(el, k) {
 	oEvent = document.createEvent('Event');
 	oEvent.initEvent('keydown', true, false);
-	oEvent.keyCode = 13;
-	oEvent.which = 13;
+	oEvent.keyCode = k;
+	oEvent.which = k;
 	dispatchEvent(el, oEvent);
 }
 function simulateKeyUp(el, k) {
 	oEvent = document.createEvent('Event');
 	oEvent.initEvent('keyup', true, false);
-	oEvent.keyCode = 13;
-	oEvent.which = 13;
+	oEvent.keyCode = k;
+	oEvent.which = k;
 	dispatchEvent(el, oEvent);
 }
 
