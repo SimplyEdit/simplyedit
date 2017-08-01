@@ -79,6 +79,12 @@
 					subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
 
+				// prepare this as an array so we can use indexOf to check for elements;
+				var subFieldsArr = [];
+				for (var a=0; a<subFields.length; a++) {
+					subFieldsArr.unshift(subFields[a]);
+				}
+
 				if (target == document) {
 					editor.settings.databind.parentKey = '/';
 				} else {
@@ -90,12 +96,7 @@
 					editor.settings.databind.parentKey = savedParentKey;
 
 					// Only handle datafields that are our direct descendants, list descendants will be handled by the list;
-					var isSub = false;
-					for (var a=0; a<subFields.length; a++) {
-						if (dataFields[i] == subFields[a]) {
-							isSub = true;
-						}
-					}
+					var isSub = (subFieldsArr.indexOf(dataFields[i]) > -1);
 					if (isSub) {
 						continue;
 					}
@@ -494,13 +495,13 @@
 				} else {
 					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
+				var subListsArr = [];
+				for (var a=0; a<subLists.length; a++) {
+					subListsArr.unshift(subLists[a]);
+				}
+
 				for (var i=0; i<dataLists.length; i++) {
-					var isSub = false;
-					for (var a=0; a<subLists.length; a++) {
-						if (dataLists[i] == subLists[a]) {
-							isSub = true;
-						}
-					}
+					var isSub = (subListsArr.indexOf(dataLists[i]) > -1);
 					if (isSub) {
 						continue;
 					}
