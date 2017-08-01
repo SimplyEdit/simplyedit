@@ -195,18 +195,19 @@
 		}
 
 		for (var i=0; i<nodes.length; i++) {
+			if (!previousNode) {
+				previousNode = 'p';
+			}
 			if (nodes[i] && nodes[i].nodeType == document.TEXT_NODE) {
 				if (nodes[i].nodeValue !== "") {
-					editor.node.wrap(nodes[i], previousNode);
-					previousNode = nodes[i].parentNode;
+					previousNode = editor.node.wrap(nodes[i], previousNode);
 				}
 			} else if (
 				nodes[i] && 
 				(nodes[i].nodeType == document.ELEMENT_NODE) &&
 				(hope.render.html.rules.nestingSets['inline'].indexOf(nodes[i].tagName.toLowerCase()) > -1)
 			) {
-				editor.node.wrap(nodes[i], previousNode);
-				previousNode = nodes[i].parentNode;
+				previousNode = editor.node.wrap(nodes[i], previousNode);
 			}
 		}
 	};
