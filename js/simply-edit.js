@@ -2999,24 +2999,8 @@
 	}
 
 	var defaultToolbars = [
-		editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
-		editor.baseURL + "simply/toolbar.simply-text.html",
-		editor.baseURL + "simply/toolbar.simply-image.html",
-		editor.baseURL + "simply/plugin.simply-browse.html",
-		editor.baseURL + "simply/toolbar.simply-iframe.html",
-		editor.baseURL + "simply/toolbar.simply-selectable.html",
-		editor.baseURL + "simply/toolbar.simply-list.html",
-		editor.baseURL + "simply/toolbar.simply-icon.html",
-		editor.baseURL + "simply/plugin.simply-template.html",
-		editor.baseURL + "simply/plugin.simply-save.html",
-		editor.baseURL + "simply/plugin.simply-meta.html",
-		editor.baseURL + "simply/plugin.simply-htmlsource.html",
-		editor.baseURL + "simply/plugin.simply-symbol.html",
-		editor.baseURL + "simply/plugin.simply-paste.html",
-		editor.baseURL + "simply/plugin.simply-undo-redo.html",
-		editor.baseURL + "simply/plugin.simply-keyboard.html",
-		editor.baseURL + "simply/plugin.simply-diff.html",
-		editor.baseURL + "simply/plugin.simply-about.html"
+		editor.baseURL + "simply/toolbar.simply-basepack.html"
+	//	editor.baseURL + "simply/plugin.simply-download.html"
 	];
 
 	if (typeof editor.settings.plugins === 'object') {
