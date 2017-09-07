@@ -265,7 +265,7 @@ dataBinding = function(config) {
 			}
 			fireEvent(binding.elements[i], "elementresolved");
 		}
-		if (data._parentBindings_ && data._parentBindings_[key] && data._parentBindings_[key] !== this) {
+		if (data._parentBindings_ && data._parentBindings_[key] && data._parentBindings_[key] !== binding) {
 			data[key] = shadowValue; 
 		}
 		if (typeof binding.config.resolve === "function") {
@@ -305,11 +305,13 @@ dataBinding = function(config) {
 
 		Object.defineProperty(data, key, {
 			set : function(value) {
-				binding.set(value);
-				binding.resolve(true);
+				if (!isEqual(value, shadowValue)) {
+					binding.set(value);
+					binding.resolve(true);
+				}
 				if (data._parentBindings_ && data._parentBindings_[key]) {
-					data._parentBindings_[key].set(value);
-					data._parentBindings_[key].resolve(value);
+					data._parentBindings_[key].get()[key] = value;
+					data._parentBindings_[key].resolve(true);
 				}
 			},
 			get : function() {
