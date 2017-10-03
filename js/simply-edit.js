@@ -1739,7 +1739,7 @@
 			},
 			followLink : function(evt) {
 				var target = evt.target;
-				if (target.tagName !== "a") {
+				if (target.tagName.toLowerCase() !== "a") {
 					target = this;
 				}
 
