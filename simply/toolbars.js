@@ -1180,7 +1180,7 @@
 
 	var vdSelection, vdSelectionState;
 	var initSelections = function() {
-		if (typeof simply === "undefined") {
+		if (typeof simply === "undefined" || typeof simply.editor === "undefined") {
 			window.setTimeout(initSelections, 100);
 			return;
 		}
