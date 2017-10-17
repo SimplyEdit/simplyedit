@@ -1,0 +1,52 @@
+<script type="text/javascript">
+	document.addEventListener("simply-stashed", function() {
+		localStorage.data = editor.toRelativeUrls(localStorage.data);
+	});
+
+	editor.toRelativeUrls = function(data, host) {
+		if (typeof host === "undefined") {
+			host = document.location.host;
+		}
+
+		var re = new RegExp("('|\")(http|https):\/\/" + host + "([#?])", 'g'); 
+		data = data.replace(re, "$1/$3");
+
+		re = new RegExp("('|\")(http|https):\/\/" + host + "([/#?])", 'g'); 
+		data = data.replace(re, "$1$3");
+
+		re = new RegExp("(')(http|https):\/\/" + host + "'", 'g');
+		data = data.replace(re, "$1/$1");
+
+		re = new RegExp("(\")(http|https):\/\/" + host + "\"", 'g');
+		data = data.replace(re, "$1/$1");
+
+		return data;
+	};
+
+	/*
+		URLs to test:
+	*/
+	/*
+		var tests = {
+			'http://www.muze.nl/' : '/',
+			'https://www.muze.nl/bla.html' : '/bla.html',
+			'http://www.muze.nl' : '/',
+			'http://www.muze.nl?foo' : '/?foo',
+			'http://www.muze.nl/#blabla' : '/#blabla',
+			'https://www.muze.nl/?foo#blabla' : '/?foo#blabla',
+			'http://www.muze.nl:80/' : 'http://www.muze.nl:80/',
+			'https://www.muze.nl:80/bla.html' : 'https://www.muze.nl:80/bla.html'
+		}
+
+		var result = true;
+		for (i in tests) {
+			console.log(i + " => " + tests[i]);
+			result = result && (editor.toRelativeUrls("'" + i + "'", "www.muze.nl") == ("'" + tests[i] + "'"));
+			result = result && (editor.toRelativeUrls('"' + i + '"', "www.muze.nl") == ('"' + tests[i] + '"'));
+			console.log(result);
+			if (!result) {
+				console.log(editor.toRelativeUrls("'" + i + "'", "www.muze.nl"));
+			}
+		}
+	*/
+</script>

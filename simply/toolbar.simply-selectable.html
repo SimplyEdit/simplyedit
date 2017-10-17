@@ -150,7 +150,10 @@
 
 		editor.addToolbar({
 			name: 'simply-selectable',
-			init : bindSelectables
+			init : function() {
+				// let the rest of the page do whatever it was doing; this way the field init will have happened before we bind selectables;
+				setTimeout(bindSelectables, 1);
+			}
 		});
 	})();
 </script>

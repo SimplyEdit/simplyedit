@@ -132,11 +132,11 @@
 			},
 			stash : function() {
 				editor.fireEvent("simply-stash", document);
-				localStorage.data = editor.data.stringify(editor.currentData);
 				var dataSources = document.querySelectorAll("[data-simply-data]");
 				for (var i=0; i<dataSources.length; i++) {
 					editor.list.get(dataSources[i]);
 				}
+				localStorage.data = editor.data.stringify(editor.currentData);
 				editor.fireEvent("simply-stashed", document);
 			},
 			stringify : function(data) {
@@ -757,6 +757,9 @@
 
 				var listIndex = list.querySelectorAll(":scope > [data-simply-list-item]");
 
+				var fragment = document.createDocumentFragment();
+				list.warnedFieldDataBinding = false;
+
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
 						continue;
@@ -771,7 +774,10 @@
 							//	console.log("Appending items to existing data");
 							}
 						} else {
-							console.log("Warning: Can't append list items to a field databinding");
+							if (!list.warnedFieldDataBinding) {
+								console.log("Warning: Can't append list items to a field databinding");
+								list.warnedFieldDataBinding = true;
+							}
 						}
 					}
 
@@ -828,7 +834,7 @@
 							stashedFields[i].removeAttribute("data-simply-stashed");
 						}
 
-						if (!listData[j]._bindings_) {
+						if (!listData[j]._bindings_ && !list.getAttribute("data-simply-data")) {
 							newData = editor.list.get(clone.firstElementChild);
 							dataPath = editor.data.getDataPath(clone.firstElementChild);
 							editor.data.apply(newData, clone.firstElementChild);
@@ -838,7 +844,8 @@
 							editor.editmode.makeEditable(clone);
 						}
 
-						list.appendChild(clone);
+						fragment.appendChild(clone);
+
 						editor.list.initLists(listData[j], clone);
 					} else {
 						for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
@@ -869,7 +876,7 @@
 								stashedFields[i].removeAttribute("data-simply-stashed");
 							}
 
-							if (!listData[j]._bindings_) {
+							if (!listData[j]._bindings_ && !list.getAttribute("data-simply-data")) {
 								newData = editor.list.get(clone);
 								dataPath = editor.data.getDataPath(clone);
 								editor.data.apply(newData, clone);
@@ -880,7 +887,7 @@
 								editor.editmode.makeEditable(clone);
 							}
 
-							list.appendChild(clone);
+							fragment.appendChild(clone);
 							editor.list.initLists(listData[j], clone);
 						}
 					}
@@ -888,6 +895,8 @@
 					editor.bindingParents.pop();
 					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/"; // + list.getAttribute("data-simply-list") + "/" + j + "/";
 				}
+
+				list.appendChild(fragment);
 
 				list.setAttribute("data-simply-selectable", true);
 				editor.bindingParents.pop();
