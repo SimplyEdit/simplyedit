@@ -79,6 +79,12 @@
 					subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
 
+				// prepare this as an array so we can use indexOf to check for elements;
+				var subFieldsArr = [];
+				for (var a=0; a<subFields.length; a++) {
+					subFieldsArr.unshift(subFields[a]);
+				}
+
 				if (target == document) {
 					editor.settings.databind.parentKey = '/';
 				} else {
@@ -90,12 +96,7 @@
 					editor.settings.databind.parentKey = savedParentKey;
 
 					// Only handle datafields that are our direct descendants, list descendants will be handled by the list;
-					var isSub = false;
-					for (var a=0; a<subFields.length; a++) {
-						if (dataFields[i] == subFields[a]) {
-							isSub = true;
-						}
-					}
+					var isSub = (subFieldsArr.indexOf(dataFields[i]) > -1);
 					if (isSub) {
 						continue;
 					}
@@ -490,17 +491,17 @@
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				var subLists;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE || !target.parentNode) {
-					subLists = target.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]");
+					subLists = target.querySelectorAll("template [data-simply-list], [data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]");
 				} else {
 					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
+				var subListsArr = [];
+				for (var a=0; a<subLists.length; a++) {
+					subListsArr.unshift(subLists[a]);
+				}
+
 				for (var i=0; i<dataLists.length; i++) {
-					var isSub = false;
-					for (var a=0; a<subLists.length; a++) {
-						if (dataLists[i] == subLists[a]) {
-							isSub = true;
-						}
-					}
+					var isSub = (subListsArr.indexOf(dataLists[i]) > -1);
 					if (isSub) {
 						continue;
 					}
@@ -591,6 +592,9 @@
 				}
 				if (list.dataBinding && list.dataBinding.mode == "field") {
 					useDataBinding = false; // this list is already bound as a field, skip dataBinding
+				}
+				if (list.getAttribute("data-simply-data")) {
+					useDataBinding = false; // this list uses a datasource, skip databinding
 				}
 
 				if (dataParent && dataParent[dataName]) {
@@ -1152,7 +1156,11 @@
 						if (field.templates[data]) {
 							var clone = editor.list.cloneTemplate(field.templates[data]);
 							field.appendChild(clone);
-							editor.data.apply(editor.currentData, field.firstElementChild);
+							for (var i=0; i<field.childNodes.length; i++) {
+								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
+									editor.data.apply(editor.currentData, field.childNodes[i]);
+								}
+							}
 						}
 						field.storedPath = editor.data.getDataPath(field);
 						field.storedData = data;
@@ -1731,7 +1739,7 @@
 			},
 			followLink : function(evt) {
 				var target = evt.target;
-				if (target.tagName !== "a") {
+				if (target.tagName.toLowerCase() !== "a") {
 					target = this;
 				}
 
@@ -1874,6 +1882,13 @@
 				var textonly = target.querySelectorAll("[data-simply-content='text']");
 				var preventNodeInsert = function(evt) {
 					if (evt.target.tagName) {
+						if (evt.target.tagName.toLowerCase() == "br") {
+							// Firefox 54 goes wonky with contenteditable divs when the <br> element it expects at the end is removed; Replacing the <br> with a placebo &shy will keep it happy.
+							if(!evt.target.nextSibling) {
+								var node = document.createTextNode("\u00AD");
+								evt.target.parentNode.insertBefore(node, evt.target);
+							}
+						}
 						editor.node.unwrap(evt.target);
 					}
 				};
@@ -2984,24 +2999,8 @@
 	}
 
 	var defaultToolbars = [
-		editor.baseURL + "simply/toolbar.simply-main-toolbar.html",
-		editor.baseURL + "simply/toolbar.simply-text.html",
-		editor.baseURL + "simply/toolbar.simply-image.html",
-		editor.baseURL + "simply/plugin.simply-browse.html",
-		editor.baseURL + "simply/toolbar.simply-iframe.html",
-		editor.baseURL + "simply/toolbar.simply-selectable.html",
-		editor.baseURL + "simply/toolbar.simply-list.html",
-		editor.baseURL + "simply/toolbar.simply-icon.html",
-		editor.baseURL + "simply/plugin.simply-template.html",
-		editor.baseURL + "simply/plugin.simply-save.html",
-		editor.baseURL + "simply/plugin.simply-meta.html",
-		editor.baseURL + "simply/plugin.simply-htmlsource.html",
-		editor.baseURL + "simply/plugin.simply-symbol.html",
-		editor.baseURL + "simply/plugin.simply-paste.html",
-		editor.baseURL + "simply/plugin.simply-undo-redo.html",
-		editor.baseURL + "simply/plugin.simply-keyboard.html",
-		editor.baseURL + "simply/plugin.simply-diff.html",
-		editor.baseURL + "simply/plugin.simply-about.html"
+		editor.baseURL + "simply/toolbar.simply-basepack.html"
+	//	editor.baseURL + "simply/plugin.simply-download.html"
 	];
 
 	if (typeof editor.settings.plugins === 'object') {

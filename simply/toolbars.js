@@ -490,14 +490,23 @@
 				};
 			}
 
-			var el = document.createElement(element);
+			var el = element;
+			if (typeof el === "string") {
+				el = document.createElement(el);
+			}
+
 			node.parentNode.insertBefore(el, node);
-			el.appendChild(node);
-			if (savedRange) {
-				range.setStart(savedRange.startContainer, savedRange.startOffset);
-				range.setEnd(savedRange.endContainer, savedRange.endOffset);
-				sel.removeAllRanges();
-				sel.addRange(range);
+			if (el.parentNode == node.parentNode) {
+				el.appendChild(node);
+				if (savedRange) {
+					range.setStart(savedRange.startContainer, savedRange.startOffset);
+					range.setEnd(savedRange.endContainer, savedRange.endOffset);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
+				return el;
+			} else {
+				return false;
 			}
 		},
 		escapeHtml : function(text) {

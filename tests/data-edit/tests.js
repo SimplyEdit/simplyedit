@@ -154,15 +154,15 @@ function dispatchEvent (el, evt) {
 function simulateKeyDown(el, k) {
 	oEvent = document.createEvent('Event');
 	oEvent.initEvent('keydown', true, false);
-	oEvent.keyCode = 13;
-	oEvent.which = 13;
+	oEvent.keyCode = k;
+	oEvent.which = k;
 	dispatchEvent(el, oEvent);
 }
 function simulateKeyUp(el, k) {
 	oEvent = document.createEvent('Event');
 	oEvent.initEvent('keyup', true, false);
-	oEvent.keyCode = 13;
-	oEvent.which = 13;
+	oEvent.keyCode = k;
+	oEvent.which = k;
 	dispatchEvent(el, oEvent);
 }
 
@@ -873,6 +873,38 @@ QUnit.module("editor text cursor");
 		var done1 = assert.async();
 		setTimeout(function() {
 			assert.equal(testContent.innerHTML, '<h1 style="display: inline;">Hello world</h1><p><br></p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text press return at end of text nodes and inline tag", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "Hello <em>little</em> world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("em"), 3, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, '<p>Hello <em>lit</em></p><p><em>tle</em> world</p>');
+			done1();
+		}, 100);
+	});
+
+	QUnit.test("text press return at end of text nodes and inline tag in paragraph field", function(assert) {
+		var testContent = document.querySelector("#testParagraph");
+		testContent.innerHTML = "Hello <em>little</em> world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("em"), 3, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, 'Hello <em>lit</em><br><em>tle</em> world');
 			done1();
 		}, 100);
 	});

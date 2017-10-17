@@ -27,6 +27,15 @@
 		// Chrome remembers that a text was bold or italic, this will remove those tags when they are inserted.
 		if (ev.target.tagName && (ev.target.tagName.toLowerCase()=='b' || ev.target.tagName.toLowerCase()=='i')) {
 			if (ev.target.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
+				// replace 'b' tags with 'strong; 'i' tags with 'em'; doing this on the childNodes so that the selection doesn't break for safari;
+				for (var i=ev.target.childNodes.length-1; i > -1; i--) {
+					if (ev.target.tagName.toLowerCase()=='b') {
+						editor.node.wrap(ev.target.childNodes[i], "strong");
+					} else if (ev.target.tagName.toLowerCase()=='i') {
+						editor.node.wrap(ev.target.childNodes[i], "em");
+					}
+				}
+
 				editor.node.unwrap(ev.target);
 				var sel = window.getSelection();
 				var range = sel.getRangeAt(0);
@@ -67,6 +76,11 @@
 				if (sel.rangeCount) {
 					var range = sel.getRangeAt(0);
 					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+				}
+
+				if (parent.tagName.toLowerCase() =='p') { // replace the div with a 'br' element when we are in a paragraph
+					var breakEl = document.createElement("BR");
+					ev.target.parentNode.insertBefore(breakEl, ev.target);
 				}
 
 				editor.node.unwrap(ev.target);
@@ -173,17 +187,27 @@
 	};
 
 	var addParagraphs = function(nodes) {
+		nodes = [].slice.call(nodes);
+
+		var previousNode = "p";
+		if (nodes[0] && nodes[0].parentNode.tagName.toLowerCase() === "p") {
+			return;
+		}
+
 		for (var i=0; i<nodes.length; i++) {
+			if (!previousNode) {
+				previousNode = 'p';
+			}
 			if (nodes[i] && nodes[i].nodeType == document.TEXT_NODE) {
 				if (nodes[i].nodeValue !== "") {
-					editor.node.wrap(nodes[i], "p");
+					previousNode = editor.node.wrap(nodes[i], previousNode);
 				}
 			} else if (
 				nodes[i] && 
 				(nodes[i].nodeType == document.ELEMENT_NODE) &&
 				(hope.render.html.rules.nestingSets['inline'].indexOf(nodes[i].tagName.toLowerCase()) > -1)
 			) {
-				editor.node.wrap(nodes[i], "p");
+				previousNode = editor.node.wrap(nodes[i], previousNode);
 			}
 		}
 	};
@@ -219,6 +243,7 @@
 					case 13:	// enter
 						// this forces the text into structured paragraphs/headings, so that firefox will behave more sanely with inserting breaks
 						addParagraphs(event.target.childNodes);
+
 						var simplyParent = editor.node.getSimplyParent(event.target);
 						if (simplyParent && simplyParent.hopeEditor) {
 							simplyParent.hopeEditor.needsUpdate = true;

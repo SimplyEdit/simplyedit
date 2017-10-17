@@ -1,0 +1,5102 @@
+<section id="simply-main-toolbar" class="simply-section">
+	<div class="simply-toolbar" data-simply-section="simply-page-management">
+		<ul class="simply-buttons">
+			<li>
+				<button data-simply-action="simply-about" id="simply-logo">
+				</button>
+			</li>
+			<li>
+				<button data-simply-action="simply-save">
+					<i class="fa fa-save"></i>Save
+				</button>
+			</li>
+			<li>
+				<button data-simply-action="simply-logout">
+					<i class="fa fa-power-off"></i>Log out
+				</button>
+			</li>
+			<li>
+				<button data-simply-action="simply-meta">
+					<i class="fa fa-tags"></i>Meta tags
+				</button>
+			</li>
+		</ul>
+	</div>
+</section>
+<script type="text/javascript">
+	editor.addToolbar({
+		init: function() {
+			var img = document.createElement('img');
+			img.src = editor.baseURL + 'graphics/simply-edit-centered.svg';
+			img.alt = 'SimplyEdit';
+			document.getElementById('simply-logo').appendChild(img);
+		}
+	});
+</script><section id="simply-text-cursor" class="simply-section">
+	<h1>*HTML Toolbar for Text Cursor*</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-text-textstyle" class="simply-expands"><i class="fa fa-magic"></i>Text</button></li>
+			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
+			<li><button data-simply-section="simply-text-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
+			<li><button data-simply-section="simply-insert" class="simply-expands"><i class="fa fa-plus"></i>Insert</button></li>
+			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-text-textstyle">
+			<ul>
+				<li class="simply-text-format"><select data-simply-action="simply-text-blockstyle">
+					<option value="h1">Heading 1</option>
+					<option value="h2">Heading 2</option>
+					<option value="h3">Heading 3</option>
+					<option value="p">Paragraph</option>
+					<option value="ol">Numbered list</option>
+					<option value="ul">Unnumbered list</option>
+					<option value="">(plain text)</option>
+				</select></li>
+			</ul>
+			<ul class="simply-text-inline">
+				<li><button data-simply-action="simply-text-inline" data-value="strong"><i class="fa fa-bold"></i>Bold</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="em"><i class="fa fa-italic"></i>Italic</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="u"><i class="fa fa-underline"></i>Underline</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="code"><i class="fa fa-code"></i>[Code]</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-text-style">
+		</div>
+		<div class="simply-toolbar-section simply-text-align">
+			<ul data-type="simply-buttongroup-radio">
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-center"><i class="fa fa-align-center"></i>Center</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-insert">
+			<ul>
+				<li><button data-simply-action="simply-insert-image" data-simply-section="simply-insert-image"><i class="fa fa-picture-o"></i>Image</button></li>
+				<li><button data-simply-action="simply-insert-source" data-simply-section="simply-insert-source"><i class="fa fa-code"></i>Code</button></li>
+			</ul>
+		</div>
+	</div>
+</section>
+<section id="simply-text-selection" class="simply-section">
+	<h1>*HTML Toolbar for Text Selection*</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-text-textstyle" class="simply-expands"><i class="fa fa-magic"></i>Text</button></li>
+			<li><button data-simply-section="simply-text-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
+			<li><button data-simply-section="simply-text-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
+			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
+			<li><button data-simply-section="simply-insert" class="simply-expands"><i class="fa fa-plus"></i>Insert</button></li>
+			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-text-textstyle">
+			<ul>
+				<li class="simply-text-format"><select data-simply-action="simply-text-blockstyle">
+					<option value="h1">Heading 1</option>
+					<option value="h2">Heading 2</option>
+					<option value="h3">Heading 3</option>
+					<option value="p">Paragraph</option>
+					<option value="ol">Numbered list</option>
+					<option value="ul">Unnumbered list</option>
+					<option value="">(plain text)</option>
+				</select></li>
+			</ul>
+			<ul class="simply-text-inline">
+				<li><button data-simply-action="simply-text-inline" data-value="strong"><i class="fa fa-bold"></i>Bold</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="em"><i class="fa fa-italic"></i>Italic</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="u"><i class="fa fa-underline"></i>Underline</button></li>
+				<li><button data-simply-action="simply-text-inline" data-value="code"><i class="fa fa-code"></i>[Code]</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-text-style">
+		</div>
+		<div class="simply-toolbar-section simply-hyperlink">
+			<div><label>URL</label><input type="text" id="vdHyperlinkHref" data-simply-action="simply-hyperlink-href"></div>
+			<div><label>Title</label><input type="text" id="vdHyperlinkTitle" data-simply-action="simply-hyperlink-title"></div>
+			<div><label>Name</label><input type="text" id="vdHyperlinkName" data-simply-action="simply-hyperlink-name"></div>
+			<div>
+				<button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-hand-stop-o"></i>Nofollow</button>
+				<button class="simply-hyperlink-newwindow" data-simply-action="simply-hyperlink-newwindow"><i class="fa fa-external-link"></i>New window</button>
+				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
+			</div>
+		</div>
+		<div class="simply-toolbar-section simply-text-align">
+			<ul data-type="simply-buttongroup-radio">
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-center"><i class="fa fa-align-center"></i>Center</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="simply-text-align-justify"><i class="fa fa-align-justify"></i>Justify</button></li>
+				<li><button data-simply-action="simply-text-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-insert">
+			<ul>
+				<li><button data-simply-action="simply-insert-image" data-simply-section="simply-insert-image"><i class="fa fa-picture-o"></i>Image</button></li>
+				<li><button data-simply-action="simply-insert-source" data-simply-section="simply-insert-source"><i class="fa fa-code"></i>Code</button></li>
+			</ul>
+		</div>
+	</div>
+</section>
+<style>
+	.simply-toolbar-section > ul > li.simply-label {
+		height: 40px;
+		line-height: 40px;
+		font-weight: bold;
+		padding-left: 5px;
+		padding-right: 5px;
+		min-width: 60px;
+	}
+</style>
+<script type="text/javascript">
+	window.setTimeout(function() {
+		editor.plugins.text = {};
+	}, 3000);
+
+
+	var initTextToolbar = function(config) {
+		var toolbar = document.querySelector("#" + this.name);
+
+		if (typeof config === "object" && toolbar) {
+			// Init blockstyles
+			if (config.block) {
+				var blockStyleSelect = toolbar.querySelector('select[data-simply-action=simply-text-blockstyle]');
+				if (blockStyleSelect) {
+					if (config.block.length) {
+						blockStyleSelect.innerHTML = '';
+						for (var i=0; i<config.block.length; i++) {
+							option = document.createElement("option");
+							option.value = config.block[i].tag;
+							option.innerHTML = config.block[i].name;
+							blockStyleSelect.appendChild(option);
+						}
+						option = document.createElement("option");
+						option.value = '';
+						option.innerHTML = '(plain text)';
+						blockStyleSelect.appendChild(option);
+					} else {
+						blockStyleSelect.style.display = "none";
+					}
+				}
+			}
+
+			// Init inline styles
+			if (config.inline) {
+				var inlineStyles = toolbar.querySelector('ul.simply-text-inline');
+				if (inlineStyles) {
+					if (config.inline.length) {
+						inlineStyles.innerHTML = '';
+						for (var i=0; i<config.inline.length; i++) {
+							var item = document.createElement("li");
+							var button = document.createElement("button");
+							button.setAttribute("data-value", config.inline[i].tag);
+							button.setAttribute("data-simply-action", "simply-text-inline");
+							button.innerHTML = "<i class='fa " + config.inline[i].icon + "'></i>" + config.inline[i].name;
+							item.appendChild(button);
+							inlineStyles.appendChild(item);
+
+						}
+					} else {
+						inlineStyles.style.display = "none";
+					}
+				}
+			}
+
+			// Backwards compatibility for classes/styles
+			if (config.class && !config.style) {
+				console.log("Warning: the classes configuration was changed in version 1.15; Please update your configuration.");
+				config.style = config.class;
+				if (config.style.length) {
+					for (var i=0; i<config.style.length; i++) {
+						if (config.style[i].classes) {
+							config.style[i].styles = config.style[i].classes;
+						}
+					}
+				}
+			}
+
+			// Init block styles
+			if (config.style) {
+				var styleSection = toolbar.querySelector('div.simply-toolbar-section.simply-text-style');
+				if (styleSection) {
+					if (config.style.length) {
+						styleSection.innerHTML = '';
+						for (var i=0; i<config.style.length; i++) {
+							var groupConfig = config.style[i];
+							if (groupConfig instanceof Array) {
+								groupConfig = {
+									styles : groupConfig,
+									description : "Block"
+								};
+							}
+							if (!groupConfig.selector) {
+								groupConfig.selector = hope.render.html.rules.nestingSets.block.join(","); // default to blocks only
+							}
+							if (groupConfig.styles.length) {
+								var styleList = groupConfig.styles.slice();
+								// styleList.push({class: "none", name: "Default", icon: "fa-times"});
+
+								var list = document.createElement("UL");
+								list.config = groupConfig;
+								list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
+
+								list.setAttribute("data-type", "simply-buttongroup-radio");
+								for (var j=0; j<styleList.length; j++) {
+									var item = document.createElement("li");
+									var button = document.createElement("button");
+									if (styleList[j].class) {
+										button.setAttribute("data-value", styleList[j].class);
+										button.setAttribute("data-simply-action", "simply-text-class");
+									} else if (styleList[j].attribute) {
+										button.setAttribute("data-value", Object.keys(styleList[j].attribute)[0]);
+										button.attributeValue = styleList[j].attribute;
+										button.setAttribute("data-simply-action", "simply-text-attribute");
+									}
+									button.innerHTML = "<i class='fa " + styleList[j].icon + "'></i>" + styleList[j].name;
+									item.appendChild(button);
+									list.appendChild(item);
+								}
+								styleSection.appendChild(list);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		toolbar.data = {};
+		// Blockstyles
+		toolbar.data.blockstyle = '';
+		editor.toolbar.bindInput(toolbar.data, 'blockstyle', toolbar.querySelector("select[data-simply-action=simply-text-blockstyle]"));
+
+		// Inline styles
+		toolbar.data.inline = {};
+		var inlineButtons = toolbar.querySelectorAll("button[data-simply-action=simply-text-inline]");
+		for (var i=0; i<inlineButtons.length; i++) {
+			var key = inlineButtons[i].getAttribute('data-value');
+			toolbar.data.inline[key] = false;
+			editor.toolbar.bindButton(toolbar.data.inline, key, inlineButtons[i]);
+		}
+
+		// Alignment
+		toolbar.data.align = '';
+		editor.toolbar.bindButtonGroup(toolbar.data, 'align', toolbar.querySelector("div.simply-text-align [data-type=simply-buttongroup-radio]"));
+
+		// Styles
+		toolbar.data.style = [];
+		var styleGroups = toolbar.querySelectorAll("div.simply-text-style [data-type=simply-buttongroup-radio]");
+		for (var i=0; i<styleGroups.length; i++) {
+			editor.toolbar.bindButtonGroup(toolbar.data.style, i, styleGroups[i]);
+		}
+
+		toolbar.data.hyperlink = {
+			href      : '',
+			title     : '',
+			name      : '',
+			nofollow  : false,
+			newwindow : false
+		};
+		if (toolbar.querySelector("#vdHyperlinkHref")) {
+			// Databinding for hyperlinks, experimental;
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "href", toolbar.querySelector("#vdHyperlinkHref"));
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "title", toolbar.querySelector("#vdHyperlinkTitle"));
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "name", toolbar.querySelector("#vdHyperlinkName"));
+			editor.toolbar.bindButton(toolbar.data.hyperlink, "nofollow", toolbar.querySelector("button.simply-hyperlink-nofollow"));
+			editor.toolbar.bindButton(toolbar.data.hyperlink, "newwindow", toolbar.querySelector("button.simply-hyperlink-newwindow"));
+		}
+	};
+
+	var updateTextToolbar = function(toolbar) {
+		if (toolbar === null) {
+			return;
+		}
+
+		var sel = vdSelectionState.get();
+		var parent = vdSelection.getNode(sel);
+		var field = editor.node.getEditableField();
+
+		hopeEditor = field.hopeEditor;
+		if (!hopeEditor) {
+			toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
+
+			toolbar.querySelector("[data-simply-section='simply-text-textstyle']").parentNode.style.display = "none";
+			toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "none";
+			if (toolbar.querySelector("[data-simply-section='simply-hyperlink']")) {
+				toolbar.querySelector("[data-simply-section='simply-hyperlink']").parentNode.style.display = "none";
+			}
+			toolbar.querySelector("[data-simply-action='simply-hyperlink-follow']").parentNode.style.display = "none";
+		} else {
+			editor.context.hopeEditor = hopeEditor;
+			hopeEditor.selection.updateRange();
+
+			var range = hopeEditor.selection.getRange();
+			hopeEditor.currentRange = range;
+
+			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+			var hyperlink = hopeEditor.fragment.has(range, "a");
+
+			if (blockAnnotation && (blockAnnotation.range.end == range.start)) {
+				var tagName1 = blockAnnotation.tag.split(/ /, 2)[0].toLowerCase();
+				var tagName2 = sel.startContainer.tagName;
+				if (!tagName2) {
+					tagName2 = sel.startContainer.parentNode.tagName;
+				}
+
+				tagName2 = tagName2.toLowerCase();
+				if (tagName1 != tagName2) {
+					blockAnnotation = false;
+				}
+			}
+
+			toolbar.data.blockstyle = '';
+			if (blockAnnotation) {
+				var tagName = blockAnnotation.tag.split(/ /, 2)[0].toLowerCase();
+				var foundTag = toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']");
+				if (foundTag) {
+					foundTag.selected = true;
+				} else if (tagName == "li") {
+					var annotation = hopeEditor.fragment.has(range, "ol");
+					if (annotation && toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ol']")) {
+						toolbar.data.blockstyle = 'ol';
+					} else {
+						annotation = hopeEditor.fragment.has(range, "ul");
+						if (annotation && toolbar.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']")) {
+							toolbar.data.blockstyle = 'ul';
+						}
+					}
+				}
+				toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "block";
+			} else {
+				toolbar.querySelector("[data-simply-section=simply-text-align]").parentNode.style.display = "none";
+			}
+
+
+			// Check inline styles;
+			var inlineStyles = toolbar.querySelectorAll("[data-simply-action='simply-text-inline']");
+			for (var i=0; i<inlineStyles.length; i++) {
+				var inlineStyle = inlineStyles[i].getAttribute("data-value");
+				toolbar.data.inline[inlineStyle] = hopeEditor.fragment.has(range, inlineStyle) ? true : false;
+			}
+
+			// Check fixed content;
+			if (field.getAttribute("data-simply-content") == "fixed") {
+				toolbar.querySelector("[data-simply-section='simply-text-textstyle']").parentNode.style.display = "none";
+				toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "none";
+			} else {
+				toolbar.querySelector("[data-simply-section='simply-text-textstyle']").parentNode.style.display = "block";
+				toolbar.querySelector("[data-simply-section='simply-insert']").parentNode.style.display = "block";
+			}
+
+			// Check hyperlink;
+			toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "none";
+
+			if (typeof toolbar.data.hyperlink !== 'undefined') {
+				toolbar.data.hyperlink.href = '';
+				toolbar.data.hyperlink.title = '';
+				toolbar.data.hyperlink.name = '';
+				toolbar.data.hyperlink.nofollow = false;
+				toolbar.data.hyperlink.newwindow = false;
+			}
+			if (hyperlink || (hopeEditor.field.tagName.toLowerCase() === 'a')) {
+
+				toolbar.querySelector("[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
+
+				var tempNode;
+				if (hyperlink) {
+					tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+				} else {
+					tempNode = hopeEditor.field;
+				}
+
+				var hyperlinkData = editor.field.get(tempNode);
+				for (var key in toolbar.data.hyperlink) {
+					toolbar.data.hyperlink[key] = (typeof hyperlinkData[key] !== "undefined") ? hyperlinkData[key] : '';
+				}
+				if (toolbar.data.hyperlink.nofollow == '') {
+					toolbar.data.hyperlink.nofollow = false;
+				}
+				if (toolbar.data.hyperlink.newwindow == '') {
+					toolbar.data.hyperlink.newwindow = false;
+				}
+
+				var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+				if (hyperlinkUnlink) {
+					if (hyperlink) {
+						toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
+					} else {
+						toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "none";
+					}
+				}
+			}
+
+
+			// Check aligment
+			blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+			var textAlign = toolbar.querySelector(".simply-text-align [data-type=simply-buttongroup-radio]");
+			if (blockAnnotation && textAlign) {
+				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
+				var buttons = textAlign.querySelectorAll("[data-value]");
+				toolbar.data.align = "none";
+				for (var j=0; j<buttons.length; j++) {
+					if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
+						toolbar.data.align = buttons[j].getAttribute("data-value");
+					}
+				}
+
+				var currentIcon = textAlign.querySelector("button.simply-selected i");
+				if (!currentIcon || (toolbar.data.align == "none")) {
+					currentIcon = textAlign.querySelector("button i");
+				}
+
+				// Set the parent icon for alignment as well;
+				var icon = toolbar.querySelector("button[data-simply-section=simply-text-align] i");
+				icon.className = currentIcon.className;
+			}
+		}
+
+		var showStyles = false;
+		var textStyles = toolbar.querySelectorAll(".simply-text-style [data-type=simply-buttongroup-radio]");
+		if (textStyles) {
+			for (var i=0; i<textStyles.length; i++) {
+				var selector = textStyles[i].config.selector;
+				var node = editor.node.findClassNode(parent, selector);
+				if (node) {
+					textStyles[i].style.display = "block";
+					showStyles = true;
+
+					toolbar.data.style[i] = '';
+					var buttons = textStyles[i].querySelectorAll("[data-value]");
+					for (var j=0; j<buttons.length; j++) {
+						if (buttons[j].getAttribute("data-simply-action") == "simply-text-class") {
+							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
+								toolbar.data.style[i] = buttons[j].getAttribute("data-value");
+							}
+						} else if (buttons[j].getAttribute("data-simply-action") == "simply-text-attribute") {
+							var attrName = buttons[j].getAttribute("data-value");
+							var attrValue = buttons[j].attributeValue[attrName];
+
+							if (node.getAttribute(attrName) == attrValue) {
+								toolbar.data.style[i] = buttons[j].attributeValue; // buttons[j].getAttribute("data-value");
+							}
+						}
+					}
+				} else {
+					textStyles[i].style.display = "none";
+				}
+			}
+		}
+
+		if (showStyles) {
+			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "block";
+		} else {
+			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "none";
+		}
+
+		return true;
+	};
+
+	editor.plugins.hope = {
+		annotation : {
+			explode : function(tag) {
+				var tempElm = document.createElement("DIV");
+				tempElm.innerHTML = "<" + tag + ">";
+				var tempNode = tempElm.childNodes[0];
+
+				return tempNode;
+			},
+			implode : function(node) {
+				if (node.className == '') {
+					node.removeAttribute("class");
+				}
+				result = node.tagName.toLowerCase();
+				for (i=0; i<node.attributes.length; i++) {
+					result += " " + node.attributes[i].name + "=\"" + node.attributes[i].value + "\"";
+				}
+				return result;
+			},
+			tagToggle : [],
+			apply : function(tag) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				var range = hopeEditor.currentRange;
+				var annotation = hopeEditor.fragment.has(range, tag);
+
+				if (range.start === range.end) {
+					var addTag = function(event) {
+						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag); // remove it now, setting textContent can trigger it again and mess up;
+						var newValue = event.newValue.replace(/ $/, "\xa0"); // replace ending space with nbsp;
+						var rangeLength = newValue.length - event.prevValue.length;
+						event.preventDefault();
+						event.target.textContent = newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
+						// ... and messes up the cursor position;
+
+						hopeEditor.parseHTML();
+						hopeEditor.selection.move(rangeLength);
+						var newRange = hope.range.create(range.start, range.start + rangeLength);
+
+						for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
+							if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
+								hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+							} else {
+								hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+							}
+						}
+						hopeEditor.update();
+
+						window.setTimeout(function() {
+							// this resets the cursor position to where it was; Chrome 54 is still busy doing stuff when the update is running, so give it a cycle to get its stuff together;
+							hopeEditor.selection.updateRange(newRange.end, newRange.end);
+							hopeEditor.showCursor();
+						}, 0);
+
+						editor.plugins.hope.annotation.tagToggle = [];
+					};
+
+					if (editor.plugins.hope.annotation.tagToggle.length === 0) {
+						hopeEditor.field.addEventListener("DOMCharacterDataModified", addTag);
+						var removeAddTagListener = function() {
+							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+						};
+					}
+				}
+
+				if (annotation) {
+					if ((annotation.range.start === range.start) && (annotation.range.end === range.end)) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					} else if (range.start === range.end) {
+						var index = editor.plugins.hope.annotation.tagToggle.indexOf(tag);
+						if (index !== -1) {
+							editor.plugins.hope.annotation.tagToggle.splice(index, 1);
+						} else {
+							editor.plugins.hope.annotation.tagToggle.push(tag);
+						}
+						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
+							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+						}
+						// hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					} else {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+						var newRange = hope.range.create(annotation.range.start, range.start);
+						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, tag);
+						newRange = hope.range.create(range.end, annotation.range.end);
+						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, tag);
+					}
+				} else {
+					if (range.start === range.end) {
+						var index = editor.plugins.hope.annotation.tagToggle.indexOf(tag);
+						if (index !== -1) {
+							editor.plugins.hope.annotation.tagToggle.splice(index, 1);
+						} else {
+							editor.plugins.hope.annotation.tagToggle.push(tag);
+						}
+						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
+							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+						}
+					} else {
+						hopeEditor.fragment = hopeEditor.fragment.apply(range, tag);
+					}
+				}
+				hopeEditor.update();
+			},
+			blocks : function(range) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				var blocks = [];
+				if (range.start != range.end) {
+					var noBlockStart = -1;
+					for (var i=range.start; i<range.end+1; i++) {
+						var blockAnnotation = hopeEditor.getBlockAnnotation(i);
+						if (blockAnnotation) {
+							if (noBlockStart > -1) {
+								blocks.push({
+									range : {
+										start : noBlockStart,
+										end : i
+									},
+									tag : ""
+								});
+								noBlockStart = -1;
+							}
+
+							if (blocks.indexOf(blockAnnotation) === -1) {
+								blocks.push(blockAnnotation);
+							}
+						} else {
+							if (noBlockStart == -1) {
+								noBlockStart = i - 1;
+							}
+						}
+					}
+				} else {
+					blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+					if (blockAnnotation) {
+						blocks.push(blockAnnotation);
+					} else {
+						var sel = window.getSelection();
+						if (sel.rangeCount) {
+							range = sel.getRangeAt(0);
+							range.setStart(sel.focusNode,0);
+							range.setEnd(sel.focusNode, sel.focusNode.length);
+							sel.removeAllRanges();
+							sel.addRange(range);
+							hopeEditor.selection.updateRange();
+							range = hopeEditor.selection.getRange();
+							blocks.push({
+								range : range,
+								tag : ""
+							});
+						}
+					}
+				}
+				return blocks;
+			}
+		}
+	};
+
+	editor.addToolbar({
+		"name" : "simply-text-cursor",
+		"filter" : {
+			"sel-collapsed" : true
+		},
+		update : updateTextToolbar,
+		init : initTextToolbar
+	});
+
+	editor.addToolbar({
+		name : "simply-text-selection",
+		filter : {
+			"sel-collapsed" : false
+		},
+		update : updateTextToolbar,
+		init : initTextToolbar,
+		actions : {
+			'simply-text-class' : function(el) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				var sel = vdSelectionState.get();
+				var parent = vdSelection.getNode(sel);
+				var selector;
+				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
+					selector = el.parentNode.parentNode.config.selector;
+				}
+
+				var targetNode = editor.node.findClassNode(parent, selector);
+				if (targetNode.classList.contains(el.getAttribute("data-value"))) {
+					targetNode.classList.remove(el.getAttribute("data-value"));
+				} else {
+					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
+					for (var i=0; i<buttons.length; i++) {
+						targetNode.classList.remove(buttons[i].getAttribute("data-value"));
+					}
+					if (el.getAttribute("data-value") !== "none") {
+						targetNode.classList.add(el.getAttribute("data-value"));
+					}
+				}
+				if (targetNode.className == "") {
+					targetNode.removeAttribute("class");
+				}
+				hopeEditor.parseHTML();
+				editor.fireEvent("databinding:valuechanged", field);
+				editor.context.show();
+			},
+			'simply-text-attribute' : function(el) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				var sel = vdSelectionState.get();
+				var parent = vdSelection.getNode(sel);
+				var selector;
+				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
+					selector = el.parentNode.parentNode.config.selector;
+				}
+
+				var targetNode = editor.node.findClassNode(parent, selector);
+				var attrName = el.getAttribute("data-value");
+				var attrValue = el.attributeValue[attrName];
+
+				if (targetNode.getAttribute(attrName) == attrValue) {
+					targetNode.removeAttribute(el.getAttribute("data-value"));
+				} else {
+					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
+					for (var i=0; i<buttons.length; i++) {
+						targetNode.removeAttribute(attrName);
+					}
+					if (el.getAttribute(attrName) !== "none") {
+						targetNode.setAttribute(attrName, attrValue);
+					}
+				}
+				hopeEditor.parseHTML();
+				editor.fireEvent("databinding:valuechanged", field);
+				editor.context.show();
+			},
+			'simply-text-inline' : function(el) {
+				editor.plugins.hope.annotation.apply(el.getAttribute("data-value"));
+			},
+			// FIXME: These are here for the tests only, tests should be rewritten.
+			'simply-text-bold' : function() {
+				editor.plugins.hope.annotation.apply("strong");
+			},
+			'simply-text-italic' : function(el) {
+				editor.plugins.hope.annotation.apply("em");
+			},
+			'simply-text-underline' : function(el) {
+				editor.plugins.hope.annotation.apply("u");
+			},
+			'simply-text-code' : function(el) {
+				editor.plugins.hope.annotation.apply("code");
+			},
+			'simply-text-blockstyle' : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				var range = hopeEditor.currentRange;
+				var blocks = editor.plugins.hope.annotation.blocks(range);
+
+				if (value == "ol" || value == "ul") {
+					var annotation = hopeEditor.fragment.has(range, "ul");
+					if (annotation) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, "ul");
+						hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, value);
+						return;
+					}
+
+					annotation = hopeEditor.fragment.has(range, "ol");
+					if (annotation) {
+						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, "ol");
+						hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, value);
+						hopeEditor.update();
+						return;
+
+					}
+
+					if (blocks.length === 0) {
+						hopeEditor.fragment = hopeEditor.fragment.apply(range, "li");
+						hopeEditor.fragment = hopeEditor.fragment.apply(range, value);
+						hopeEditor.update();
+						return;
+					} else {
+						// find out the range that will contain all the to-be-created list items;
+						var containingRange;
+						for (var i=0; i<blocks.length; i++) {
+							if (typeof containingRange === "undefined") {
+								containingRange = hope.range.create(blocks[i].range.start, blocks[i].range.end);
+							} else {
+								containingRange = hope.range.create(Math.min(blocks[i].range.start, containingRange.start), Math.max(blocks[i].range.end, containingRange.end));
+							}
+						}
+						if (range.start != range.end) {
+							containingRange = hope.range.create(Math.max(containingRange.start, range.start), Math.min(containingRange.end, range.end));
+						}
+						hopeEditor.fragment = hopeEditor.fragment.apply(containingRange, value);
+						hopeEditor.update();
+						value = "li";
+					}
+				}
+
+				if (blocks.length === 0) {
+					return editor.plugins.hope.annotation.apply(value);
+				}
+
+				while (blocks.length) {
+					var block = blocks.shift();
+					var newRange;
+					if (range.start != range.end) {
+						newRange = hope.range.create(Math.max(block.range.start, range.start), Math.min(block.range.end, range.end));
+					} else {
+						newRange = hope.range.create(block.range.start, block.range.end);
+					}
+					if (newRange.start == newRange.end) {
+						continue;
+					}
+					if ((newRange.start == block.range.start) && (newRange.end == block.range.end)) {
+						var tagName = block.tag.split(" ")[0];
+						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
+							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
+						}
+					}
+					var nodeInfo = false;
+					if (block.tag.indexOf(" ") !== -1) {
+						nodeInfo = block.tag.substr(block.tag.indexOf(" ")+1);
+					}
+					var newValue = value;
+					if (nodeInfo) {
+						newValue += " " + nodeInfo;
+					}
+					if (value) {
+						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, newValue);
+					}
+				}
+
+				hopeEditor.update();
+			},
+			"simply-hyperlink-href" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					hopeEditor.field.setAttribute("href", value);
+					return;
+				}
+
+				var range = hopeEditor.currentRange;
+
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+				
+				if (!hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a href="' + value + '"');
+				} else {
+					var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+					tempNode.setAttribute("href", value);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
+				}
+				hopeEditor.update();
+			},
+			"simply-hyperlink-unlink" : function() {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				var range = hopeEditor.currentRange;
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+				if (hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.update();
+				}
+			},
+			"simply-hyperlink-title" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					hopeEditor.field.setAttribute("title", value);
+					return;
+				}
+
+				var range = hopeEditor.currentRange;
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+				
+				if (!hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a title="' + value + '"');
+				} else {
+					var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+					tempNode.setAttribute("title", value);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
+				}
+				hopeEditor.update();
+			},
+			"simply-hyperlink-name" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					hopeEditor.field.setAttribute("name", value);
+					hopeEditor.field.setAttribute("id", value);
+					return;
+				}
+
+				var range = hopeEditor.currentRange;
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+				
+				if (!hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a name="' + value + '" id="' + value + '"');
+				} else {
+					var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+					tempNode.setAttribute("name", value);
+					tempNode.setAttribute("id", value);
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
+				}
+				hopeEditor.update();
+			},
+			"simply-hyperlink-nofollow" : function(button) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					if (hopeEditor.field.getAttribute("rel") == "nofollow") {
+						hopeEditor.field.removeAttribute("rel");
+					} else {
+						hopeEditor.field.setAttribute("rel", "nofollow");
+					}
+					hopeEditor.update();
+					return;
+				}
+
+				var range = hopeEditor.currentRange;
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+				
+				if (!hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a rel="nofollow"');
+				} else {
+					var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+
+					if (tempNode.getAttribute("rel") == "nofollow") {
+						tempNode.removeAttribute("rel");
+					} else {
+						tempNode.setAttribute("rel", "nofollow");
+					}
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
+				}
+				hopeEditor.update();
+			},
+			"simply-hyperlink-newwindow" : function(button) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					if (hopeEditor.field.getAttribute("target") == "_blank") {
+						hopeEditor.field.removeAttribute("target");
+					} else {
+						hopeEditor.field.setAttribute("target", "_blank");
+					}
+					hopeEditor.update();
+					return;
+				}
+
+				var range = hopeEditor.currentRange;
+				var hyperlink = hopeEditor.fragment.has(range, "a");
+
+				if (!hyperlink) {
+					hopeEditor.fragment = hopeEditor.fragment.apply(range, 'a target="_blank"');
+				} else {
+					var tempNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+
+					if (tempNode.getAttribute("target") == "_blank") {
+						tempNode.removeAttribute("target");
+					} else {
+						tempNode.setAttribute("target", "_blank");
+					}
+					var newValue = editor.plugins.hope.annotation.implode(tempNode);
+					hopeEditor.fragment = hopeEditor.fragment.remove(hyperlink.range, hyperlink.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(hyperlink.range, newValue);
+				}
+				hopeEditor.update();
+			},
+			"simply-hyperlink-follow" : function(button) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				var target;
+				if (hopeEditor.field.tagName.toLowerCase() === 'a') {
+					target = hopeEditor.field;
+				} else {
+					var sel = vdSelectionState.get();
+					target = vdSelection.getNode(sel);
+					if (target.tagName.toLowerCase() !== 'a') {
+						target = target.parentNode;
+					}
+				}
+				muze.event.fire(target, "dblclick");
+			}
+		}
+	});
+	editor.addContextFilter("simply-hyperlink", {
+		"selector" : "A",
+		"parent" : {
+			"selector" : "*"
+		},
+		"context" : "simply-text-selection"
+	});
+	editor.addContextFilter("simply-textonly", {
+		"selector" : "[data-simply-content='text']",
+		"context" : "simply-no-context"
+	});
+</script><section id="simply-image" class="simply-section">
+	<h1>HTML Image Toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
+			<li><button data-simply-section="simply-image-align" class="simply-expands"><i class="fa fa-align-left"></i>Align</button></li>
+			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
+			<li><button data-simply-section="simply-hyperlink" class="simply-expands"><i class="fa fa-link"></i>Link</button></li>
+			<li><button data-simply-section="simply-code" data-simply-action="simply-edit-source"><i class="fa fa-code"></i>Code</button></li>
+			<li><button data-simply-action="simply-hyperlink-follow"><i class="fa fa-external-link"></i>Follow link</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-image-style">
+		</div>
+		<div class="simply-toolbar-section simply-image-align">
+			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-left"><i class="fa fa-align-left"></i>Left</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-right"><i class="fa fa-align-right"></i>Right</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
+			</ul>
+			<ul data-type="simply-buttongroup-radio" style='display: inline-block;'>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-top"><i class="fa fa-chevron-up"></i>Top</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-bottom"><i class="fa fa-chevron-down"></i>Bottom</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="simply-image-align-middle"><i class="fa fa-chevron-right"></i>Middle</button></li>
+				<li><button data-simply-action="simply-image-class" data-value="none"><i class="fa fa-times"></i>None</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-image-properties">
+			<div><label>URL</label><input type="text" class="simply-image-src" data-simply-action="simply-image-src"></div>
+			<div><label>Alt</label><input type="text" class="simply-image-alt" data-simply-action="simply-image-alt"></div>
+			<div><label>Title</label><input type="text" class="simply-image-title" data-simply-action="simply-image-title"></div>
+		</div>
+		<div class="simply-toolbar-section simply-hyperlink">
+			<div><label>URL</label><input type="text" class="simply-hyperlink-href" data-simply-action="simply-hyperlink-href"></div>
+			<div><label>Title</label><input type="text" class="simply-hyperlink-title" data-simply-action="simply-hyperlink-title"></div>
+			<div><label>Name</label><input type="text" class="simply-hyperlink-name" data-simply-action="simply-hyperlink-name"></div>
+			<div>
+				<button class="simply-hyperlink-nofollow" data-simply-action="simply-hyperlink-nofollow"><i class="fa fa-chain-broken"></i>Nofollow</button>
+				<button class="simply-hyperlink-newwindow" data-simply-action="simply-hyperlink-newwindow"><i class="fa fa-external-link"></i>New window</button>
+				<button class="simply-hyperlink-unlink" data-simply-action="simply-hyperlink-unlink"><i class="fa fa-chain-broken"></i>Remove link</button>
+			</div>
+		</div>
+	</div>
+</section>
+<section id="simply-image-field" class="simply-section">
+	<h1>HTML Image Toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-image-style" class="simply-expands"><i class="fa fa-paint-brush"></i>Style</button></li>
+			<li><button data-simply-section="simply-image-properties" class="simply-expands"><i class="fa fa-tags"></i>Properties</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-image-style">
+		</div>
+		<div class="simply-toolbar-section simply-image-properties">
+			<div><label>URL</label><input type="text" class="simply-image-src" data-simply-action="simply-image-src"></div>
+			<div><label>Alt</label><input type="text" class="simply-image-alt" data-simply-action="simply-image-alt"></div>
+			<div><label>Title</label><input type="text" class="simply-image-title" data-simply-action="simply-image-title"></div>
+		</div>
+	</div>
+</section>
+
+<script type="text/javascript">
+	var currentImage;
+	var currentLink;
+
+	editor.plugins.image = {
+		placeholderData : null,
+		placeholder : function() {
+			if (!editor.plugins.image.placeholderData) {
+				// Create a nice placeholder image and insert that;
+				var canvas = document.createElement("canvas");
+				canvas.setAttribute("height", 60);
+				canvas.setAttribute("width", 80);
+
+				var ctx = canvas.getContext("2d");
+				ctx.fillStyle = "#ccc";
+				ctx.fillRect(0,0,canvas.getAttribute("width"), canvas.getAttribute("height"));
+				ctx.fillStyle = "#eee";
+				ctx.fillRect(2,2,canvas.getAttribute("width")-4, canvas.getAttribute("height")-4);
+
+				ctx.font = "48px FontAwesome";
+				ctx.fillStyle = "#999";
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+
+				// Use FontAwesome 'photo' icon;
+				ctx.fillText("\uf03e", canvas.getAttribute("width")/2, canvas.getAttribute("height")/2);
+				
+				editor.plugins.image.placeholderData = canvas.toDataURL("image/png");
+			}
+			return editor.plugins.image.placeholderData;
+		},
+		reselect : function() {
+			var field = editor.context.hopeEditor.field;
+			var hopeEditor = field.hopeEditor;
+
+			hopeEditor.showCursor();
+			vdSelectionState.remove();
+			var sel = window.getSelection();
+			var image = vdSelection.getNode(vdSelectionState.get());
+
+			var found = false;
+			if (field.tagName.toLowerCase() == "img") {
+				image = field;
+				found = true;
+			} else if (image.nodeType == 1 && image.tagName.toLowerCase() == "img") {
+				found = true;
+			} else if (sel.focusNode.nextSibling && sel.focusNode.nextSibling.nodeType == 1 && sel.focusNode.nextSibling.tagName.toLowerCase() == "img") {
+				image = sel.focusNode.nextSibling;
+				found = true;
+			} else if (sel.focusNode.childNodes.length && sel.focusNode.childNodes[0].nodeType == 1 && sel.focusNode.childNodes[0].tagName.toLowerCase() == "img") {
+				image = sel.focusNode.childNodes[0];
+				found = true;
+			} else if (sel.focusNode.parentNode.nextSibling && sel.focusNode.parentNode.nextSibling.nodeType == 1 && sel.focusNode.parentNode.nextSibling.tagName.toLowerCase() == "img") {
+				image = sel.focusNode.parentNode.nextSibling;
+				found = true;
+			}
+
+			if (found) {
+				var range = document.createRange();
+				range.setStartBefore(image);
+				range.setEndAfter(image);
+
+				sel.removeAllRanges();
+				sel.addRange(range);
+				return image;
+			} else {
+				sel.removeAllRanges();
+			}
+		}
+	};
+
+	editor.addToolbar({
+		"name" : "simply-image",
+		"filter" : {
+			"selector" : "IMG",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var image = vdSelection.getNode(sel);
+			var field = editor.node.getEditableField();
+			var hopeEditor = field.hopeEditor;
+			editor.context.hopeEditor = hopeEditor;
+
+			var imagePos = hopeEditor.selection.getTotalOffset(image);
+			hopeEditor.selection.start = imagePos;
+			hopeEditor.selection.end = imagePos+1;
+
+			var range = hopeEditor.selection.getRange();
+			hopeEditor.currentRange = range;
+
+			var annotation = hopeEditor.fragment.has(range, "img");
+			
+			var imageData = editor.field.get(image);
+			toolbar.data.alt = (typeof imageData.alt !== "undefined") ? imageData.alt : '';
+			toolbar.data.title = (typeof imageData.title !== "undefined") ? imageData.title : '';
+			toolbar.data.src = ((typeof imageData.src == "undefined") || (imageData.src == editor.plugins.image.placeholder())) ? "" : imageData.src;
+
+			var showStyles = false;
+			var imageStyles = toolbar.querySelectorAll(".simply-image-style [data-type=simply-buttongroup-radio]");
+			if (imageStyles) {
+				for (var i=0; i<imageStyles.length; i++) {
+					var selector = imageStyles[i].config.selector;
+					var node = editor.node.findClassNode(image, selector);
+					if (node) {
+						imageStyles[i].style.display = "block";
+						showStyles = true;
+
+						var buttons = imageStyles[i].querySelectorAll("[data-value]");
+						toolbar.data.style[i] = '';
+						for (var j=0; j<buttons.length; j++) {
+							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
+								toolbar.data.style[i] = buttons[j].getAttribute("data-value");
+							}
+						}
+					} else {
+						imageStyles[i].style.display = "none";
+					}
+				}
+			}
+
+			if (showStyles) {
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "block";
+			} else {
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "none";
+			}
+
+			var alignClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
+			if (alignClasses) {
+				var tempNode;
+				if (annotation) {
+					tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					tempNode = hopeEditor.field;
+				}
+
+				for (var i=0; i<alignClasses.length; i++) {
+					var buttons = alignClasses[i].querySelectorAll("[data-value]");
+					toolbar.data.align[i] = '';
+					for (var j=0; j<buttons.length; j++) {
+						if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
+							toolbar.data.align[i] = buttons[j].getAttribute("data-value");
+						}
+					}
+				}
+			}
+
+			toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "none";
+
+			toolbar.data.hyperlink.href = '';
+			toolbar.data.hyperlink.title = '';
+			toolbar.data.hyperlink.name = '';
+			toolbar.data.hyperlink.nofollow = false;
+			toolbar.data.hyperlink.newwindow = false;
+
+			var linkNode;
+			var hyperlink = hopeEditor.fragment.has(range, "a");
+			if (hyperlink) {
+				linkNode = editor.plugins.hope.annotation.explode(hyperlink.tag);
+			} else if (hopeEditor.field.tagName.toLowerCase() === "a") {
+				linkNode = hopeEditor.field;
+			}
+			if (linkNode) {
+				toolbar.querySelector("button[data-simply-action=simply-hyperlink-follow]").parentNode.style.display = "block";
+				var hyperlinkData = editor.field.get(linkNode);
+				for (var key in toolbar.data.hyperlink) {
+					toolbar.data.hyperlink[key] = (typeof hyperlinkData[key] !== "undefined") ? hyperlinkData[key] : '';
+				}
+				if (toolbar.data.hyperlink.nofollow == '') {
+					toolbar.data.hyperlink.nofollow = false;
+				}
+				if (toolbar.data.hyperlink.newwindow == '') {
+					toolbar.data.hyperlink.newwindow = false;
+				}
+			}
+
+			// Hide the unlink button if there is no hyperlink;
+			var hyperlinkUnlink = toolbar.querySelector("button.simply-hyperlink-unlink");
+			if (hyperlinkUnlink) {
+				if (hyperlink) {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "inline-block";
+				} else {
+					toolbar.querySelector("button.simply-hyperlink-unlink").style.display = "none";
+				}
+			}
+
+			// Set the parent icon for alignment as well;
+			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
+			if (!currentIcon || (currentIcon.parentNode.getAttribute("data-value") == "none")) {
+				currentIcon = document.querySelector("div.simply-image-align button i");
+			}
+			if (currentIcon) {
+				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+				for (var i=0; i<icons.length; i++) {
+					icons[i].className = currentIcon.className;
+				}
+			}
+
+
+		},
+		"init" : function(config) {
+			var toolbar = document.querySelector("#" + this.name);
+			if (typeof config === "object" && toolbar) {
+				// Backwards compatibility for classes/styles
+				if (config.class && !config.style) {
+					console.log("Warning: the classes configuration was changed in version 1.15; Please update your configuration.");
+					config.style = config.class;
+					if (config.style.length) {
+						for (var i=0; i<config.style.length; i++) {
+							if (config.style[i].classes) {
+								config.style[i].styles = config.style[i].classes;
+							}
+						}
+					}
+				}
+
+				// Init block styles
+				if (config.style) {
+					var styleSections = toolbar.querySelectorAll('div.simply-toolbar-section.simply-image-style');
+					for (var i=0; i<styleSections.length; i++) {
+						if (config.style.length) {
+							styleSections[i].innerHTML = '';
+							for (var j=0; j<config.style.length; j++) {
+								var groupConfig = config.style[j];
+								if (groupConfig instanceof Array) {
+									groupConfig = {
+										styles : groupConfig,
+										description: "Image",
+										selector : "img"
+									};
+								}
+								if (!groupConfig.selector) {
+									groupConfig.selector = "img";
+								}
+								if (groupConfig.styles.length) {
+									var styleList = groupConfig.styles.slice();
+									// styleList.push({class: "none", name: "Default", icon: "fa-times"});
+									var list = document.createElement("UL");
+									list.config = groupConfig;
+									list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
+									list.setAttribute("data-type", "simply-buttongroup-radio");
+									for (var k=0; k<styleList.length; k++) {
+										var item = document.createElement("li");
+										var button = document.createElement("button");
+										button.setAttribute("data-value", styleList[k].class);
+										button.setAttribute("data-simply-action", "simply-image-class");
+										button.innerHTML = "<i class='fa " + styleList[k].icon + "'></i>" + styleList[k].name;
+										item.appendChild(button);
+										list.appendChild(item);
+									}
+									styleSections[i].appendChild(list);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Disable user zoom, because it will zoom extremely weird when you select an image on android devices;
+			var viewportMeta = document.head.querySelector("meta[name=viewport]");
+			if (!viewportMeta) {
+				viewportMeta = document.createElement("meta");
+				viewportMeta.setAttribute("name", "viewport");
+				viewportMeta.setAttribute("content", "user-scalable=no");
+				document.head.appendChild(viewportMeta);
+			} else {
+				viewportMeta.setAttribute("content", viewportMeta.getAttribute("content") + ", user-scalable=no");
+			}
+
+			toolbar.data = {
+				src : '',
+				alt : '',
+				title : ''
+			};
+			editor.toolbar.bindInput(toolbar.data, "src", toolbar.querySelector(".simply-image-src"));
+			editor.toolbar.bindInput(toolbar.data, "alt", toolbar.querySelector(".simply-image-alt"));
+			editor.toolbar.bindInput(toolbar.data, "title", toolbar.querySelector(".simply-image-title"));
+
+			// Styles
+			toolbar.data.style = [];
+			var styleGroups = toolbar.querySelectorAll("div.simply-image-style [data-type=simply-buttongroup-radio]");
+			for (var i=0; i<styleGroups.length; i++) {
+				editor.toolbar.bindButtonGroup(toolbar.data.style, i, styleGroups[i]);
+			}
+
+			// Align
+			toolbar.data.align = [];
+			var alignGroups = toolbar.querySelectorAll("div.simply-image-align [data-type=simply-buttongroup-radio]");
+			for (var i=0; i<alignGroups.length; i++) {
+				editor.toolbar.bindButtonGroup(toolbar.data.align, i, alignGroups[i]);
+			}
+			
+			// Hyperlinks
+			toolbar.data.hyperlink = {
+				href      : '',
+				title     : '',
+				name      : '',
+				nofollow  : false,
+				newwindow : false
+			};
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "href", toolbar.querySelector(".simply-hyperlink-href"));
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "title", toolbar.querySelector(".simply-hyperlink-title"));
+			editor.toolbar.bindInput(toolbar.data.hyperlink, "name", toolbar.querySelector(".simply-hyperlink-name"));
+			editor.toolbar.bindButton(toolbar.data.hyperlink, "nofollow", toolbar.querySelector("button.simply-hyperlink-nofollow"));
+			editor.toolbar.bindButton(toolbar.data.hyperlink, "newwindow", toolbar.querySelector("button.simply-hyperlink-newwindow"));
+		},
+		"actions" : {
+			'simply-image-class' : function(el) {
+				var sel = vdSelectionState.get();
+				var parent = vdSelection.getNode(sel);
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+				var selector;
+				if (el.parentNode.parentNode.config && el.parentNode.parentNode.config.selector) {
+					selector = el.parentNode.parentNode.config.selector;
+				} else {
+					selector = "img";
+				}
+
+				var targetNode = editor.node.findClassNode(parent, selector);
+
+				if (targetNode.classList.contains(el.getAttribute("data-value"))) {
+					targetNode.classList.remove(el.getAttribute("data-value"));
+				} else {
+					var buttons = el.parentNode.parentNode.querySelectorAll("[data-value]");
+					for (var i=0; i<buttons.length; i++) {
+						targetNode.classList.remove(buttons[i].getAttribute("data-value"));
+					}
+					if (el.getAttribute("data-value") !== "none") {
+						targetNode.classList.add(el.getAttribute("data-value"));
+					}
+				}
+				if (targetNode.className == "") {
+					targetNode.removeAttribute("class");
+				}
+				hopeEditor.parseHTML();
+				var imageNode = editor.plugins.image.reselect();
+				if (imageNode) {
+					editor.responsiveImages.initImage(imageNode);
+				}
+				editor.fireEvent("databinding:valuechanged", field);
+				editor.context.show();
+			},
+			"simply-image-delete" : function() {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				var range = hopeEditor.currentRange;
+				var annotation = hopeEditor.fragment.has(range, "img");
+
+				if (annotation) {
+					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					hopeEditor.update();
+				}
+			},
+			"simply-image-alt" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				var range = hopeEditor.currentRange;
+				var annotation = hopeEditor.fragment.has(range, "img");
+				if (annotation) {
+					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+					tempNode.setAttribute("alt", value);
+
+					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
+					hopeEditor.update();
+					editor.plugins.image.reselect();
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					hopeEditor.field.setAttribute("alt", value);
+				}
+			},
+			"simply-image-title" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				var range = hopeEditor.currentRange;
+				var annotation = hopeEditor.fragment.has(range, "img");
+				if (annotation) {
+					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+					tempNode.setAttribute("title", value);
+					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
+					hopeEditor.update();
+					editor.plugins.image.reselect();
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					hopeEditor.field.setAttribute("title", value);
+				}
+			},
+			"simply-image-src" : function(value) {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				value = value.replace(/\\/g, "/");
+
+				var range = hopeEditor.currentRange;
+				var annotation = hopeEditor.fragment.has(range, "img");
+
+				if (annotation) {
+					var tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+					if (value) {
+						tempNode.setAttribute("data-simply-src", value);
+					} else {
+						tempNode.setAttribute("data-simply-src", editor.plugins.image.placeholder());
+					}
+					hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
+					hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, editor.plugins.hope.annotation.implode(tempNode));
+					hopeEditor.update();
+					var imageNode = editor.plugins.image.reselect();
+					if (imageNode) {
+						editor.responsiveImages.initImage(imageNode);
+					}
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					if (value) {
+						hopeEditor.field.setAttribute("data-simply-src", value);
+					} else {
+						hopeEditor.field.setAttribute("data-simply-src", editor.plugins.image.placeholder());
+					}
+					editor.responsiveImages.initImage(hopeEditor.field);
+					editor.plugins.image.reselect();
+					editor.context.update();
+				}
+			},
+			"simply-insert-image" : function() {
+				var field = editor.context.hopeEditor.field;
+				var hopeEditor = field.hopeEditor;
+
+				var imageSrc = editor.plugins.image.placeholder();
+				var range = hopeEditor.currentRange;
+
+				if ( range.length ) {
+					hopeEditor.fragment = hopeEditor.fragment.delete(range);
+				}
+				var imageFragment = hope.fragment.create("\u00AD", '0-1:img src="' + imageSrc + '"');
+				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, imageFragment);
+
+				range = hope.range.create(range.start, range.start+1);
+
+				hopeEditor.fragment = hopeEditor.fragment.apply(range, 'img src="' + imageSrc + '"');
+				hopeEditor.selection.updateRange(range.start, range.start+1);
+
+				hopeEditor.update();
+				editor.plugins.image.reselect();
+				window.setTimeout(editor.context.update, 100);
+			}
+		}
+	});
+
+	editor.addToolbar({
+		"name" : "simply-image-field",
+		"filter" : {
+			"selector" : "IMG[data-simply-field]",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var image = vdSelection.getNode(sel);
+			if (!image.hopeEditor) {
+				editor.field.initHopeStub(image);
+			}
+
+			var hopeEditor = image.hopeEditor;
+			editor.context.hopeEditor = hopeEditor;
+
+			var annotation = false;
+
+			var imageData = editor.field.get(image);
+			toolbar.data.alt = (typeof imageData.alt !== "undefined") ? imageData.alt : '';
+			toolbar.data.title = (typeof imageData.title !== "undefined") ? imageData.title : '';
+			toolbar.data.src = ((typeof imageData.src == "undefined") || (imageData.src == editor.plugins.image.placeholder())) ? "" : imageData.src;
+
+			var showStyles = false;
+			var imageStyles = toolbar.querySelectorAll(".simply-image-style [data-type=simply-buttongroup-radio]");
+			if (imageStyles) {
+				for (var i=0; i<imageStyles.length; i++) {
+					var selector = imageStyles[i].config.selector;
+					var node = editor.node.findClassNode(image, selector);
+					if (node) {
+						imageStyles[i].style.display = "block";
+						showStyles = true;
+
+						var buttons = imageStyles[i].querySelectorAll("[data-value]");
+						toolbar.data.style[i] = '';
+						for (var j=0; j<buttons.length; j++) {
+							if (node.classList.contains(buttons[j].getAttribute("data-value"))) {
+								toolbar.data.style[i] = buttons[j].getAttribute("data-value");
+							}
+						}
+					} else {
+						imageStyles[i].style.display = "none";
+					}
+				}
+			}
+
+			if (showStyles) {
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "block";
+			} else {
+				toolbar.querySelector("[data-simply-section='simply-image-style']").parentNode.style.display = "none";
+			}
+
+			var alignClasses = toolbar.querySelectorAll(".simply-image-align [data-type=simply-buttongroup-radio]");
+			if (alignClasses) {
+				var tempNode;
+				if (annotation) {
+					tempNode = editor.plugins.hope.annotation.explode(annotation.tag);
+				} else if (hopeEditor.field.tagName.toLowerCase() === "img") {
+					tempNode = hopeEditor.field;
+				}
+
+				for (var i=0; i<alignClasses.length; i++) {
+					var buttons = alignClasses[i].querySelectorAll("[data-value]");
+					toolbar.data.align[i] = '';
+					for (var j=0; j<buttons.length; j++) {
+						if (tempNode.classList.contains(buttons[j].getAttribute("data-value"))) {
+							toolbar.data.align[i] = buttons[j].getAttribute("data-value");
+						}
+					}
+				}
+			}
+
+			// Set the parent icon for alignment as well;
+			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
+			if (!currentIcon || (currentIcon.parentNode.getAttribute("data-value") == "none")) {
+				currentIcon = document.querySelector("div.simply-image-align button i");
+			}
+			if (currentIcon) {
+				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+				for (var i=0; i<icons.length; i++) {
+					icons[i].className = currentIcon.className;
+				}
+			}
+		},
+		"init" : function(config) {
+			var toolbar = document.querySelector("#" + this.name);
+			if (typeof config === "object" && toolbar) {
+				// Backwards compatibility for classes/styles
+				if (config.class && !config.style) {
+					console.log("Warning: the classes configuration was changed in version 1.15; Please update your configuration.");
+					config.style = config.class;
+					if (config.style.length) {
+						for (var i=0; i<config.style.length; i++) {
+							if (config.style[i].classes) {
+								config.style[i].styles = config.style[i].classes;
+							}
+						}
+					}
+				}
+
+				// Init block styles
+				if (config.style) {
+					var styleSections = toolbar.querySelectorAll('div.simply-toolbar-section.simply-image-style');
+					for (var i=0; i<styleSections.length; i++) {
+						if (config.style.length) {
+							styleSections[i].innerHTML = '';
+							for (var j=0; j<config.style.length; j++) {
+								var groupConfig = config.style[j];
+								if (groupConfig instanceof Array) {
+									groupConfig = {
+										styles : groupConfig,
+										description: "Image",
+										selector : "img"
+									};
+								}
+								if (!groupConfig.selector) {
+									groupConfig.selector = "img";
+								}
+								if (groupConfig.styles.length) {
+									var styleList = groupConfig.styles.slice();
+									// styleList.push({class: "none", name: "Default", icon: "fa-times"});
+									var list = document.createElement("UL");
+									list.config = groupConfig;
+									list.innerHTML = "<li class='simply-label'>" + groupConfig.description + "</li>";
+									list.setAttribute("data-type", "simply-buttongroup-radio");
+									for (var k=0; k<styleList.length; k++) {
+										var item = document.createElement("li");
+										var button = document.createElement("button");
+										button.setAttribute("data-value", styleList[k].class);
+										button.setAttribute("data-simply-action", "simply-image-class");
+										button.innerHTML = "<i class='fa " + styleList[k].icon + "'></i>" + styleList[k].name;
+										item.appendChild(button);
+										list.appendChild(item);
+									}
+									styleSections[i].appendChild(list);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			toolbar.data = {
+				src : '',
+				alt : '',
+				title : ''
+			};
+			editor.toolbar.bindInput(toolbar.data, "src", toolbar.querySelector(".simply-image-src"));
+			editor.toolbar.bindInput(toolbar.data, "alt", toolbar.querySelector(".simply-image-alt"));
+			editor.toolbar.bindInput(toolbar.data, "title", toolbar.querySelector(".simply-image-title"));
+
+			// Styles
+			toolbar.data.style = [];
+			var styleGroups = toolbar.querySelectorAll("div.simply-image-style [data-type=simply-buttongroup-radio]");
+			for (var i=0; i<styleGroups.length; i++) {
+				editor.toolbar.bindButtonGroup(toolbar.data.style, i, styleGroups[i]);
+			}
+		}
+	});
+</script><script>
+	/*
+		TODO: 
+		Upload input type filter for images
+
+	*/
+</script>
+<section id="simply-browse" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<!-- Add -->
+			<li><button data-simply-action="simply-browse-add-page"><i class="fa fa-file-text-o"></i>Add page</button></li>
+			<li><button data-simply-action="simply-browse-add-folder"><i class="fa fa-plus-square"></i>Add folder</button></li>
+			<li><button data-simply-action="simply-browse-upload"><i class="fa fa-upload"></i>Upload</button><input type="file" multiple></li>
+			<li><button data-simply-action="simply-browse-listmode"><i class="fa fa-list"></i>List mode</button></li>
+
+			<!-- Delete -->
+			<li><button data-simply-action="simply-browse-delete"><i class="fa fa-trash"></i>Delete</button></li>
+
+			<!-- Dialog -->
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+	</div>
+	<div class="simply-dialog-body">
+	</div>
+</section>
+<style type="text/css">
+	#simply-browse .simply-dialog-body > button,
+	#simply-browse .simply-dialog-body > .simply-button,
+	#simply-browse .simply-add-folder,
+	#simply-browse .simply-add-page {
+		border: 1px solid #eee;
+		background-color: white;
+		height: 149px;
+		width: 149px;
+		font-family: inherit;
+		font-size: 20px;
+		position: relative;
+		padding: 5px;
+		color: #999 !important;
+		display: inline-block;
+		vertical-align: top;
+		text-align: center;
+		box-sizing: border-box;
+		padding-top: 30px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.2em;
+	}
+
+	#simply-browse .simply-button:after {
+		display: block;
+		content: "";
+		bottom: 0;
+		background-image: -webkit-gradient( linear, left top, left bottom, from(rgba(255,255,255,0.1)), to(rgba(2550,255,255,1)) );
+		width: 100%;
+		height: 20px;
+		z-index: 10;
+		position: absolute;
+	}
+
+	#simply-browse .simply-add-folder,
+	#simply-browse .simply-add-page {
+		box-sizing: border-box;
+		padding-top: 38px;
+	}
+
+	#simply-browse .simply-add-folder input,
+	#simply-browse .simply-add-page input {
+		width: 133px;
+		color: #333;
+		line-height: 1.2em;
+		font-family: arial;
+	}
+	#simply-browse input[type="file"] {
+		display: none;
+	}
+	#simply-browse .simply-dialog-body > button:before,
+	#simply-browse .simply-dialog-body > .simply-button:before {
+		display: block;
+		content: '';
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		height: 100%;
+		width: 100%;
+	}
+        #simply-browse .simply-dialog-body > button i,
+        #simply-browse .simply-dialog-body > .simply-button i,
+	#simply-browse .simply-add-folder > i,
+	#simply-browse .simply-add-page > i {
+		font-size: 48px;
+		display: block;
+		width: 100%;
+		text-align: center;
+	}
+	#simply-browse .simply-add-folder > button.simply-add,
+	#simply-browse .simply-add-page > button.simply-add {
+		color: #333;
+		background-color: #eee;
+		position: absolute;
+		bottom: 5px;
+		left: 5px;
+		padding: 3px 10px 3px 6px;
+		border: 1px solid #999
+		font-size: 12px;
+		border-radius: 0;
+		font-weight: normal;
+	}
+	#simply-browse .simply-add-folder > button.simply-cancel,
+	#simply-browse .simply-add-page > button.simply-cancel {
+		color: #666;
+		position: absolute;
+		bottom: 5px;
+		right: 5px;
+		border: 0px;
+		background-color: white;
+		font-size: 18px;
+		padding: 0;
+	}
+	#simply-browse .simply-add-folder > button.simply-add > i,
+	#simply-browse .simply-add-page > button.simply-add > i {
+		margin-right: 5px;
+	}
+
+	#simply-browse .simply-dialog-body > button img,
+	#simply-browse .simply-dialog-body > .simply-button img {
+		max-width: 100%;
+		max-height: 100%;
+	}
+	#simply-browse .simply-dialog-body > button progress,
+	#simply-browse .simply-dialog-body > .simply-button progress {
+		width: 100%;
+		height: 10px;
+	}
+	#simply-browse .simply-dialog-body > button i.select,
+	#simply-browse .simply-dialog-body > .simply-button i.select {
+		position: absolute;
+		top: 0;
+		right: 0px;
+		display: inline-block;
+		text-align: right;
+		width: 40px;
+	}
+	#simply-browse .simply-dialog-body > button i.select:before,
+	#simply-browse .simply-dialog-body > .simply-button i.select:before {
+		width: 16px;
+		display: inline-block;
+		font-size: 20px;
+		border-left: 1px solid #ddd;
+		padding: 10px;
+		border-bottom: 1px solid #ddd;
+		color: #ddd;
+		border-bottom-left-radius: 15px;
+		z-index: 1;
+		background-color: rgba(255,255,255,0.3);
+		vertical-align: top;
+		box-sizing: content-box;
+	}
+	#simply-browse .simply-dialog-body.simply-selecting button i.select,
+	#simply-browse .simply-dialog-body.simply-selecting .simply-button i.select {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		bottom: 0px;
+		right: 0px;
+		width: auto;
+	}
+	#simply-browse .simply-dialog-body > button.simply-selected i.select:before,
+	#simply-browse .simply-dialog-body > .simply-button.simply-selected i.select:before {
+		border-color: #999;
+		color: #16B916;
+		background-color: rgba(255,255,255,0.8);
+	}
+
+	@media (max-width: 481px) {
+		#simply-browse .simply-dialog-body > button,
+		#simply-browse .simply-dialog-body > .simply-button {
+			width: 50%;
+		}
+		#simply-browse .simply-dialog-body > .simply-add-folder,
+		#simply-browse .simply-dialog-body > .simply-add-page {
+			width: 50%;
+		}
+	}
+
+	#simply-browse .simply-dialog-body > .simply-button.simply-image {
+		line-height: 149px;
+		padding-top: 0px;
+	}
+
+	#simply-browse .simply-dialog-body > button img,
+	#simply-browse .simply-dialog-body > .simply-button img {
+		max-width: 100%;
+		max-height: 100%;
+		vertical-align: middle;
+	}
+	#simply-browse .simply-button span.filename {
+		position: absolute;
+		font-size: 14px;
+		text-align: center;
+		line-height: 15px;
+		word-wrap: break-word;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(255,255,255,0.3);
+		color: #666;
+		padding: 3px;
+		text-shadow: white 0px 0px 2px;
+		border-top: 1px solid #eee;
+		transition: background-color 0.6s ease;
+	}
+	#simply-browse .simply-button.simply-selected span.filename {
+		background-color: rgba(255,255,255,1);
+	}
+
+	#simply-browse.simply-listmode .simply-dialog-body > button i.select:before,
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button i.select:before {
+		border-bottom: 0;
+		border-bottom-left-radius: 0;
+		border-left: 1px solid #eee;
+	}
+	#simply-browse.simply-listmode .simply-dialog-body > button,
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button,
+	#simply-browse.simply-listmode .simply-add-folder,
+	#simply-browse.simply-listmode .simply-add-page {
+		height: 40px;
+		width: 100%;
+		padding: 7px;
+		padding-right: 40px;
+		text-align: left;
+		white-space: nowrap;
+	}
+	#simply-browse.simply-listmode .simply-button:after {
+		display: none;
+	}
+	#simply-browse.simply-listmode .simply-dialog-body > button i,
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button i,
+	#simply-browse.simply-listmode .simply-add-folder > i,
+	#simply-browse.simply-listmode .simply-add-page > i {
+		font-size: 24px;
+		display: inline-block;
+		width: auto;
+		padding-right: 7px;
+		text-align: left;
+	}
+
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button.simply-image {
+		line-height: inherit;
+	}
+	#simply-browse.simply-listmode .simply-dialog-body > button img[data-value],
+	#simply-browse.simply-listmode .simply-dialog-body > .simply-button img[data-value] {
+		display: none;
+	}
+	#simply-browse.simply-listmode .simply-button span.filename {
+		position: static;
+		font-size: inherit;
+		text-align: inherit;
+		display: inline;
+		color: inherit;
+		border: 0;
+		padding: 0;
+		text-shadow: 0;
+		display: inline-block;
+		overflow: hidden;
+		max-width: 95%;
+		text-overflow: ellipsis;
+		line-height: 26px;
+		white-space: nowrap;
+	}
+	#simply-browse.simply-listmode .simply-dialog-body.simply-selecting button i.select,
+	#simply-browse.simply-listmode .simply-dialog-body.simply-selecting .simply-button i.select {
+		left: auto;
+	}
+
+	#simply-browse.simply-listmode .simply-add-folder > button.simply-add,
+	#simply-browse.simply-listmode .simply-add-page > button.simply-add {
+		bottom: -40px;
+		margin-bottom: 10px;
+	}
+	#simply-browse.simply-listmode .simply-add-folder input,
+	#simply-browse.simply-listmode .simply-add-page input {
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	#simply-browse.simply-listmode .simply-add-folder > button.simply-cancel,
+	#simply-browse.simply-listmode .simply-add-page > button.simply-cancel {
+		bottom: 7px;
+		right: 9px;
+	}
+</style>
+<script>
+	editor.plugins.browse = {
+		currentSel : null,
+		currentField : null,
+		currentJail : null,
+		path : null,
+		dialog : {
+			open : function() {
+				editor.plugins.browse.currentSel = vdSelectionState.get();
+				editor.plugins.browse.currentField = editor.node.getEditableField();
+				editor.plugins.browse.currentJail = null;
+
+				vdSelectionState.save(editor.plugins.browse.currentSel);
+				editor.plugins.dialog.open(document.getElementById('simply-browse'), editor.plugins.browse.dialog.update);
+			},
+			load : function(url) {
+				var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+				var parser = document.createElement("A");
+				parser.href = url;
+				if (editor.plugins.browse.currentJail === null) {
+					editor.plugins.browse.currentJail = parser.href;
+				}
+				editor.plugins.browse.currentPath = parser.href;
+
+				if (editor.plugins.browse.currentPath.indexOf(editor.storage.imagesEndpoint) === 0) {
+					editor.plugins.browse.mode = "images";
+				} else {
+					editor.plugins.browse.mode = "files";
+				}
+				if (editor.storage.imagesEndpoint == editor.storage.endpoint) {
+					if (editor.plugins.browse.insertMode == "image") {
+						editor.plugins.browse.mode = "images";
+					} else {
+						editor.plugins.browse.mode = "files";
+					}
+				}
+
+				editor.storage.list(url, function(data) {
+					var i;
+					var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+					var newHtml = '';
+					for (i=0; i<data.folders.length; i++) {
+						if (data.folders[i].url.indexOf(editor.plugins.browse.currentJail) === 0) {
+							newHtml += editor.plugins.browse.dialog.getFolderButtonHtml(data.folders[i]);
+						}
+					}
+
+					switch (editor.plugins.browse.mode) {
+						case 'images':
+							for (i=0; i<data.images.length; i++) {
+								newHtml += editor.plugins.browse.dialog.getImageButtonHtml(data.images[i]);
+							}
+						break;
+						default:
+							for (i=0; i<data.files.length; i++) {
+								newHtml += editor.plugins.browse.dialog.getFileButtonHtml(data.files[i]);
+							}
+						break;
+					}
+					targetList.innerHTML = newHtml;
+					targetList.scrollTop = 0;
+
+					if (editor.plugins.browse.mode == 'images') {
+						editor.responsiveImages.init(targetList);
+					}
+
+					var selectors = targetList.querySelectorAll("i.select");
+					for (i=0; i<selectors.length; i++) {
+						selectors[i].addEventListener("click", function(evt) {
+							this.parentNode.classList.toggle("simply-selected");
+							evt.preventDefault();
+							evt.stopPropagation();
+							editor.plugins.browse.dialog.updateToolbar();
+						});
+					}
+				});
+			},
+			getImageButtonHtml : function(data) {
+				var src = data.url;
+				if (typeof data.src !== "undefined") {
+					src = data.src;
+				}
+				if (typeof data.name === "undefined") {
+					data.name = src.split("/").pop();
+				}
+
+				var result = "<div class='simply-button simply-image' data-simply-action='simply-browse-insert' title='" + editor.node.escapeHtml(data.name) + "'>";
+				result += "<i class='select fa fa-check'></i><img data-value='" + src + "'";
+				if (data.thumb) {
+					result += " src='" + data.thumb + "'";
+				} else {
+					result += " data-simply-src='" + src + "'";
+				}
+				if (data.id) {
+					result += " data-simply-id='" + data.id + "'";
+				}
+				result += ">";
+				result += "<span class='filename'>";
+				result += editor.node.escapeHtml(data.name);
+				result += "</span>";
+				result += "</div>";
+
+				return result;
+			},
+			getFileButtonHtml : function(data) {
+				var result = "<div class='simply-button' data-simply-action='simply-browse-insert' data-value='" + data.url + "' title='" + editor.node.escapeHtml(data.name) + "'>";
+				result += "<i class='select fa fa-check'></i><i class='fa fa-file-text-o'></i>" + data.name + "</div>";
+				return result;
+			},
+			getFolderButtonHtml : function(data) {
+				var result = "<div class='simply-button' data-simply-action='simply-browse-directory' data-value='" + data.url + "' title='" + editor.node.escapeHtml(data.name) + "'><i class='select fa fa-check'></i><i class='fa fa-folder'></i>" + data.name + "</div>";
+				return result;
+			},
+			update : function() {
+				editor.plugins.browse.dialog.load(editor.plugins.browse.path);
+			},
+			updateToolbar : function() {
+				window.setTimeout(function() {
+					var targetList = document.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
+					var uploadButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-upload']");
+					var addPageButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-add-page']");
+					var addFolderButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-add-folder']");
+					var deleteButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-delete']");
+
+					if (targetList.length === 0) {
+						document.querySelector("#simply-browse .simply-dialog-body").classList.remove("simply-selecting");
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "block";
+						}
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "block";
+						}
+						if (addFolderButton) {
+							addFolderButton.parentNode.style.display = "block";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "none";
+						}
+					} else {
+						document.querySelector("#simply-browse .simply-dialog-body").classList.add("simply-selecting");
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "none";
+						}
+						if (addFolderButton) {
+							addFolderButton.parentNode.style.display = "none";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "block";
+						}
+					}
+
+					if (editor.plugins.browse.currentPath == editor.storage.endpoint) {
+						// In sitemap overview; disable upload button;
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+					}
+					if (editor.plugins.browse.currentPath && editor.plugins.browse.currentPath.indexOf(editor.storage.endpoint) == -1) {
+						console.log("Notice: this endpoint is outside storage endpoint, disabling action buttons.");
+						// The image endpoint is not within our storage endpoint, so we can't upload anything;
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "none";
+						}
+						if (addFolderButton) {
+							addFolderButton.parentNode.style.display = "none";
+						}
+						if (deleteButton) {
+							deleteButton.parentNode.style.display = "none";
+						}
+					}
+
+					if (editor.plugins.browse.currentPath && (editor.plugins.browse.currentPath.indexOf("data.json") > -1)) {
+						// In data.json browsing mode; disable upload button;
+						if (uploadButton) {
+							uploadButton.parentNode.style.display = "none";
+						}
+					} else {
+						if (addPageButton) {
+							addPageButton.parentNode.style.display = "none";
+						}
+					}
+				}, 50);
+			}
+
+		},
+		init : function() {
+			var listItem = document.createElement("LI");
+			var button = document.createElement("button");
+			button.dataset.simplyAction = "simply-browse-sitemap";
+			button.innerHTML = '<i class="fa fa-sitemap"></i>Sitemap';
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+
+			editor.plugins.browse.path = editor.storage.endpoint;
+			editor.storage.imagesEndpoint = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
+			editor.storage.filesEndpoint = editor.storage.endpoint;
+
+			// Fix urls from relative to absolute;
+			var parser = document.createElement("A");
+			if (editor.storage.imagesEndpoint) {
+				parser.href = editor.storage.imagesEndpoint;
+				editor.storage.imagesEndpoint = parser.href;
+				editor.plugins.browse.initImageBrowse();
+			}
+			if (editor.storage.filesEndpoint) {
+				parser.href = editor.storage.filesEndpoint;
+				editor.storage.filesEndpoint = parser.href;
+				editor.plugins.browse.initLinkBrowse();
+			}
+
+			if (editor.storage.file && typeof editor.storage.file.save === "function") {
+				document.querySelector("#simply-browse").addEventListener("drop", function(evt) {
+					evt.preventDefault();
+					editor.plugins.browse.handleFiles(evt.dataTransfer.files);
+				});
+				document.querySelector("#simply-browse input[type='file']").addEventListener("change", function(evt) {
+					editor.plugins.browse.handleFiles(this.files);
+					this.value = '';
+				});
+			} else {
+				var uploadButton = document.querySelector('[data-simply-action="simply-browse-upload"]');
+				uploadButton.parentNode.parentNode.removeChild(uploadButton.parentNode);
+
+				var addButton = document.querySelector('[data-simply-action="simply-browse-add-folder"]');
+				addButton.parentNode.parentNode.removeChild(addButton.parentNode);
+			}
+
+			if (editor.storage.file && typeof editor.storage.file.delete === "function") {
+				// Do nothing;
+			} else {
+				var deleteButton = document.querySelector('[data-simply-action="simply-browse-delete"]');
+				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);
+			}
+
+			document.querySelector("#simply-browse").addEventListener("DOMNodeInserted", editor.plugins.browse.dialog.updateToolbar);
+			document.querySelector("#simply-browse").addEventListener("DOMNodeRemoved",editor.plugins.browse.dialog.updateToolbar);
+
+			var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+			new Slip(targetList); // slip is used for the tap-hold timing;
+			targetList.addEventListener("slip:beforereorder", function(evt) {
+				var targetButton = evt.target;
+				if (targetButton.tagName.toLowerCase() == "i") {
+					targetButton = targetButton.parentNode;
+				}
+				targetButton.classList.toggle("simply-selected");
+				editor.plugins.browse.dialog.updateToolbar();
+
+				targetButton.addEventListener("click", editor.plugins.browse.cancelClick, true);
+				targetButton.addEventListener("mouseup", function(evt) {
+					var currentButton = this;
+					window.setTimeout(function() {
+						currentButton.removeEventListener("click", editor.plugins.browse.cancelClick, true);
+					}, 50);
+				});
+				evt.preventDefault();
+				evt.stopPropagation();
+			});
+		},
+		initImageBrowse : function() {
+			var browseTargets = [];
+			browseTargets.push('[data-simply-action="simply-image-src"]');
+
+			var target = document.querySelectorAll(browseTargets.join(", "));
+			if (target) {
+				for (var i=0; i<target.length; i++) {
+					var button = document.createElement("div");
+					button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i></button>';
+					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
+				}
+
+				// Add Browse button to image toolbars;
+				var target = document.querySelectorAll("#simply-image .simply-toolbar .simply-buttons, #simply-image-field .simply-toolbar .simply-buttons");
+				if (target) {
+					var i;
+					for (i=0; i<target.length; i++) {
+						var button = document.createElement("LI");
+						button.innerHTML = '<button data-simply-action="simply-browse-images"><i class="fa fa-folder"></i>Browse</button>';
+						target[i].appendChild(button);
+					}
+				}
+			} else {
+				window.setTimeout(editor.plugins.browse.initImageBrowse, 200);	
+			}
+		},
+		initLinkBrowse : function() {
+			var browseTargets = [];
+			browseTargets.push('[data-simply-action="simply-hyperlink-href"]');
+
+			var target = document.querySelectorAll(browseTargets.join(", "));
+			if (target) {
+				for (var i=0; i<target.length; i++) {
+					var button = document.createElement("div");
+					button.innerHTML = '<button data-simply-action="simply-browse"><i class="fa fa-folder"></i></button>';
+					target[i].parentNode.querySelector("label").appendChild(button.firstChild);
+				}
+			} else {
+				window.setTimeout(editor.plugins.browse.initLinkBrowse, 200);
+			}
+		},
+		cancelClick : function(evt) {
+			evt.preventDefault();
+			evt.stopPropagation();
+		},
+		handleFiles : function(files) {
+			if (files.length) {
+				for (var i=0; i<files.length; i++) {
+					var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
+					var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+
+					var newButton = document.createElement("DIV");
+					newButton.className = "simply-button";
+					newButton.setAttribute("data-simply-action", "simply-browse-uploading");
+					newButton.innerHTML = "Uploading<br><progress value=0 max=100></progress><br>" + files[i].name;
+					targetList.appendChild(newButton);
+					newButton.querySelector("progress").setAttribute("data-simply-progress", editor.storage.escape(subpath + files[i].name));
+					var url = editor.plugins.browse.currentPath + editor.storage.escape(files[i].name);
+
+					if (editor.plugins.browse.mode == "images") {
+						(function(targetButton, url, name) {
+							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
+								if (result.error) {
+									var errorEvent = editor.fireEvent("simply-image-save-error", document, result);
+									if (!errorEvent.defaultPrevented) {
+										targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+										targetButton.setAttribute("data-simply-action", "simply-browse-error");
+										targetButton.message = "SAVE FAILED: " + errorEvent.data.message;
+										targetButton.classList.add("simply-error");
+									}
+									return;
+								}
+								var image = {
+									name : name,
+									src : url
+								};
+
+								var buttonHtml = editor.plugins.browse.dialog.getImageButtonHtml(image);
+								var tempNode = document.createElement("div");
+								tempNode.innerHTML = buttonHtml;
+								targetButton.innerHTML = tempNode.querySelector("button, div.simply-button").innerHTML;
+								targetButton.setAttribute("data-simply-action", "simply-browse-insert");
+								targetButton.classList.add("simply-image");
+
+								editor.responsiveImages.init(targetButton);
+							});
+						}(newButton, url, files[i].name));
+					} else {
+						(function(targetButton, url, name) {
+							editor.storage.file.save(subpath + files[i].name, files[i], function(result) {
+								if (result.error) {
+									var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
+									if (!errorEvent.defaultPrevented) {
+										targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+										targetButton.setAttribute("data-simply-action", "simply-browse-error");
+										targetButton.message = "SAVE FAILED: " + errorEvent.data.message;
+										targetButton.classList.add("simply-error");
+									}
+									return;
+								}
+								var file = {
+									name : name,
+									url : url
+								};
+
+								var buttonHtml = editor.plugins.browse.dialog.getFileButtonHtml(file);
+								var tempNode = document.createElement("div");
+								tempNode.innerHTML = buttonHtml;
+								targetButton.innerHTML = tempNode.querySelector("button, div.simply-button").innerHTML;
+								targetButton.setAttribute("data-simply-action", "simply-browse-insert");
+								targetButton.setAttribute("data-value", url);
+							});
+						}(newButton, url, files[i].name));
+					}
+				}
+				newButton.scrollIntoView();
+			}
+		}
+	};
+
+	editor.addAction("simply-browse", function(el) {
+		editor.plugins.browse.insertMode = "file";
+		editor.plugins.browse.insertTarget = el.parentNode.parentNode.querySelector("input");
+		editor.plugins.browse.path = editor.storage.endpoint;
+		editor.plugins.browse.dialog.open();
+	});
+	editor.addAction("simply-browse-sitemap", function(el) {
+		editor.plugins.browse.insertMode = "page";
+		editor.plugins.browse.insertTarget = null;
+		editor.plugins.browse.path = editor.storage.dataEndpoint ? editor.storage.dataEndpoint : editor.storage.endpoint;
+		editor.plugins.browse.dialog.open();
+	});
+
+	editor.addAction("simply-browse-images", function(el) {
+		editor.plugins.browse.insertMode = "image";
+		editor.plugins.browse.insertTarget = el.parentNode.parentNode.querySelector("input");
+		editor.plugins.browse.path = editor.storage.imagesEndpoint ? editor.storage.imagesEndpoint : editor.storage.endpoint;
+		editor.plugins.browse.dialog.open();
+	});
+
+	editor.addAction("simply-browse-directory", function(el) {
+		editor.plugins.browse.dialog.load(el.dataset.value);
+	});
+	editor.addAction("simply-browse-upload", function(el) {
+		var target = el.parentNode.querySelector("input");
+		muze.event.fire(target, "click");
+	});
+	editor.addAction("simply-browse-delete", function(el) {
+		var targetList = document.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
+		var subpath;
+		if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
+			if (confirm("Delete all selected pages? This action cannot be reversed and is final after you save.")) {
+				for (var i=0; i<targetList.length; i++) {
+					subpath = targetList[i].getAttribute("data-value").replace(editor.storage.dataEndpoint, "");
+					(function(targetButton) {
+						delete editor.currentData[subpath];
+						targetButton.parentNode.removeChild(targetButton);
+					}(targetList[i]));
+				}
+			}
+		} else {
+			if (confirm("Delete all selected folders and files?")) {
+				for (var i=0; i<targetList.length; i++) {
+					if (targetList[i].querySelector("img")) {
+						subpath = targetList[i].querySelector("img").getAttribute("src").replace(editor.storage.endpoint, "");
+					} else {
+						subpath = targetList[i].getAttribute("data-value").replace(editor.storage.endpoint, "");
+					}
+					(function(targetButton) {
+						editor.storage.file.delete(subpath, function() {
+							targetButton.parentNode.removeChild(targetButton);
+						});
+					}(targetList[i]));
+				}
+			}
+		}
+	});
+
+	editor.addAction("simply-browse-handle-upload", function(el) {
+		editor.plugins.browse.handleFiles(el.files);
+	});
+
+	editor.addAction("simply-browse-handle-add-folder", function(el) {
+		var filename = el.parentNode.querySelector("input").value;
+		if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
+			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.dataEndpoint, "");
+			var url = editor.plugins.browse.currentPath + "/" + editor.storage.escape(filename);
+
+			(function(targetButton, url) {
+				targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
+				newButton = targetButton.querySelector("div");
+				targetButton.parentNode.insertBefore(newButton, targetButton);
+				targetButton.parentNode.removeChild(targetButton);
+
+				if (typeof editor.currentData[subpath + "/" + filename + "/"] === "undefined") {
+					editor.currentData[subpath + "/" + filename + "/"] = {};
+				}
+			}(el.parentNode, url));
+
+		} else {
+			var url = editor.plugins.browse.currentPath + editor.storage.escape(filename) + '/';
+			var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
+
+			(function(targetButton, url) {
+				editor.storage.file.save(subpath + filename + '/', '', function(result) {
+					if (result.error) {
+						var errorEvent = editor.fireEvent("simply-file-save-error", document, result);
+						if (!errorEvent.defaultPrevented) {
+							targetButton.innerHTML = "<i class='fa fa-warning'></i>" + name + "</div>";
+							targetButton.setAttribute("data-simply-action", "simply-browse-error");
+							targetButton.message = "Add folder failed: " + errorEvent.data.message;
+							targetButton.classList.add("simply-error");
+						}
+						return;
+					}
+					targetButton.innerHTML =  editor.plugins.browse.dialog.getFolderButtonHtml({'url': url, 'name' : filename});
+					newButton = targetButton.querySelector("div");
+					targetButton.parentNode.insertBefore(newButton, targetButton);
+					targetButton.parentNode.removeChild(targetButton);
+				});
+			}(el.parentNode, url));
+		}
+	});
+	editor.addAction("simply-browse-cancel-add-folder", function(el) {
+		var target = el.parentNode;
+		target.parentNode.removeChild(target);
+	});
+	editor.addAction("simply-browse-add-folder", function(el) {
+		var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+		var addButton = document.createElement("DIV");
+		addButton.classList.add("simply-add-folder");
+		addButton.innerHTML = '<i class="fa fa-folder"></i>';
+		var addInput = document.createElement("input");
+		addInput.type = "text";
+		addInput.value = "new-folder";
+
+		addSubmit = document.createElement("button");
+		addSubmit.setAttribute("data-simply-action", "simply-browse-handle-add-folder");
+		addSubmit.classList.add('simply-add');
+		addSubmit.innerHTML = '<i class="fa fa-check"></i>Add';
+
+		addCancel = document.createElement("button");
+		addCancel.setAttribute("data-simply-action", "simply-browse-cancel-add-folder");
+		addCancel.classList.add('simply-cancel');
+		addCancel.innerHTML = '<i class="fa fa-times"></i>';
+		addButton.appendChild(addInput);
+		addButton.appendChild(addSubmit);
+		addButton.appendChild(addCancel);
+		targetList.appendChild(addButton);
+		addInput.addEventListener("input", function(evt) {
+			this.value = editor.storage.escape(this.value);
+		});
+
+		addInput.addEventListener("keydown", function(evt) {
+			if (evt.keyCode == 13) { // enter
+				muze.event.fire(addSubmit, "click");
+				evt.stopPropagation();
+			} else if (evt.keyCode == 27) { // ESC
+				muze.event.fire(addCancel, "click");
+				evt.stopPropagation();
+			}
+		});
+
+		addInput.select();
+		addInput.focus();
+		window.setTimeout(function() { // give the mobile keyboard time to pop up;
+			targetList.scrollTop = targetList.scrollHeight; // scroll the new element into view;
+		}, 500);
+	});
+
+	editor.addAction("simply-browse-handle-add-page", function(el) {
+		var subpath = editor.plugins.browse.currentPath.replace(editor.storage.dataEndpoint, "");
+		var filename = el.parentNode.querySelector("input").value;
+		if (typeof editor.currentData[subpath + "/" + filename + "/"] === "undefined"){
+			editor.storage.page.save(document.location.protocol + '//' + document.location.hostname + subpath + "/" + filename + "/");
+		} else {
+			alert("A page with that name already exists.");
+			el.parentNode.querySelector("input").focus();
+		}
+	});
+	editor.addAction("simply-browse-cancel-add-page", function(el) {
+		var target = el.parentNode;
+		target.parentNode.removeChild(target);
+	});
+	editor.addAction("simply-browse-add-page", function(el) {
+		var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+		var addButton = document.createElement("DIV");
+		addButton.classList.add("simply-add-page");
+		addButton.innerHTML = '<i class="fa fa-file-text-o"></i>';
+		var addInput = document.createElement("input");
+		addInput.type = "text";
+		addInput.value = "new-page";
+
+		addSubmit = document.createElement("button");
+		addSubmit.setAttribute("data-simply-action", "simply-browse-handle-add-page");
+		addSubmit.classList.add('simply-add');
+		addSubmit.innerHTML = '<i class="fa fa-check"></i>Add';
+
+		addCancel = document.createElement("button");
+		addCancel.setAttribute("data-simply-action", "simply-browse-cancel-add-page");
+		addCancel.classList.add('simply-cancel');
+		addCancel.innerHTML = '<i class="fa fa-times"></i>';
+		addButton.appendChild(addInput);
+		addButton.appendChild(addSubmit);
+		addButton.appendChild(addCancel);
+		targetList.appendChild(addButton);
+		addInput.addEventListener("input", function(evt) {
+			this.value = editor.storage.escape(this.value);
+		});
+
+		addInput.addEventListener("keydown", function(evt) {
+			if (evt.keyCode == 13) { // enter
+				muze.event.fire(addSubmit, "click");
+				evt.stopPropagation();
+			} else if (evt.keyCode == 27) { // ESC
+				muze.event.fire(addCancel, "click");
+				evt.stopPropagation();
+			}
+		});
+
+		addInput.select();
+		addInput.focus();
+		window.setTimeout(function() { // give the mobile keyboard time to pop up;
+			targetList.scrollTop = targetList.scrollHeight; // scroll the new element into view;
+		}, 500);
+	});
+	editor.addAction("simply-browse-error", function(el) {
+		if (el.message) {
+			alert(el.message);
+		}
+	});
+	editor.addAction("simply-browse-insert", function(el) {
+		var getTargetUrl = function(el) {
+			if (el.querySelector("img")) {
+				return el.querySelector("img").getAttribute("data-value");
+			}
+			return el.getAttribute("data-value");
+		};
+
+		var target = getTargetUrl(el);
+		if (editor.storage.dataEndpoint) {
+			target = target.replace(editor.storage.dataEndpoint, "");
+		}
+
+		editor.plugins.dialog.close();
+
+		switch (editor.plugins.browse.insertMode) {
+			case 'page':
+				// FIXME: check for dirty fields and stash/save the changes
+				document.location.href = target + "#simply-edit";
+			break;
+			case 'image':
+				editor.actions["simply-image-src"](target);
+				if (editor.plugins.browse.insertTarget) {
+					editor.plugins.browse.insertTarget.value = target;
+				}
+			break;
+			case 'file':
+				editor.actions["simply-hyperlink-href"](target);
+				if (editor.plugins.browse.insertTarget) {
+					editor.plugins.browse.insertTarget.value = target;
+				}
+			break;
+		}
+
+		editor.context.update();
+	});
+	editor.addAction("simply-browse-listmode", function(el) {
+		document.getElementById("simply-browse").classList.toggle("simply-listmode");
+	});
+
+	editor.plugins.browse.init();
+</script>
+<section id="simply-iframe" class="simply-section">
+	<h1>HTML Iframe Toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-section="simply-iframe-properties" class="simply-expands"><i class="fa fa-link"></i>IFrame target</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-iframe-properties">
+			<div><label>URL</label><input type="text" id="vdIframeSrc" data-simply-action="simply-iframe-src"></div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+	editor.addToolbar({
+		"name" : "simply-iframe",
+		"filter" : {
+			"selector" : "IFRAME",
+			"parent" : {
+				"selector" : "*"
+			}
+		},
+		"update" : function(toolbar) {
+			var sel = vdSelectionState.get();
+			var iframe = vdSelection.getNode(sel);
+
+			vdSelectionState.currentSelection = sel;
+			vdSelectionState.currentNode = iframe;
+
+			var fieldData = editor.field.get(iframe);
+			toolbar.data.src = (typeof fieldData.src !== "undefined") ? fieldData.src : '';
+		},
+		"init" : function() {
+			var toolbar = document.querySelector("#simply-iframe");
+			toolbar.data = {};
+			toolbar.data.src = '';
+			editor.toolbar.bindInput(toolbar.data, 'src', toolbar.querySelector("input[data-simply-action=simply-iframe-src]"));
+		},
+		"actions" : {
+			"simply-iframe-delete" : function() {
+				var sel = vdSelectionState.get();
+				var iframe = vdSelection.getNode(sel);
+				iframe.parentNode.removeChild(iframe);
+			},
+			"simply-iframe-src" : function(value) {
+				if (vdSelectionState.currentNode) {
+					if (value) {
+						vdSelectionState.currentNode.setAttribute("src", value);
+					} else {
+						vdSelectionState.currentNode.setAttribute("src", '');
+					}
+				}
+			}
+		}
+	});
+</script><script>
+	(function() {
+		var removeMouseSelectionEvent;
+		var removeTouchSelectionEvent;
+	
+		var selectTarget = function(target) {
+			var sel = vdSelectionState.get();
+			sel.selectNode(target);
+			vdSelectionState.save(sel);
+			sel.startContainer.ownerDocument.defaultView.getSelection().removeAllRanges();
+			editor.context.update();
+		};
+
+		var handleItemFocus = function(event) {
+			var target = muze.event.target(event);
+			if (target.getAttribute("contenteditable")) {
+				return;
+			}
+			selectTarget(target);
+		};
+
+		var clickedInside = function(target) {
+			var rect = target.getBoundingClientRect();
+			if (
+				target.clickStart.x > rect.left &&
+				target.clickStart.x < rect.right &&
+				target.clickStart.y < rect.bottom &&
+				target.clickStart.y > rect.top
+			) {
+				// click was in the element;
+				return true;
+			}
+			return false;
+		};
+
+		var handleItemSelect = function(event) {
+			if (!this.clickStart) {
+				return;
+			}
+			var deltaX = Math.abs(event.clientX - this.clickStart.x);
+			var deltaY = Math.abs(event.clientY - this.clickStart.y);
+			var deltaTime = Math.abs((new Date()).getTime() - this.clickStart.time);
+
+			if (deltaTime > 1000) { // if the click took more than one second, or...
+				return;
+			} else {
+				if (deltaX > 40 || deltaY > 40) { // the pointer moved a lot to get this click, it probably wasn't to select the item.
+					return;
+				}
+			}
+			var target = muze.event.target(event);
+			if (target.getAttribute("contenteditable")) {
+				if (clickedInside(target)) {
+					// click was in the element;
+					return;
+				}
+			}
+
+			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
+				if (target.getAttribute("contenteditable")) {
+					if (target.tagName.toLowerCase() == "td") {
+						if (clickedInside(target.parentNode)) {
+							return; // the click was in an editable field, so just leave it there.
+						}
+					} else {
+						return;
+					}
+				}
+				target = target.parentNode;
+			}
+			// FIXME: This is the third time for this check so this could be written in a better way;
+			if (target.getAttribute("contenteditable")) {
+				if (clickedInside(target)) {
+					// click was in the editable element;
+					return;
+				}
+			}
+
+			event.stopPropagation();
+			event.cancelBubble = true;
+
+			selectTarget(target);
+		
+			window.setTimeout(function() {
+				removeMouseSelectionEvent = muze.event.attach(document, "mousedown", function(evt) {
+					var target = muze.event.target(evt);
+					// Keep the selection when the click is within a toolbar;
+					if (editor.node.hasToolbarParent(target)) {
+						return;
+					}
+
+					if (document.querySelector(":focus") &&
+						editor.node.hasToolbarParent(document.querySelector(":focus"))) {
+						return;
+					}
+
+					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
+					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
+					vdSelectionState.remove();
+				});
+				removeTouchSelectionEvent = muze.event.attach(document, "touchstart", function(evt) {
+					var target = muze.event.target(evt);
+					// Keep the selection when the click is within a toolbar;
+					if (editor.node.hasToolbarParent(target)) {
+						return;
+					}
+
+					if (document.querySelector(":focus") &&
+						editor.node.hasToolbarParent(document.querySelector(":focus"))) {
+						return;
+					}
+
+					muze.event.detach(document, "mousedown", removeMouseSelectionEvent);
+					muze.event.detach(document, "touchstart", removeTouchSelectionEvent);
+					vdSelectionState.remove();
+				});
+			}, 50);
+		};
+	
+		var registerClickStart = function(evt) {
+			var target = this;
+			target.clickStart = {
+				x : evt.clientX,
+				y : evt.clientY,
+				time : (new Date()).getTime()
+			};
+		};
+
+		var bindSelectables = function() {
+			var listItems = document.querySelectorAll("[data-simply-selectable]");
+			for (var i=0; i<listItems.length; i++) {
+				listItems[i].removeEventListener('click', handleItemSelect);
+				listItems[i].removeEventListener('focus', handleItemFocus);
+				if (!listItems[i].getAttribute("tabindex")) {
+					listItems[i].setAttribute("tabindex", 0);
+				}
+				listItems[i].addEventListener('click', handleItemSelect);
+				listItems[i].addEventListener('focus', handleItemFocus);
+			}
+
+			// Set clickstart on all selectable things and fields; Fields need this to interact with slip correctly.
+			var simplyItems = document.querySelectorAll("[data-simply-selectable], [data-simply-field]");
+			for (var j=0; j<simplyItems.length; j++) {
+				simplyItems[j].removeEventListener('mousedown',registerClickStart);
+				simplyItems[j].addEventListener('mousedown',registerClickStart);
+			}
+		};
+		
+		document.addEventListener("simply-selectable-inserted", bindSelectables);
+
+		editor.addToolbar({
+			name: 'simply-selectable',
+			init : bindSelectables
+		});
+	})();
+</script><section id="simply-list-item" class="simply-section">
+	<h1>*Objectlist Toolbar*</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-action="simply-list-item-delete"><i class="fa fa-times"></i>Delete</button></li>
+			<li><button data-simply-action="simply-list-item-add"><i class="fa fa-plus-circle"></i>Add</button></li>
+			<li><button data-simply-section="simply-list-mogrify" class="simply-expands"><i class="fa fa-cube"></i>Switch type</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-list-templates">
+			<ul>
+				<li><button data-simply-action="simply-list-item-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-list-mogrify">
+			<ul>
+				<li><button data-simply-action="simply-list-item-mogrify"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
+	</div>
+</section>
+<section id="simply-list" class="simply-section">
+	<h1>*Objectlist Toolbar*</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-action="simply-list-add"><i class="fa fa-plus-circle"></i>Add</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-list-templates">
+			<ul>
+				<li><button data-simply-action="simply-list-item-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
+	</div>
+</section>
+<script>
+	var currentList, currentListItem;
+
+	editor.plugins.list = {
+		item : {
+			add : function(el) {
+				var targetNode = currentListItem;
+				
+				var targetObjectList = targetNode.parentNode;
+				if (targetObjectList.getAttribute("data-simply-list")) {
+					var template = el.getAttribute("data-simply-value");
+					if (template === null) {
+						template = Object.keys(targetObjectList.templates)[0];
+					}
+
+					editor.plugins.list.insertTemplate(targetObjectList, template, targetNode);
+				}
+			},
+			delete : function() {
+				var targetNode = currentListItem;
+				var objectList = targetNode.parentNode;
+				objectList.removeChild(targetNode);
+				
+				if (!objectList.querySelector("[data-simply-list-item]")) {
+					objectList.classList.add("simply-empty");
+				}
+				editor.context.show(); // force toolbar context update to remove the toolbar pointing to the deleted item;
+
+				// FIXME: register change stond hier;
+			},
+			mogrify : function(el) {
+				var mogrifyData = {};
+				if (currentList.mogrifyItem == currentListItem && currentList.mogrifyData) {
+					mogrifyData = currentList.mogrifyData;
+				}
+				var currentData = editor.list.get(currentListItem);
+
+				// Accumulate the data in mogrifyData so we don't lose any data while switching around;
+				for (var i in currentData) {
+					if (!mogrifyData[i]) {
+						mogrifyData[i] = {};
+					}
+
+					for (var j in currentData[i]) {
+						mogrifyData[i][j] = currentData[i][j];
+					}
+				}
+
+				editor.plugins.list.item.add(el);
+				var newItem = currentListItem.nextElementSibling;
+
+				// skip this update for the undo/redo plugin;
+				if (editor.plugins.undoRedo) {
+					editor.plugins.undoRedo.undoing = true;
+					newItem.parentNode.dataBinding.skipOldValueUpdate = true; // this makes the mogrify resolve as one undo/redo action;
+				}
+				editor.data.apply(mogrifyData, newItem);
+				currentListItem.parentNode.removeChild(currentListItem);
+				if (editor.plugins.undoRedo) {
+					editor.plugins.undoRedo.undoing = false;
+					newItem.parentNode.dataBinding.skipOldValueUpdate = false;
+				}
+				newItem.parentNode.dataBinding.resolve(true);
+
+				currentListItem = newItem;
+				currentList.mogrifyData = mogrifyData;
+				currentList.mogrifyItem = currentListItem;
+
+				newItem.focus();
+				editor.context.update();
+			}
+		},
+		add : function(el) {
+			var targetObjectList = currentList;
+
+			if (targetObjectList.getAttribute("data-simply-list")) {
+				var template = el.getAttribute("data-simply-value");
+				if (template === null) {
+					template = Object.keys(targetObjectList.templates)[0];
+				}
+				editor.plugins.list.insertTemplate(targetObjectList, template);
+			}
+		},
+		insertTemplate : function(list, templateName, targetNode) {
+			if (list.dataBinding) {
+				editor.bindingParents = [list.dataBinding.parentKey + list.dataBinding.key];
+			}
+			var template = list.templates[templateName];
+
+			if (template) {
+				var newNode = document.importNode(template.content, true);
+
+				// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
+				var originalTemplates = list.templates[templateName].content.querySelectorAll("template");
+				var importedTemplates = newNode.querySelectorAll("template");
+
+				for (var i=0; i<importedTemplates.length; i++) {
+					importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
+				}
+
+				// editor.list.init({}, newNode);
+
+				editor.list.fixFirstElementChild(newNode);
+				editor.list.fixFirstElementChild(list);
+
+				counter = 0;
+				for (t in list.templates) {
+					counter++;
+				}
+				if (counter > 1) {
+					newNode.firstElementChild.dataset.simplyTemplate = templateName;
+				}
+
+				newNode.firstElementChild.dataset.simplyListItem = true;
+				newNode.firstElementChild.dataset.simplySelectable = true;
+				if (list.templateIcons[templateName]) {
+					newNode.firstElementChild.dataset.simplyListIcon = list.templateIcons[templateName];
+				}
+
+				var newListItem = newNode.firstElementChild;
+				// save a reference so we can make it editable after it has gone into the document;
+				var newData = editor.data.get(newListItem);
+
+				var listItems = list.querySelectorAll(":scope > [data-simply-list-item]");
+				var listIndex = 0;
+				if ( targetNode ) {
+					for (var i=0; i<listItems.length; i++) {
+						if (listItems[i] == targetNode) {
+							listIndex = i+1;
+						}
+					}
+				} else if (listItems.length) {
+					listIndex = listItems.length;
+				} else {
+					listIndex = 0;
+				}
+
+				if (list.dataBinding) {
+					editor.bindingParents.push(listIndex);
+					editor.settings.databind.parentKey = editor.bindingParents.join("/") + "/";
+				}
+				editor.data.apply(newData, newListItem);
+				var dataPath = editor.data.getDataPath(newListItem);
+				newListItem.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
+
+				if ( targetNode ) {
+					list.insertBefore(newNode.firstElementChild, targetNode.nextElementSibling);
+				} else if (listItems.length) {
+					list.insertBefore(newNode.firstElementChild, listItems[listItems.length-1].nextSibling);
+				} else {
+					list.insertBefore(newNode.firstElementChild, list.firstElementChild);
+				}
+
+				muze.event.fire(document, "simply-selectable-inserted");
+
+				editor.editmode.makeEditable(newListItem);
+				if (list.dataBinding) {
+					editor.bindingParents.pop();
+					editor.bindingParents.pop();
+				}
+				list.classList.remove("simply-empty");
+			}
+		}
+	};
+
+	var preventDefault = function(event) {
+		event.preventDefault();
+	};
+
+	document.addEventListener("slip:beforereorder", function(e) {
+		document.addEventListener("slip:beforeswipe", preventDefault);
+	});
+	document.addEventListener("slip:reorder", function(e) {
+		document.removeEventListener("slip:beforeswipe", preventDefault);
+	});
+
+	document.addEventListener("slip:beforeswipe", function(e) {
+		var listItem = e.target;
+		while (listItem != document && !listItem.getAttribute("data-simply-list")) {
+			listItem = listItem.parentNode;
+		}
+
+		if (listItem != currentList) {
+			e.preventDefault();
+		}
+	});
+	document.addEventListener("slip:swipe", function(e) {
+		var currentTemplate = e.target.getAttribute("data-simply-template");
+		if (!currentTemplate) {
+			currentTemplate = 0;
+		}
+		var templateList = Object.keys(currentList.templates);
+		var currentIndex = templateList.indexOf(currentTemplate);
+		var nextIndex = currentIndex + 1;
+		var prevIndex = currentIndex - 1;
+
+		if (nextIndex >= templateList.length) {
+			nextIndex = 0;
+		}
+		if (prevIndex < 0) {
+			prevIndex = templateList.length-1;
+		}
+
+		var el = document.createElement("button");
+		if (e.detail.direction == "left") {
+			el.setAttribute('data-simply-value', templateList[nextIndex]);
+		} else {
+			el.setAttribute('data-simply-value', templateList[prevIndex]);
+		}
+		listItem = e.target;
+		while (listItem != document && !listItem.getAttribute("data-simply-list-item")) {
+			listItem = listItem.parentNode;
+		}
+		currentListItem = listItem;
+		editor.plugins.list.item.mogrify(el);
+	});
+
+	editor.addToolbar({
+		name: 'simply-list-item',
+		filter:{
+			"list-bonus" : true,
+			"selector" : "[data-simply-list-item]"
+			/*"parent" : {
+				"selector" : "[data-simply-list]"
+			}*/
+		},
+		actions: {
+			"simply-list-item-add" : editor.plugins.list.item.add,
+			"simply-list-item-delete" : editor.plugins.list.item.delete,
+			"simply-list-item-mogrify" : editor.plugins.list.item.mogrify
+		},
+		update : function(toolbar) {
+			currentListItem = vdSelection.getNode(vdSelectionState.get());
+			currentList = currentListItem.parentNode;
+			while (currentList && !currentList.getAttribute('data-simply-list')) {
+				currentList = currentList.parentNode;
+			}
+
+			var listTemplates = toolbar.querySelector("div.simply-list-templates ul");
+			var mogrifyTemplates = toolbar.querySelector("div.simply-list-mogrify ul");
+
+			listTemplates.innerHTML = '';
+			mogrifyTemplates.innerHTML = '';
+
+			for (var i=0; i<Object.keys(currentList.templates).length; i++) {
+				var templateName = Object.keys(currentList.templates)[i];
+				var templateDisplay = templateName;				
+
+				if (templateName == i) {
+					templateDisplay = "Template " + (i+1);
+				}
+				
+				var item = document.createElement("li");
+				var itemIcon = '<i class="fa fa-cube"></i>';
+				if (typeof currentList.templateIcons[templateName] !== "undefined") {
+					if (currentList.templateIcons[templateName].indexOf("fa-") === 0) {
+						itemIcon = '<i class="fa ' + currentList.templateIcons[templateName] + '"></i>';
+					} else {
+						itemIcon = '<i class="fa">' + currentList.templateIcons[templateName] + '</i>';
+					}
+				}
+
+				item.innerHTML = '<button data-simply-action="simply-list-item-add" data-simply-value="' + templateName + '">' +
+					itemIcon +
+					templateDisplay + '</button>';
+
+				listTemplates.appendChild(item);
+
+				// FIXME: Only add compatible templates;
+				item = document.createElement("li");
+				item.innerHTML = '<button data-simply-action="simply-list-item-mogrify" data-simply-value="' + templateName + '">' +
+					itemIcon +
+					templateDisplay + '</button>';
+
+				if (templateName == currentListItem.getAttribute("data-simply-template")) {
+					item.querySelector("button").classList.add("simply-selected");
+				}
+				mogrifyTemplates.appendChild(item);
+			}
+			var addButton = toolbar.querySelector("button[data-simply-action='simply-list-item-add'], button[data-simply-section='simply-list-templates']");
+			var mogrifyButton = toolbar.querySelector("button[data-simply-section='simply-list-mogrify']");
+
+			if (Object.keys(currentList.templates).length > 1) {
+				delete addButton.dataset.simplyAction;
+				addButton.dataset.simplySection = "simply-list-templates";
+				addButton.classList.add("simply-expands");
+			} else {
+				delete addButton.dataset.simplySection;
+				addButton.dataset.simplyAction = "simply-list-item-add";
+				addButton.classList.remove("simply-expands");
+			}
+			// addButton.classList.remove("simply-selected");
+			// toolbar.querySelector("div.simply-list-templates").classList.remove("simply-selected");
+
+			if (mogrifyButton) {
+				if (Object.keys(currentList.templates).length > 1) {
+					mogrifyButton.style.display = "block";
+				} else {
+					mogrifyButton.style.display = "none";
+				}
+			//	mogrifyButton.classList.remove("simply-selected");
+			//	toolbar.querySelector("div.simply-list-mogrify").classList.remove("simply-selected");
+			}
+
+		}
+	});
+	
+	editor.addToolbar({
+		name: 'simply-list',
+		filter:{
+			"list-bonus" : true,
+			"selector" : "[data-simply-list]"
+			/*"parent" : {
+				"selector" : "[data-simply-list]"
+			}*/
+		},
+		init: function() {
+		},
+		actions: {
+			"simply-list-add" : editor.plugins.list.add
+		},
+		update : function(toolbar) {
+			currentList = vdSelection.getNode(vdSelectionState.get());
+
+			var listTemplates = toolbar.querySelector("div.simply-list-templates ul");
+			listTemplates.innerHTML = '';
+			for (var i=0; i<Object.keys(currentList.templates).length; i++) {
+				var templateName = Object.keys(currentList.templates)[i];
+				var templateDisplay = templateName;				
+
+				if (templateName == i) {
+					templateDisplay = "Template " + (i+1);
+				}
+				
+				var item = document.createElement("li");
+				var itemIcon = '<i class="fa fa-cube"></i>';
+				if (typeof currentList.templateIcons[templateName] !== "undefined") {
+					if (currentList.templateIcons[templateName].indexOf("fa-") === 0) {
+						itemIcon = '<i class="fa ' + currentList.templateIcons[templateName] + '"></i>';
+					} else {
+						itemIcon = '<i class="fa">' + currentList.templateIcons[templateName] + '</i>';
+					}
+				}
+
+				item.innerHTML = '<button data-simply-action="simply-list-add" data-simply-value="' + templateName + '">' +
+					itemIcon +
+					templateDisplay + '</button>';
+
+				listTemplates.appendChild(item);
+			}
+		
+			var addButton = toolbar.querySelector("button[data-simply-action='simply-list-add'], button[data-simply-section='simply-list-templates']");
+
+			if (Object.keys(currentList.templates).length > 1) {
+				delete addButton.dataset.simplyAction;
+				addButton.dataset.simplySection = "simply-list-templates";
+				addButton.classList.add("simply-expands");
+			} else { 
+				delete addButton.dataset.simplySection;
+				addButton.dataset.simplyAction = "simply-list-add";
+				addButton.classList.remove("simply-expands");
+			}
+			addButton.classList.remove("simply-selected");
+			toolbar.querySelector("div.simply-list-templates").classList.remove("simply-selected");
+		}
+	});
+	editor.addContextFilter(
+		"simply-list-and-item", {
+			"list-bonus" : true,
+			"selector" : "[data-simply-list][data-simply-list-item]",
+			"context" : "simply-list" // FIXME: There should be a toolbar that is specific for list-items that double as a list
+		}
+	);
+</script><section id="simply-icon" class="simply-section">
+	<h1>Insert icon toolbar</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-action="simply-symbol"><i class="fa fa-rocket"></i>Insert icon</button></li>
+		</ul>
+	</div>
+</section>
+<script type="text/javascript">
+	editor.addToolbar({
+		"name" : "simply-icon",
+		"filter" : {
+			"selector" : "i.fa"
+		}
+	});
+</script><section id="simply-template" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button class="simply-expands simply-selected" data-simply-action="simply-page-template" data-simply-section="simply-page-template"><i class="fa fa-paint-brush"></i>Page template</li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-page-template simply-selected">
+			<div class="field">
+				<label for="simply-page-template-list">Page template</label>
+				<select id="simply-page-template-list">
+					<option value="index.html">Homepage</option>
+				</select>
+			</div>
+			<div class="field">
+				<label><strong>Notice: </strong>when you apply, the page will be saved and reloaded with the new template;</label>
+			</div>
+		</div>
+	</div>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-right'><button data-simply-action="simply-template-apply"><i class="fa fa-check"></i>Apply</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#simply-template .simply-toolbar-section ul {
+		background: transparent;
+	}
+	#simply-template .simply-page-template button:not(.simply-selected) {
+		background: white;
+	}
+	#simply-template .simply-page-template .simply-buttons {
+		margin-top: 0px;
+		margin-left: -3px;
+		display: inline-block;
+	}
+	#simply-template .simply-page-template .simply-buttons li {
+		margin-right: 5px;
+		list-style: none;
+	}
+	#simply-template .simply-page-template .field {
+		margin-bottom: 10px;
+		padding-left: 120px;
+		margin-right: 20px;
+	}
+	#simply-template .simply-page-template .field label {
+		margin-left: -120px;
+		display: inline-block;
+		width: 95px;
+		vertical-align: top;
+		margin-top: 12px;
+		white-space: normal;
+		line-height: 1.8em;
+    }
+	#simply-template .simply-page-template input {
+		width: 100%;
+	}
+</style>
+<script>
+	editor.plugins.pageTemplate = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-template'), editor.plugins.pageTemplate.dialog.update);
+			},
+			update : function() {
+				var pageTemplate = "index.html";
+				if (document.head.querySelector("meta[name=page-template]")) {
+					pageTemplate = document.head.querySelector("meta[name=page-template]").getAttribute("content");
+				} else if (editor.currentData[editor.data.getDataPath()]['data-simply-page-template']) {
+					pageTemplate = editor.currentData[editor.data.getDataPath()]['data-simply-page-template'];
+				}
+				document.getElementById("simply-page-template-list").value = pageTemplate;
+			}
+		},
+		apply : function() {
+			var pageTemplate = document.querySelector("#simply-page-template-list").value;
+			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
+			editor.plugins.dialog.close();
+			var reloadPage = function() {
+				if (editor.storage.saveTemplate) {
+					editor.storage.saveTemplate(pageTemplate, function() {
+						document.location.reload();
+					});
+				} else {
+					document.location.reload();
+				}
+			};
+			editor.actions['simply-aftersave'] = reloadPage;
+			editor.data.save();
+		},
+		setMeta : function(name, value) {
+			// just set the data, databinding will take care of the rest if needed.
+			editor.currentData[editor.data.getDataPath()]['data-simply-' + name] = value;
+		},
+		init : function(config) {
+			if (
+				(typeof config !== "undefined") && 
+				(typeof config['templates'] !== undefined) && 
+				config['templates'].length
+			) {
+				var listItem = document.createElement("li");
+				var button = document.createElement("button");
+				button.dataset.simplyAction = "simply-template";
+				button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
+				listItem.appendChild(button);
+				document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+
+				var templateSelect = document.querySelector("#simply-page-template-list");
+
+				templateSelect.innerHTML = '';
+				for (var i=0; i<config['templates'].length; i++) {
+					var option = document.createElement("option");
+					option.value = config['templates'][i].template;
+					option.innerHTML = config['templates'][i].name;
+					templateSelect.appendChild(option);
+				}
+				editor.addAction("simply-page-template", function(el) {
+					el.classList.toggle("simply-selected");
+				});
+
+				editor.addAction("simply-template", editor.plugins.pageTemplate.dialog.open);
+				editor.addAction("simply-template-apply", editor.plugins.pageTemplate.apply);
+			}
+		}
+	};
+
+	editor.plugins.pageTemplate.init(editor.settings['pageTemplates']);
+</script><section id="simply-save" class="simply-dialog">
+	<div class="simply-dialog-body">
+		<i class="fa fa-spinner fa-spin"></i>
+		<div class="simply-title">Saving...</div>
+		<div class="simply-message">Please wait...</div>
+	</div>
+</section>
+<style type="text/css">
+	#simply-save {
+		top: 50%;
+		max-height: 80%;
+		margin-top: -100px;
+		bottom: auto;
+		right: auto;
+		left: 50%;
+		width: 200px;
+		max-width: 80%;
+		margin-left: -100px;
+	}
+	#simply-save .simply-title {
+		font-size: 20px;
+		font-weight: bold;
+		margin-bottom: 5px;
+	}
+	#simply-save .simply-message {
+		font-size: 12px;
+	}
+	#simply-save i {
+		float: right;
+		font-size: 24px;
+	}
+	#simply-save .simply-dialog-body {
+		padding: 10px;
+	}
+	
+	@media (max-width: 481px) {
+		#simply-save {
+			top: 50%;
+			max-height: 80%;
+			margin-top: -100px;
+			left: 50%;
+			margin-left: -100px;
+			width: 200px;
+			max-width: 80%;
+			bottom: auto;
+			right: auto;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+		}
+	}
+</style>
+<script>
+	editor.plugins.save = {
+		beforeSave : function() {
+			document.querySelector("#simply-save .simply-message").innerHTML = "Storing your changes.";
+			editor.plugins.dialog.open(document.getElementById('simply-save'));
+		},
+		afterSave : function() {
+			window.setTimeout(function() {
+				document.querySelector("#simply-save .simply-message").innerHTML = "All changes saved.";
+				window.setTimeout(function() {
+					editor.plugins.dialog.close();
+				}, 800);
+			}, 300);
+		},
+		afterSaveError : function(result) {
+			window.setTimeout(function() {
+				if (result.error) {
+					var errorEvent = editor.fireEvent("simply-page-save-error", document, result);
+					if (!errorEvent.defaultPrevented) {
+						var message = errorEvent.data.message;
+						document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
+						window.setTimeout(function() {
+							editor.plugins.dialog.close();
+						}, 2000);
+					}
+				}
+			}, 300);
+		}
+	};
+
+	editor.addAction("simply-beforesave", editor.plugins.save.beforeSave);
+	editor.addAction("simply-aftersave", editor.plugins.save.afterSave);
+	editor.addAction("simply-aftersave-error", editor.plugins.save.afterSaveError);
+</script>
+<section id="simply-meta" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button class="simply-expands simply-selected" data-simply-action="simply-metadata" data-simply-section="simply-metadata"><i class="fa fa-tags"></i>Meta tags</li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-metadata simply-selected">
+			<div class="field">
+				<label for="simply-meta-title">Page title</label>
+				<input type="text" id="simply-meta-title">
+			</div>
+			<div class="field">
+				<label for="simply-meta-description">Page description</label>
+				<input type="text" id="simply-meta-description">
+			</div>
+			<div class="field">
+				<label for="simply-meta-author">Author</label>
+				<input type="text" id="simply-meta-author">
+			</div>
+			<div class="field">
+				<label>Robots</label>
+				<ul class="simply-buttons" id="simply-meta-robots">
+					<li><button data-simply-action="simply-meta-robots" data-value="nofollow"><i class="fa fa-chain-broken"></i>No follow</button></li>
+					<li><button data-simply-action="simply-meta-robots" data-value="noindex"><i class="fa fa-eye-slash"></i>No index</button></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-right'><button data-simply-action="simply-meta-apply"><i class="fa fa-check"></i>Apply</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#simply-meta .simply-toolbar-section ul {
+		background: transparent;
+	}
+	#simply-meta .simply-metadata button:not(.simply-selected) {
+		background: white;
+	}
+	#simply-meta .simply-metadata .simply-buttons {
+		margin-top: 0px;
+		margin-left: -3px;
+		display: inline-block;
+	}
+	#simply-meta .simply-metadata .simply-buttons li {
+		margin-right: 5px;
+		list-style: none;
+	}
+	#simply-meta .simply-metadata .field {
+		margin-bottom: 10px;
+		padding-left: 120px;
+		margin-right: 20px;
+	}
+	#simply-meta .simply-metadata .field label {
+		margin-left: -120px;
+		display: inline-block;
+		width: 95px;
+		vertical-align: top;
+		margin-top: 12px;
+	}
+	#simply-meta .simply-metadata input {
+		width: 100%;
+	}
+</style>
+<script>
+	editor.plugins.meta = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-meta'), editor.plugins.meta.dialog.update);
+			},
+			update : function() {
+				var metaBindingConfig = {
+					getter : function() {
+						return {
+							content : this.value
+						}
+					},
+					setter : function(value) {
+						this.value = (typeof value.content === "undefined") ? "" : value.content;
+					}
+				};
+
+				var metaRobotsBindingConfig = {
+					getter : function() {
+						var activeButtons = this.querySelectorAll(".simply-selected");
+						var instructions = [];
+						for (var i=0; i<activeButtons.length; i++) {
+							instructions.push(activeButtons[i].getAttribute("data-value"));
+						}
+						return {
+							content : instructions.join(",")
+						}
+					},
+					setter : function(value) {
+						var instructions = (typeof value.content === "undefined") ? [] : value.content.split(",");
+						var allButtons = this.querySelectorAll("[data-value]");
+						for (var i=0; i<allButtons.length; i++) {
+							allButtons[i].classList.remove("simply-selected");
+						}
+						for (var j=0; j<instructions.length; j++) {
+							this.querySelector("[data-value=" + instructions[j] + "]").classList.add("simply-selected");
+						}
+					}
+				};
+
+				var titleElm = document.head.querySelector("title");
+				var descElm = document.head.querySelector("meta[name=description]");
+				var authorElm = document.head.querySelector("meta[name=author]");
+				var robotsElm = document.head.querySelector("meta[name=robots]");
+				if (titleElm && titleElm.dataBinding) {
+					titleElm.dataBinding.bind(document.getElementById("simply-meta-title"));
+				}
+				if (descElm && descElm.dataBinding) {
+					descElm.dataBinding.bind(document.getElementById("simply-meta-description"), metaBindingConfig);
+				}
+				if (authorElm && authorElm.dataBinding) {
+					authorElm.dataBinding.bind(document.getElementById("simply-meta-author"), metaBindingConfig);
+				}
+				if (robotsElm && robotsElm.dataBinding) {
+					robotsElm.dataBinding.bind(document.getElementById("simply-meta-robots"), metaRobotsBindingConfig);
+				}
+			}
+		},
+		apply : function() {
+			editor.plugins.dialog.close();
+		}
+	};
+
+	editor.addAction("simply-metadata", function(el) {
+		el.classList.toggle("simply-selected");
+		document.querySelector("#simply-meta .simply-metadata").classList.toggle("simply-selected");
+	});
+
+	editor.addAction("simply-meta-robots", function(el) {
+		el.classList.toggle('simply-selected');
+		muze.event.fire(el, "databinding:valuechanged");
+	});
+	editor.addAction("simply-meta", editor.plugins.meta.dialog.open);
+	editor.addAction("simply-meta-apply", editor.plugins.meta.apply);
+</script><section id="simply-htmlsource" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-action="simply-htmlsource-selectall"><i class="fa fa-quote-right"></i>Select field</button></li>
+			<!-- li><button data-simply-action="simply-htmlsource-editable"><i class="fa fa-lock"></i>Lock source</button></li -->
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+	</div>
+	<div class="simply-dialog-body">
+		<textarea id="insertHTMLSource"></textarea>
+	</div>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class="simply-warning" id="insertHTMLWarning" style="display: none;">
+				<i class='fa fa-warning'></i> Warning: editable source and javascript do not mix.
+			</li>
+			<li class='simply-right'><button data-simply-action="simply-htmlsource-insert"><i class="fa fa-check"></i>Insert</button></li>
+		</ul>
+	</div>
+</section>
+<style type="text/css">
+	#simply-htmlsource .simply-dialog-body {
+		overflow-y: hidden;
+	}
+	#simply-htmlsource textarea {
+		width: 100%;
+		height: 100%;
+		border: 1px solid #9F9F9F;
+		background-color: white;
+		box-sizing: border-box;
+	}
+	#insertHTMLWarning {
+		height: 60px;
+		line-height: 60px;
+		overflow: hidden;
+		font-size: 14px;
+		margin-left: 5px;
+	}
+</style>
+<script>
+	editor.plugins.htmlsource = {
+		currentField : null,
+		currentSel : null,
+		selectAll : function() {
+			var element = editor.plugins.htmlsource.currentField;
+			var sel = vdSelectionState.get();
+			vdSelection.selectNode(sel, element);
+			vdSelectionState.save(sel);
+			vdSelectionState.selectAll = true;
+			editor.plugins.htmlsource.dialog.setSource();
+		},
+		getSourceSpan : function() {
+			var parent=false;
+			var sel = vdSelectionState.get();
+			if (sel) {
+				parent = vdSelection.getNode(sel);
+				while (parent && (parent.tagName=='DIV' || parent.tagName=='SPAN') && parent.parentNode && !parent.getAttribute('data-simply-htmlsource')) {
+					parent=parent.parentNode;
+				}
+				if (!parent || (parent.tagName!='DIV' && parent.tagName!='SPAN') || !parent.getAttribute('data-simply-htmlsource')) {
+					parent=false;
+				}
+			}
+			return parent;
+		},
+		get : function() {
+			var span = editor.plugins.htmlsource.getSourceSpan();
+			if (span) {
+				return simply.util.base64.decode(span.getAttribute('data-simply-htmlsource'));
+			} else {
+				var sel = vdSelectionState.get();
+				return vdSelection.getHTMLText(sel);
+			}
+		},
+		dialog : {
+			setSource : function() {
+				var source = editor.plugins.htmlsource.get();
+				document.getElementById('insertHTMLSource').value = source;
+
+				var span = editor.plugins.htmlsource.getSourceSpan();
+
+				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				if (button) {
+					if (span) {
+						button.classList.add("simply-selected");
+					} else {
+						button.classList.remove("simply-selected");
+					}
+					document.getElementById('insertHTMLSource').select();
+				}
+
+				var fullscreen = document.querySelector("[data-simply-action=simply-dialog-fullscreen]");
+				if (document.getElementById('simply-htmlsource').classList.contains("fullscreen")) {
+					fullscreen.classList.add("simply-selected");
+				} else {
+					fullscreen.classList.remove("simply-selected");
+				}
+			},
+			open : function() {
+				editor.plugins.htmlsource.currentSel = vdSelectionState.get().cloneRange();
+				editor.plugins.htmlsource.currentField = editor.node.getEditableField();
+				vdSelectionState.save(editor.plugins.htmlsource.currentSel);
+
+				editor.plugins.dialog.open(document.getElementById('simply-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
+				editor.plugins.htmlsource.dialog.setWarning();
+
+				vdSelectionState.selectAll = false;
+				vdSelectionState.selectedElement = false;
+			},
+			setWarning : function() {
+				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				if (button && button.classList.contains("simply-selected")) {
+					document.getElementById('insertHTMLWarning').style.display='none';
+				} else {
+					document.getElementById('insertHTMLWarning').style.display='block';
+				}
+			}
+		},
+		tidy : function(html) {
+			var d = document.createElement('div');
+			d.innerHTML = html;
+			if (d.querySelector("iframe")) {
+				return d.innerHTML.replace(/&amp;/g, "&");
+			} else {
+				return d.innerHTML;
+			}
+		},
+		insert : function() {
+			var source = document.getElementById('insertHTMLSource').value;
+			var tidySource = editor.plugins.htmlsource.tidy(source);
+			if (tidySource != source) {
+				if (confirm("The HTML content does not seem valid and cannot be inserted. Correct it automatically?")) {
+					document.getElementById('insertHTMLSource').value = tidySource;
+				}
+				return;
+			}
+
+			var field=editor.plugins.htmlsource.currentField;
+			if (field) {
+				vdSelectionState.restore(editor.plugins.htmlsource.currentSel);
+				editor.plugins.htmlsource.currentField.hopeEditor.selection.updateRange();
+
+				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				if (button && button.classList.contains("simply-selected")) {
+					var encodedsource = simply.util.base64.encode(source); // this makes sure IE doesn't touch the sourcecode.
+					var decodedsource = source;
+
+					source = '<div data-simply-selectable data-simply-htmlsource="'+encodedsource+'" contenteditable="false">'+source+'</div>';
+				}
+				var span = editor.plugins.htmlsource.getSourceSpan();
+	
+				if (vdSelectionState.selectAll) {
+					field.innerHTML = source;
+				} else if (span) {
+					if (button && button.classList.contains("simply-selected")) {
+						span.innerHTML = decodedsource;
+						span.setAttribute("data-simply-htmlsource", encodedsource);
+					} else {
+						span.innerHTML = source;
+						editor.node.unwrap(span);
+					}
+				} else {
+					if (!editor.plugins.htmlsource.currentSel.collapsed) {
+						vdSelectionState.restore(editor.plugins.htmlsource.currentSel);
+						document.execCommand('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+					}
+					vdSelection.setHTMLText(editor.plugins.htmlsource.currentSel, source);
+				}
+			}
+
+			var hopeEditor = editor.plugins.htmlsource.currentField.hopeEditor;
+
+			if (hopeEditor) {
+				hopeEditor.parseHTML();
+				hopeEditor.update();
+			}
+
+			vdSelectionState.selectAll = false;
+			editor.plugins.htmlsource.currentField = false;
+			vdSelectionState.remove();
+			editor.plugins.dialog.close();
+		}
+	};
+
+	editor.addAction("simply-insert-source", editor.plugins.htmlsource.dialog.open);
+	editor.addAction("simply-edit-source", editor.plugins.htmlsource.dialog.open);
+	editor.addAction("simply-htmlsource-selectall", editor.plugins.htmlsource.selectAll);
+	editor.addAction("simply-htmlsource-insert", editor.plugins.htmlsource.insert);
+</script>
+<section id="simply-symbol" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+	</div>
+	<div class="simply-dialog-body">
+	</div>
+</section>
+<style type="text/css">
+	#simply-symbol .simply-dialog-body button {
+		border: 1px solid #eee;
+		background-color: white;
+		color: black;
+		font-weight: normal;
+		height: 50px;
+		width: 50px;
+		font-family: inherit;
+		font-size: 20px;
+	}
+</style>
+<script>
+	editor.plugins.symbol = {
+		currentSel : null,
+		currentField : null,
+		dialog : {
+			open : function() {
+				editor.plugins.symbol.currentSel = vdSelectionState.get();
+				editor.plugins.symbol.currentField = editor.node.getEditableField();
+				editor.plugins.dialog.open(document.getElementById('simply-symbol'), editor.plugins.symbol.dialog.update);
+			},
+			update : function() {
+				var parent = vdSelection.getNode(editor.plugins.symbol.currentSel);
+				var styles = editor.node.getAllStyles(parent);
+
+				var targetList = document.querySelector("#simply-symbol .simply-dialog-body");
+				targetList.style.fontFamily = styles['font-family'];
+
+				var charset;
+				switch (targetList.style.fontFamily) {
+					case "FontAwesome":
+						charset = {
+							start : 61440,
+							middle : 61440 + 300,
+							end : 61440 + 750,
+							skip : {}
+						};
+					break;
+					default:
+						charset = {
+							start : 33,
+							middle : 400,
+							end : 2000,
+							skip : {
+								173: true // &shy;
+							}
+						};
+					break;
+				}
+				newHtml = '';
+				// List all characters from start to middle directly... 
+				for (var i=charset.start; i<charset.middle; i++) {
+					if (charset.skip[i] && (charset.skip[i] === true)) {
+						continue; // &shy
+					}
+					newHtml += "<button data-simply-action='simply-symbol-insert' data-value=" + i + ">&#" + i + ";</button>";
+				}
+				targetList.innerHTML = newHtml;
+				window.setTimeout(function() {
+					// ... and the middle to the end a bit later so it loads faster.
+					for (var i=charset.middle; i<charset.end; i++) {
+						newHtml += "<button data-simply-action='simply-symbol-insert' data-value=" + i + ">&#" + i + ";</button>";
+					}
+					targetList.innerHTML = newHtml;
+				}, 1);
+			}
+		}
+	};
+
+	editor.addAction("simply-symbol", editor.plugins.symbol.dialog.open);
+	editor.addAction("simply-symbol-insert", function(el) {
+		if (editor.plugins.symbol.currentField.hopeEditor) {
+			var hopeEditor = editor.plugins.symbol.currentField.hopeEditor;
+
+			vdSelectionState.restore(editor.plugins.symbol.currentSel);
+			hopeEditor.selection.updateRange();
+
+			var range = hopeEditor.selection.getRange();
+
+			var tempNode = document.createElement("SPAN");
+			tempNode.innerHTML = "&#" + el.dataset.value + ";";
+			var charTyped = tempNode.innerText;
+
+			if ( charTyped ) { // ignore non printable characters
+				if ( range.length ) {
+					hopeEditor.fragment = hopeEditor.fragment.delete(range);
+				}
+				hopeEditor.fragment = hopeEditor.fragment.insert(range.start, charTyped);
+				var range = hopeEditor.selection.getRange();
+				if (range.start == range.end) {
+					hopeEditor.selection.move(charTyped.length);
+				} else {
+					hopeEditor.selection.updateRange(range.start, range.start + charTyped.length);
+				}
+
+				hopeEditor.update();
+				hopeEditor.currentRange = hopeEditor.selection.getRange();
+			}
+		} else if (editor.plugins.symbol.currentField.tagName.toLowerCase() === "i") {
+			editor.plugins.symbol.currentField.innerHTML = "&#" + el.dataset.value + ";";
+		} else {
+			if (!editor.plugins.symbol.currentSel.collapsed) {
+				vdSelectionState.restore(editor.plugins.symbol.currentSel);
+				document.execCommand('delete'); // this is somehow needed to trick IE into breaking potential <P>'s into 2
+			}
+			vdSelection.setHTMLText(editor.plugins.symbol.currentSel, "&#" + el.dataset.value + ";");
+		}
+		editor.plugins.dialog.close();
+	});
+
+	var inserts = document.querySelectorAll(".simply-toolbar-section.simply-insert > ul");
+	for (var i=0; i<inserts.length; i++) {
+		var symbolLi = document.createElement("LI");
+		var symbolButton = document.createElement("BUTTON");
+		symbolButton.dataset.simplyAction = "simply-symbol";
+		symbolButton.innerHTML = '<i class="fa fa-copyright"></i>Symbol';
+		symbolLi.appendChild(symbolButton);
+		inserts[i].appendChild(symbolLi);
+	}
+</script><script type="text/javascript">
+	var spanListener = function(ev) {
+		if (ev.target.tagName && ev.target.tagName.toLowerCase()=='span') {
+			editor.node.unwrap(ev.target);
+			var sel = window.getSelection();
+			var range = sel.getRangeAt(0);
+			sel.removeAllRanges();
+			sel.addRange(range);
+		}
+	};
+
+	var fontListener = function(ev) {
+		if (ev.target.tagName && ev.target.tagName.toLowerCase()=='font') {
+			editor.node.unwrap(ev.target);
+			var sel = window.getSelection();
+			var range = sel.getRangeAt(0);
+			sel.removeAllRanges();
+			sel.addRange(range);
+
+			// If a browser is bold enough to ask us to insert a font tag, that must mean they are up to no good. No more tags allowed!
+			event.target.ownerDocument.addEventListener("DOMNodeInserted", noTagsAllowedListener);
+			window.setTimeout(function() {
+				document.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
+			}, 200);
+		}
+
+		// Chrome remembers that a text was bold or italic, this will remove those tags when they are inserted.
+		if (ev.target.tagName && (ev.target.tagName.toLowerCase()=='b' || ev.target.tagName.toLowerCase()=='i')) {
+			if (ev.target.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
+				// replace 'b' tags with 'strong; 'i' tags with 'em'; doing this on the childNodes so that the selection doesn't break for safari;
+				for (var i=ev.target.childNodes.length-1; i > -1; i--) {
+					if (ev.target.tagName.toLowerCase()=='b') {
+						editor.node.wrap(ev.target.childNodes[i], "strong");
+					} else if (ev.target.tagName.toLowerCase()=='i') {
+						editor.node.wrap(ev.target.childNodes[i], "em");
+					}
+				}
+
+				editor.node.unwrap(ev.target);
+				var sel = window.getSelection();
+				var range = sel.getRangeAt(0);
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
+		}
+	};
+
+	var noTagsAllowedListener = function(ev) {
+		if (ev.target.tagName) {
+			editor.node.unwrap(ev.target);
+			var sel = window.getSelection();
+			var range = sel.getRangeAt(0);
+			sel.removeAllRanges();
+			sel.addRange(range);
+		}
+	};
+
+	var divListener = function(ev) {
+		if (
+			ev.target.tagName && (ev.target.tagName.toLowerCase()=='div')
+		) {
+			window.setTimeout(function() {
+				// allow a bit of time before unwrapping - chrome is still moving elements around at this point
+				if (ev.target.innerHTML == '') {
+					ev.target.innerHTML = "<br>";
+				}
+
+				// var siblings = newP.parentNode.childNodes;
+				var parent = ev.target.parentNode;
+				if (!parent) {
+					return;
+				}
+
+				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
+				var sel = window.getSelection();
+				if (sel.rangeCount) {
+					var range = sel.getRangeAt(0);
+					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+				}
+
+				if (parent.tagName.toLowerCase() =='p') { // replace the div with a 'br' element when we are in a paragraph
+					var breakEl = document.createElement("BR");
+					ev.target.parentNode.insertBefore(breakEl, ev.target);
+				}
+
+				editor.node.unwrap(ev.target);
+				var siblings = parent.childNodes;
+				editor.node.unwrap(ev.target);
+				addParagraphs(siblings);
+				if (caretNode) {
+					range = document.createRange();
+					range.setStart(caretNode, 0);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
+			}, 10);
+		} else if (ev.target.tagName && (ev.target.tagName.toLowerCase() == 'h1')) {
+			window.setTimeout(function() {
+				// special case for H1 - we don't want it inserted as a result of an enter key. The first one should be a H1, the others should be a paragraph.
+				// Firefox inserts the new element in front of the original; Chrome inserts the new H1 behind the original.
+
+				var parent = ev.target.parentNode;
+				if (!parent) {
+					return;
+				}
+
+				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
+				var sel = window.getSelection();
+				if (sel.rangeCount) {
+					var range = sel.getRangeAt(0);
+					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+				}
+
+				var nodes = parent.querySelectorAll("h1");
+				for (var i=1; i<nodes.length; i++) {
+					editor.node.unwrap(nodes[i]); // Unwrap the other nodes, leave the first H1;
+				}
+				var siblings = parent.childNodes;
+				addParagraphs(siblings);
+				if (caretNode) {
+					range = document.createRange();
+					range.setStart(caretNode, 0);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
+			}, 10);
+		}
+	};
+
+	var cleanPastedHtml = function(pastedHtml, target) {
+		var tempNode = document.createElement("DIV");
+		tempNode.innerHTML = pastedHtml;
+
+		// Remove the startfragment and endfragment bits;
+		for (var i=tempNode.childNodes.length-1; i>-1; i--) {
+			if (tempNode.childNodes[i].nodeType == 8) {
+				if ((tempNode.childNodes[i].data == "StartFragment") || (tempNode.childNodes[i].data == "EndFragment")) {
+					tempNode.removeChild(tempNode.childNodes[i]);
+				}
+			}
+		}
+	
+		// Remove inline styles;
+		var tempNodes = tempNode.querySelectorAll("*");
+		for (var i=0; i<tempNodes.length; i++) {
+			tempNodes[i].removeAttribute("style", '');
+		}
+
+		return tempNode.innerHTML.trim();
+	};
+
+	var unwrapPastedHtml = function(pastedHtml) {
+		var tempNode = document.createElement("DIV");
+		tempNode.innerHTML = pastedHtml;
+		if (tempNode.childNodes.length == 1) {
+			editor.node.unwrap(tempNode.firstChild);
+			return tempNode.innerHTML;
+		}
+		return;
+	};
+
+	var pasteAllowed = function(pastedHtml, target) {
+		var tempNode = document.createElement("DIV");
+		tempNode.innerHTML = pastedHtml;
+
+		if (target.nodeType === document.TEXT_NODE) {
+			target = target.parentNode;
+		}
+		while (hope.render.html.rules.nestingSets['block'].indexOf(target.tagName.toLowerCase()) < 0) {
+			target = target.parentNode;
+		}
+
+		var nestingRules = hope.render.html.rules.nesting[target.tagName.toLowerCase()];
+		if (typeof nestingRules === "undefined") {
+			nestingRules = hope.render.html.rules.nesting["span"];
+		}
+
+		for (var i=0; i<tempNode.childNodes.length; i++) {
+			if (tempNode.childNodes[i].nodeType == document.ELEMENT_NODE) {
+				var tagName = tempNode.childNodes[i].tagName.toLowerCase();
+				if (nestingRules.indexOf(tagName) === -1) {
+					return false;
+				}
+			}
+		}
+		return true;
+	};
+
+	var addParagraphs = function(nodes) {
+		nodes = [].slice.call(nodes);
+
+		var previousNode = "p";
+		if (nodes[0] && nodes[0].parentNode.tagName.toLowerCase() === "p") {
+			return;
+		}
+
+		for (var i=0; i<nodes.length; i++) {
+			if (!previousNode) {
+				previousNode = 'p';
+			}
+			if (nodes[i] && nodes[i].nodeType == document.TEXT_NODE) {
+				if (nodes[i].nodeValue !== "") {
+					previousNode = editor.node.wrap(nodes[i], previousNode);
+				}
+			} else if (
+				nodes[i] && 
+				(nodes[i].nodeType == document.ELEMENT_NODE) &&
+				(hope.render.html.rules.nestingSets['inline'].indexOf(nodes[i].tagName.toLowerCase()) > -1)
+			) {
+				previousNode = editor.node.wrap(nodes[i], previousNode);
+			}
+		}
+	};
+
+	editor.addToolbar({
+		name : 'simply-paste-handler',
+		init : function() {
+			// Chrome will remember the styling from an element that was removed and helpfully insert it back into the HTML.
+			// We never want that.
+			document.addEventListener("DOMNodeInserted", fontListener);
+
+			document.addEventListener("keydown", function(event) {
+				if (
+					editor.toolbar.getSectionEl(event.target) ||
+					editor.toolbar.getDialogEl(event.target)
+				) {
+					return;
+				}
+
+				switch (event.keyCode) {
+					case 8:		// backspace
+					case 46: 	// delete
+						event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+
+						// empty the field if only a newline remains;
+						if (
+							(event.target.innerText == "\n") &&
+							(event.target.childNodes.length == 1) // only do this when the newline-text-node is our only node;
+						) {
+							event.target.innerHTML = "";
+						}
+					break;
+					case 13:	// enter
+						// this forces the text into structured paragraphs/headings, so that firefox will behave more sanely with inserting breaks
+						addParagraphs(event.target.childNodes);
+
+						var simplyParent = editor.node.getSimplyParent(event.target);
+						if (simplyParent && simplyParent.hopeEditor) {
+							simplyParent.hopeEditor.needsUpdate = true;
+						}
+						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
+					break;
+				}
+			});
+
+			document.addEventListener("keyup", function(event) {
+				if (
+					editor.toolbar.getSectionEl(event.target) ||
+					editor.toolbar.getDialogEl(event.target)
+				) {
+					return;
+				}
+
+				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+				event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
+				event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
+			});
+
+			document.addEventListener("paste", function(event) {
+				if (
+					editor.toolbar.getSectionEl(event.target) ||
+					editor.toolbar.getDialogEl(event.target)
+				) {
+					return;
+				}
+
+				var pastedText = undefined;
+				var pastedHtml = undefined;
+					
+				// No IE support is needed, since only webkit/chrome is broken.
+				if (event.clipboardData && event.clipboardData.getData) {
+					pastedText = event.clipboardData.getData('text/plain');
+					pastedHtml = event.clipboardData.getData('text/html');
+				}
+
+				var targetField = editor.node.getSimplyParent(event.target);
+
+				pastedHtml = cleanPastedHtml(pastedHtml, event.target);
+				while (pastedHtml && (!pasteAllowed(pastedHtml, targetField))) {
+					pastedHtml = unwrapPastedHtml(pastedHtml);
+				}
+
+				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+				event.target.ownerDocument.addEventListener("DOMNodeInserted", fontListener);
+
+				if (pastedHtml) {
+					event.preventDefault();
+					event.target.ownerDocument.execCommand("insertHtml", false, pastedHtml);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", fontListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
+					return;
+				}
+				if (pastedText) {
+					event.preventDefault();
+					event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
+					event.target.ownerDocument.execCommand("insertText", false, pastedText);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", fontListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
+					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
+				}
+			});
+		}
+	});
+</script><script type="text/javascript">
+	editor.plugins.undoRedo = {
+		currentUndo : -1,
+		undoSet : [],
+		timer : false,
+		isEqual : function(data1, data2) {
+			if (typeof data1 === "undefined" || typeof data2 === "undefined") {
+				return false;
+			}
+			if (JSON.stringify(data1) == JSON.stringify(data2)) {
+				return true;
+			}
+			return false;
+		},
+		storeUndo : function(undoAction) {
+			if (editor.plugins.undoRedo.undoing) {
+				return;
+			}
+			editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo + 1);
+
+			var currentStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
+
+			// check if the previous step has the same keys, we are still changing the same thing; maybe we can make the changeset smaller;
+			if (
+				(currentStep) && 
+				(currentStep.meta.dataPath == undoAction.meta.dataPath) &&
+				(currentStep.meta.key == undoAction.meta.key) &&
+				(currentStep.meta.parentKey == undoAction.meta.parentKey)
+			) {
+				// check if the previous step has the same oldvalue, in that case the databinding hasn't resolved yet; just save the last one.
+				if (
+					JSON.stringify(currentStep.meta.oldValue) == JSON.stringify(undoAction.meta.oldValue) // contents can be objects that do not compare well, so stringify them;
+				) {
+					editor.plugins.undoRedo.undoSet.splice(editor.plugins.undoRedo.currentUndo);
+					editor.plugins.undoRedo.currentUndo--;
+				}
+			}
+
+			editor.plugins.undoRedo.undoSet.push(undoAction);
+			editor.plugins.undoRedo.currentUndo++;
+
+			editor.toolbars["simply-undo-redo"].update();
+		},
+		explain : function() {
+			var undoSet = editor.plugins['undoRedo'].undoSet;
+			for (var i=0; i<undoSet.length; i++) {
+				console.log("Step " + i + ": ");
+				console.log("Set " + undoSet[i].meta.key + " from " + undoSet[i].meta.oldValue + " to " + undoSet[i].meta.newValue + " on " + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey);
+			}
+		},
+		replay : function(data, interactive) {
+			var undoSet = editor.plugins['undoRedo'].undoSet;
+			var mergeErrors = 0;
+			for (var i=0; i<undoSet.length; i++) {
+				var targetValue = data[undoSet[i].meta.dataPath];
+				var myValue = editor.currentData[undoSet[i].meta.dataPath];
+
+				var key = undoSet[i].meta.key;
+				var subkeys = undoSet[i].meta.parentKey.split("/");
+
+				var subkey;
+				while (subkeys.length) {
+					subkey = subkeys.shift();
+					if (subkey != "") {
+						targetValue = targetValue[subkey];
+						myValue = myValue[subkey];
+					}
+				}
+
+				if (typeof targetValue[key] !== 'undefined' && JSON.stringify(targetValue[key]) == JSON.stringify(undoSet[i].meta.oldValue)) {
+					targetValue[key] = undoSet[i].meta.newValue;
+				} else {
+					console.log("Modified value " + targetValue[key] + " in " + ":" + undoSet[i].meta.dataPath + ":" + undoSet[i].meta.parentKey + ":" + undoSet[i].meta.key + " (we had: " + undoSet[i].meta.oldValue + ")");
+					mergeErrors++;
+
+					if (interactive) {
+						alert("Could not merge changes to this value: " + undoSet[i].meta.newValue);
+						if (!confirm("Discard your changes and set this field to the server value? (" + targetValue[key] + ")")) {
+							targetValue[key] = undoSet[i].meta.newValue;
+						}
+						mergeErrors--;
+					}
+				}
+			}
+			if (mergeErrors > 0) {
+				editor.plugins.undoRedo.mergeErrors = mergeErrors;
+				return false;
+			}
+			return data;
+		},
+		undo : function() {
+			if (!editor.plugins.undoRedo.canUndo()) {
+				return;
+			}
+			editor.plugins.undoRedo.undoing = true;
+			editor.context.toolbar.hide = true;
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
+			if (typeof undoStep !== "undefined") {
+				var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
+				undoStep.undo();
+				document.body.scrollTop = currentScroll;
+				editor.plugins.undoRedo.currentUndo--;
+			}
+			editor.plugins.undoRedo.undoing = false;
+			editor.toolbars["simply-undo-redo"].update();
+		},
+		redo : function() {
+			if (!editor.plugins.undoRedo.canRedo()) {
+				return;
+			}
+			editor.plugins.undoRedo.undoing = true;
+			editor.context.toolbar.hide = true;
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo + 1];
+			if (typeof undoStep !== "undefined") {
+				var currentScroll = document.body.scrollTop; // removing the items will reset the scrolloffset;
+				undoStep.redo();
+				document.body.scrollTop = currentScroll;
+				editor.plugins.undoRedo.currentUndo++;
+			}
+			editor.plugins.undoRedo.undoing = false;
+			editor.toolbars["simply-undo-redo"].update();
+		},
+		canUndo : function() {
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo];
+                        if (typeof undoStep !== "undefined") {
+				return true;
+			}
+			return false;
+		},
+		canRedo : function() {
+			var undoStep = editor.plugins.undoRedo.undoSet[editor.plugins.undoRedo.currentUndo + 1];
+			if (typeof undoStep !== "undefined") {
+				return true;
+			}
+			return false;
+		},
+		changeHandler : function(evt) {
+			if (!editor.plugins.undoRedo.undoing) {
+				var dataBinding = evt.data.dataBinding;
+				var newValue = evt.data.arguments[1];
+				var oldValue = evt.data.arguments[2];
+
+				var dataPath = editor.data.getDataPath(dataBinding.elements[0]);
+
+				var set = function(value) {
+					var targetValue = editor.currentData[dataPath];
+					var subkeys = dataBinding.parentKey.split("/");
+					var subkey;
+					while (subkeys.length) {
+						subkey = subkeys.shift();
+						if (subkey != "") {
+							targetValue = targetValue[subkey];
+						}
+					}
+					targetValue[dataBinding.key] = value;
+					dataBinding.resolve(true);
+				};
+					
+				var undoAction = {
+					undo : function() {
+						set(oldValue);
+					},
+					redo : function() {
+						set(newValue);
+					},
+					meta : {
+						dataPath : dataPath,
+						parentKey : dataBinding.parentKey,
+						key : dataBinding.key,
+						oldValue : oldValue,
+						newValue : newValue
+					}
+				};
+				editor.plugins.undoRedo.storeUndo(undoAction);
+			}
+		}
+	};
+
+	editor.addToolbar({
+		name : 'simply-undo-redo',
+		init : function() {
+			var listItem = document.createElement("li");
+			var button = document.createElement("button");
+			button.dataset.simplyAction = "simply-undo";
+			button.setAttribute("disabled", true);
+			button.innerHTML = '<i class="fa fa-undo"></i>Undo';
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+
+			listItem = document.createElement("li");
+			button = document.createElement("button");
+			button.dataset.simplyAction = "simply-redo";
+			button.setAttribute("disabled", true);
+			button.innerHTML = '<i class="fa fa-repeat"></i>Redo';
+			listItem.appendChild(button);
+			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+			document.addEventListener("simply-data-changed", editor.plugins.undoRedo.changeHandler);
+		},
+		update : function() {
+			var undoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
+			var redoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
+
+			if (editor.plugins.undoRedo.canUndo()) {
+				if (undoButton && undoButton.getAttribute("disabled")) {
+					undoButton.removeAttribute("disabled");
+				}
+			} else {
+				if (undoButton && !undoButton.getAttribute("disabled")) {
+					undoButton.setAttribute("disabled", true);
+				}
+			}
+			if (editor.plugins.undoRedo.canRedo()) {
+				if (redoButton && redoButton.getAttribute("disabled")) {
+					redoButton.removeAttribute("disabled");
+				}
+			} else {
+				if (redoButton && !redoButton.getAttribute("disabled")) {
+					redoButton.setAttribute("disabled", true);
+				}
+			}
+		},
+		actions : {
+			"simply-undo" : function() {
+				editor.plugins.undoRedo.undo();
+				editor.toolbars["simply-undo-redo"].update();
+			},
+			"simply-redo" : function() {
+				editor.plugins.undoRedo.redo();
+				editor.toolbars["simply-undo-redo"].update();
+			}
+		}
+	});
+</script><script type="text/javascript">
+	var documentHandler = function(event) {
+		var key = event.keyCode || event.which;
+
+		if (key == 66 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-B
+			if (typeof editor.actions["simply-text-bold"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-text-bold"]();
+				event.preventDefault();
+			}
+		} else if (key == 27) { // ESC
+			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-close']");
+			if (target) {
+				muze.event.fire(target, "click");
+			} else {
+				editor.context.toolbar.hide = true;
+				editor.context.update();
+			}
+			event.preventDefault();
+		} else if (key == 73 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-I
+			if (typeof editor.actions["simply-text-italic"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-text-italic"]();
+				event.preventDefault();
+			}
+		} else if (key == 85 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-U
+			if (typeof editor.actions["simply-text-underline"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-text-underline"]();
+				event.preventDefault();
+			}
+		} else if (key == 83 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-S
+			if (typeof editor.actions["simply-save"] === "function") {
+				editor.toolbar.beforeAction();
+				editor.actions["simply-save"]();
+				event.preventDefault();
+			}
+		} else if (key == 32 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-space
+			var activeDialog = document.querySelector(".simply-dialog.active");
+			if (activeDialog) {
+				var firstButton = activeDialog.querySelector("button");
+				if (firstButton) {
+					firstButton.focus();
+				}
+				return;
+			}
+
+			editor.context.toolbar.hide = false;
+			editor.context.update();
+			var activeToolbar = document.querySelector(".simply-section.active");
+			if (activeToolbar) {
+				var firstButton = activeToolbar.querySelector("button");
+				if (firstButton) {
+					firstButton.focus();
+				}
+			}
+
+			var toolbarTarget = document.querySelector(".simply-section.active .simply-buttons > li");
+			
+			if (toolbarTarget) {
+				toolbarTarget.focus();
+			}
+			event.preventDefault();
+		} else if (key == 77 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-M
+			document.querySelector("#simply-main-toolbar button").focus();
+			event.preventDefault();
+		} else if (key == 90 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-Z
+			if (typeof editor.actions["simply-undo"] === "function") {
+				editor.actions["simply-undo"]();
+				event.preventDefault();
+			}
+		} else if (key == 89 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-Y
+			if (typeof editor.actions["simply-redo"] === "function") {
+				editor.actions["simply-redo"]();
+				event.preventDefault();
+			}
+		} else if (key == 37) { // left
+			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
+			if (target) {
+				var previousSibling = target.parentNode.previousSibling;
+				while (previousSibling) {
+					if (previousSibling.nodeType == 1) {
+						if (
+							previousSibling.childNodes[0] && 
+							previousSibling.offsetWidth > 0 
+						) {
+							break;
+						}
+					}
+					previousSibling = previousSibling.previousSibling;
+				}
+
+				if (previousSibling) {
+					previousSibling.querySelector("*").focus();
+				}
+				event.preventDefault();
+			} else {
+				editor.context.toolbar.hide = true;
+			}
+		} else if (key == 38) { // up
+			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
+			if (target) {
+				// close current toolbar section;
+
+				var targets = this.querySelectorAll('.simply-section.active .simply-selected');
+				if (targets.length) {
+					for (var i=0; i<targets.length; i++) {
+						targets[i].classList.remove("simply-selected");
+					}
+					targets[0].focus();
+					event.preventDefault();
+				}
+			} else {
+				editor.context.toolbar.hide = true;
+			}
+		} else if (key == 39) { // right
+			var target = this.querySelector(".simply-section.active button:focus, .simply-section.active select:focus, #simply-main-toolbar :focus"); 
+			if (target) {
+				var nextSibling = target.parentNode.nextSibling;
+				while (nextSibling) {
+					if (nextSibling.nodeType == 1) {
+						if (nextSibling.childNodes[0] && nextSibling.offsetWidth > 0) {
+							break;
+						}
+					}
+					nextSibling = nextSibling.nextSibling;
+				}
+
+				if (nextSibling) {
+					nextSibling.querySelector("*").focus();
+				}
+				event.preventDefault();
+			} else {
+				editor.context.toolbar.hide = true;
+			}
+		} else if (key == 40) { // down
+			// open current toolbar section;
+			var target = this.querySelector('.simply-section.active :focus');
+			if (target) {
+				if (target.classList.contains("simply-expands")) {
+					if (target.classList.contains("simply-selected")) {
+						muze.event.fire(target, "click");
+					}
+					muze.event.fire(target, "click");
+					event.preventDefault();
+				}
+			} else {
+				editor.context.toolbar.hide = true;
+			}
+		} else if (key == 13 && event.altKey) {
+			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-fullscreen']");
+			if (target) {
+				muze.event.fire(target, "click");
+				event.preventDefault();
+			}
+		} else {
+			var target = this.querySelector('.simply-section.active :focus');
+			if (!target) {
+				editor.context.toolbar.hide = true;
+			}
+		}
+	};
+
+	editor.addToolbar({
+		name : 'simply-keyboard-handler',
+		init : function() {
+			document.addEventListener("keydown", documentHandler);
+		}
+	});
+</script><script type="text/javascript">
+	var mergeAndSave = function(callback) {
+		editor.storage.load(function(data) {
+			// check if the data is different from the last time;
+			if ((data != editor.loadedData) && editor.plugins.undoRedo) {
+				console.log("Notice: Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
+				alert("Is someone else also editing? Data on the server changed since we loaded it. Trying to merge...");
+				var newData = JSON.parse(data);
+
+				// if so, try to replay the undoset on it;
+				if (editor.plugins.undoRedo) {
+					newData = editor.plugins.undoRedo.replay(newData);
+				} else {
+					newData = false;
+				}
+
+				if (newData) {
+					// if that works, go ahead and save the replayed version;
+					console.log("Notice: Automatic merge was succesful.");
+					alert("Automatic merge was succesful.");
+					localStorage.data = editor.data.stringify(newData);
+					callback();
+				} else {
+					editor.plugins.diff.serverData = data;
+					editor.plugins.diff.dialog.open();
+					editor.plugins.diff.save = callback;
+				}
+			} else {
+				callback();
+			}
+		});
+	};
+
+	editor.actions['simply-executesave'] = mergeAndSave;
+
+	editor.plugins.diff = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-diff'), editor.plugins.diff.dialog.update);
+			},
+			update : function() {
+				if (!editor.plugins.diff.dmp) {
+					editor.plugins.diff.dmp = new diff_match_patch();
+					editor.plugins.diff.dmp.Diff_Timeout = parseFloat(1);
+					editor.plugins.diff.dmp.Diff_EditCost = parseFloat(4);
+				}
+				editor.data.stash();
+				
+				editor.plugins.diff.lhs = editor.data.stringify(JSON.parse(editor.plugins.diff.serverData)); // FIXME: This should be diff.serverData;
+				editor.plugins.diff.rhs = editor.data.stringify(editor.currentData);
+
+				editor.plugins.diff.diff();
+				editor.plugins.diff.select(0);
+			},
+		},
+		select : function(number) {
+			var theirDiffs = document.querySelectorAll("#diff .theirs span + ins, #diff .theirs span + del");
+			var mineDiffs = document.querySelectorAll("#diff .mine span + ins, #diff .mine span + del");
+			if (number < 0) {
+				number = theirDiffs.length - 1;
+			}
+			if (number >= theirDiffs.length) {
+				number = 0;
+			}
+
+			if (theirDiffs[number]) {
+				var currentSelected = document.querySelectorAll("#diff .selected");
+				for (var i=0; i<currentSelected.length; i++) {
+					currentSelected[i].className = '';
+				}
+				theirDiffs[number].className = "selected";
+				mineDiffs[number].className = "selected";
+				theirDiffs[number].scrollIntoView();
+			}
+			editor.plugins.diff.selected = number;
+		},
+		diff : function() {
+			var diff = editor.plugins.diff.dmp.diff_main(editor.plugins.diff.lhs, editor.plugins.diff.rhs);
+			editor.plugins.diff.dmp.diff_cleanupSemantic(diff);
+			// editor.plugins.diff.dmp.diff_cleanupEfficiency(diff);
+
+			editor.plugins.diff.patches = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.lhs, editor.plugins.diff.rhs);
+			editor.plugins.diff.patchesReversed = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.rhs, editor.plugins.diff.lhs);
+
+			document.querySelector("#diff .theirs").innerHTML = editor.plugins.diff.prettyHtml(diff);
+			document.querySelector("#diff .mine").innerHTML = document.querySelector("#diff .theirs").innerHTML;
+			if (editor.plugins.diff.patches == 0) {
+				document.querySelector("[data-simply-action='simply-diff-save']").removeAttribute("disabled");
+			} else {
+				document.querySelector("[data-simply-action='simply-diff-save']").setAttribute("disabled", true);
+			}
+		},
+		keepMine : function(number) {
+			var patched = editor.plugins.diff.dmp.patch_apply([editor.plugins.diff.patches[number]], editor.plugins.diff.lhs);
+			editor.plugins.diff.lhs = patched[0];
+			editor.plugins.diff.diff();
+			editor.plugins.diff.select(editor.plugins.diff.selected);
+		},
+		keepTheirs: function(number) {
+			var patched = editor.plugins.diff.dmp.patch_apply([editor.plugins.diff.patchesReversed[number]], editor.plugins.diff.rhs);
+			editor.plugins.diff.rhs = patched[0];
+
+			editor.plugins.diff.diff();
+			editor.plugins.diff.select(editor.plugins.diff.selected);
+		},
+		prettyHtml : function(diffs) {
+			/**
+			 * Convert a diff array into a pretty HTML report.
+			 * @param {!Array.<!diff_match_patch.Diff>} diffs Array of diff tuples.
+			 * @return {string} HTML representation.
+			 */
+			var html = [];
+			var pattern_amp = /&/g;
+			var pattern_lt = /</g;
+			var pattern_gt = />/g;
+			var pattern_para = /\n/g;
+			for (var x = 0; x < diffs.length; x++) {
+				var op = diffs[x][0];		// Operation (insert, delete, equal)
+				var data = diffs[x][1];	// Text of change.
+				var text = data.replace(pattern_amp, '&amp;').replace(pattern_lt, '&lt;')
+						.replace(pattern_gt, '&gt;').replace(pattern_para, '<br>');
+				switch (op) {
+					case DIFF_INSERT:
+						html[x] = '<ins>' + text + '</ins>';
+						break;
+					case DIFF_DELETE:
+						html[x] = '<del>' + text + '</del>';
+						break;
+					case DIFF_EQUAL:
+						html[x] = '<span>' + text + '</span>';
+						break;
+				}
+			}
+			return html.join('');
+		}
+	};
+	editor.addToolbar({
+		name : 'simply-diff',
+		init : function() {
+			editor.loadScript(editor.baseURL + "simply/diff_match_patch.js" + "?v=" + editor.version);
+		},
+		actions : {
+			"simply-diff" : editor.plugins.diff.dialog.open,
+			"simply-diff-next" : function() {
+				editor.plugins.diff.select(editor.plugins.diff.selected + 1);
+			},
+			"simply-diff-prev" : function() {
+				editor.plugins.diff.select(editor.plugins.diff.selected - 1);
+			},
+			"simply-diff-keep-theirs" : function() {
+				editor.plugins.diff.keepTheirs(editor.plugins.diff.selected);
+			},
+			"simply-diff-keep-mine" : function() {
+				editor.plugins.diff.keepMine(editor.plugins.diff.selected);
+			},
+			"simply-diff-save" : function() {
+				if (editor.plugins.diff.patches.length == 0) {
+					editor.currentData = JSON.parse(editor.plugins.diff.lhs);
+					editor.data.apply(editor.currentData, document);
+					editor.data.stash();
+					document.getElementById('simply-diff').classList.remove("active");
+					editor.plugins.diff.save();
+				}
+			}
+		}
+	});
+</script>
+<section id="simply-diff" class="simply-dialog simply-modal fullscreen">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-action="simply-diff-prev"><i class="fa fa-chevron-up"></i>Previous</button></li>
+			<li><button data-simply-action="simply-diff-next"><i class="fa fa-chevron-down"></i>Next</button></li>
+			<li><button data-simply-action="simply-diff-keep-theirs"><i class="fa fa-toggle-left"></i>Keep theirs</button></li>
+			<li><button data-simply-action="simply-diff-keep-mine"><i class="fa fa-toggle-right"></i>Keep mine</button></li>
+			<!-- Dialog -->
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Cancel</button></li>
+			<!-- li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li -->
+		</ul>
+	</div>
+	<div class="simply-dialog-body">
+		<div id="diff">
+			<div class="theirs">Theirs</div>
+			<div class="mine">Mine</div>
+		</div>
+	</div>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='message'>Review the differences and choose which of them to use.</li>
+			<li class='simply-right'><button disabled data-simply-action="simply-diff-save"><i class="fa fa-check"></i>Save merged</button></li>
+		</ul>
+	</div>
+</section>
+<style>
+	#simply-diff .message {
+		font-size: 12px;
+		line-height: 30px;
+		vertical-align: middle;
+		padding: 15px;
+	}
+	#simply-diff .simply-dialog-body {
+		padding-top: 30px;
+	}
+	#simply-diff #diff {
+		font-size: 0px;
+	}
+
+	#simply-diff #diff .theirs,
+	#simply-diff #diff .mine {
+		background-color: white;
+		box-sizing: border-box;
+		box-shadow: 0 0 5px #ccc;
+		width: 48%;
+		display: inline-block;
+		vertical-align: top;
+		color: #555;
+		white-space: pre-wrap;
+		position: relative;
+		margin-left: 1%;
+		margin-right: 1%;
+		line-height: initial;
+	}
+	#simply-diff #diff span,
+	#simply-diff #diff ins,
+	#simply-diff #diff del {
+		font-family: monospace;
+		font-size: initial;
+	}
+	#simply-diff #diff .theirs:before,
+	#simply-diff #diff .mine:before {
+		content: "Mine";
+		position: absolute;
+		display: block;
+		height: 30px;
+		line-height: 30px;
+		vertical-align: middle;
+		text-align: center;
+		margin-top: -30px;
+		width: 100%;
+		font-size: initial;
+	}
+	#simply-diff #diff .theirs:before {
+		content: "Theirs (server version)";
+	}
+
+	
+	#simply-diff #diff .theirs ins,
+	#simply-diff #diff .mine del {
+		color: transparent;
+		letter-spacing: -20px;
+		/*
+			xdisplay: none;
+			width: 0;
+			overflow: hidden;
+			display: inline-block;
+			line-height: 0;
+			vertical-align: top;
+		*/
+	}
+	#simply-diff #diff del.selected:before,
+	#simply-diff #diff ins.selected:before {
+		content: " ";
+		position: absolute;
+		left: 0px;
+		right: 0px;
+		box-shadow: 0 0 2px #ccc;
+
+		background-color: rgba(25, 25 ,255, 0.1);
+		line-height: 1.2em;
+	}
+
+	#simply-diff #diff .theirs del,
+	#simply-diff #diff .mine ins {
+		background-color: #ffc0cb;
+		color: black;
+		text-decoration: none;
+	}
+	#simply-diff #diff .theirs del.selected,
+	#simply-diff #diff .mine ins.selected,
+	#simply-diff #diff .theirs ins.selected + del,
+	#simply-diff #diff .mine del.selected + ins {
+		background-color: #c2eeff;
+	}
+
+</style>
+<section id="simply-about" class="simply-dialog simply-modal">
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li class='simply-left simply-expands'><button data-simply-section="simply-about-body" class="simply-selected"><i class="fa fa-info"></i>About</button></li>
+			<li class='simply-left simply-expands'><button data-simply-section="simply-key"><i class="fa fa-key"></i>Your Key</button></li>
+			<li class='simply-left'><button data-simply-action="simply-help"><i class="fa fa-question"></i>Help</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-close"><i class="fa fa-times"></i>Close</button></li>
+			<li class='simply-right'><button data-simply-action="simply-dialog-fullscreen"><i class="fa fa-expand"></i>Full screen</button></li>
+		</ul>
+		<div id="simply-key" class="simply-key simply-toolbar-section simply-dialog-body">
+			<div id="simply-about-header">
+				<img src="https://simplyedit.io/graphics/logo.svg" alt="SimplyEdit" class="simply-logo">
+			</div>
+			<div id="simply-about-key-info">
+				<div id="simply-about-key"><span class="simply-label">Your key</span><span class="simply-info"></span></div>
+				<div id="simply-about-key-domains"><span class="simply-label">Valid for</span><span class="simply-info"></span></div>
+			</div>
+			<div id="simply-about-footer">
+				<p>SimplyEdit is a product by <button class="simply-about-muze" data-simply-action="simply-about-muze">Muze</button>, &copy; 2016, <button class="simply-about-muze" data-simply-action="simply-about-license">all rights reserved.</button></p>
+			</div>
+		</div>
+		<div id="simply-about-body" class="simply-about-body simply-toolbar-section simply-dialog-body simply-selected">
+			<div id="simply-about-header">
+				<img src="https://simplyedit.io/graphics/logo.svg" alt="SimplyEdit" class="simply-logo">
+				<div id="simply-about-version"></div>
+			</div>
+			<div id="simply-about-info">
+				<div id="simply-about-key-valid" style="display: none"></div>
+				<div id="simply-about-key-upgrade" style="display: none"></div>
+				<button id="simply-buy-button" data-simply-action="simply-about-buy" style="display: none">Buy now</button>
+			</div>
+			<div id="simply-about-footer">
+				<p>SimplyEdit is a product by <button class="simply-about-muze" data-simply-action="simply-about-muze">Muze</button>, &copy; 2016, <button class="simply-about-muze" data-simply-action="simply-about-license">all rights reserved.</button></p>
+			</div>
+		</div>
+	</div>
+</section>
+<style type="text/css">
+	#simply-about .simply-toolbar-section {
+		font-size: 16px;
+		overflow: hidden;
+		line-height: 25px;
+	}
+	#simply-about .simply-toolbar-section > div {
+		padding: 0;
+	}
+	#simply-about .simply-toolbar-section button:focus {
+		border: 0 !important;
+	}
+	#simply-about .simply-toolbar-section button {
+		border: 1px solid #eee;
+		background-color: white;
+		height: 50px;
+		width: 50px;
+		font-family: inherit;
+		font-size: 20px;
+	}
+	#simply-about .simply-toolbar-section button.simply-about-muze {
+		font-size: 1em;
+		display: inline;
+		color: #888;
+		padding: 0;
+		background-color: transparent;
+		border: 0;
+		height: auto;
+		width: auto;
+		box-shadow: 0 0 0;
+	}
+	#simply-about button.simply-about-muze:hover {
+		text-decoration: underline;
+	}
+	#simply-about .simply-toolbar-section button {
+		width: auto;
+		font-size: 1em;
+		color: #333;
+		height: auto;
+		padding: 5px;
+		border-radius: 3px;
+		box-shadow: 2px 2px 3px #666;
+	}
+	#simply-about img.simply-logo {
+		display: block;
+	}
+	#simply-about-header {
+		width: 50%;
+		max-width: 400px;
+		text-align: center;
+		margin: 20px auto 10px auto;
+	}
+	#simply-about-footer {
+		position: absolute;
+		bottom: 0;
+		font-size: 0.8em;
+		color: #888;
+		text-align: center;
+		width: 100%;
+	}
+	#simply-about-info {
+		margin-top: 20px;
+		padding: 0 20px;
+	}
+	#simply-about-upgrade {
+		visibility: hidden;
+	}
+	#simply-about-info,
+	#simply-about-key-valid {
+		text-align: center;
+	}
+	#simply-about .simply-label {
+		display: block;
+	}
+	#simply-about .simply-info {
+		display: block;
+		padding: 5px;
+		border-radius: 3px;
+		background-color: white;
+	}
+	#simply-about-key-info {
+		margin: 0 20px;
+	}
+	#simply-about-key {
+		margin-bottom: 10px;
+	}
+</style>
+<script>
+	editor.plugins.about = {
+		dialog : {
+			open : function() {
+				editor.plugins.dialog.open(document.getElementById('simply-about'));
+				// fetch key info
+				var result = muze.load('https://api.simplyedit.io/0/keys/'+editor.apiKey)
+				.onload(function(result) {
+					var keyEl = document.querySelector('#simply-about-key .simply-info');
+					var hostsEl = document.querySelector('#simply-about-key-domains .simply-info');
+					var validEl = document.getElementById('simply-about-key-valid');
+					var versionEl = document.getElementById('simply-about-version');
+
+					versionEl.innerHTML = 'Version '+editor.version;
+					var majorVersion = parseInt(editor.version.split('.')[0]);
+
+					var info;
+					if (result.length) {
+						info = JSON.parse(result);
+					} else {
+						info = {
+							'expire' : false,
+							'key' : editor.apiKey,
+							'hosts' : ["(<em>Unknown - can't contact key server</em>)"],
+							'latest-version' : editor.version
+						};
+					}
+					
+					keyEl.innerHTML = info['key'];
+					hostsEl.innerHTML = info['hosts'].join(', ');
+					var latestVersion = parseInt(info['latest-version'].split('.')[0]);
+					if ( info['expire'] ) {
+						var ExpireDate = new Date(info['expire']*1000);
+						var now = new Date();
+						var diff= ExpireDate.getTime() - now.getTime();
+						if ( diff < 0 ) {
+							validEl.innerHTML = 'Your trial key has expired.';
+							validEl.style.display = 'block';
+							document.getElementById('simply-buy-button').style.display = 'block';
+						} else {
+							var diffDays = Math.floor( diff / ( 1000 * 3600 * 24 ) );
+							validEl.innerHTML = 'Your trial key expires in '+diffDays+' days.';
+							validEl.style.display = 'block';
+							document.getElementById('simply-buy-button').style.display = 'inline-block';
+						}
+					} else if ( majorVersion < latestVersion ) {
+						// upgrade possible
+						document.getElementById('simply-about-key-upgrade').innerHTML = 'Version '+info['latest-version']+' is available now';
+						document.getElementById('simply-about-key-upgrade').style.display = 'block';
+						document.getElementById('simply-buy-button').style.display = 'inline-block';
+					} else {
+						document.getElementById('simply-about-key-upgrade').innerHTML = 'This is the latest version.';
+						document.getElementById('simply-about-key-upgrade').style.display = 'block';
+						
+					}
+				});
+			}
+		}
+	};
+
+	editor.addAction("simply-about", editor.plugins.about.dialog.open);
+	editor.addAction("simply-help", function() {
+		window.open('https://simplyedit.io/help.html');
+	});
+	editor.addAction("simply-about-key", function() {});
+</script>
