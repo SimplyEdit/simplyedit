@@ -1187,7 +1187,7 @@
 		vdSelectionState = simply.editor.selection;
 		vdSelection = simply.dom.selection;
 		vdSelectionState.init(window);
-		selectionchange.start(document); // onselectionchange event for Firefox
+		simply.editor.selectionchange.start(document); // onselectionchange event for Firefox
 
 		editor.selectionChangeTimer = false;
 		muze.event.attach( document, 'selectionchange', function() {
