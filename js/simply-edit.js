@@ -187,7 +187,7 @@
 
 					var executeSave = function() {
 						for (var source in editor.dataSources) {
-							if (editor.dataSources[source].save) {
+							if (editor.dataSources[source].save && typeof editor.dataSources[source].stash != 'undefined') {
 								for (var i=0; i<editor.dataSources[source].stash.length; i++) {
 									editor.dataSources[source].save(editor.dataSources[source].stash[i]);
 								}
