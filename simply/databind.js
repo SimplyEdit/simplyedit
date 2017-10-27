@@ -447,16 +447,22 @@ dataBinding.prototype.addListeners = function(element) {
 		element.dataBinding.removeListeners(element);
 	}
 	if (typeof element.mutationObserver === "undefined") {
-		element.mutationObserver = new MutationObserver(this.handleMutation);
+		if (typeof MutationObserver === "function") {
+			element.mutationObserver = new MutationObserver(this.handleMutation);
+		}
 	}
 	if (this.mode == "field") {
-		element.mutationObserver.observe(element, {attributes: true});
+		if (element.mutationObserver) {
+			element.mutationObserver.observe(element, {attributes: true});
+		}
 		element.addEventListener("DOMSubtreeModified", this.handleEvent);
 		element.addEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		element.addEventListener("change", this.handleEvent);
 	}
 	if (this.mode == "list") {
-		element.mutationObserver.observe(element, {attributes: true});
+		if (element.mutationObserver) {
+			element.mutationObserver.observe(element, {attributes: true});
+		}
 		element.addEventListener("DOMNodeRemoved", this.handleEvent);
 		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
