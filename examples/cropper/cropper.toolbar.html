@@ -75,8 +75,8 @@
 				var sel = vdSelectionState.get();
 				var field = vdSelection.getNode(sel);
 
-				var alt = field.cropper.elements.img.getAttribute("alt");
-				var title = field.cropper.elements.img.getAttribute("title");
+				var alt = field.cropper ? field.cropper.elements.img.getAttribute("alt") : false;
+				var title = field.cropper ? field.cropper.elements.img.getAttribute("title") : false;
 
 				var sizes = editor.responsiveImages.sizes(value);
 				if (sizes["640w"]) {

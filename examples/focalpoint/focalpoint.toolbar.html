@@ -70,8 +70,10 @@
 				editor.actions['simply-browse-images'](el);
 			},
 			"simply-focalpoint-x" : function(value) {
+				console.log('x');
 				var sel = vdSelectionState.get();
 				var field = vdSelection.getNode(sel);
+				console.log(field);
 				field.className = field.className.replace(/ (left|right)-\d/, '');
 				if (value > 0) {
 					field.className += " right-" + value;
