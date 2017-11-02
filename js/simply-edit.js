@@ -765,6 +765,16 @@
 						continue;
 					}
 
+					if (list.getAttribute("data-simply-entry")) {
+						if (!listData[j].simplyConverted) {
+							var entry = new Object(listData[j]);
+							entry[list.getAttribute("data-simply-entry")] = listData[j] + "";
+							entry.simplyConverted = true;
+							entry.parent = listData;
+							listData[j] = entry;
+						}
+					}
+
 					editor.bindingParents.push(j + listIndex.length);
 					var currentBinding = list.dataBinding;
 					if (typeof currentBinding !== "undefined") {
