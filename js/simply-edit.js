@@ -165,7 +165,7 @@
 				return jsonData;
 			},
 			save : function() {
-				if (editor.storage.connect()) {
+				editor.storage.connect( function() {
 					editor.data.stash();
 					if (editor.actions['simply-beforesave']) {
 						editor.actions['simply-beforesave']();
@@ -211,7 +211,7 @@
 					} else {
 						executeSave();
 					}
-				} 
+				});
 			},
 			load : function() {
 				editor.storage.load(function(data) {
@@ -234,8 +234,8 @@
 					editor.fireEvent("simply-content-loaded", document);
 
 					var checkEdit = function() {
-						if (document.location.hash == "#simply-edit" && !document.body.getAttribute("data-simply-edit")) {
-							if (editor.storage.connect()) {
+						if ((document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
+							editor.storage.connect(function() {
 								editor.editmode.init();
 								var checkHope = function() {
 									if (typeof hope !== "undefined" && document.getElementById("simply-main-toolbar")) {
@@ -245,9 +245,7 @@
 									}
 								};
 								checkHope();
-							} else {
-								window.setTimeout(checkEdit, 100);
-							}
+							});
 						}
 					};
 
@@ -2284,12 +2282,14 @@
 				};
 				http.send();
 			},
-			connect : function() {
+			connect : function(callback) {
 				var url = editor.storage.url + "login";
 				var http = new XMLHttpRequest();
 				http.open("POST", url, true);
 				http.send();
-				return true;
+				if (typeof callback === "function") {
+					callback();
+				}
 			}
 		},
 		github : {
@@ -2397,7 +2397,7 @@
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
 			},
-			connect : function() {
+			connect : function(callback) {
 				if (typeof Github === "undefined") {
 					return false;
 				}
@@ -2418,15 +2418,19 @@
 						});
 						this.repo = this.github.getRepo(this.repoUser, this.repoName);
 					}
-					return true;
+					if (typeof callback === "function") {
+						callback();
+					}
 				} else {
-					return editor.storage.connect();
+					return editor.storage.connect(callback);
 				}
 			},
 			disconnect : function(callback) {
 				delete this.repo;
 				delete localStorage.storageKey;
-				callback();
+				if (typeof callback === "function") {
+					callback();
+				}
 			},
 			validateKey : function(key) {
 				return true;
@@ -2657,12 +2661,14 @@
 				};
 				http.send();
 			},
-			connect : function() {
+			connect : function(callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "login";
 				http.open("POST", url, true);
 				http.send();
-				return true;
+				if (typeof callback === "function") {
+					callback();
+				}
 			},
 			disconnect : function(callback) {
 				delete editor.storage.key;
@@ -2675,7 +2681,9 @@
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && ((http.status > 399) && (http.status < 500)) ) {
-						callback();
+						if (typeof callback === "function") {
+							callback();
+						}
 					}
 				};
 				http.send();
