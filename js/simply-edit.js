@@ -1059,7 +1059,7 @@
 						field.addEventListener("click", function(evt) {
 							evt.preventDefault();
 						}, true);
-						field.addEventListener("dblclick", editor.editmode.followLink);
+						// field.addEventListener("dblclick", editor.editmode.followLink);
 
 						if (field.getAttribute("data-simply-content") == "fixed") {
 							editor.field.initHopeStub(field);
