@@ -1010,7 +1010,12 @@
 						return editor.field.defaultGetter(field, ["content"]);
 					},
 					set : function(field, data) {
+						if (typeof data == "string") {
+							field.simplyString = true;
+							data = {"content" : data};
+						}
 						return editor.field.defaultSetter(field, data);
+						
 					},
 					makeEditable : function(field) {
 						field.contentEditable = true;
