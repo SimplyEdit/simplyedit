@@ -93,6 +93,7 @@
 		}
 		#simply-editor {
 			font-family: arial;
+			font-variant-caps: normal;
 		}
 		#simply-logo {
 			width: 60px;
@@ -212,6 +213,7 @@
 			box-shadow: inherit;
 			border-radius: 0;
 			transition: inherit;
+			font-variant-caps: normal;
 		}
 
 		@media (max-width: 480px) {
