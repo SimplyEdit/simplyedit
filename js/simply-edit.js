@@ -537,7 +537,7 @@
 				var dataPath = editor.data.getDataPath(list);
 
 				list.innerHTML = list.innerHTML; // reset innerHTML to make sure templates are recognized;
-				var templates = list.getElementsByTagName("template");
+				var templates = list.querySelectorAll(":scope > template, :scope > *[data-simply-template]");
 
 				if (templates.length === 0) {
 					console.log("Warning: no list templates found for " + dataName);
@@ -576,8 +576,8 @@
 						list.templateIcons[templateName] = templateIcon;
 					}
 				}
-				while (templates.length) {
-					templates[0].parentNode.removeChild(templates[0]);
+				for (t=0; t<templates.length; t++) {
+					templates[t].parentNode.removeChild(templates[t]);
 				}
 			},
 			init : function(list, dataParent, useDataBinding) {
