@@ -1335,6 +1335,17 @@
 			},
 			defaultSetter : function(field, data) {
 				if (typeof data === "string") {
+					if (field.getAttribute("data-simply-content") == "attributes" &&  field.hasAttribute("data-simply-attributes")) {
+						var attrs = field.getAttribute("data-simply-attributes").split(" ");
+						if (attrs.length == 1) {
+							field.simplyString = true;
+							var newData = {};
+							newData[attrs[0]] = data;
+							data = newData;
+						}
+					}
+				}
+				if (typeof data === "string") {
 					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
 					return;
 				}
