@@ -51,6 +51,15 @@
 				var parent = field;
 				while (parent && parent.parentNode) {
 					if (parent.getAttribute("data-simply-path")) {
+						if (parent.getAttribute("data-simply-path").indexOf("/") !== 0) {
+							var resolver = document.createElement("A");
+							resolver.href = location.pathname + parent.getAttribute("data-simply-path");
+							if (resolver.pathname.indexOf("../") == -1) {
+								return resolver.pathname;
+							} else {
+								return resolver.href.replace(document.location.origin, ""); // IE11 just adds ../ to the end;
+							}
+						}
 						return parent.getAttribute("data-simply-path");
 					}
 					parent = parent.parentNode;
