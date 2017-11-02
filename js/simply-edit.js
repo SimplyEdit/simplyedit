@@ -121,6 +121,7 @@
 				editor.settings.databind.parentKey = savedParentKey;
 				editor.list.initLists(data, target);
 				editor.fireEvent("simply-data-applied", target);
+				editor.fireEvent("simply-selectable-inserted", target);
 			},
 			get : function(target) {
 				if (target == document && editor.currentData) {
