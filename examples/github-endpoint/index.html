@@ -1,32 +1,64 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+	<link rel="stylesheet" href="../examples-styles.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title data-simply-field="meta title">Simple edit</title>
-	<meta name="description" content="Simple edit testpage description" data-simply-field="meta description">
+	<title data-simply-field="meta title">Simply edit</title>
+	<meta name="description" content="Simply edit testpage description" data-simply-field="meta description">
 	<meta name="robots" content="noindex,nofollow" data-simply-field="meta robots">
 	<meta name="author" content="" data-simply-field="meta author">
 	<meta name="page-template" content="index.html" data-simply-field="data-simply-page-template">
 </head>
 <body>
-	<h1 data-simply-field="title" data-simply-content="text">Thing goes here</h1>
-	<div data-simply-field="page content">Other things go here</div>
-	<img src="/simply-edit/imgs/muze.png" data-simply-field="image">
-	<nav>
-		Menu goes here!
-		<ul data-simply-list="menu" data-simply-path="/simply-edit/" data-simply-sortable>
-			<template>
-				<li>
-					<a href="/simply-edit/" data-simply-field="item">Menu item</a>
-				</li>
-			</template>
-		</ul>
-	</nav>
-	<img src="/simply-edit/imgs/muze.png" data-simply-selectable="true">
+	<h1 id="simply-edit" data-simply-field="title" data-simply-content="text"></h1>
+	<div data-simply-field="page content"></div>
 	<script src="/simply-edit/js/simply-edit.js" 
 		data-api-key="muze"
 		data-simply-endpoint="https://github.com/ylebre/editor-data/"
 		data-simply-images="https://ylebre.github.io/spectral/images/"
 	></script>
+	<script>
+		editor.storageConnectors.github.connect = function(callback) {
+			if (!document.getElementById("simply-login")) {
+				callback();
+			}
+
+			document.querySelector("#simply-login .simply-message").innerHTML = "Login with Github:";
+
+			editor.plugins.dialog.open(document.getElementById('simply-login'));
+			window.setTimeout(function() {
+				document.querySelector("#simply-login input").focus();
+			}, 10);
+			var handleLogin = function(evt) {
+				evt.preventDefault();
+				editor.plugins.dialog.close();
+				document.querySelector("#simply-login input[value=Login]").removeEventListener("click", handleLogin);
+				document.querySelector("#simply-login input[value=Cancel]").removeEventListener("click", handleLogin);
+
+				if (evt.target.getAttribute("value") == 'Login') {
+					editor.storage.github = new Github({
+						username: evt.target.form.username.value,
+						password: evt.target.form.password.value
+					});
+					editor.storage.repo = editor.storage.github.getRepo(editor.storage.repoUser, editor.storage.repoName);
+					callback();
+				}
+			};
+			document.querySelector("#simply-login input[value=Login]").addEventListener("click", handleLogin);
+			document.querySelector("#simply-login input[value=Cancel]").addEventListener("click", handleLogin);
+		};
+		editor.loadToolbar("//yvo.muze.nl/simply-edit/simply/plugin.simply-login.html");
+
+		document.addEventListener("simply-toolbars-loaded", function() {
+			editor.storage.connect(function() {
+				editor.storage.repo.read(editor.storage.repoBranch, "data.json", function(err, data) {
+					if (data) {
+						editor.currentData = JSON.parse(data);
+						editor.data.apply(editor.currentData, document);
+					}
+				});
+			});
+		});
+	</script>
 </body>
 </html>

@@ -51,6 +51,15 @@
 				var parent = field;
 				while (parent && parent.parentNode) {
 					if (parent.getAttribute("data-simply-path")) {
+						if (parent.getAttribute("data-simply-path").indexOf("/") !== 0) {
+							var resolver = document.createElement("A");
+							resolver.href = location.pathname + parent.getAttribute("data-simply-path");
+							if (resolver.pathname.indexOf("../") == -1) {
+								return resolver.pathname;
+							} else {
+								return resolver.href.replace(document.location.origin, ""); // IE11 just adds ../ to the end;
+							}
+						}
 						return parent.getAttribute("data-simply-path");
 					}
 					parent = parent.parentNode;
@@ -112,6 +121,7 @@
 				editor.settings.databind.parentKey = savedParentKey;
 				editor.list.initLists(data, target);
 				editor.fireEvent("simply-data-applied", target);
+				editor.fireEvent("simply-selectable-inserted", target);
 			},
 			get : function(target) {
 				if (target == document && editor.currentData) {
@@ -156,7 +166,7 @@
 				return jsonData;
 			},
 			save : function() {
-				if (editor.storage.connect()) {
+				editor.storage.connect( function() {
 					editor.data.stash();
 					if (editor.actions['simply-beforesave']) {
 						editor.actions['simply-beforesave']();
@@ -202,7 +212,7 @@
 					} else {
 						executeSave();
 					}
-				} 
+				});
 			},
 			load : function() {
 				editor.storage.load(function(data) {
@@ -225,8 +235,8 @@
 					editor.fireEvent("simply-content-loaded", document);
 
 					var checkEdit = function() {
-						if (document.location.hash == "#simply-edit" && !document.body.getAttribute("data-simply-edit")) {
-							if (editor.storage.connect()) {
+						if ((document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
+							editor.storage.connect(function() {
 								editor.editmode.init();
 								var checkHope = function() {
 									if (typeof hope !== "undefined" && document.getElementById("simply-main-toolbar")) {
@@ -236,9 +246,7 @@
 									}
 								};
 								checkHope();
-							} else {
-								window.setTimeout(checkEdit, 100);
-							}
+							});
 						}
 					};
 
@@ -530,7 +538,7 @@
 				var dataPath = editor.data.getDataPath(list);
 
 				list.innerHTML = list.innerHTML; // reset innerHTML to make sure templates are recognized;
-				var templates = list.getElementsByTagName("template");
+				var templates = list.querySelectorAll(":scope > template, :scope > *[data-simply-template]");
 
 				if (templates.length === 0) {
 					console.log("Warning: no list templates found for " + dataName);
@@ -569,8 +577,8 @@
 						list.templateIcons[templateName] = templateIcon;
 					}
 				}
-				while (templates.length) {
-					templates[0].parentNode.removeChild(templates[0]);
+				for (t=0; t<templates.length; t++) {
+					templates[t].parentNode.removeChild(templates[t]);
 				}
 			},
 			init : function(list, dataParent, useDataBinding) {
@@ -763,6 +771,16 @@
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
 						continue;
+					}
+
+					if (list.getAttribute("data-simply-entry")) {
+						if (!listData[j].simplyConverted) {
+							var entry = new Object(listData[j]);
+							entry[list.getAttribute("data-simply-entry")] = listData[j] + "";
+							entry.simplyConverted = true;
+							entry.parent = listData;
+							listData[j] = entry;
+						}
 					}
 
 					editor.bindingParents.push(j + listIndex.length);
@@ -992,7 +1010,12 @@
 						return editor.field.defaultGetter(field, ["content"]);
 					},
 					set : function(field, data) {
+						if (typeof data == "string") {
+							field.simplyString = true;
+							data = {"content" : data};
+						}
 						return editor.field.defaultSetter(field, data);
+						
 					},
 					makeEditable : function(field) {
 						field.contentEditable = true;
@@ -1036,7 +1059,7 @@
 						field.addEventListener("click", function(evt) {
 							evt.preventDefault();
 						}, true);
-						field.addEventListener("dblclick", editor.editmode.followLink);
+						// field.addEventListener("dblclick", editor.editmode.followLink);
 
 						if (field.getAttribute("data-simply-content") == "fixed") {
 							editor.field.initHopeStub(field);
@@ -1317,6 +1340,17 @@
 				return result;
 			},
 			defaultSetter : function(field, data) {
+				if (typeof data === "string") {
+					if (field.getAttribute("data-simply-content") == "attributes" &&  field.hasAttribute("data-simply-attributes")) {
+						var attrs = field.getAttribute("data-simply-attributes").split(" ");
+						if (attrs.length == 1) {
+							field.simplyString = true;
+							var newData = {};
+							newData[attrs[0]] = data;
+							data = newData;
+						}
+					}
+				}
 				if (typeof data === "string") {
 					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
 					return;
@@ -2265,12 +2299,14 @@
 				};
 				http.send();
 			},
-			connect : function() {
+			connect : function(callback) {
 				var url = editor.storage.url + "login";
 				var http = new XMLHttpRequest();
 				http.open("POST", url, true);
 				http.send();
-				return true;
+				if (typeof callback === "function") {
+					callback();
+				}
 			}
 		},
 		github : {
@@ -2304,10 +2340,10 @@
 					result.repoBranch = document.querySelector("[data-simply-repo-branch]").getAttribute("data-simply-repo-branch");
 				}
 				if (document.querySelector("[data-simply-repo-name]")) {
-					result.repoBranch = document.querySelector("[data-simply-repo-name]").getAttribute("data-simply-repo-name");
+					result.repoName = document.querySelector("[data-simply-repo-name]").getAttribute("data-simply-repo-name");
 				}
 				if (document.querySelector("[data-simply-repo-user]")) {
-					result.repoBranch = document.querySelector("[data-simply-repo-user]").getAttribute("data-simply-repo-user");
+					result.repoUser = document.querySelector("[data-simply-repo-user]").getAttribute("data-simply-repo-user");
 				}
 
 				var repoPath = pathInfo.join("/");
@@ -2378,7 +2414,7 @@
 					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
 				}
 			},
-			connect : function() {
+			connect : function(callback) {
 				if (typeof Github === "undefined") {
 					return false;
 				}
@@ -2399,15 +2435,19 @@
 						});
 						this.repo = this.github.getRepo(this.repoUser, this.repoName);
 					}
-					return true;
+					if (typeof callback === "function") {
+						callback();
+					}
 				} else {
-					return editor.storage.connect();
+					return editor.storage.connect(callback);
 				}
 			},
 			disconnect : function(callback) {
 				delete this.repo;
 				delete localStorage.storageKey;
-				callback();
+				if (typeof callback === "function") {
+					callback();
+				}
 			},
 			validateKey : function(key) {
 				return true;
@@ -2638,12 +2678,14 @@
 				};
 				http.send();
 			},
-			connect : function() {
+			connect : function(callback) {
 				var http = new XMLHttpRequest();
 				var url = editor.storage.url + "login";
 				http.open("POST", url, true);
 				http.send();
-				return true;
+				if (typeof callback === "function") {
+					callback();
+				}
 			},
 			disconnect : function(callback) {
 				delete editor.storage.key;
@@ -2656,7 +2698,9 @@
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4 && ((http.status > 399) && (http.status < 500)) ) {
-						callback();
+						if (typeof callback === "function") {
+							callback();
+						}
 					}
 				};
 				http.send();

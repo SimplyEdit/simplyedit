@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+	<link rel="stylesheet" href="../examples-styles.css">
 	<script src="Croppie-2.1.0/croppie.js"></script>
 	<link rel="stylesheet" type="text/css" href="Croppie-2.1.0/croppie.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,6 +63,7 @@
 					attributes.points = field.cropper.get().points;
 					attributes.zoom = field.cropper.get().zoom;
 					attributes.url = field.cropper.data.url;
+				} else {
 				}
 				if (field.querySelector('img')) {
 					attributes.alt = field.querySelector('img').getAttribute('alt');

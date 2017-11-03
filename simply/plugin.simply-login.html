@@ -1,0 +1,67 @@
+<section id="simply-login" class="simply-dialog">
+	<div class="simply-dialog-body">
+		<p class="simply-message"></p>
+		<form action="" method="POST">
+		<div class="simply-field">
+			<label for="username">Username:</label>
+			<input type="text" name="username">
+		</div>
+		<div class="simply-field">
+			<label for="password">Password:</label>
+			<input type="password" name="password">
+		</div>
+		<input type="submit" value="Login"> <input type="submit" value="Cancel" data-simply-action='simply-dialog-close'>
+	</div>
+</section>
+<style type="text/css">
+	#simply-login {
+		top: 50%;
+		max-height: 80%;
+		margin-top: -100px;
+		bottom: auto;
+		right: auto;
+		left: 50%;
+		width: 200px;
+		max-width: 80%;
+		margin-left: -100px;
+	}
+	#simply-login .simply-message {
+		font-size: 12px;
+		font-weight: bold;
+	}
+	#simply-login .simply-dialog-body {
+		padding: 10px;
+	}
+	#simply-login div.simply-field {
+		margin-bottom: 10px;
+	}
+	#simply-login input {
+		margin-top: 5px;
+		padding: 5px;
+		border-radius: 3px;
+		border: 1px solid #ccc;
+		box-sizing: border-box;
+	}
+	#simply-login .simply-field input {
+		width: 100%;
+	}
+	#simply-login input[value=Cancel] {
+		float: right;
+	}
+	@media (max-width: 481px) {
+		#simply-login {
+			top: 50%;
+			max-height: 80%;
+			margin-top: -100px;
+			left: 50%;
+			margin-left: -100px;
+			width: 200px;
+			max-width: 80%;
+			bottom: auto;
+			right: auto;
+			max-width: 100%;
+			max-height: 100%;
+			height: auto;
+		}
+	}
+</style>
