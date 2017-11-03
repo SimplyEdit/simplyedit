@@ -2307,6 +2307,7 @@
 				if (typeof callback === "function") {
 					callback();
 				}
+				return true;
 			}
 		},
 		github : {
@@ -2438,6 +2439,7 @@
 					if (typeof callback === "function") {
 						callback();
 					}
+					return true;
 				} else {
 					return editor.storage.connect(callback);
 				}
@@ -2448,6 +2450,7 @@
 				if (typeof callback === "function") {
 					callback();
 				}
+				return true;
 			},
 			validateKey : function(key) {
 				return true;
@@ -2686,6 +2689,7 @@
 				if (typeof callback === "function") {
 					callback();
 				}
+				return true;
 			},
 			disconnect : function(callback) {
 				delete editor.storage.key;
