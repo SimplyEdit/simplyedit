@@ -2242,7 +2242,7 @@
 									var result = {};
 									var info = src.split(".");
 									var extension = info.pop().toLowerCase();
-									if (extension === "jpg" || extension === "png") {
+									if (extension === "jpg" || extension === "jpeg" || extension === "png") {
 										for (var i=0; i<sizes.length; i++) {
 											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
 										}
@@ -2253,7 +2253,7 @@
 						}
 					} else {
 						editor.responsiveImages.sizes = function(src) {
-							if (!(src.match(/\.(jpg|png)$/i))) {
+							if (!(src.match(/\.(jpg|jpeg|png)$/i))) {
 								return {};
 							}
 
@@ -2402,7 +2402,7 @@
 									var result = {};
 									var info = src.split(".");
 									var extension = info.pop().toLowerCase();
-									if (extension === "jpg" || extension === "png") {
+									if (extension === "jpg" || extension === "jpeg" || extension === "png") {
 										for (var i=0; i<sizes.length; i++) {
 											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
 										}
@@ -2540,7 +2540,7 @@
 									result.folders.push(fileData);
 								} else {
 									result.files.push(fileData);
-									if (fileData.url.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
+									if (fileData.url.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
 										result.images.push(fileData);
 									}
 								}
@@ -2580,7 +2580,7 @@
 									var result = {};
 									var info = src.split(".");
 									var extension = info.pop().toLowerCase();
-									if (extension === "jpg" || extension === "png") {
+									if (extension === "jpg" || extension === "jpeg" || extension === "png") {
 										for (var i=0; i<sizes.length; i++) {
 											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
 										}
@@ -2893,9 +2893,9 @@
 								if (targetUrl === editor.storage.dataEndpoint) {
 									result.folders.push({url : targetUrl, name: "My pages"});
 								} else {
-									result.files.push({url : targetUrl, name : images[i].innerHTML});
-									if (targetUrl.match(/(jpg|gif|png|bmp|tif|svg)$/i)) {
-										result.images.push({url : targetUrl, name : images[i].innerHTML});
+									result.files.push({url : targetPath, name : images[i].innerHTML});
+									if (targetUrl.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
+										result.images.push({url : targetPath, name : images[i].innerHTML});
 									}
 								}
 							}
