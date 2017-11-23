@@ -2893,9 +2893,9 @@
 								if (targetUrl === editor.storage.dataEndpoint) {
 									result.folders.push({url : targetUrl, name: "My pages"});
 								} else {
-									result.files.push({url : targetPath, name : images[i].innerHTML});
+									result.files.push({url : targetUrl, name : images[i].innerHTML});
 									if (targetUrl.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
-										result.images.push({url : targetPath, name : images[i].innerHTML});
+										result.images.push({url : targetUrl, name : images[i].innerHTML});
 									}
 								}
 							}
