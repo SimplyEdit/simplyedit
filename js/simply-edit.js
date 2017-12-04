@@ -1181,21 +1181,46 @@
 						if (editor.data.getDataPath(field) == field.storedPath) {
 							return field.storedData;
 						}
+						if (field.getAttribute("data-simply-value")) {
+							editor.field.set(field, field.getAttribute("data-simply-value"));
+						}
 					},
 					set : function(field, data) {
 						editor.list.parseTemplates(field);
 						field.innerHTML = '';
+
+						var savedBindingParents = editor.bindingParents;
+
 						if (field.templates[data]) {
 							var clone = editor.list.cloneTemplate(field.templates[data]);
 							field.appendChild(clone);
 							for (var i=0; i<field.childNodes.length; i++) {
 								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
-									editor.data.apply(editor.currentData, field.childNodes[i]);
+
+									if (field.dataBinding) {
+										// Bind the subfields of the template to the same data-level as this field;
+										var fieldData = {};
+										fieldData[editor.data.getDataPath(field)] = editor.currentData[editor.data.getDataPath(field)];
+										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
+										if (subkeys[0] === "") {
+											subkeys.shift();
+										}
+										for (var j=0; j<subkeys.length; j++) {
+											fieldData[editor.data.getDataPath(field)] = fieldData[editor.data.getDataPath(field)][subkeys[j]];
+										}
+										editor.data.apply(fieldData, field.childNodes[i]);
+									} else {
+										editor.data.apply(editor.currentData, field.childNodes[i]);
+									}
 								}
 							}
 						}
 						field.storedPath = editor.data.getDataPath(field);
 						field.storedData = data;
+						if (document.body.getAttribute("data-simply-edit")) {
+							editor.editmode.makeEditable(field);
+						}
+						editor.bindingParents = savedBindingParents;
 					},
 					makeEditable : function(field) {
 						return true;
