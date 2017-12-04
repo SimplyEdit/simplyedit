@@ -1218,6 +1218,10 @@
 			}, 0);
 		});
 		muze.event.attach( document, 'keyup', function(evt) {
+			// skip context updates when the keyup event is coming from autofilled (username/password) inputs, to prevent looping in chrome when credentials are saved.
+			if (evt.target && evt.target.matches && evt.target.matches(":-webkit-autofill")) {
+				return;
+			}
 			editor.context.update();
 		});
 		muze.event.attach( document, 'mouseup', function(evt) {
