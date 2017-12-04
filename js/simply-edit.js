@@ -1641,6 +1641,11 @@
 			toolbars : [],
 			loadToolbarList : function(toolbarList) {
 				var toolbarsContainer = document.querySelector("#simply-editor");
+				if (!toolbarsContainer) {
+					toolbarsContainer = document.createElement("DIV");
+					toolbarsContainer.id = "simply-editor";
+					document.body.appendChild(toolbarsContainer);
+				}
 
 				var url = toolbarList.shift();
 				var i;
