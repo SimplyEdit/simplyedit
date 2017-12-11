@@ -51,9 +51,10 @@
 				var parent = field;
 				while (parent && parent.parentNode) {
 					if (parent.getAttribute("data-simply-path")) {
-						if (parent.getAttribute("data-simply-path").indexOf("../") !== -1) {
+						if (parent.getAttribute("data-simply-path").indexOf("/") !== 0) { // Resolve as relative path if it doesn't start with a slash; allows the use of ../
 							var resolver = document.createElement("A");
-							resolver.href = location.pathname + parent.getAttribute("data-simply-path");
+							var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+							resolver.href = basePath + parent.getAttribute("data-simply-path");
 							if (resolver.pathname.indexOf("../") == -1) {
 								return resolver.pathname;
 							} else {
