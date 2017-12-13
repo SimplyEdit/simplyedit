@@ -1182,8 +1182,9 @@
 						if (editor.data.getDataPath(field) == field.storedPath) {
 							return field.storedData;
 						}
-						if (field.getAttribute("data-simply-value")) {
-							editor.field.set(field, field.getAttribute("data-simply-value"));
+						if (field.getAttribute("data-simply-default-value")) {
+							editor.field.set(field, field.getAttribute("data-simply-default-value"));
+							return field.storedData;
 						}
 					},
 					set : function(field, data) {
@@ -1191,23 +1192,26 @@
 						field.innerHTML = '';
 
 						var savedBindingParents = editor.bindingParents;
+						var fieldPath = editor.data.getDataPath(field);
 
 						if (field.templates[data]) {
 							var clone = editor.list.cloneTemplate(field.templates[data]);
 							field.appendChild(clone);
 							for (var i=0; i<field.childNodes.length; i++) {
 								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
-
 									if (field.dataBinding) {
 										// Bind the subfields of the template to the same data-level as this field;
 										var fieldData = {};
-										fieldData[editor.data.getDataPath(field)] = editor.currentData[editor.data.getDataPath(field)];
+										fieldData[fieldPath] = editor.currentData[fieldPath];
+
+										// split the binding parents into seperate entries and remove the first empty entry;
 										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
 										if (subkeys[0] === "") {
 											subkeys.shift();
 										}
-										for (var j=0; j<subkeys.length; j++) {
-											fieldData[editor.data.getDataPath(field)] = fieldData[editor.data.getDataPath(field)][subkeys[j]];
+
+										if (subkeys.length) {
+											fieldData[fieldPath] = fieldData[fieldPath][subkeys.pop()];
 										}
 										editor.data.apply(fieldData, field.childNodes[i]);
 									} else {
@@ -1216,7 +1220,7 @@
 								}
 							}
 						}
-						field.storedPath = editor.data.getDataPath(field);
+						field.storedPath = fieldPath;
 						field.storedData = data;
 						if (document.body.getAttribute("data-simply-edit")) {
 							editor.editmode.makeEditable(field);
