@@ -151,7 +151,7 @@
 		}
 		.simply-toolbar > ul {
 			background: linear-gradient(to bottom, white 0%, #FFF 95%, #DDD 100%);
-			width: 100%;
+			min-width: 100%;
 			line-height: 0px;
 		}
 		.simply-toolbar > ul,
@@ -171,6 +171,19 @@
 			position: relative;
 			float: left;
 		}
+		#simply-main-toolbar .simply-toolbar {
+			min-height: 60px;
+			transform: translate3d(0,0,0);
+		}
+		#simply-main-toolbar .simply-buttons {
+			white-space: nowrap !important;
+			position: absolute;
+		}
+		#simply-main-toolbar .simply-toolbar li {
+			float: none;
+			display: inline-block;
+		}
+
 		#vdTablePopup {
 			left: 40px;
 			top: 0px;
