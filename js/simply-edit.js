@@ -51,9 +51,10 @@
 				var parent = field;
 				while (parent && parent.parentNode) {
 					if (parent.getAttribute("data-simply-path")) {
-						if (parent.getAttribute("data-simply-path").indexOf("/") !== 0) {
+						if (parent.getAttribute("data-simply-path").indexOf("/") !== 0) { // Resolve as relative path if it doesn't start with a slash; allows the use of ../
 							var resolver = document.createElement("A");
-							resolver.href = location.pathname + parent.getAttribute("data-simply-path");
+							var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+							resolver.href = basePath + parent.getAttribute("data-simply-path");
 							if (resolver.pathname.indexOf("../") == -1) {
 								return resolver.pathname;
 							} else {
@@ -1181,21 +1182,50 @@
 						if (editor.data.getDataPath(field) == field.storedPath) {
 							return field.storedData;
 						}
+						if (field.getAttribute("data-simply-default-value")) {
+							editor.field.set(field, field.getAttribute("data-simply-default-value"));
+							return field.storedData;
+						}
 					},
 					set : function(field, data) {
 						editor.list.parseTemplates(field);
 						field.innerHTML = '';
+
+						var savedBindingParents = editor.bindingParents;
+						var fieldPath = editor.data.getDataPath(field);
+
 						if (field.templates[data]) {
 							var clone = editor.list.cloneTemplate(field.templates[data]);
 							field.appendChild(clone);
 							for (var i=0; i<field.childNodes.length; i++) {
 								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
-									editor.data.apply(editor.currentData, field.childNodes[i]);
+									if (field.dataBinding) {
+										// Bind the subfields of the template to the same data-level as this field;
+										var fieldData = {};
+										fieldData[fieldPath] = editor.currentData[fieldPath];
+
+										// split the binding parents into seperate entries and remove the first empty entry;
+										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
+										if (subkeys[0] === "") {
+											subkeys.shift();
+										}
+
+										if (subkeys.length) {
+											fieldData[fieldPath] = fieldData[fieldPath][subkeys.pop()];
+										}
+										editor.data.apply(fieldData, field.childNodes[i]);
+									} else {
+										editor.data.apply(editor.currentData, field.childNodes[i]);
+									}
 								}
 							}
 						}
-						field.storedPath = editor.data.getDataPath(field);
+						field.storedPath = fieldPath;
 						field.storedData = data;
+						if (document.body.getAttribute("data-simply-edit")) {
+							editor.editmode.makeEditable(field);
+						}
+						editor.bindingParents = savedBindingParents;
 					},
 					makeEditable : function(field) {
 						return true;
@@ -1616,6 +1646,11 @@
 			toolbars : [],
 			loadToolbarList : function(toolbarList) {
 				var toolbarsContainer = document.querySelector("#simply-editor");
+				if (!toolbarsContainer) {
+					toolbarsContainer = document.createElement("DIV");
+					toolbarsContainer.id = "simply-editor";
+					document.body.appendChild(toolbarsContainer);
+				}
 
 				var url = toolbarList.shift();
 				var i;

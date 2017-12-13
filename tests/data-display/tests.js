@@ -1138,4 +1138,59 @@ QUnit.module("responsive images");
 		target.innerHTML = '<img data-simply-src="bogus" alt="This is an alt tag">';
 		assert.equal(editor.responsiveImages.getSizeRatio(document.querySelector("#testContent img")), 0);
 	});
- 
+
+
+QUnit.module("data path");
+	QUnit.test("unset data path", function(assert) {
+		document.body.removeAttribute("data-simply-path");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), location.pathname);
+	});
+
+	QUnit.test("data path root", function(assert) {
+		var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+		document.body.setAttribute("data-simply-path", "/");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), "/"); 
+		document.body.removeAttribute("data-simply-path");
+	});
+
+	QUnit.test("relative data path", function(assert) {
+		var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+		document.body.setAttribute("data-simply-path", "foo/");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), basePath + "foo/"); 
+		document.body.removeAttribute("data-simply-path");
+	});
+
+	QUnit.test("relative data path decend one step", function(assert) {
+		var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+		document.body.setAttribute("data-simply-path", "bar/../foo/");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), basePath + "foo/"); 
+		document.body.removeAttribute("data-simply-path");
+	});
+
+	QUnit.test("relative data path from current, two deep", function(assert) {
+		var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+		document.body.setAttribute("data-simply-path", "./foo/bar/");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), basePath + "foo/bar/"); 
+		document.body.removeAttribute("data-simply-path");
+	});
+
+	QUnit.test("relative data path from current, two deep and back up", function(assert) {
+		var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+		document.body.setAttribute("data-simply-path", "./foo/bar/../../");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), basePath); 
+		document.body.removeAttribute("data-simply-path");
+	});
+
+	QUnit.test("relative data path with subkey", function(assert) {
+		var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+		document.body.setAttribute("data-simply-path", "/bar/foo/");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), "/bar/foo/"); 
+		document.body.removeAttribute("data-simply-path");
+	});
+
+	QUnit.test("not resolving when path has a slash", function(assert) {
+		var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
+		document.body.setAttribute("data-simply-path", "/bar/../foo/");
+		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), "/bar/../foo/"); 
+		document.body.removeAttribute("data-simply-path");
+	});

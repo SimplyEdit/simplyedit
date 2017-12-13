@@ -404,7 +404,7 @@
 				while(parent && parent != document) {
 					if (typeof parent.className === "string" && parent.className.match(/\beditable\b/)) {
 						return parent;
-					} else if (parent.getAttribute("data-simply-field")) {
+					} else if (parent.getAttribute("data-simply-field") && (parent.getAttribute("data-simply-content") !== "template")) {
 						return parent;
 					} else {
 						parent = parent.parentNode;

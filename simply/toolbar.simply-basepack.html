@@ -2799,7 +2799,9 @@
 			}
 
 			// Set clickstart on all selectable things and fields; Fields need this to interact with slip correctly.
-			var simplyItems = document.querySelectorAll("[data-simply-selectable], [data-simply-field]");
+			// FIXME: Deze is verdacht voor issue met clicks binnen fields met content-type="template";
+			var simplyItems = document.querySelectorAll("[data-simply-selectable], [data-simply-field]:not([data-simply-content='template'])");
+			// var simplyItems = document.querySelectorAll("[data-simply-selectable], [data-simply-field]");
 			for (var j=0; j<simplyItems.length; j++) {
 				simplyItems[j].removeEventListener('mousedown',registerClickStart);
 				simplyItems[j].addEventListener('mousedown',registerClickStart);
