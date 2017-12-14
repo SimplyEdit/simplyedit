@@ -2345,6 +2345,134 @@
 				return true;
 			}
 		},
+		beaker : {
+			init : function(endpoint) {
+				this.endpoint = endpoint;
+				this.dataEndpoint = endpoint + "data.json";
+				if (this.endpoint.indexOf("dat://") === 0 && window.DatArchive) {
+					this.archive = new DatArchive(this.endpoint);
+					this.archive.readFile("dat.json").then(function(data) {
+						try {
+							editor.storage.meta = JSON.parse(data);
+							if (!editor.storage.meta.web_root) {
+								editor.storage.meta.web_root = "/";
+							}
+							if (!editor.storage.meta.web_root.match(/\/$/)) {
+								editor.storage.meta.web_root += "/";
+							}
+						} catch (e) {
+							console.log("Warning: could not parse archive metadata (dat.json)");
+						}
+					});
+				}
+				this.load = storage.default.load;
+				this.list = storage.default.list;
+				this.sitemap = storage.default.sitemap;
+				this.page = storage.default.page;
+				this.listSitemap = storage.default.listSitemap;
+			},
+			connect : function(callback) {
+				callback();
+			},
+			save: function(data,callback) {
+				editor.storage.file.save("data.json", data, callback);
+			},
+			saveTemplate : function(pageTemplate, callback) {
+				var dataPath = location.pathname.split(/\//, 3)[2];
+				if (dataPath.match(/\/$/)) {
+					dataPath += "index.html";
+				}
+
+				editor.storage.archive.readFile(editor.storage.meta.web_root + pageTemplate).then(function(result) {
+					if (result) {
+						editor.storage.file.save(dataPath, result, callback);
+					}
+				});
+			},
+			file : {
+				save : function(path, data, callback) {
+					if (!editor.storage.archive) {
+						callback({
+							error : true,
+							message : "No connection to dat archive (are you on https?)"
+						});
+						console.log("Warning: no connection to dat archive (are you on https?)");
+						return;
+					}
+					editor.storage.archive.getInfo().then(function(info) {
+						if (!info.isOwner) {
+							callback({
+								error : true,
+								message : "Not the owner."
+							});
+							console.log("Warning: Save failed because we are not owner for this archive.");
+							return;
+						}
+
+						var executeSave = function(path, data) {
+							createDirectories(path);
+							if (path.match(/\/$/)) {
+								// path points to a directory;
+								callback({});
+							} else {
+								editor.storage.archive.writeFile(editor.storage.meta.web_root + path, data).then(function() {
+									editor.storage.archive.commit().then(function() {
+										var saveResult = {path : path, response: "Saved."};
+										callback(saveResult);
+									});
+								});
+							}
+						};
+						var createDirectory = function(path, callback) {
+							editor.storage.archive.readdir(path).then(null, function () {
+								editor.storage.archive.mkdir(path).then(function() {
+									editor.storage.archive.commit();
+								});
+							});
+						};
+						var createDirectories = function(path, callback) {
+							var parts = path.split("/");
+							if (!path.match(/\/$/)) {
+								parts.pop(); // last part is the filename
+							}
+							var dirToCreate = '/';
+							
+							for (var i=0; i<parts.length; i++) {
+								if (parts[i] !== "") {
+									dirToCreate += parts[i] + "/";
+								}
+								createDirectory(editor.storage.meta.web_root + dirToCreate);
+							}
+						};
+						if (data instanceof File) {
+							var fileReader = new FileReader();
+							fileReader.onload = function(evt) {
+								executeSave(path, this.result);
+							};
+							fileReader.readAsArrayBuffer(data);
+						} else {
+							executeSave(path, data);
+						}
+					});
+				},
+				delete : function(path, callback) {
+					if (path.match(/\/$/)) {
+						// path points to a directory;
+						editor.storage.archive.rmdir(editor.storage.meta.web_root + path, {recursive: true}).then(function() {
+							editor.storage.archive.commit().then(function() {
+								callback();
+							});
+						});
+					} else {
+						editor.storage.archive.unlink(editor.storage.meta.web_root + path).then(function() {
+							editor.storage.archive.commit().then(function() {
+								callback();
+							});
+						});
+					}
+				}
+			}
+		},
 		github : {
 			repoName : null,
 			repoUser : null,
