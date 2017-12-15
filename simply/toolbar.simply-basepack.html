@@ -2826,7 +2826,7 @@
 			<li><button data-simply-action="simply-list-item-add"><i class="fa fa-plus-circle"></i>Add</button></li>
 			<li><button data-simply-section="simply-list-mogrify" class="simply-expands"><i class="fa fa-cube"></i>Switch type</button></li>
 		</ul>
-		<div class="simply-toolbar-section simply-list-templates">
+		<div class="simply-toolbar-section simply-list-item-templates">
 			<ul>
 				<li><button data-simply-action="simply-list-item-add"><i class="fa fa-cube"></i>Template</button></li>
 			</ul>
@@ -2846,7 +2846,33 @@
 		</ul>
 		<div class="simply-toolbar-section simply-list-templates">
 			<ul>
+				<li><button data-simply-action="simply-list-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
+	</div>
+</section>
+<section id="simply-list-and-item" class="simply-section">
+	<h1>*Objectlist Toolbar*</h1>
+	<div class="simply-toolbar">
+		<ul class="simply-buttons">
+			<li><button data-simply-action="simply-list-add"><i class="fa fa-plus-circle"></i>Add child</button></li>
+			<li><button data-simply-action="simply-list-item-delete"><i class="fa fa-times"></i>Delete</button></li>
+			<li><button data-simply-action="simply-list-item-add"><i class="fa fa-plus-circle"></i>Add sibling</button></li>
+			<li><button data-simply-section="simply-list-mogrify" class="simply-expands"><i class="fa fa-cube"></i>Switch type</button></li>
+		</ul>
+		<div class="simply-toolbar-section simply-list-templates">
+			<ul>
+				<li><button data-simply-action="simply-list-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-list-item-templates">
+			<ul>
 				<li><button data-simply-action="simply-list-item-add"><i class="fa fa-cube"></i>Template</button></li>
+			</ul>
+		</div>
+		<div class="simply-toolbar-section simply-list-mogrify">
+			<ul>
+				<li><button data-simply-action="simply-list-item-mogrify"><i class="fa fa-cube"></i>Template</button></li>
 			</ul>
 		</div>
 	</div>
@@ -3089,7 +3115,7 @@
 				currentList = currentList.parentNode;
 			}
 
-			var listTemplates = toolbar.querySelector("div.simply-list-templates ul");
+			var listTemplates = toolbar.querySelector("div.simply-list-item-templates ul");
 			var mogrifyTemplates = toolbar.querySelector("div.simply-list-mogrify ul");
 
 			listTemplates.innerHTML = '';
@@ -3130,12 +3156,12 @@
 				}
 				mogrifyTemplates.appendChild(item);
 			}
-			var addButton = toolbar.querySelector("button[data-simply-action='simply-list-item-add'], button[data-simply-section='simply-list-templates']");
+			var addButton = toolbar.querySelector("button[data-simply-action='simply-list-item-add'], button[data-simply-section='simply-list-item-templates']");
 			var mogrifyButton = toolbar.querySelector("button[data-simply-section='simply-list-mogrify']");
 
 			if (Object.keys(currentList.templates).length > 1) {
 				delete addButton.dataset.simplyAction;
-				addButton.dataset.simplySection = "simply-list-templates";
+				addButton.dataset.simplySection = "simply-list-item-templates";
 				addButton.classList.add("simply-expands");
 			} else {
 				delete addButton.dataset.simplySection;
@@ -3217,13 +3243,20 @@
 			toolbar.querySelector("div.simply-list-templates").classList.remove("simply-selected");
 		}
 	});
-	editor.addContextFilter(
-		"simply-list-and-item", {
+
+	editor.addToolbar({
+		name: 'simply-list-and-item',
+		filter:{
 			"list-bonus" : true,
-			"selector" : "[data-simply-list][data-simply-list-item]",
-			"context" : "simply-list" // FIXME: There should be a toolbar that is specific for list-items that double as a list
+			"selector" : "[data-simply-list][data-simply-list-item]"
+		},
+		init: function() {
+		},
+		update : function(toolbar) {
+			editor.toolbars['simply-list-item'].update(toolbar);
+			editor.toolbars['simply-list'].update(toolbar);
 		}
-	);
+	});
 </script><section id="simply-icon" class="simply-section">
 	<h1>Insert icon toolbar</h1>
 	<div class="simply-toolbar">
