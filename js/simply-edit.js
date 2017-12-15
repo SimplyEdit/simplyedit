@@ -256,6 +256,17 @@
 					}
 					checkEdit();
 				});
+			},
+			bindAsParent : function(dataParent, dataKey) {
+				if (!dataParent._bindings_) {
+					var parentBindingConfig = {};
+					for (var i in editor.settings.databind) {
+						parentBindingConfig[i] = editor.settings.databind[i];
+					}
+					parentBindingConfig.data = dataParent;
+					parentBindingConfig.key = dataKey;
+					parentDataBinding = new dataBinding(parentBindingConfig);
+				}
 			}
 		},
 		list : {
@@ -282,6 +293,7 @@
 						if (!dataParent[dataKeys[j]]) {
 							dataParent[dataKeys[j]] = {};
 						}
+						editor.data.bindAsParent(dataParent, dataKeys[j]);
 						dataParent = dataParent[dataKeys[j]];
 					}
 
@@ -358,6 +370,7 @@
 						if (!dataParent[dataKeys[j]]) {
 							dataParent[dataKeys[j]] = {};
 						}
+						editor.data.bindAsParent(dataParent, dataKeys[j]);
 						dataParent = dataParent[dataKeys[j]];
 					}
 
@@ -592,6 +605,7 @@
 					if (!dataParent[dataKeys[j]]) {
 						dataParent[dataKeys[j]] = {};
 					}
+					editor.data.bindAsParent(dataParent, dataKeys[j]);
 					dataParent = dataParent[dataKeys[j]];
 					editor.settings.databind.parentKey += dataKeys[j] + "/";
 				}
@@ -1504,6 +1518,7 @@
 					if (!dataParent[dataKeys[j]]) {
 						dataParent[dataKeys[j]] = {};
 					}
+					editor.data.bindAsParent(dataParent, dataKeys[j]);
 					dataParent = dataParent[dataKeys[j]];
 					editor.settings.databind.parentKey += dataKeys[j] + "/";
 				}

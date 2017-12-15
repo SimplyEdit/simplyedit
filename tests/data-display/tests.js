@@ -1132,6 +1132,68 @@ QUnit.module("databinding");
 		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
 	});
 
+	QUnit.test("databinding for subkeys", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.one"></div><div data-simply-path="/" data-simply-field="item.two"></div>';
+		var data = {
+			"/" : {}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item = {
+			one : "One",
+			two : "Two"
+		};
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+		document.querySelector("#testContent div + div").dataBinding.resolve(true);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "One");
+		assert.equal(document.querySelector("#testContent div + div").innerHTML, "Two");
+	});
+
+	QUnit.test("databinding for subkeyed lists", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-list="item.one"><template><div data-simply-field="name"></div></template></div><div data-simply-path="/" data-simply-list="item.two"><template><div data-simply-field="name"></div></template></div>';
+		var data = {
+			"/" : {}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item = {
+			one : [{name : "One.1"}, {name : "One.2"}],
+			two : [{name : "Two.1"}, {name : "Two.2"}],
+		};
+		document.querySelector("#testContent div[data-simply-list='item.one']").dataBinding.resolve(true);
+		document.querySelector("#testContent div[data-simply-list='item.two']").dataBinding.resolve(true);
+
+		assert.equal(document.querySelector("#testContent div[data-simply-list='item.one'] > div").innerHTML, "One.1");
+		assert.equal(document.querySelector("#testContent div[data-simply-list='item.two'] > div").innerHTML, "Two.1");
+	});
+
+	QUnit.test("databinding for subkeys with preset data", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.one"></div><div data-simply-path="/" data-simply-field="item.two"></div>';
+		var data = {
+			"/" : {
+				item : {
+					one : "1",
+					two : "2"
+				}
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item = {
+			one : "One",
+			two : "Two"
+		};
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+		document.querySelector("#testContent div + div").dataBinding.resolve(true);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "One");
+		assert.equal(document.querySelector("#testContent div + div").innerHTML, "Two");
+	});
+
 QUnit.module("responsive images");
 	QUnit.test("responsive image width from ALT tag is ignored", function(assert) {
 		var target = document.querySelector("#testContent");
