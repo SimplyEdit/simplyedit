@@ -1782,7 +1782,7 @@
 				editor.loadStyleSheet(editor.baseURL + "simply/css/editor.v9.css");
 
 				// Add font awesome
-				editor.loadStyleSheet("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css",{
+				editor.loadStyleSheet("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css",{
 					'integrity': 'sha256-k2/8zcNbxVIh5mnQ52A0r3a6jAgMGxFJFE2707UxGCk=',
 					'crossorigin':"anonymous"
 				});
