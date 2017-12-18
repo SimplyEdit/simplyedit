@@ -293,15 +293,16 @@ dataBinding = function(config) {
 				}
 			});
 		}
+
+		setShadowValue(data[key]);
+		oldValue = dereference(data[key]);
+
 		data._bindings_[key] = binding;
 		if (binding.mode == "list") {
 			if (data[key] === null) {
 				data[key] = [];
 			}
 		}
-
-		setShadowValue(data[key]);
-		oldValue = dereference(data[key]);
 
 		Object.defineProperty(data, key, {
 			set : function(value) {
