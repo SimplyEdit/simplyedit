@@ -2633,19 +2633,45 @@
 			validateKey : function(key) {
 				return true;
 			},
+			file : {
+				save : function(path, data, callback) {
+					if (path.match(/\/$/)) {
+						// github will create directories as needed.
+						var saveResult = {path : path, response: "Saved."};
+						return callback(saveResult);
+					}
+
+					var saveCallback = function(err) {
+						if (err === null) {
+							var saveResult = {path : path, response: "Saved."};
+							return callback(saveResult);
+						}
+
+						if (err.error == 401) {
+							return callback({message : "Authorization failed.", error: true});
+						}
+						return callback({message : "SAVE FAILED: Could not store.", error: true});
+					};
+
+					var executeSave = function(path, data) {
+						editor.storage.repo.write(editor.storage.repoBranch, path, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
+					};
+					if (data instanceof File) {
+						var fileReader = new FileReader();
+						fileReader.onload = function(evt) {
+							executeSave(path, this.result);
+						};
+						fileReader.readAsBinaryString(data);
+					} else {
+						executeSave(path, data);
+					}
+				},
+				delete : function(path, callback) {
+					editor.storage.repo.delete(editor.storage.repoBranch, path, callback);
+				}
+			},
 			save : function(data, callback) {
-				var saveCallback = function(err) {
-					if (err === null) {
-						return callback();
-					}
-
-					if (err.error == 401) {
-						return callback({message : "Authorization failed.", error: true});
-					}
-					return callback({message : "SAVE FAILED: Could not store.", error: true});
-				};
-
-				this.repo.write(this.repoBranch, this.dataFile, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
+				return editor.storage.file.save("data.json", data, callback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
@@ -2698,14 +2724,14 @@
 				var github = new Github({});
 				var repo = github.getRepo(repoUser, repoName);
 				repo.read(repoBranch, repoPath, function(err, data) {
+					var result = {
+						images : [],
+						folders : [],
+						files : []
+					};
+
 					if (data) {
 						data = JSON.parse(data);
-						var result = {
-							images : [],
-							folders : [],
-							files : []
-						};
-
 						for (var i=0; i<data.length; i++) {
 							if (data[i].type == "file") {
 								var fileData = {
@@ -2724,12 +2750,14 @@
 								}
 							} else if (data[i].type == "dir") {
 								result.folders.push({
-									url : url + data[i].path,
+									url : editor.storage.endpoint + data[i].path + "/",
 									name : data[i].name
 								});
 							}
 						}
-
+						callback(result);
+					} else {
+						// Empty (non-existant) directory - return the empty resultset, github will create the dir automatically when we save things to it.");
 						callback(result);
 					}
 				});
