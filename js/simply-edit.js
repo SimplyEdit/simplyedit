@@ -68,6 +68,9 @@
 				return location.pathname;
 			},
 			apply : function(data, target) {
+				if (typeof data === "undefined") {
+					data = {};
+				}
 				// data = JSON.parse(JSON.stringify(data)); // clone data to prevent reference issues;
 
 				if (typeof editor.data.originalBody === "undefined") {
@@ -79,6 +82,12 @@
 				var dataFields;
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
 					dataFields = [target];
+					if (target.getAttribute("data-simply-content") === 'fixed') { // special case - if the target field has content fixed, we need to handle its children as well.
+						var extraFields = target.querySelectorAll("[data-simply-field]");
+						for (var x=0; x<extraFields.length; x++) {
+							dataFields.push(extraFields[x]);
+						}
+					}
 				} else {
 					dataFields = target.querySelectorAll("[data-simply-field]");
 				}
@@ -258,15 +267,13 @@
 				});
 			},
 			bindAsParent : function(dataParent, dataKey) {
-				if (!dataParent._bindings_) {
-					var parentBindingConfig = {};
-					for (var i in editor.settings.databind) {
-						parentBindingConfig[i] = editor.settings.databind[i];
-					}
-					parentBindingConfig.data = dataParent;
-					parentBindingConfig.key = dataKey;
-					parentDataBinding = new dataBinding(parentBindingConfig);
+				var parentBindingConfig = {};
+				for (var i in editor.settings.databind) {
+					parentBindingConfig[i] = editor.settings.databind[i];
 				}
+				parentBindingConfig.data = dataParent;
+				parentBindingConfig.key = dataKey;
+				parentDataBinding = new dataBinding(parentBindingConfig);
 			}
 		},
 		list : {
@@ -1367,6 +1374,9 @@
 			},
 			defaultGetter : function(field, attributes) {
 				var result = {};
+				if (field.dataBinding) {
+					result = field.dataBinding.get(); // Start with the existing data if there to prevent destroying data that is not part of our scope;
+				}
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
 					if (attr == "innerHTML") {
@@ -1446,8 +1456,10 @@
 				}
 				if (setter) {
 					return setter(field, data);
+				} else {
+					editor.field.defaultSetter(field, {innerHTML : data});
 				}
-				field.innerHTML = data;
+				// field.innerHTML = data;
 				editor.responsiveImages.init(field);
 				if (field.hopeEditor) {
 					field.hopeEditor.needsUpdate = true;
