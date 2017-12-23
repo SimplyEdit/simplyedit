@@ -1374,7 +1374,7 @@
 			},
 			defaultGetter : function(field, attributes) {
 				var result = {};
-				if (field.dataBinding) {
+				if (field.dataBinding && typeof field.dataBinding.get() === "object") {
 					result = field.dataBinding.get(); // Start with the existing data if there to prevent destroying data that is not part of our scope;
 				}
 				for (var i=0; i<attributes.length; i++) {
