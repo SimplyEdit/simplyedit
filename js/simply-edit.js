@@ -68,6 +68,9 @@
 				return location.pathname;
 			},
 			apply : function(data, target) {
+				if (typeof data === "undefined") {
+					data = {};
+				}
 				// data = JSON.parse(JSON.stringify(data)); // clone data to prevent reference issues;
 
 				if (typeof editor.data.originalBody === "undefined") {
@@ -79,6 +82,12 @@
 				var dataFields;
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
 					dataFields = [target];
+					if (target.getAttribute("data-simply-content") === 'fixed') { // special case - if the target field has content fixed, we need to handle its children as well.
+						var extraFields = target.querySelectorAll("[data-simply-field]");
+						for (var x=0; x<extraFields.length; x++) {
+							dataFields.push(extraFields[x]);
+						}
+					}
 				} else {
 					dataFields = target.querySelectorAll("[data-simply-field]");
 				}
@@ -258,15 +267,13 @@
 				});
 			},
 			bindAsParent : function(dataParent, dataKey) {
-				if (!dataParent._bindings_) {
-					var parentBindingConfig = {};
-					for (var i in editor.settings.databind) {
-						parentBindingConfig[i] = editor.settings.databind[i];
-					}
-					parentBindingConfig.data = dataParent;
-					parentBindingConfig.key = dataKey;
-					parentDataBinding = new dataBinding(parentBindingConfig);
+				var parentBindingConfig = {};
+				for (var i in editor.settings.databind) {
+					parentBindingConfig[i] = editor.settings.databind[i];
 				}
+				parentBindingConfig.data = dataParent;
+				parentBindingConfig.key = dataKey;
+				parentDataBinding = new dataBinding(parentBindingConfig);
 			}
 		},
 		list : {
@@ -1367,6 +1374,9 @@
 			},
 			defaultGetter : function(field, attributes) {
 				var result = {};
+				if (field.dataBinding && typeof field.dataBinding.get() === "object") {
+					result = field.dataBinding.get(); // Start with the existing data if there to prevent destroying data that is not part of our scope;
+				}
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
 					if (attr == "innerHTML") {
@@ -1446,8 +1456,10 @@
 				}
 				if (setter) {
 					return setter(field, data);
+				} else {
+					editor.field.defaultSetter(field, {innerHTML : data});
 				}
-				field.innerHTML = data;
+				// field.innerHTML = data;
 				editor.responsiveImages.init(field);
 				if (field.hopeEditor) {
 					field.hopeEditor.needsUpdate = true;
@@ -2633,19 +2645,45 @@
 			validateKey : function(key) {
 				return true;
 			},
+			file : {
+				save : function(path, data, callback) {
+					if (path.match(/\/$/)) {
+						// github will create directories as needed.
+						var saveResult = {path : path, response: "Saved."};
+						return callback(saveResult);
+					}
+
+					var saveCallback = function(err) {
+						if (err === null) {
+							var saveResult = {path : path, response: "Saved."};
+							return callback(saveResult);
+						}
+
+						if (err.error == 401) {
+							return callback({message : "Authorization failed.", error: true});
+						}
+						return callback({message : "SAVE FAILED: Could not store.", error: true});
+					};
+
+					var executeSave = function(path, data) {
+						editor.storage.repo.write(editor.storage.repoBranch, path, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
+					};
+					if (data instanceof File) {
+						var fileReader = new FileReader();
+						fileReader.onload = function(evt) {
+							executeSave(path, this.result);
+						};
+						fileReader.readAsBinaryString(data);
+					} else {
+						executeSave(path, data);
+					}
+				},
+				delete : function(path, callback) {
+					editor.storage.repo.delete(editor.storage.repoBranch, path, callback);
+				}
+			},
 			save : function(data, callback) {
-				var saveCallback = function(err) {
-					if (err === null) {
-						return callback();
-					}
-
-					if (err.error == 401) {
-						return callback({message : "Authorization failed.", error: true});
-					}
-					return callback({message : "SAVE FAILED: Could not store.", error: true});
-				};
-
-				this.repo.write(this.repoBranch, this.dataFile, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
+				return editor.storage.file.save("data.json", data, callback);
 			},
 			load : function(callback) {
 				var http = new XMLHttpRequest();
@@ -2698,14 +2736,14 @@
 				var github = new Github({});
 				var repo = github.getRepo(repoUser, repoName);
 				repo.read(repoBranch, repoPath, function(err, data) {
+					var result = {
+						images : [],
+						folders : [],
+						files : []
+					};
+
 					if (data) {
 						data = JSON.parse(data);
-						var result = {
-							images : [],
-							folders : [],
-							files : []
-						};
-
 						for (var i=0; i<data.length; i++) {
 							if (data[i].type == "file") {
 								var fileData = {
@@ -2724,12 +2762,14 @@
 								}
 							} else if (data[i].type == "dir") {
 								result.folders.push({
-									url : url + data[i].path,
+									url : editor.storage.endpoint + data[i].path + "/",
 									name : data[i].name
 								});
 							}
 						}
-
+						callback(result);
+					} else {
+						// Empty (non-existant) directory - return the empty resultset, github will create the dir automatically when we save things to it.");
 						callback(result);
 					}
 				});
