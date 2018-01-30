@@ -973,9 +973,7 @@
 				return editor.field.get(this);
 			},
 			dataBindingSetter : function(value) {
-				if (JSON.stringify(editor.field.get(this)) != JSON.stringify(value)) {
-					return editor.field.set(this, value);
-				}
+				return editor.field.set(this, value);
 			},
 			fieldTypes : {
 				"img" : {
