@@ -1213,6 +1213,14 @@
 						var savedBindingParents = editor.bindingParents;
 						var fieldPath = editor.data.getDataPath(field);
 
+						if (!field.templates[data]) {
+							var defaultTemplate = field.getAttribute("data-simply-default-template");
+							if (defaultTemplate && field.templates[defaultTemplate]) {
+								// We don't have a template for this value, but there is a default template set;
+								field.templates[data] = field.templates[defaultTemplate];
+							}
+						}
+
 						if (field.templates[data]) {
 							var clone = editor.list.cloneTemplate(field.templates[data]);
 							field.appendChild(clone);
