@@ -91,6 +91,52 @@ QUnit.module("editor field set");
 		assert.equal(field.innerHTML, "Hello world");
 	});
 
+	QUnit.test("field set fixed field data with child field", function(assert) {
+		var field = document.createElement("A");
+		field.setAttribute("data-simply-content", "fixed");
+
+		field.innerHTML = "<span data-simply-field='span'>Hi there</span>";
+
+		var data = {
+			href : "http://www.muze.nl/logo.gif",
+			innerHTML : "Foo"
+		};
+
+		var spandata = "Hello world";
+		editor.field.set(field, data);
+		editor.field.set(field.querySelector("span"), spandata);
+
+		assert.equal(field.getAttribute("href"), data.href, "a href is set correctly");
+		assert.equal(field.innerText, "Hello world");
+	});
+
+/*	QUnit.test("field set template", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<div data-simply-field='title' data-simply-content='template'><template data-simply-template='hello'>Hello world</template</div>";
+
+		var field = target.querySelector("div");
+
+		editor.field.set(field, "hello");
+		assert.equal(field.innerText, "Hello world");
+	});
+*/
+
+	QUnit.test("field set template with fixed child", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = "<div data-simply-field='title' data-simply-content='template'><template data-simply-template='hello'><a href='#' data-simply-field='link' data-simply-content='fixed'><span data-simply-field='span'>Hi</span></a></template</div>";
+
+		var field = target.querySelector("div");
+		editor.field.set(field, "hello");
+		editor.field.set(field.querySelector('a'), {
+			href: 'http://www.muze.nl/',
+			innerHTML: "Foo"
+		});
+		editor.field.set(field.querySelector("span"), "Hello world");
+
+		assert.equal(field.innerText, "Hello world");
+	});
+
+
 QUnit.module("editor field get");
 
 	QUnit.test("field get img data", function(assert) {

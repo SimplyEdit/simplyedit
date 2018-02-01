@@ -1551,8 +1551,7 @@ QUnit.module("lists");
 		};
 		editor.currentData = data;
 		editor.data.apply(data, document);
-		editor.pageData = editor.currentData['/'];
-		assert.equal(editor.pageData.menu[0].items[0]._bindings_.item, list.querySelector("[data-simply-field=item]").dataBinding);
+		assert.equal(editor.currentData['/'].menu[0].items[0]._bindings_.item, list.querySelector("[data-simply-field=item]").dataBinding);
 	});
 /* FIXME: Decide how this should work and make it so */
 /*QUnit.module("static link with editable content");
