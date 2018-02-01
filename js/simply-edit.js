@@ -3225,20 +3225,14 @@
 				});
 				document.body.appendChild(iframe);
 			}
-		}
-	};
-
-
-	editor.actions = {
-		"simply-save" : editor.data.save,
-		"simply-logout" : editor.editmode.stop
-	};
+		};
+	}
 
 	editor.toolbars = {};
 	editor.contextFilters = {};
 	editor.plugins = {};
 	editor.dataSources = {};
-
+	editor.actions = {};
 	editor.loadToolbar = function(url) {
 		if (!editor.toolbar || (typeof muze === "undefined")) {
 			// Main toolbar code isn't loaded yet;

@@ -32,4 +32,7 @@
 			document.getElementById('simply-logo').appendChild(img);
 		}
 	});
+
+	editor.addAction("simply-save", editor.data.save);
+	editor.addAction("simply-logout", editor.editmode.stop);
 </script>
