@@ -1027,7 +1027,11 @@
 				},
 				"meta" : {
 					get : function(field) {
-						return editor.field.defaultGetter(field, ["content"]);
+						var result = editor.field.defaultGetter(field, ["content"]);
+						if (field.simplyString) {
+							return result.content;
+						}
+						return result;
 					},
 					set : function(field, data) {
 						if (typeof data == "string") {
@@ -1183,10 +1187,16 @@
 				},
 				"option" : {
 					get : function(field) {
-						return field.value;
+						var result = editor.field.defaultGetter(field, ["innerHTML"]);
+						result.value = field.value;
+						if (field.simplyString) {
+							return result.value;
+						}
+						return result;
 					},
 					set : function(field, data) {
 						if (typeof data === "string") {
+							field.simplyString = true;
 							if (field.getAttribute("data-simply-content") != "fixed") {
 								field.innerHTML = data;
 							}
@@ -1271,6 +1281,25 @@
 						return result;
 					},
 					set : function(field, data) {
+						var attributes = field.getAttribute("data-simply-attributes");
+						if (attributes) {
+							attributes = attributes.split(" ");
+						} else {
+							// If none were set, default to all the non-simply-attributes;
+							attributes = [];
+							for (var i=0; i<field.attributes.length; i++) {
+								if (!field.attributes[i].nodeName.match(/^data-simply/)) {
+									attributes.push(field.attributes[i].nodeName);
+								}
+							}
+						}
+
+						if ((typeof data === "string") && (attributes.length === 1)) {
+							field.simplyString = true;
+							var newdata = {};
+							newdata[attributes[0]] = data;
+							return editor.field.defaultSetter(field, newdata);
+						}
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
