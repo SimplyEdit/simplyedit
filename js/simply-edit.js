@@ -50,18 +50,19 @@
 			getDataPath : function(field) {
 				var parent = field;
 				while (parent && parent.parentNode) {
-					if (parent.getAttribute("data-simply-path")) {
-						if (parent.getAttribute("data-simply-path").indexOf("/") !== 0) { // Resolve as relative path if it doesn't start with a slash; allows the use of ../
+					var parentPath = parent.getAttribute("data-simply-path");
+					if (parentPath) {
+						if (parentPath.indexOf("/") !== 0) { // Resolve as relative path if it doesn't start with a slash; allows the use of ../
 							var resolver = document.createElement("A");
 							var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
-							resolver.href = basePath + parent.getAttribute("data-simply-path");
+							resolver.href = basePath + parentPath;
 							if (resolver.pathname.indexOf("../") == -1) {
 								return resolver.pathname;
 							} else {
 								return resolver.href.replace(document.location.origin, ""); // IE11 just adds ../ to the end;
 							}
 						}
-						return parent.getAttribute("data-simply-path");
+						return parentPath;
 					}
 					parent = parent.parentNode;
 				}
@@ -71,9 +72,10 @@
 				if (typeof data === "undefined") {
 					data = {};
 				}
+
 				// data = JSON.parse(JSON.stringify(data)); // clone data to prevent reference issues;
 
-				if (typeof editor.data.originalBody === "undefined") {
+				if (typeof editor.data.originalBody === "undefined" && document.body) {
 					editor.data.originalBody = document.body.cloneNode(true);
 				}
 
@@ -241,7 +243,6 @@
 					}
 
 					editor.data.apply(editor.currentData, document);
-					editor.pageData = editor.currentData[document.location.pathname];
 					editor.fireEvent("simply-content-loaded", document);
 
 					var checkEdit = function() {
@@ -437,7 +438,9 @@
 					if (list.dataSourceTimer) { // just in case we already have a timer running, don't do things twice;
 						window.clearTimeout(list.dataSourceTimer);
 					}
-					editor.fireEvent("databinding:pause", list);
+					if (list.dataBinding) {
+						list.dataBinding.pauseListeners(list);
+					}
 					if (typeof editor.dataSources[dataSource].set === "function") {
 						editor.dataSources[dataSource].set(list, listData);
 					}
@@ -459,7 +462,9 @@
 					if (typeof editor.dataSources[dataSource].set === "function") {
 						editor.dataSources[dataSource].set(list, listData);
 					}
-					editor.fireEvent("databinding:resume", list);
+					if (list.dataBinding) {
+						list.dataBinding.resumeListeners(list);
+					}
 					list.dataSourceApplied = true;
 				} else {
 					list.dataSourceTimer = window.setTimeout(function() {editor.list.applyDataSource(list, dataSource, listData);}, 500);
@@ -497,26 +502,25 @@
 					editor.editmode.makeEditable(list);
 				}
 			},
+			initList : function(data, list) {
+				editor.list.parseTemplates(list);
+				var dataPath = editor.data.getDataPath(list);
+
+				if (!data[dataPath]) {
+					data[dataPath] = {};
+				}
+
+				var savedParentKey = editor.settings.databind.parentKey;
+
+				if (list.getAttribute("data-simply-data")) {
+					editor.list.init(list, data[dataPath], false);
+				} else {
+					editor.list.init(list, data[dataPath], true);
+				}
+
+				editor.settings.databind.parentKey = savedParentKey;
+			},
 			initLists : function(data, target) {
-				var initList = function(data, list) {
-					editor.list.parseTemplates(list);
-					var dataPath = editor.data.getDataPath(list);
-
-					if (!data[dataPath]) {
-						data[dataPath] = {};
-					}
-
-					var savedParentKey = editor.settings.databind.parentKey;
-
-					if (list.getAttribute("data-simply-data")) {
-						editor.list.init(list, data[dataPath], false);
-					} else {
-						editor.list.init(list, data[dataPath], true);
-					}
-
-					editor.settings.databind.parentKey = savedParentKey;
-				};
-
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				var subLists;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE || !target.parentNode) {
@@ -535,10 +539,10 @@
 						continue;
 					}
 
-					initList(data, dataLists[i]);
+					editor.list.initList(data, dataLists[i]);
 				}
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-list")) {
-					initList(data, target);
+					editor.list.initList(data, target);
 				}
 			},
 			fixFirstElementChild : function(clone) {
@@ -572,7 +576,10 @@
 					list.templateIcons = {};
 				}
 				for (var t=0; t<templates.length; t++) {
-					var templateName = templates[t].getAttribute("data-simply-template") ? templates[t].getAttribute("data-simply-template") : t;
+					var templateName = templates[t].getAttribute("data-simply-template");
+					if (!templateName) {
+						templateName = t;
+					}
 
 					// Allow the 'rel' attribute to point to the contents of another (global) template;
 					var sourceTemplate = templates[t].getAttribute("rel");
@@ -596,6 +603,9 @@
 					var templateIcon = templates[t].getAttribute("data-simply-template-icon");
 					if (templateIcon) {
 						list.templateIcons[templateName] = templateIcon;
+					}
+					if (!list.defaultTemplate) {
+						list.defaultTemplate = templateName;
 					}
 				}
 				for (t=0; t<templates.length; t++) {
@@ -681,6 +691,7 @@
 						list.childNodes[m].getAttribute("data-simply-list-item")
 					) {
 						hasChild = true;
+						continue;
 					}
 				}
 				if (!hasChild) {
@@ -708,7 +719,9 @@
 				}
 			},
 			clear : function(list) {
-				editor.fireEvent("databinding:pause", list);
+				if (list.dataBinding) {
+					list.dataBinding.pauseListeners(list);
+				}
 				// Remove the current list items to replace them with the new data;
 				var children = list.querySelectorAll("[data-simply-list-item]");
 				for (var i=0; i<children.length; i++) {
@@ -716,7 +729,9 @@
 						list.removeChild(children[i]);
 					}
 				}
-				editor.fireEvent("databinding:resume", list);
+				if (list.dataBinding) {
+					list.dataBinding.resumeListeners(list);
+				}
 			},
 			initListItem : function(clone, useDataBinding, listDataItem) {
 				var k;
@@ -740,11 +755,15 @@
 				}
 			},
 			set : function(list, listData) {
-				editor.fireEvent("databinding:pause", list);
+				if (list.dataBinding) {
+					list.dataBinding.pauseListeners(list);
+				}
 				editor.list.clear(list);
 				editor.list.append(list, listData);
 				editor.list.emptyClass(list);
-				editor.fireEvent("databinding:resume", list);
+				if (list.dataBinding) {
+					list.dataBinding.resumeListeners(list);
+				}
 			},
 			cloneTemplate : function(template) {
 				var clone;
@@ -771,11 +790,16 @@
 				var e,j,l;
 				var t, counter;
 				var stashedFields, i, newData, dataPath;
+				var listenersRemoved;
 
 				if (!listData) {
 					listData = [];
 				}
-				editor.fireEvent("databinding:pause", list);
+				if (list.dataBinding) {
+				//	list.dataBinding.pauseListeners(list);
+					list.dataBinding.removeListeners(list);
+					listenersRemoved = true;
+				}
 
 				editor.list.detach(list);
 
@@ -790,15 +814,20 @@
 				var fragment = document.createDocumentFragment();
 				list.warnedFieldDataBinding = false;
 
+				if (!list.clones) {
+					list.clones = {};
+				}
+
+				var listEntryMapping = list.getAttribute("data-simply-entry");
+				var listDataSource = list.getAttribute("data-simply-data");
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
 						continue;
 					}
-
-					if (list.getAttribute("data-simply-entry")) {
+					if (listEntryMapping) {
 						if (!listData[j].simplyConverted) {
 							var entry = new Object(listData[j]);
-							entry[list.getAttribute("data-simply-entry")] = listData[j] + "";
+							entry[listEntryMapping] = listData[j];
 							entry.simplyConverted = true;
 							entry.parent = listData;
 							listData[j] = entry;
@@ -826,26 +855,25 @@
 					var requestedTemplate = listData[j]["data-simply-template"];
 
 					if (!list.templates[requestedTemplate]) {
-						for (t in list.templates) {
-							requestedTemplate = t;
-							break;
-						}
-						// requestedTemplate = Object.keys(list.templates)[0];
+						requestedTemplate = list.defaultTemplate;
 					}
 
 					var clone;
 					if ("importNode" in document) {
-						clone = document.importNode(list.templates[requestedTemplate].content, true);
+						if (list.clones[requestedTemplate]) {
+							clone = list.clones[requestedTemplate].cloneNode(true);
+						} else {
+							clone = document.importNode(list.templates[requestedTemplate].content, true);
+							// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
+							var originalTemplates = list.templates[requestedTemplate].content.querySelectorAll("template");
+							var importedTemplates = clone.querySelectorAll("template");
 
-						// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
-						var originalTemplates = list.templates[requestedTemplate].content.querySelectorAll("template");
-						var importedTemplates = clone.querySelectorAll("template");
-
-						for (i=0; i<importedTemplates.length; i++) {
-							importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
+							for (i=0; i<importedTemplates.length; i++) {
+								importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
+							}
+							list.clones[requestedTemplate] = clone.cloneNode(true);
 						}
-
-						if (list.getAttribute("data-simply-data")) {
+						if (listDataSource) {
 							editor.list.initListItem(clone, false, listData[j]);
 						} else {
 							editor.list.initListItem(clone, true, listData[j]);
@@ -890,7 +918,7 @@
 					} else {
 						for (e=0; e<list.templates[requestedTemplate].contentNode.childNodes.length; e++) {
 							clone = list.templates[requestedTemplate].contentNode.childNodes[e].cloneNode(true);
-							if (list.getAttribute("data-simply-data")) {
+							if (listDataSource) {
 								editor.list.initListItem(clone, false, listData[j]);
 							} else {
 								editor.list.initListItem(clone, true, listData[j]);
@@ -949,6 +977,7 @@
 						list.childNodes[j].getAttribute("data-simply-list-item")
 					) {
 						hasChild = true;
+						continue;
 					}
 				}
 				if ("classList" in list) {
@@ -965,7 +994,14 @@
 					}
 				}
 				list.reattach();
-				editor.fireEvent("databinding:resume", list);
+				if (list.dataBinding) {
+					if (listenersRemoved) {
+						var pauseCount = list.dataBindingPaused;
+						list.dataBinding.addListeners(list);
+						list.dataBindingPaused = pauseCount;
+					}
+					// list.dataBinding.resumeListeners(list);
+				}
 			}
 		},
 		field : {
@@ -1246,9 +1282,8 @@
 										if (subkeys[0] === "") {
 											subkeys.shift();
 										}
-
-										if (subkeys.length) {
-											fieldData[fieldPath] = fieldData[fieldPath][subkeys.pop()];
+										while (subkeys.length) {
+											fieldData[fieldPath] = fieldData[fieldPath][subkeys.shift()];
 										}
 										editor.data.apply(fieldData, field.childNodes[i]);
 									} else {
@@ -1429,8 +1464,9 @@
 				return result;
 			},
 			defaultSetter : function(field, data) {
+				var contentType = field.getAttribute("data-simply-content");
 				if (typeof data === "string") {
-					if (field.getAttribute("data-simply-content") == "attributes" &&  field.hasAttribute("data-simply-attributes")) {
+					if (contentType == "attributes" &&  field.hasAttribute("data-simply-attributes")) {
 						var attrs = field.getAttribute("data-simply-attributes").split(" ");
 						if (attrs.length == 1) {
 							field.simplyString = true;
@@ -1444,16 +1480,18 @@
 					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
 					return;
 				}
-
-				if (field.getAttribute("data-simply-content") == "fixed") {
-					delete data.innerHTML;
-				}
 				for (var attr in data) {
 					if (attr == "innerHTML") {
-						field.innerHTML = data[attr];
-						editor.responsiveImages.init(field);
-						if (field.hopeEditor) {
-							field.hopeEditor.needsUpdate = true;
+						if (contentType != "fixed") {
+							if (contentType == "text") {
+								field.textContent = data[attr];
+							} else {
+								field.innerHTML = data[attr];
+								editor.responsiveImages.init(field);
+							}
+							if (field.hopeEditor) {
+								field.hopeEditor.needsUpdate = true;
+							}
 						}
 					} else {
 						if (data[attr] !== null) {
@@ -1481,16 +1519,17 @@
 						editor.selectionchangeTimer = false;
 					}, 0);
 				}
-				var setter;
-				for (var i in editor.field.fieldTypes) {
-					if (editor.field.matches(field, i)) {
-						if (typeof editor.field.fieldTypes[i].set === "function") {
-							setter = editor.field.fieldTypes[i].set;
+				if (!field.simplySetter) {
+					for (var i in editor.field.fieldTypes) {
+						if (editor.field.matches(field, i)) {
+							if (typeof editor.field.fieldTypes[i].set === "function") {
+								field.simplySetter = editor.field.fieldTypes[i].set;
+							}
 						}
 					}
 				}
-				if (setter) {
-					return setter(field, data);
+				if (field.simplySetter) {
+					return field.simplySetter(field, data);
 				} else {
 					editor.field.defaultSetter(field, {innerHTML : data});
 				}
@@ -1517,17 +1556,17 @@
 				}
 			},
 			get : function(field) {
-				var getter;
-				for (var i in editor.field.fieldTypes) {
-					if (editor.field.matches(field, i)) {
-						if (typeof editor.field.fieldTypes[i].get === "function") {
-							getter = editor.field.fieldTypes[i].get;
+				if (!field.simplyGetter) {
+					for (var i in editor.field.fieldTypes) {
+						if (editor.field.matches(field, i)) {
+							if (typeof editor.field.fieldTypes[i].get === "function") {
+								field.simplyGetter = editor.field.fieldTypes[i].get;
+							}
 						}
 					}
 				}
-
-				if (getter) {
-					return getter(field);
+				if (field.simplyGetter) {
+					return field.simplyGetter(field);
 				}
 				return editor.field.getInnerHTML(field);
 			},
@@ -1557,6 +1596,17 @@
 				}
 			},
 			init : function(field, dataParent, useDataBinding) {
+				for (var t in editor.field.fieldTypes) {
+					if (editor.field.matches(field, t)) {
+						if (typeof editor.field.fieldTypes[t].get === "function") {
+							field.simplyGetter = editor.field.fieldTypes[t].get;
+						}
+						if (typeof editor.field.fieldTypes[t].set === "function") {
+							field.simplySetter = editor.field.fieldTypes[t].set;
+						}
+					}
+				}
+
 				var dataName = field.getAttribute("data-simply-field");
 
 				var dataKeys = dataName.split(".");
@@ -1675,6 +1725,17 @@
 			editor.profile = config.profile;
 			editor.storage = storage.init(config.endpoint);
 			editor.fireEvent("simply-storage-init", document);
+
+			// Add binding for editor.pageData so it follows the current path of the document;
+			Object.defineProperty(editor, "pageData", {
+				get : function() {
+					var path = editor.data.getDataPath(document);
+					if (typeof editor.currentData[path] === "undefined") {
+						editor.currentData[path] = {};
+					}
+					return editor.currentData[path];
+				}
+			});
 
 			// Add databinding and load data afterwards
 			// editor.loadScript(editor.baseURLClean + "simply/databind.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version), editor.data.load);
@@ -3254,29 +3315,14 @@
 	// Add fake window.console for IE8/9
 	if (!window.console) console = {log: function() {}};
 
-/*	document.addEventListener("click", function(evt) {
-		if (
-			evt.target && 
-			evt.target.pathname
-		) {
-			var pathname = evt.target.pathname;
-			var hostname = evt.target.hostname;
-			if (hostname == document.location.hostname && (typeof editor.currentData[evt.target.pathname] !== "undefined")) {
-				history.pushState(null, null, evt.target.href);
-				document.body.innerHTML = editor.data.originalBody.innerHTML;
-				editor.data.load();
-				evt.preventDefault();
-			}
-		}
-	});
-*/
 	window.editor = editor;
 	editor.storageConnectors = storage;
 
 	editor.settings = {};
 	// Find custom settings if they are set;
-	if (scriptEl.hasAttribute("data-simply-settings")) {
-		var customSettings = window[scriptEl.getAttribute("data-simply-settings")];
+	var simplySettings = scriptEl.getAttribute("data-simply-settings");
+	if (simplySettings) {
+		var customSettings = window[simplySettings];
 		if (customSettings) {
 			editor.settings = customSettings;
 		} else {
@@ -3284,6 +3330,10 @@
 		}
 	}
 
+	var dataSources = scriptEl.getAttribute("data-simply-datasources");
+	if (window[dataSources]) {
+		editor.dataSources = window[dataSources];
+	}
 	if (!editor.settings.databind) {
 		editor.settings.databind = {};
 	}
