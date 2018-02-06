@@ -3225,8 +3225,8 @@
 				});
 				document.body.appendChild(iframe);
 			}
-		};
-	}
+		}
+	};
 
 	editor.toolbars = {};
 	editor.contextFilters = {};
