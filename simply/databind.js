@@ -311,8 +311,10 @@ dataBinding = function(config) {
 					binding.resolve(true);
 				}
 				if (data._parentBindings_ && data._parentBindings_[key]) {
-					data._parentBindings_[key].get()[key] = value;
-					data._parentBindings_[key].resolve(true);
+					if (data._parentBindings_[key].get()[key] !== value) {
+						data._parentBindings_[key].get()[key] = value;
+						data._parentBindings_[key].resolve(true);
+					}
 				}
 			},
 			get : function() {
@@ -392,8 +394,9 @@ dataBinding = function(config) {
 		element.dataBinding 	= binding;
 
 		element.setter(shadowValue);
-		binding.addListeners(element);
-
+//		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
+			binding.addListeners(element);
+//		}, 0);
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
@@ -411,7 +414,9 @@ dataBinding = function(config) {
 		element.setter 		= (config && typeof config.setter === "function") ? config.setter : binding.setter;
 		element.dataBinding 	= binding;
 
-		binding.addListeners(element);
+//		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
+			binding.addListeners(element);
+//		}, 0);
 
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
