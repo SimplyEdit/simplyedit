@@ -2,98 +2,98 @@
 
 editor.toolbar.scroll = (function() {
 
-    return function(el) {
-        var startPos   = 0;
-        var startTouch = 0;
-        var boundRight = 0;
+	return function(el) {
+		var startPos   = 0;
+		var startTouch = 0;
+		var boundRight = 0;
 		var hasMoved   = false;
-		
-        function getOffset(el) {
-            return parseInt(el.style.transform.substr(10)) || 0;;
-        }
 
-        function startListener(e) {
-            hasMoved = false;
-            startTouch = getPosition(e);
-            startPos   = getOffset(el);
-            var bounds = el.getBoundingClientRect();
-            var boundsEl = el.lastElementChild.getBoundingClientRect();  
-            var parentBounds  = el.parentElement.getBoundingClientRect();
-            var neededWidth = (boundsEl.right - bounds.left);
-            if ( parentBounds.width < neededWidth ) {
-                boundRight = neededWidth - parentBounds.width; 
-                el.addEventListener('mousemove', moveListener);
-                el.addEventListener('mouseup', endListener, true);   
-                el.addEventListener('touchmove', moveListener);
-                el.addEventListener('touchend', endListener, true);
-                el.addEventListener('click', endListener, true);
-            }
-        }
+		function getOffset(el) {
+			return parseInt(el.style.transform.substr(10)) || 0;
+		}
 
-        function mouseButtonPressed(e) {
-            if ('buttons' in e) {
-                return e.buttons === 1;
-            } else if ('which' in e) {
-                return e.which === 1;
-            } else {
-                return e.button === 1;
-            }
-        }
+		function startListener(e) {
+			hasMoved = false;
+			startTouch = getPosition(e);
+			startPos   = getOffset(el);
+			var bounds = el.getBoundingClientRect();
+			var boundsEl = el.lastElementChild.getBoundingClientRect();
+			var parentBounds  = el.parentElement.getBoundingClientRect();
+			var neededWidth = (boundsEl.right - bounds.left);
+			if ( parentBounds.width < neededWidth ) {
+				boundRight = neededWidth - parentBounds.width;
+				el.addEventListener('mousemove', moveListener);
+				el.addEventListener('mouseup', endListener, true);
+				el.addEventListener('touchmove', moveListener);
+				el.addEventListener('touchend', endListener, true);
+				el.addEventListener('click', endListener, true);
+			}
+		}
 
-        function moveListener(e) {
-            var move = getPosition(e);     
-            var diff = startTouch - move;  
-            var newPos = (startPos - diff);
-            if (newPos>0) {
-                newPos = 0;
-            }
-            if (newPos < -(boundRight)) {
-                newPos = -boundRight;
-            }
-            if (Math.abs(newPos)<10) {
-                newPos = 0;
-            } else {
-            	hasMoved = true;
-            }
-            el.style.transform = 'translate('+newPos+'px,0)';
-            e.preventDefault();
-            return false;
-        }
+		function mouseButtonPressed(e) {
+			if ('buttons' in e) {
+				return e.buttons === 1;
+			} else if ('which' in e) {
+				return e.which === 1;
+			} else {
+				return e.button === 1;
+			}
+		}
 
-        function endListener(e) {        	
-            el.removeEventListener('mousemove', moveListener);
-            el.removeEventListener('mouseup', endListener, true);
-            el.removeEventListener('touchmove', moveListener);
-            el.removeEventListener('touchend', endListener, true);
-            if (e.type=='click') {
-	            el.removeEventListener('click', endListener, true);
-	        }
-        	if (hasMoved) {
-        		e.preventDefault();
-        		e.stopPropagation();
-        		return false;
-        	}
-        }
+		function moveListener(e) {
+			var move = getPosition(e);
+			var diff = startTouch - move;
+			var newPos = (startPos - diff);
+			if (newPos>0) {
+				newPos = 0;
+			}
+			if (newPos < -(boundRight)) {
+				newPos = -boundRight;
+			}
+			if (Math.abs(newPos)<10) {
+				newPos = 0;
+			} else {
+				hasMoved = true;
+			}
+			el.style.transform = 'translate('+newPos+'px,0)';
+			e.preventDefault();
+			return false;
+		}
 
-        function resizeListener(e) { 
-            el.style.left = 0+'px';
-            startPos = 0;
-        }
+		function endListener(e) {
+			el.removeEventListener('mousemove', moveListener);
+			el.removeEventListener('mouseup', endListener, true);
+			el.removeEventListener('touchmove', moveListener);
+			el.removeEventListener('touchend', endListener, true);
+			if (e.type=='click') {
+				el.removeEventListener('click', endListener, true);
+			}
+			if (hasMoved) {
+				e.preventDefault();
+				e.stopPropagation();
+				return false;
+			}
+		}
 
-        function getPosition(e) {
-            if ( e.clientX ) {
-                return e.clientX;
-            }
-            if (e.touches && e.touches[0] ) {
-                return e.touches[0].pageX - document.body.scrollLeft - document.documentElement.scrollLeft;
-            }
-            return 0;
-        }
+		function resizeListener(e) {
+			el.style.left = 0+'px';
+			startPos = 0;
+		}
 
-        el.addEventListener('mousedown', startListener);
-        el.addEventListener('touchstart', startListener);
-        window.addEventListener('resize', resizeListener);
-    };
+		function getPosition(e) {
+			if ( e.clientX ) {
+				return e.clientX;
+			}
+			if (e.touches && e.touches[0] ) {
+				return e.touches[0].pageX - document.body.scrollLeft - document.documentElement.scrollLeft;
+			}
+			return 0;
+		}
+
+		el.addEventListener('mousedown', startListener);
+		el.addEventListener('touchstart', startListener);
+		window.addEventListener('resize', resizeListener);
+	};
 
 })();
 
