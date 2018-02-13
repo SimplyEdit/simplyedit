@@ -2329,902 +2329,921 @@
 		}
 	};
 
-	var storage = {
-		getType : function(endpoint) {
-			if (document.querySelector("[data-simply-storage]")) {
-				return document.querySelector("[data-simply-storage]").getAttribute("data-simply-storage");
-			}
-			if (endpoint === null) {
-				endpoint = document.location.href;
-			}
-			if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
-				return "ariadne";
-			} else if (endpoint.indexOf("github.io") !== -1) {
-				return "github";
-			} else if (endpoint.indexOf("github.com") !== -1) {
-				return "github";
-			}
-			return "default";
-		},
-		init : function(endpoint) {
-			var result;
-
-			var storageType = storage.getType(endpoint);
-
-			if (storage[storageType]) {
-				result = storage[storageType];
-			} else if (window[storageType]) {
-				result = window[storageType];
-			} else {
-				console.log("Warning: custom storage not found");
-			}
-
-			if (!result.escape) {
-				result.escape = storage.default.escape;
-			}
-
-			if (typeof result.init === "function") {
-				result.init(endpoint);
-			}
-			return result;
-		},
-		ariadne : {
+	var storage;
+	if (scriptEl.getAttribute("data-simply-storage") == "none") {
+		var returnTrue = function() {
+			return true;
+		};
+		storage = {
 			init : function(endpoint) {
-				if (endpoint === null) {
-					endpoint = location.origin + "/";
-				}
-				this.url = endpoint;
-				this.list = storage.default.list;
-				this.sitemap = storage.default.sitemap;
-				this.listSitemap = storage.default.listSitemap;
-				this.disconnect = storage.default.disconnect;
-				this.escape = storage.default.escape;
-				this.page = storage.default.page;
-
-				this.endpoint = endpoint;
-				this.dataEndpoint = endpoint + "data.json";
-				this.file = storage.default.file;
-
-				if (editor.responsiveImages) {
-					if (
-						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive
-					) {
-						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
-							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
-						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
-							editor.responsiveImages.sizes = (function(sizes) {
-								return function(src) {
-									var result = {};
-									var info = src.split(".");
-									var extension = info.pop().toLowerCase();
-									if (extension === "jpg" || extension === "jpeg" || extension === "png") {
-										for (var i=0; i<sizes.length; i++) {
-											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
-										}
-									}
-									return result;
-								};
-							}(editor.settings['simply-image'].responsive.sizes));
-						}
-					} else {
-						editor.responsiveImages.sizes = function(src) {
-							if (!(src.match(/\.(jpg|jpeg|png)$/i))) {
-								return {};
-							}
-
-							return {
-								"1200w" : src + "?size=1200",
-								"800w" : src + "?size=800",
-								"640w" : src + "?size=640",
-								"480w" : src + "?size=480",
-								"320w" : src + "?size=320",
-								"160w" : src + "?size=160",
-								"80w" : src + "?size=80"
-							};
-						};
-					}
-
-					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
-				}
-			},
-			save : function(data, callback) {
-				return editor.storage.file.save("data.json", data, callback);
-			},
-			load : function(callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.dataEndpoint;
-				if (editor.profile == "dev") {
-					url += "?t=" + (new Date().getTime());
-				}
-
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4) {
-						if ((http.status > 199) && (http.status < 300) && http.responseText.length) { // accept any 2xx http status as 'OK';
-							if (http.responseText === "") {
-								console.log("Warning: data file found, but empty");
-								return callback("{}");
-							}
-							callback(http.responseText.replace(/data-vedor/g, "data-simply"));
-						} else {
-							console.log("Could not load data, starting empty.");
-							callback("{}");
-						}
-					}
+				return {
+					init : returnTrue,
+					save : returnTrue,
+					load : function(callback) {
+						callback("{}");
+					},
+					connect: returnTrue,
+					disconnect: returnTrue
 				};
-				http.send();
-			},
-			connect : function(callback) {
-				var url = editor.storage.url + "login";
-				var http = new XMLHttpRequest();
-				http.open("POST", url, true);
-				http.send();
-				if (typeof callback === "function") {
-					callback();
-				}
-				return true;
 			}
-		},
-		beaker : {
+		};
+	} else {
+		storage = {
+			getType : function(endpoint) {
+				if (document.querySelector("[data-simply-storage]")) {
+					return document.querySelector("[data-simply-storage]").getAttribute("data-simply-storage");
+				}
+				if (endpoint === null) {
+					endpoint = document.location.href;
+				}
+				if (endpoint.indexOf("/ariadne/loader.php/") !== -1) {
+					return "ariadne";
+				} else if (endpoint.indexOf("github.io") !== -1) {
+					return "github";
+				} else if (endpoint.indexOf("github.com") !== -1) {
+					return "github";
+				}
+				return "default";
+			},
 			init : function(endpoint) {
-				this.endpoint = endpoint;
-				this.dataEndpoint = endpoint + "data.json";
-				if (this.endpoint.indexOf("dat://") === 0 && window.DatArchive) {
-					this.archive = new DatArchive(this.endpoint);
-					this.archive.readFile("dat.json").then(function(data) {
-						try {
-							editor.storage.meta = JSON.parse(data);
-							if (!editor.storage.meta.web_root) {
-								editor.storage.meta.web_root = "/";
+				var result;
+
+				var storageType = storage.getType(endpoint);
+
+				if (storage[storageType]) {
+					result = storage[storageType];
+				} else if (window[storageType]) {
+					result = window[storageType];
+				} else {
+					console.log("Warning: custom storage (" + storageType + ") not found");
+				}
+
+				if (!result.escape) {
+					result.escape = storage.default.escape;
+				}
+
+				if (typeof result.init === "function") {
+					result.init(endpoint);
+				}
+				return result;
+			},
+			ariadne : {
+				init : function(endpoint) {
+					if (endpoint === null) {
+						endpoint = location.origin + "/";
+					}
+					this.url = endpoint;
+					this.list = storage.default.list;
+					this.sitemap = storage.default.sitemap;
+					this.listSitemap = storage.default.listSitemap;
+					this.disconnect = storage.default.disconnect;
+					this.escape = storage.default.escape;
+					this.page = storage.default.page;
+
+					this.endpoint = endpoint;
+					this.dataEndpoint = endpoint + "data.json";
+					this.file = storage.default.file;
+
+					if (editor.responsiveImages) {
+						if (
+							editor.settings['simply-image'] &&
+							editor.settings['simply-image'].responsive
+						) {
+							if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+								editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+							} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+								editor.responsiveImages.sizes = (function(sizes) {
+									return function(src) {
+										var result = {};
+										var info = src.split(".");
+										var extension = info.pop().toLowerCase();
+										if (extension === "jpg" || extension === "jpeg" || extension === "png") {
+											for (var i=0; i<sizes.length; i++) {
+												result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+											}
+										}
+										return result;
+									};
+								}(editor.settings['simply-image'].responsive.sizes));
 							}
-							if (!editor.storage.meta.web_root.match(/\/$/)) {
-								editor.storage.meta.web_root += "/";
+						} else {
+							editor.responsiveImages.sizes = function(src) {
+								if (!(src.match(/\.(jpg|jpeg|png)$/i))) {
+									return {};
+								}
+
+								return {
+									"1200w" : src + "?size=1200",
+									"800w" : src + "?size=800",
+									"640w" : src + "?size=640",
+									"480w" : src + "?size=480",
+									"320w" : src + "?size=320",
+									"160w" : src + "?size=160",
+									"80w" : src + "?size=80"
+								};
+							};
+						}
+
+						window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+					}
+				},
+				save : function(data, callback) {
+					return editor.storage.file.save("data.json", data, callback);
+				},
+				load : function(callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.dataEndpoint;
+					if (editor.profile == "dev") {
+						url += "?t=" + (new Date().getTime());
+					}
+
+					http.open("GET", url, true);
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4) {
+							if ((http.status > 199) && (http.status < 300) && http.responseText.length) { // accept any 2xx http status as 'OK';
+								if (http.responseText === "") {
+									console.log("Warning: data file found, but empty");
+									return callback("{}");
+								}
+								callback(http.responseText.replace(/data-vedor/g, "data-simply"));
+							} else {
+								console.log("Could not load data, starting empty.");
+								callback("{}");
 							}
-						} catch (e) {
-							console.log("Warning: could not parse archive metadata (dat.json)");
+						}
+					};
+					http.send();
+				},
+				connect : function(callback) {
+					var url = editor.storage.url + "login";
+					var http = new XMLHttpRequest();
+					http.open("POST", url, true);
+					http.send();
+					if (typeof callback === "function") {
+						callback();
+					}
+					return true;
+				}
+			},
+			beaker : {
+				init : function(endpoint) {
+					this.endpoint = endpoint;
+					this.dataEndpoint = endpoint + "data.json";
+					if (this.endpoint.indexOf("dat://") === 0 && window.DatArchive) {
+						this.archive = new DatArchive(this.endpoint);
+						this.archive.readFile("dat.json").then(function(data) {
+							try {
+								editor.storage.meta = JSON.parse(data);
+								if (!editor.storage.meta.web_root) {
+									editor.storage.meta.web_root = "/";
+								}
+								if (!editor.storage.meta.web_root.match(/\/$/)) {
+									editor.storage.meta.web_root += "/";
+								}
+							} catch (e) {
+								console.log("Warning: could not parse archive metadata (dat.json)");
+							}
+						});
+					}
+					this.load = storage.default.load;
+					this.list = storage.default.list;
+					this.sitemap = storage.default.sitemap;
+					this.page = storage.default.page;
+					this.listSitemap = storage.default.listSitemap;
+				},
+				connect : function(callback) {
+					callback();
+				},
+				save: function(data,callback) {
+					editor.storage.file.save("data.json", data, callback);
+				},
+				saveTemplate : function(pageTemplate, callback) {
+					var dataPath = location.pathname.split(/\//, 3)[2];
+					if (dataPath.match(/\/$/)) {
+						dataPath += "index.html";
+					}
+
+					editor.storage.archive.readFile(editor.storage.meta.web_root + pageTemplate).then(function(result) {
+						if (result) {
+							editor.storage.file.save(dataPath, result, callback);
 						}
 					});
-				}
-				this.load = storage.default.load;
-				this.list = storage.default.list;
-				this.sitemap = storage.default.sitemap;
-				this.page = storage.default.page;
-				this.listSitemap = storage.default.listSitemap;
-			},
-			connect : function(callback) {
-				callback();
-			},
-			save: function(data,callback) {
-				editor.storage.file.save("data.json", data, callback);
-			},
-			saveTemplate : function(pageTemplate, callback) {
-				var dataPath = location.pathname.split(/\//, 3)[2];
-				if (dataPath.match(/\/$/)) {
-					dataPath += "index.html";
-				}
-
-				editor.storage.archive.readFile(editor.storage.meta.web_root + pageTemplate).then(function(result) {
-					if (result) {
-						editor.storage.file.save(dataPath, result, callback);
-					}
-				});
-			},
-			file : {
-				save : function(path, data, callback) {
-					if (!editor.storage.archive) {
-						callback({
-							error : true,
-							message : "No connection to dat archive (are you on https?)"
-						});
-						console.log("Warning: no connection to dat archive (are you on https?)");
-						return;
-					}
-					editor.storage.archive.getInfo().then(function(info) {
-						if (!info.isOwner) {
+				},
+				file : {
+					save : function(path, data, callback) {
+						if (!editor.storage.archive) {
 							callback({
 								error : true,
-								message : "Not the owner."
+								message : "No connection to dat archive (are you on https?)"
 							});
-							console.log("Warning: Save failed because we are not owner for this archive.");
+							console.log("Warning: no connection to dat archive (are you on https?)");
 							return;
 						}
+						editor.storage.archive.getInfo().then(function(info) {
+							if (!info.isOwner) {
+								callback({
+									error : true,
+									message : "Not the owner."
+								});
+								console.log("Warning: Save failed because we are not owner for this archive.");
+								return;
+							}
 
-						var executeSave = function(path, data) {
-							createDirectories(path);
-							if (path.match(/\/$/)) {
-								// path points to a directory;
-								callback({});
-							} else {
-								editor.storage.archive.writeFile(editor.storage.meta.web_root + path, data).then(function() {
-									editor.storage.archive.commit().then(function() {
-										var saveResult = {path : path, response: "Saved."};
-										callback(saveResult);
+							var executeSave = function(path, data) {
+								createDirectories(path);
+								if (path.match(/\/$/)) {
+									// path points to a directory;
+									callback({});
+								} else {
+									editor.storage.archive.writeFile(editor.storage.meta.web_root + path, data).then(function() {
+										editor.storage.archive.commit().then(function() {
+											var saveResult = {path : path, response: "Saved."};
+											callback(saveResult);
+										});
+									});
+								}
+							};
+							var createDirectory = function(path, callback) {
+								editor.storage.archive.readdir(path).then(null, function () {
+									editor.storage.archive.mkdir(path).then(function() {
+										editor.storage.archive.commit();
 									});
 								});
+							};
+							var createDirectories = function(path, callback) {
+								var parts = path.split("/");
+								if (!path.match(/\/$/)) {
+									parts.pop(); // last part is the filename
+								}
+								var dirToCreate = '/';
+
+								for (var i=0; i<parts.length; i++) {
+									if (parts[i] !== "") {
+										dirToCreate += parts[i] + "/";
+									}
+									createDirectory(editor.storage.meta.web_root + dirToCreate);
+								}
+							};
+							if (data instanceof File) {
+								var fileReader = new FileReader();
+								fileReader.onload = function(evt) {
+									executeSave(path, this.result);
+								};
+								fileReader.readAsArrayBuffer(data);
+							} else {
+								executeSave(path, data);
 							}
-						};
-						var createDirectory = function(path, callback) {
-							editor.storage.archive.readdir(path).then(null, function () {
-								editor.storage.archive.mkdir(path).then(function() {
-									editor.storage.archive.commit();
+						});
+					},
+					delete : function(path, callback) {
+						if (path.match(/\/$/)) {
+							// path points to a directory;
+							editor.storage.archive.rmdir(editor.storage.meta.web_root + path, {recursive: true}).then(function() {
+								editor.storage.archive.commit().then(function() {
+									callback();
 								});
 							});
+						} else {
+							editor.storage.archive.unlink(editor.storage.meta.web_root + path).then(function() {
+								editor.storage.archive.commit().then(function() {
+									callback();
+								});
+							});
+						}
+					}
+				}
+			},
+			github : {
+				repoName : null,
+				repoUser : null,
+				repoBranch : "gh-pages",
+				dataFile : "data.json",
+				getRepoInfo : function(endpoint) {
+					var result = {};
+					var parser = document.createElement('a');
+					parser.href = endpoint;
+
+					var pathInfo;
+					pathInfo = parser.pathname.split("/");
+					if (parser.pathname.indexOf("/") === 0) {
+						pathInfo.shift();
+					}
+
+					if (parser.hostname == "github.com") {
+						result.repoUser = pathInfo.shift();
+						result.repoName =  pathInfo.shift();
+						result.repoBranch = "master";
+					} else {
+						//github.io;
+						result.repoUser = parser.hostname.split(".")[0];
+						result.repoName = pathInfo.shift();
+						result.repoBranch = "gh-pages";
+					}
+
+					if (document.querySelector("[data-simply-repo-branch]")) {
+						result.repoBranch = document.querySelector("[data-simply-repo-branch]").getAttribute("data-simply-repo-branch");
+					}
+					if (document.querySelector("[data-simply-repo-name]")) {
+						result.repoName = document.querySelector("[data-simply-repo-name]").getAttribute("data-simply-repo-name");
+					}
+					if (document.querySelector("[data-simply-repo-user]")) {
+						result.repoUser = document.querySelector("[data-simply-repo-user]").getAttribute("data-simply-repo-user");
+					}
+
+					var repoPath = pathInfo.join("/");
+					repoPath = repoPath.replace(/\/$/, '');
+
+					result.repoPath = repoPath;
+					return result;
+				},
+				checkJail : function(url) {
+					var repo1 = this.getRepoInfo(url);
+					var repo2 = this.getRepoInfo(this.endpoint);
+
+					if (
+						(repo1.repoUser == repo2.repoUser) && 
+						(repo1.repoName == repo2.repoName) &&
+						(repo1.repoBranch == repo2.repoBranch)
+					) {
+						return true;
+					}
+					return false;
+				},
+				init : function(endpoint) {
+					if (endpoint === null) {
+						endpoint = document.location.href.replace(document.location.hash, "");
+					}
+					var script = document.createElement("SCRIPT");
+					script.src = editor.baseURLClean + "github.js";
+					document.head.appendChild(script);
+
+					var repoInfo = this.getRepoInfo(endpoint);
+					this.repoUser = repoInfo.repoUser;
+					this.repoName = repoInfo.repoName;
+					this.repoBranch = repoInfo.repoBranch;
+
+					this.endpoint = endpoint;
+					this.dataFile = "data.json";
+					this.dataEndpoint = endpoint + "data.json";
+
+					this.sitemap = storage.default.sitemap;
+					this.listSitemap = storage.default.listSitemap;
+					this.page = storage.default.page;
+					this.escape = storage.default.escape;
+
+					if (editor.responsiveImages) {
+						if (
+							editor.settings['simply-image'] &&
+							editor.settings['simply-image'].responsive
+						) {
+							if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+								editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+							} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+								editor.responsiveImages.sizes = (function(sizes) {
+									return function(src) {
+										var result = {};
+										var info = src.split(".");
+										var extension = info.pop().toLowerCase();
+										if (extension === "jpg" || extension === "jpeg" || extension === "png") {
+											for (var i=0; i<sizes.length; i++) {
+												result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+											}
+										}
+										return result;
+									};
+								}(editor.settings['simply-image'].responsive.sizes));
+							}
+						}
+						window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+					}
+				},
+				connect : function(callback) {
+					if (typeof Github === "undefined") {
+						return false;
+					}
+
+					if (!editor.storage.key) {
+						editor.storage.key = localStorage.storageKey;
+					}
+					if (!editor.storage.key) {
+						editor.storage.key = prompt("Please enter your authentication key");
+					}
+
+					if (editor.storage.validateKey(editor.storage.key)) {
+						if (!this.repo) {
+							localStorage.storageKey = editor.storage.key;
+							this.github = new Github({
+								token: editor.storage.key,
+								auth: "oauth"
+							});
+							this.repo = this.github.getRepo(this.repoUser, this.repoName);
+						}
+						if (typeof callback === "function") {
+							callback();
+						}
+						return true;
+					} else {
+						return editor.storage.connect(callback);
+					}
+				},
+				disconnect : function(callback) {
+					delete this.repo;
+					delete localStorage.storageKey;
+					if (typeof callback === "function") {
+						callback();
+					}
+					return true;
+				},
+				validateKey : function(key) {
+					return true;
+				},
+				file : {
+					save : function(path, data, callback) {
+						if (path.match(/\/$/)) {
+							// github will create directories as needed.
+							var saveResult = {path : path, response: "Saved."};
+							return callback(saveResult);
+						}
+
+						var saveCallback = function(err) {
+							if (err === null) {
+								var saveResult = {path : path, response: "Saved."};
+								return callback(saveResult);
+							}
+
+							if (err.error == 401) {
+								return callback({message : "Authorization failed.", error: true});
+							}
+							return callback({message : "SAVE FAILED: Could not store.", error: true});
 						};
-						var createDirectories = function(path, callback) {
-							var parts = path.split("/");
-							if (!path.match(/\/$/)) {
-								parts.pop(); // last part is the filename
-							}
-							var dirToCreate = '/';
-							
-							for (var i=0; i<parts.length; i++) {
-								if (parts[i] !== "") {
-									dirToCreate += parts[i] + "/";
-								}
-								createDirectory(editor.storage.meta.web_root + dirToCreate);
-							}
+
+						var executeSave = function(path, data) {
+							editor.storage.repo.write(editor.storage.repoBranch, path, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
 						};
 						if (data instanceof File) {
 							var fileReader = new FileReader();
 							fileReader.onload = function(evt) {
 								executeSave(path, this.result);
 							};
-							fileReader.readAsArrayBuffer(data);
+							fileReader.readAsBinaryString(data);
 						} else {
 							executeSave(path, data);
 						}
+					},
+					delete : function(path, callback) {
+						editor.storage.repo.delete(editor.storage.repoBranch, path, callback);
+					}
+				},
+				save : function(data, callback) {
+					return editor.storage.file.save("data.json", data, callback);
+				},
+				load : function(callback) {
+					var http = new XMLHttpRequest();
+					var url = "https://raw.githubusercontent.com/" + this.repoUser + "/" + this.repoName + "/" + this.repoBranch + "/" + this.dataFile;
+					if (editor.profile == "dev") {
+						url += "?t=" + (new Date().getTime());
+					}
+					http.open("GET", url, true);
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4) {
+							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+								if (http.responseText === "") {
+									console.log("Warning: data file found, but empty");
+									return callback("{}");
+								}
+								callback(http.responseText);
+							} else {
+								console.log("No data found, starting with empty dataset");
+								callback("{}");
+							}
+						}
+					};
+					http.send();
+				},
+				saveTemplate : function(pageTemplate, callback) {
+					var dataPath = location.pathname.split(/\//, 3)[2];
+					if (dataPath.match(/\/$/)) {
+						dataPath += "index.html";
+					}
+
+					var repo = this.repo;
+					repo.read(this.repoBranch, pageTemplate, function(err, data) {
+						if (data) {
+							repo.write(this.repoBranch, dataPath, data, pageTemplate + " (copy)", callback);
+						}
 					});
 				},
-				delete : function(path, callback) {
-					if (path.match(/\/$/)) {
-						// path points to a directory;
-						editor.storage.archive.rmdir(editor.storage.meta.web_root + path, {recursive: true}).then(function() {
-							editor.storage.archive.commit().then(function() {
-								callback();
-							});
-						});
-					} else {
-						editor.storage.archive.unlink(editor.storage.meta.web_root + path).then(function() {
-							editor.storage.archive.commit().then(function() {
-								callback();
-							});
-						});
+				list : function(url, callback) {
+					if (url.indexOf(editor.storage.dataEndpoint) === 0) {
+						return this.listSitemap(url, callback);
 					}
-				}
-			}
-		},
-		github : {
-			repoName : null,
-			repoUser : null,
-			repoBranch : "gh-pages",
-			dataFile : "data.json",
-			getRepoInfo : function(endpoint) {
-				var result = {};
-				var parser = document.createElement('a');
-				parser.href = endpoint;
 
-				var pathInfo;
-				pathInfo = parser.pathname.split("/");
-				if (parser.pathname.indexOf("/") === 0) {
-					pathInfo.shift();
-				}
+					var repoInfo = this.getRepoInfo(url);
 
-				if (parser.hostname == "github.com") {
-					result.repoUser = pathInfo.shift();
-					result.repoName =  pathInfo.shift();
-					result.repoBranch = "master";
-				} else {
-					//github.io;
-					result.repoUser = parser.hostname.split(".")[0];
-					result.repoName = pathInfo.shift();
-					result.repoBranch = "gh-pages";
-				}
+					var repoUser = repoInfo.repoUser;
+					var repoName = repoInfo.repoName;
+					var repoBranch = repoInfo.repoBranch;
+					var repoPath = repoInfo.repoPath;
 
-				if (document.querySelector("[data-simply-repo-branch]")) {
-					result.repoBranch = document.querySelector("[data-simply-repo-branch]").getAttribute("data-simply-repo-branch");
-				}
-				if (document.querySelector("[data-simply-repo-name]")) {
-					result.repoName = document.querySelector("[data-simply-repo-name]").getAttribute("data-simply-repo-name");
-				}
-				if (document.querySelector("[data-simply-repo-user]")) {
-					result.repoUser = document.querySelector("[data-simply-repo-user]").getAttribute("data-simply-repo-user");
-				}
+					var github = new Github({});
+					var repo = github.getRepo(repoUser, repoName);
+					repo.read(repoBranch, repoPath, function(err, data) {
+						var result = {
+							images : [],
+							folders : [],
+							files : []
+						};
 
-				var repoPath = pathInfo.join("/");
-				repoPath = repoPath.replace(/\/$/, '');
-
-				result.repoPath = repoPath;
-				return result;
-			},
-			checkJail : function(url) {
-				var repo1 = this.getRepoInfo(url);
-				var repo2 = this.getRepoInfo(this.endpoint);
-				
-				
-				if (
-					(repo1.repoUser == repo2.repoUser) && 
-					(repo1.repoName == repo2.repoName) &&
-					(repo1.repoBranch == repo2.repoBranch)
-				) {
-					return true;
-				}
-				return false;
-			},
-			init : function(endpoint) {
-				if (endpoint === null) {
-					endpoint = document.location.href.replace(document.location.hash, "");
-				}
-				var script = document.createElement("SCRIPT");
-				script.src = editor.baseURLClean + "github.js";
-				document.head.appendChild(script);
-
-				var repoInfo = this.getRepoInfo(endpoint);
-				this.repoUser = repoInfo.repoUser;
-				this.repoName = repoInfo.repoName;
-				this.repoBranch = repoInfo.repoBranch;
-
-				this.endpoint = endpoint;
-				this.dataFile = "data.json";
-				this.dataEndpoint = endpoint + "data.json";
-
-				this.sitemap = storage.default.sitemap;
-				this.listSitemap = storage.default.listSitemap;
-				this.page = storage.default.page;
-				this.escape = storage.default.escape;
-
-				if (editor.responsiveImages) {
-					if (
-						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive
-					) {
-						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
-							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
-						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
-							editor.responsiveImages.sizes = (function(sizes) {
-								return function(src) {
-									var result = {};
-									var info = src.split(".");
-									var extension = info.pop().toLowerCase();
-									if (extension === "jpg" || extension === "jpeg" || extension === "png") {
-										for (var i=0; i<sizes.length; i++) {
-											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+						if (data) {
+							data = JSON.parse(data);
+							for (var i=0; i<data.length; i++) {
+								if (data[i].type == "file") {
+									var fileData = {
+										url : url + data[i].name,
+										src : url + data[i].name,
+										name : data[i].name // data[i].download_url
+									};
+									if (url === editor.storage.endpoint && data[i].name === "data.json") {
+										fileData.name = "My pages";
+										result.folders.push(fileData);
+									} else {
+										result.files.push(fileData);
+										if (fileData.url.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
+											result.images.push(fileData);
 										}
 									}
-									return result;
-								};
-							}(editor.settings['simply-image'].responsive.sizes));
+								} else if (data[i].type == "dir") {
+									result.folders.push({
+										url : editor.storage.endpoint + data[i].path + "/",
+										name : data[i].name
+									});
+								}
+							}
+							callback(result);
+						} else {
+							// Empty (non-existant) directory - return the empty resultset, github will create the dir automatically when we save things to it.");
+							callback(result);
 						}
-					}
-					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+					});
 				}
 			},
-			connect : function(callback) {
-				if (typeof Github === "undefined") {
-					return false;
-				}
-
-				if (!editor.storage.key) {
-					editor.storage.key = localStorage.storageKey;
-				}
-				if (!editor.storage.key) {
-					editor.storage.key = prompt("Please enter your authentication key");
-				}
-
-				if (editor.storage.validateKey(editor.storage.key)) {
-					if (!this.repo) {
-						localStorage.storageKey = editor.storage.key;
-						this.github = new Github({
-							token: editor.storage.key,
-							auth: "oauth"
-						});
-						this.repo = this.github.getRepo(this.repoUser, this.repoName);
+			default : {
+				init : function(endpoint) {
+					if (endpoint === null) {
+						endpoint = location.origin + "/";
 					}
+					this.url = endpoint;
+					this.endpoint = endpoint;
+					this.dataPath = "data/data.json";
+					this.dataEndpoint = this.url + this.dataPath;
+
+					if (editor.responsiveImages) {
+						if (
+							editor.settings['simply-image'] &&
+							editor.settings['simply-image'].responsive
+						) {
+							if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+								editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+							} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+								editor.responsiveImages.sizes = (function(sizes) {
+									return function(src) {
+										var result = {};
+										var info = src.split(".");
+										var extension = info.pop().toLowerCase();
+										if (extension === "jpg" || extension === "jpeg" || extension === "png") {
+											for (var i=0; i<sizes.length; i++) {
+												result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+											}
+										}
+										return result;
+									};
+								}(editor.settings['simply-image'].responsive.sizes));
+							}
+						}
+						window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+					}
+				},
+				escape : function(path) {
+					return path.replace(/[^A-Za-z0-9_\.-]/g, "-");
+				},
+				file : {
+					save : function(path, data, callback) {
+						var http = new XMLHttpRequest();
+						var url = editor.storage.url + path;
+
+						http.open("PUT", url, true);
+						http.withCredentials = true;
+
+						http.onreadystatechange = function() {//Call a function when the state changes.
+							if(http.readyState == 4) {
+								var saveResult = {};
+								if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+									saveResult = {path : path, response: http.responseText};
+								} else {
+									saveResult = {path : path, message : "SAVE FAILED: Could not store.", error: true, response: http.responseText};
+								}
+								var saveEvent = editor.fireEvent("simply-storage-file-saved", document, saveResult);
+								if (!saveEvent.defaultPrevented) {
+									callback(saveEvent.data);
+								}
+							}
+						};
+						http.upload.onprogress = function (event) {
+							if (event.lengthComputable) {
+								var complete = (event.loaded / event.total * 100 | 0);
+								var progress = document.querySelector("progress[data-simply-progress='" + editor.storage.escape(path) + "']");
+								if (progress) {
+									progress.value = progress.innerHTML = complete;
+								}
+							}
+						};
+
+						http.send(data);
+					},
+					delete : function(path, callback) {
+						var http = new XMLHttpRequest();
+						var url = editor.storage.url + path;
+
+						http.open("DELETE", url, true);
+						http.withCredentials = true;
+
+						http.onreadystatechange = function() {//Call a function when the state changes.
+							if(http.readyState == 4) {
+								var deleteResult = {};
+								if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+									deleteResult = {path : path, response: http.responseText};
+								} else {
+									deleteResult = {path : path, message : "DELETE FAILED: Could not delete.", error: true, response: http.responseText};
+								}
+								var deleteEvent = editor.fireEvent("simply-storage-file-deleted", document, deleteResult);
+								if (!deleteEvent.defaultPrevented) {
+									callback(deleteEvent.data);
+								}
+							}
+						};
+
+						http.send();
+					}
+				},
+				save : function(data, callback) {
+					return editor.storage.file.save(this.dataPath, data, callback);
+				},
+				load : function(callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.dataEndpoint;
+					if (editor.profile == "dev") {
+						url += "?t=" + (new Date().getTime());
+					}
+					http.open("GET", url, true);
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4) {
+							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
+								if (http.responseText === "") {
+									console.log("Warning: data file found, but empty");
+									return callback("{}");
+								}
+								callback(http.responseText.replace(/\0+$/, ''));
+							} else {
+								callback("{}");
+								console.log("Warning: no data found. Starting with empty set");
+							}
+						}
+					};
+					http.send();
+				},
+				connect : function(callback) {
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + "login";
+					http.open("POST", url, true);
+					http.send();
 					if (typeof callback === "function") {
 						callback();
 					}
 					return true;
-				} else {
-					return editor.storage.connect(callback);
-				}
-			},
-			disconnect : function(callback) {
-				delete this.repo;
-				delete localStorage.storageKey;
-				if (typeof callback === "function") {
-					callback();
-				}
-				return true;
-			},
-			validateKey : function(key) {
-				return true;
-			},
-			file : {
-				save : function(path, data, callback) {
-					if (path.match(/\/$/)) {
-						// github will create directories as needed.
-						var saveResult = {path : path, response: "Saved."};
-						return callback(saveResult);
-					}
+				},
+				disconnect : function(callback) {
+					delete editor.storage.key;
+					delete localStorage.storageKey;
 
-					var saveCallback = function(err) {
-						if (err === null) {
-							var saveResult = {path : path, response: "Saved."};
-							return callback(saveResult);
+					var http = new XMLHttpRequest();
+					var url = editor.storage.url + "logout";
+					http.open("GET", url, true, "logout", (new Date()).getTime().toString());
+					http.setRequestHeader("Authorization", "Basic ABCDEF");
+
+					http.onreadystatechange = function() {//Call a function when the state changes.
+						if(http.readyState == 4 && ((http.status > 399) && (http.status < 500)) ) {
+							if (typeof callback === "function") {
+								callback();
+							}
 						}
-
-						if (err.error == 401) {
-							return callback({message : "Authorization failed.", error: true});
-						}
-						return callback({message : "SAVE FAILED: Could not store.", error: true});
 					};
+					http.send();
+				},
+				page : {
+					save : function(url) {
+						history.pushState(null, null, url + "#simply-edit");
 
-					var executeSave = function(path, data) {
-						editor.storage.repo.write(editor.storage.repoBranch, path, data, "Simply edit changes on " + new Date().toUTCString(), saveCallback);
-					};
-					if (data instanceof File) {
-						var fileReader = new FileReader();
-						fileReader.onload = function(evt) {
-							executeSave(path, this.result);
+						document.body.innerHTML = editor.data.originalBody.innerHTML;
+						document.body.removeAttribute("data-simply-edit");
+
+						editor.data.load();
+						var openTemplateDialog = function() {
+							if (editor.actions['simply-template']) {
+								if (!document.getElementById("simply-template")) {
+									window.setTimeout(openTemplateDialog, 200);
+									return;
+								}
+								editor.actions['simply-template']();
+							} else {
+								alert("This page does not exist yet. Save it to create it!");
+							}
 						};
-						fileReader.readAsBinaryString(data);
-					} else {
-						executeSave(path, data);
+						openTemplateDialog();
 					}
 				},
-				delete : function(path, callback) {
-					editor.storage.repo.delete(editor.storage.repoBranch, path, callback);
-				}
-			},
-			save : function(data, callback) {
-				return editor.storage.file.save("data.json", data, callback);
-			},
-			load : function(callback) {
-				var http = new XMLHttpRequest();
-				var url = "https://raw.githubusercontent.com/" + this.repoUser + "/" + this.repoName + "/" + this.repoBranch + "/" + this.dataFile;
-				if (editor.profile == "dev") {
-					url += "?t=" + (new Date().getTime());
-				}
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4) {
-						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
-							if (http.responseText === "") {
-								console.log("Warning: data file found, but empty");
-								return callback("{}");
-							}
-							callback(http.responseText);
+				sitemap : function() {
+					var output = {
+						children : {},
+						name : 'Sitemap'
+					};
+					for (var i in editor.currentData) {
+						var chain = i.split("/");
+						chain.shift();
+						var lastItem = chain.pop();
+						if (lastItem !== "") {
+							chain.push(lastItem);
 						} else {
-							console.log("No data found, starting with empty dataset");
-							callback("{}");
+							var item = chain.pop();
+							if (typeof item === "undefined") {
+								item = '';
+							}
+							chain.push(item + "/");
+						}
+
+						var currentNode = output.children;
+						var prevNode;
+						for (var j = 0; j < chain.length; j++) {
+							var wantedNode = chain[j];
+							var lastNode = currentNode;
+							for (var k in currentNode) {
+								if (currentNode[k].name == wantedNode) {
+									currentNode = currentNode[k].children;
+									break;
+								}
+							}
+							// If we couldn't find an item in this list of children
+							// that has the right name, create one:
+							if (lastNode == currentNode) {
+								currentNode[wantedNode] = {
+									name : wantedNode,
+									children : {}
+								};
+								currentNode = currentNode[wantedNode].children;
+							}
 						}
 					}
-				};
-				http.send();
-			},
-			saveTemplate : function(pageTemplate, callback) {
-				var dataPath = location.pathname.split(/\//, 3)[2];
-				if (dataPath.match(/\/$/)) {
-					dataPath += "index.html";
-				}
-
-				var repo = this.repo;
-				repo.read(this.repoBranch, pageTemplate, function(err, data) {
-					if (data) {
-						repo.write(this.repoBranch, dataPath, data, pageTemplate + " (copy)", callback);
-					}
-				});
-			},
-			list : function(url, callback) {
-				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
-					return this.listSitemap(url, callback);
-				}
-
-				var repoInfo = this.getRepoInfo(url);
-
-				var repoUser = repoInfo.repoUser;
-				var repoName = repoInfo.repoName;
-				var repoBranch = repoInfo.repoBranch;
-				var repoPath = repoInfo.repoPath;
-
-				var github = new Github({});
-				var repo = github.getRepo(repoUser, repoName);
-				repo.read(repoBranch, repoPath, function(err, data) {
-					var result = {
-						images : [],
-						folders : [],
-						files : []
-					};
-
-					if (data) {
-						data = JSON.parse(data);
-						for (var i=0; i<data.length; i++) {
-							if (data[i].type == "file") {
-								var fileData = {
-									url : url + data[i].name,
-									src : url + data[i].name,
-									name : data[i].name // data[i].download_url
-								};
-								if (url === editor.storage.endpoint && data[i].name === "data.json") {
-									fileData.name = "My pages";
-									result.folders.push(fileData);
+					return output;
+				},
+				listSitemap : function(url, callback) {
+					if (url.indexOf(editor.storage.dataEndpoint) === 0) {
+						var subpath = url.replace(editor.storage.dataEndpoint, "");
+						var sitemap = editor.storage.sitemap();
+						var result = {
+							folders : [],
+							files : []
+						};
+						if (subpath !== "") {
+							var pathicles = subpath.split("/");
+							pathicles.shift();
+							for (var i=0; i<pathicles.length; i++) {
+								if (sitemap.children[pathicles[i]]) {
+									sitemap = sitemap.children[pathicles[i]];
 								} else {
-									result.files.push(fileData);
-									if (fileData.url.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
-										result.images.push(fileData);
-									}
+									sitemap = {};
+									break;
 								}
-							} else if (data[i].type == "dir") {
-								result.folders.push({
-									url : editor.storage.endpoint + data[i].path + "/",
-									name : data[i].name
+							}
+							result.folders.push({
+								url : url.replace(/\/[^\/]+$/, ''),
+								name : '..'
+							});
+						} else {
+							result.folders.push({
+								url : editor.storage.endpoint,
+								name : '..'
+							});
+						}
+
+						for (var j in sitemap.children) {
+							if (j=="/") {
+								result.files.push({
+									url : url + "/",
+									name : "Home"
 								});
 							}
-						}
-						callback(result);
-					} else {
-						// Empty (non-existant) directory - return the empty resultset, github will create the dir automatically when we save things to it.");
-						callback(result);
-					}
-				});
-			}
-		},
-		default : {
-			init : function(endpoint) {
-				if (endpoint === null) {
-					endpoint = location.origin + "/";
-				}
-				this.url = endpoint;
-				this.endpoint = endpoint;
-				this.dataPath = "data/data.json";
-				this.dataEndpoint = this.url + this.dataPath;
 
-				if (editor.responsiveImages) {
-					if (
-						editor.settings['simply-image'] &&
-						editor.settings['simply-image'].responsive
-					) {
-						if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
-							editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
-						} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
-							editor.responsiveImages.sizes = (function(sizes) {
-								return function(src) {
-									var result = {};
-									var info = src.split(".");
-									var extension = info.pop().toLowerCase();
-									if (extension === "jpg" || extension === "jpeg" || extension === "png") {
-										for (var i=0; i<sizes.length; i++) {
-											result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+							if (Object.keys(sitemap.children[j].children).length) {
+								result.folders.push({
+									url : url + "/" + j,
+									name : j + "/"
+								});
+							} else {
+								if (j != "/") {
+									result.files.push({
+										url : url + "/" + j,
+										name : j.replace(/\/$/, '')
+									});
+
+									if (Object.keys(editor.currentData[(url + "/" + j).replace(editor.storage.dataEndpoint, "")]).length === 0) {
+										result.folders.push({
+											url : url + "/" + j.replace(/\/$/, ''),
+											name : j
+										});
+									}
+								}
+							}
+						}
+
+						return callback(result);
+					}
+				},
+				list : function(url, callback) {
+					if (url.indexOf(editor.storage.dataEndpoint) === 0) {
+						return this.listSitemap(url, callback);
+					}
+					if (url == editor.storage.endpoint) {
+						var result = {
+							images : [],
+							folders : [],
+							files : []
+						};
+						result.folders.push({url : editor.storage.dataEndpoint, name : 'My pages'});
+						var parser = document.createElement("A");
+
+						if (document.querySelector("[data-simply-images]")) {
+							var imagesEndpoint = document.querySelector("[data-simply-images]").getAttribute("data-simply-images");
+							parser.href = imagesEndpoint;
+							imagesEndpoint = parser.href;
+							result.folders.push({url : imagesEndpoint, name : 'My images'});
+						}
+						if (document.querySelector("[data-simply-files]")) {
+							var filesEndpoint = document.querySelector("[data-simply-files]").getAttribute("data-simply-files");
+							parser.href = filesEndpoint;
+							filesEndpoint = parser.href;
+							result.folders.push({url : filesEndpoint, name : 'My files'});
+						}
+						return callback(result);
+					}
+
+					url += "?t=" + (new Date().getTime());
+					var iframe = document.createElement("IFRAME");
+					iframe.src = url;
+					iframe.style.opacity = 0;
+					iframe.style.position = "absolute";
+					iframe.style.left = "-10000px";
+					iframe.addEventListener("load", function() {
+						var result = {
+							images : [],
+							folders : [],
+							files : []
+						};
+
+						try {
+							var images = iframe.contentDocument.body.querySelectorAll("a");
+							for (var i=0; i<images.length; i++) {
+								href = images[i].getAttribute("href");
+								if (href.substring(0, 1) === "?") {
+									continue;
+								}
+
+								var targetUrl = images[i].href;
+								if (href.substring(href.length-1, href.length) === "/") {
+									result.folders.push({url : targetUrl, name : images[i].innerHTML});
+								} else {
+									if (targetUrl === editor.storage.dataEndpoint) {
+										result.folders.push({url : targetUrl, name: "My pages"});
+									} else {
+										result.files.push({url : targetUrl, name : images[i].innerHTML});
+										if (targetUrl.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
+											result.images.push({url : targetUrl, name : images[i].innerHTML});
 										}
 									}
-									return result;
-								};
-							}(editor.settings['simply-image'].responsive.sizes));
-						}
-					}
-					window.addEventListener("resize", editor.responsiveImages.resizeHandler);
-				}
-			},
-			escape : function(path) {
-				return path.replace(/[^A-Za-z0-9_\.-]/g, "-");
-			},
-			file : {
-				save : function(path, data, callback) {
-					var http = new XMLHttpRequest();
-					var url = editor.storage.url + path;
-
-					http.open("PUT", url, true);
-					http.withCredentials = true;
-
-					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4) {
-							var saveResult = {};
-							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
-								saveResult = {path : path, response: http.responseText};
-							} else {
-								saveResult = {path : path, message : "SAVE FAILED: Could not store.", error: true, response: http.responseText};
-							}
-							var saveEvent = editor.fireEvent("simply-storage-file-saved", document, saveResult);
-							if (!saveEvent.defaultPrevented) {
-								callback(saveEvent.data);
-							}
-						} 
-					};
-					http.upload.onprogress = function (event) {
-						if (event.lengthComputable) {
-							var complete = (event.loaded / event.total * 100 | 0);
-							var progress = document.querySelector("progress[data-simply-progress='" + editor.storage.escape(path) + "']");
-							if (progress) {
-								progress.value = progress.innerHTML = complete;
-							}
-						}
-					};
-
-					http.send(data);
-				},
-				delete : function(path, callback) {
-					var http = new XMLHttpRequest();
-					var url = editor.storage.url + path;
-
-					http.open("DELETE", url, true);
-					http.withCredentials = true;
-
-					http.onreadystatechange = function() {//Call a function when the state changes.
-						if(http.readyState == 4) {
-							var deleteResult = {};
-							if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
-								deleteResult = {path : path, response: http.responseText};
-							} else {
-								deleteResult = {path : path, message : "DELETE FAILED: Could not delete.", error: true, response: http.responseText};
-							}
-							var deleteEvent = editor.fireEvent("simply-storage-file-deleted", document, deleteResult);
-							if (!deleteEvent.defaultPrevented) {
-								callback(deleteEvent.data);
-							}
-						}
-					};
-
-					http.send();
-				}
-			},
-			save : function(data, callback) {
-				return editor.storage.file.save(this.dataPath, data, callback);
-			},
-			load : function(callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.dataEndpoint;
-				if (editor.profile == "dev") {
-					url += "?t=" + (new Date().getTime());
-				}
-				http.open("GET", url, true);
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4) {
-						if ((http.status > 199) && (http.status < 300)) { // accept any 2xx http status as 'OK';
-							if (http.responseText === "") {
-								console.log("Warning: data file found, but empty");
-								return callback("{}");
-							}
-							callback(http.responseText.replace(/\0+$/, ''));
-						} else {
-							callback("{}");
-							console.log("Warning: no data found. Starting with empty set");
-						}
-					}
-				};
-				http.send();
-			},
-			connect : function(callback) {
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "login";
-				http.open("POST", url, true);
-				http.send();
-				if (typeof callback === "function") {
-					callback();
-				}
-				return true;
-			},
-			disconnect : function(callback) {
-				delete editor.storage.key;
-				delete localStorage.storageKey;
-
-				var http = new XMLHttpRequest();
-				var url = editor.storage.url + "logout";
-				http.open("GET", url, true, "logout", (new Date()).getTime().toString());
-				http.setRequestHeader("Authorization", "Basic ABCDEF");
-
-				http.onreadystatechange = function() {//Call a function when the state changes.
-					if(http.readyState == 4 && ((http.status > 399) && (http.status < 500)) ) {
-						if (typeof callback === "function") {
-							callback();
-						}
-					}
-				};
-				http.send();
-			},
-			page : {
-				save : function(url) {
-					history.pushState(null, null, url + "#simply-edit");
-
-					document.body.innerHTML = editor.data.originalBody.innerHTML;
-					document.body.removeAttribute("data-simply-edit");
-
-					editor.data.load();
-					var openTemplateDialog = function() {
-						if (editor.actions['simply-template']) {
-							if (!document.getElementById("simply-template")) {
-								window.setTimeout(openTemplateDialog, 200);
-								return;
-							}
-							editor.actions['simply-template']();
-						} else {
-							alert("This page does not exist yet. Save it to create it!");
-						}
-					};
-					openTemplateDialog();
-				}
-			},
-			sitemap : function() {
-				var output = {
-					children : {},
-					name : 'Sitemap'
-				};
-				for (var i in editor.currentData) {
-					var chain = i.split("/");
-					chain.shift();
-					var lastItem = chain.pop();
-					if (lastItem !== "") {
-						chain.push(lastItem);
-					} else {
-						var item = chain.pop();
-						if (typeof item === "undefined") {
-							item = '';
-						}
-						chain.push(item + "/");
-					}
-					
-					var currentNode = output.children;
-					var prevNode;
-					for (var j = 0; j < chain.length; j++) {
-						var wantedNode = chain[j];
-						var lastNode = currentNode;
-						for (var k in currentNode) {
-							if (currentNode[k].name == wantedNode) {
-								currentNode = currentNode[k].children;
-								break;
-							}
-						}
-						// If we couldn't find an item in this list of children
-						// that has the right name, create one:
-						if (lastNode == currentNode) {
-							currentNode[wantedNode] = {
-								name : wantedNode,
-								children : {}
-							};
-							currentNode = currentNode[wantedNode].children;
-						}
-					}
-				}
-				return output;
-			},
-			listSitemap : function(url, callback) {
-				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
-					var subpath = url.replace(editor.storage.dataEndpoint, "");
-					var sitemap = editor.storage.sitemap();
-					var result = {
-						folders : [],
-						files : []
-					};
-					if (subpath !== "") {
-						var pathicles = subpath.split("/");
-						pathicles.shift();
-						for (var i=0; i<pathicles.length; i++) {
-							if (sitemap.children[pathicles[i]]) {
-								sitemap = sitemap.children[pathicles[i]];
-							} else {
-								sitemap = {};
-								break;
-							}
-						}
-						result.folders.push({
-							url : url.replace(/\/[^\/]+$/, ''),
-							name : '..'
-						});
-					} else {
-						result.folders.push({
-							url : editor.storage.endpoint,
-							name : '..'
-						});
-					}
-
-					for (var j in sitemap.children) {
-						if (j=="/") {
-							result.files.push({
-								url : url + "/",
-								name : "Home"
-							});
-						}
-
-						if (Object.keys(sitemap.children[j].children).length) {
-							result.folders.push({
-								url : url + "/" + j,
-								name : j + "/"
-							});
-						} else {
-							if (j != "/") {
-								result.files.push({
-									url : url + "/" + j,
-									name : j.replace(/\/$/, '')
-								});
-
-								if (Object.keys(editor.currentData[(url + "/" + j).replace(editor.storage.dataEndpoint, "")]).length === 0) {
-									result.folders.push({
-										url : url + "/" + j.replace(/\/$/, ''),
-										name : j
-									});
 								}
 							}
-						}
-					}
 
-					return callback(result);
-				}
-			},
-			list : function(url, callback) {
-				if (url.indexOf(editor.storage.dataEndpoint) === 0) {
-					return this.listSitemap(url, callback);
-				}
-				if (url == editor.storage.endpoint) {
-					var result = {
-						images : [],
-						folders : [],
-						files : []
-					};
-					result.folders.push({url : editor.storage.dataEndpoint, name : 'My pages'});
-					var parser = document.createElement("A");
-
-					if (document.querySelector("[data-simply-images]")) {
-						var imagesEndpoint = document.querySelector("[data-simply-images]").getAttribute("data-simply-images");
-						parser.href = imagesEndpoint;
-						imagesEndpoint = parser.href;
-						result.folders.push({url : imagesEndpoint, name : 'My images'});
-					}
-					if (document.querySelector("[data-simply-files]")) {
-						var filesEndpoint = document.querySelector("[data-simply-files]").getAttribute("data-simply-files");
-						parser.href = filesEndpoint;
-						filesEndpoint = parser.href;
-						result.folders.push({url : filesEndpoint, name : 'My files'});
-					}
-					return callback(result);
-				}
-
-				url += "?t=" + (new Date().getTime());
-				var iframe = document.createElement("IFRAME");
-				iframe.src = url;
-				iframe.style.opacity = 0;
-				iframe.style.position = "absolute";
-				iframe.style.left = "-10000px";
-				iframe.addEventListener("load", function() {
-					var result = {
-						images : [],
-						folders : [],
-						files : []
-					};
-
-					try {
-						var images = iframe.contentDocument.body.querySelectorAll("a");
-						for (var i=0; i<images.length; i++) {
-							href = images[i].getAttribute("href");
-							if (href.substring(0, 1) === "?") {
-								continue;
-							}
-
-							var targetUrl = images[i].href;
-							if (href.substring(href.length-1, href.length) === "/") {
-								result.folders.push({url : targetUrl, name : images[i].innerHTML});
-							} else {
-								if (targetUrl === editor.storage.dataEndpoint) {
-									result.folders.push({url : targetUrl, name: "My pages"});
-								} else {
-									result.files.push({url : targetUrl, name : images[i].innerHTML});
-									if (targetUrl.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
-										result.images.push({url : targetUrl, name : images[i].innerHTML});
-									}
-								}
-							}
+							document.body.removeChild(iframe);
+						} catch(e) {
+							console.log("The target endpoint could not be accessed.");
+							console.log(e);
 						}
 
-						document.body.removeChild(iframe);
-					} catch(e) {
-						console.log("The target endpoint could not be accessed.");
-						console.log(e);
-					}
-
-					callback(result);
-				});
-				document.body.appendChild(iframe);
+						callback(result);
+					});
+					document.body.appendChild(iframe);
+				}
 			}
-		}
-	};
+		};
+	}
 
 	editor.toolbars = {};
 	editor.contextFilters = {};
