@@ -1450,16 +1450,14 @@
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
 					if (attr == "innerHTML") {
-						result.innerHTML = editor.field.getInnerHTML(field);
+						if (field.getAttribute("data-simply-content") != "fixed") {
+							result.innerHTML = editor.field.getInnerHTML(field);
+						}
 					} else {
 						if (field.getAttribute(attr) !== null) {
 							result[attr] = field.getAttribute(attr);
 						}
 					}
-				}
-
-				if (field.getAttribute("data-simply-content") == "fixed") {
-					delete result.innerHTML;
 				}
 				return result;
 			},
