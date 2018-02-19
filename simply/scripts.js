@@ -2313,5 +2313,5 @@ simply.editor = ( function(editor) {
         overrideNodeMethod(HTMLElement.prototype, 'querySelector');
         overrideNodeMethod(HTMLElement.prototype, 'querySelectorAll');
     }
-}());// github.com/2is10/selectionchange-polyfill
+}());
 
