@@ -2896,6 +2896,9 @@
 					this.endpoint = endpoint;
 					this.dataPath = "data/data.json";
 					this.dataEndpoint = this.url + this.dataPath;
+                                        if (document.querySelector("[data-storage-get-post-only]")) {
+                                                this.getPostOnly = true;
+                                        }
 
 					if (editor.responsiveImages) {
 						if (
@@ -2930,8 +2933,12 @@
 					save : function(path, data, callback) {
 						var http = new XMLHttpRequest();
 						var url = editor.storage.url + path;
-
-						http.open("PUT", url, true);
+						if (editor.storage.getPostOnly) {
+							url += "?_method=PUT";
+							http.open("POST", url, true);
+						} else {
+							http.open("PUT", url, true);
+						}
 						http.withCredentials = true;
 
 						http.onreadystatechange = function() {//Call a function when the state changes.
@@ -2964,7 +2971,12 @@
 						var http = new XMLHttpRequest();
 						var url = editor.storage.url + path;
 
-						http.open("DELETE", url, true);
+						if (editor.storage.getPostOnly) {
+							url += "?_method=DELETE";
+							http.open("POST", url, true);
+						} else {
+							http.open("DELETE", url, true);
+						}
 						http.withCredentials = true;
 
 						http.onreadystatechange = function() {//Call a function when the state changes.
