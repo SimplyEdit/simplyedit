@@ -56,10 +56,15 @@
 							var resolver = document.createElement("A");
 							var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
 							resolver.href = basePath + parentPath;
-							if (resolver.pathname.indexOf("../") == -1) {
-								return resolver.pathname;
+							if (resolver.pathname.indexOf("./") == -1) {
+								// IE11 doesn't add a leading slash;
+								if (resolver.pathname.indexOf("/") !== 0) {
+									return "/" + resolver.pathname;
+								} else {
+									return resolver.pathname;
+								}
 							} else {
-								return resolver.href.replace(document.location.origin, ""); // IE11 just adds ../ to the end;
+								return resolver.href.replace(document.location.origin, ""); // IE11 doesn't resolve ../ or ./ in the path
 							}
 						}
 						return parentPath;
