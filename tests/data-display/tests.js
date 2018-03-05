@@ -986,12 +986,17 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		field.innerHTML = "Hi world!";
 
-		field.dataBinding.resolve(true);
-		assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
-		assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
-		assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+		stop();
+		field.addEventListener("databind:domchanged", function() { 
+			field.dataBinding.resolve(true);
+			assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
+			assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
+			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+			start();
+		});
+
+		field.innerHTML = "Hi world!";
 	});
 
 	QUnit.test("databinding list push 2 items", function(assert) {
