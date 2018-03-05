@@ -2283,12 +2283,20 @@
 
 				imgEl.setAttribute("alt", "");
 				imgEl.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // transparent 1x1 gif, this forces a redraw of the image thus recalculating its width;
+				var imageWidth = imgEl.width;
 				if (storedSrc) {
 					imgEl.setAttribute("src", storedSrc);
+					imageWidth = imgEl.width;
 				} else {
 					imgEl.removeAttribute("src");
+					if (imageWidth == 1) {
+						// We didn't have a source to start with and the calculated width is 1 pixel
+						// from the transparent 1x1. This means the width is not resized by the image
+						// tag or css;
+						imageWidth = 0;
+					}
 				}
-				var imageWidth = imgEl.width;
+
 				if (storedAlt) {
 					imgEl.setAttribute("alt", storedAlt);
 				}
@@ -2311,6 +2319,7 @@
 						}
 					}
 				}
+
 				var sizeRatio = parseInt(Math.ceil(100 * imageWidth / window.innerWidth));
 				return sizeRatio;
 			},
