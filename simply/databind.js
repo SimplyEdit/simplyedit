@@ -86,6 +86,27 @@ dataBinding = function(config) {
 		initBindings(data, key);
 	};
 
+	var reconnectParentBindings = function(binding) {
+		var parent;
+
+		if (binding.config.data._parentBindings_) {
+			parent = binding.config.data._parentBindings_[binding.key];
+			while (parent && parent.get()[binding.key] == binding.get()) {
+				binding = parent;
+				parent = binding.config.data._parentBindings_? binding.config.data._parentBindings_[binding.key] : null;
+				if (!parent) {
+					if (binding.config.data._parentData_ && (binding.config.data._parentData_[binding.key] !== binding.get())) {
+						binding.config.data._parentData_[binding.key] = binding.get();
+					}
+					for (var i in binding.config.data._parentBindings_) {
+						parent = binding.config.data._parentBindings_[i];
+						continue;
+					}
+				}
+			}
+		}
+	};
+
 	var setShadowValue = function(value) {
 		var valueBindings;
 		if (shadowValue && shadowValue._bindings_) {
@@ -93,8 +114,11 @@ dataBinding = function(config) {
 		}
 
 		shadowValue = value;
+
+		reconnectParentBindings(binding);
+
 		if (valueBindings && (typeof shadowValue === "object")) {
-			if (!shadowValue.hasOwnProperty("_bindings_")) {
+			if (shadowValue && !shadowValue.hasOwnProperty("_bindings_")) {
 				var bindings = {};
 
 				Object.defineProperty(shadowValue, "_bindings_", {
@@ -107,10 +131,68 @@ dataBinding = function(config) {
 				});
 			}
 
+			var setRestoreTrigger = function(data, key, previousBinding) {
+				var prevDescriptor = Object.getOwnPropertyDescriptor(previousBinding.config.data, key);
+				var childTriggers = function(previousData) {
+					return function(value) {
+						if (typeof value === "undefined") {
+							return;
+						}
+						if (previousData && previousData._bindings_) {
+							for (var i in previousData._bindings_) {
+								if (typeof value[i] === "undefined") {
+									setRestoreTrigger(value, i, previousData._bindings_[i]);
+									value._bindings_[i] = previousData._bindings_[i];
+								} else {
+									value._bindings_[i] = previousData._bindings_[i];
+									value._bindings_[i].config.data = value;
+									value._bindings_[i].set(value[i]);
+								}
+							}
+						}
+					};
+				}(previousBinding.config.data[key]);
+
+				previousBinding.config.data = data;
+			//	binding.config.data = data;
+
+				// binding.set(null);
+				// delete data[key];
+				var restoreBinding = function(value) {
+					if (typeof value === "object" && !value.hasOwnProperty("_bindings_")) {
+						var bindings = {};
+
+						Object.defineProperty(value, "_bindings_", {
+							get : function() {
+								return bindings;
+							},
+							set : function(value) {
+								bindings[key] = previousBinding;
+							}
+						});
+					}
+					childTriggers(value);
+					data._bindings_[key].setData(data);
+					data._bindings_[key].set(value);
+					if (typeof prevDescriptor.get !== "function" && typeof prevDescriptor.set === "function") {
+						prevDescriptor.set(value);
+					}
+				};
+
+				Object.defineProperty(data, key, {
+					set : restoreBinding,
+					configurable : true
+				});
+			};
+
 			for (var i in valueBindings) {
 				shadowValue._bindings_[i] = valueBindings[i];
-				valueBindings[i].set(shadowValue[i]);
-				valueBindings[i].resolve();
+				if (typeof shadowValue[i] === "undefined") {
+					setRestoreTrigger(shadowValue, i, valueBindings[i]);
+				} else {
+					valueBindings[i].set(shadowValue[i]);
+					valueBindings[i].resolve();
+				}
 			}
 		}
 
@@ -402,7 +484,6 @@ dataBinding = function(config) {
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
-
 	};
 
 	this.rebind = function(element, config) {
@@ -544,7 +625,7 @@ dataBinding.prototype.handleMutation = function(event) {
 			self.resumeListeners(target);
 		}, 0); // allow the rest of the mutation event to occur;
 	}
-};			
+};
 
 dataBinding.prototype.handleEvent = function (event) {
 	var target = event.currentTarget;
@@ -712,4 +793,4 @@ document.addEventListener("DOMNodeRemoved", function(evt) {
     overrideNodeMethod(HTMLElement.prototype, 'querySelector');
     overrideNodeMethod(HTMLElement.prototype, 'querySelectorAll');
   }
-}());// github.com/2is10/selectionchange-polyfill
+}());

@@ -1235,6 +1235,185 @@ QUnit.module("databinding");
 		assert.equal(document.querySelector("#testContent div + div").innerHTML, "Two");
 	});
 
+	QUnit.test("databinding, remove a key and then restore it step by step", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.a.b.c"></div>';
+		var data = {
+			"/" : {
+				item : {
+					a : {
+						b : {
+							c : "Cee"
+						}
+					}
+				}
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item = {
+			q : "Que"
+		};
+		editor.currentData['/'].item.a = {};
+		editor.currentData['/'].item.a.b = {};
+		editor.currentData['/'].item.a.b.c = "Hello again";
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Hello again");
+	});
+
+	QUnit.test("databinding, remove a key in 2 steps and then restore it step by step", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.a.b.c.d"></div>';
+		var data = {
+			"/" : {
+				item : {
+					a : {
+						b : {
+							c : {
+								d : "Dee"
+							}
+						}
+					}
+				}
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item.a.b = {
+			q : "Que"
+		};
+		editor.currentData['/'].item = {
+			x : "Ex"
+		};
+		editor.currentData['/'].item.a = {};
+		editor.currentData['/'].item.a.b = {};
+		editor.currentData['/'].item.a.b.c = {};
+		editor.currentData['/'].item.a.b.c.d = "Hello again";
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Hello again");
+	});
+
+	QUnit.test("databinding, remove a key and then restore it in one structure", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.a.b.c"></div>';
+		var data = {
+			"/" : {
+				item : {
+					a : {
+						b : {
+							c : "Cee"
+						}
+					}
+				}
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item = {
+			q : "Que"
+		};
+		editor.currentData['/'].item.a = {
+			b : {
+				c : "Hello again"
+			}
+		};
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Hello again");
+	});
+
+	QUnit.test("databinding, remove a key in 2 steps and then restore it in one structure", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.a.b.c.d"></div>';
+		var data = {
+			"/" : {
+				item : {
+					a : {
+						b : {
+							c : {
+								d : "Dee"
+							}
+						}
+					}
+				}
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item.a.b = {
+			q : "Que"
+		};
+		editor.currentData['/'].item = {
+			x : "Ex"
+		};
+		editor.currentData['/'].item.a = {
+			b : {
+				c : {
+					d : "Hello again"
+				}
+			}
+		};
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+
+		assert.equal(document.querySelector("#testContent div").innerHTML, "Hello again");
+	});
+
+	QUnit.test("databinding, remove a key and then restore it by setting it in the DOM", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.a.b.c"></div>';
+		var data = {
+			"/" : {
+				item : {
+					a : {
+						b : {
+							c : "Cee"
+						}
+					}
+				}
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item = {
+			q : "Que"
+		};
+		document.querySelector("#testContent div").innerHTML = "Hello again";
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+
+		assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
+	});
+
+	QUnit.test("databinding, remove a key in 2 steps and then restore it by setting it in the DOM", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '<div data-simply-path="/" data-simply-field="item.a.b.c.d"></div>';
+		var data = {
+			"/" : {
+				item : {
+					a : {
+						b : {
+							c : {
+								d : "Dee"
+							}
+						}
+					}
+				}
+			}
+		};
+		editor.currentData = data;
+		editor.data.apply(data, document);
+		editor.currentData['/'].item.a.b = {
+			q : "Que"
+		};
+		editor.currentData['/'].item = {
+			x : "Ex"
+		};
+		document.querySelector("#testContent div").innerHTML = "Hello again";
+		document.querySelector("#testContent div").dataBinding.resolve(true);
+		assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
+	});
+
 QUnit.module("responsive images");
 	QUnit.test("responsive image width from ALT tag is ignored", function(assert) {
 		var target = document.querySelector("#testContent");
