@@ -825,6 +825,7 @@ QUnit.module("databinding");
 			field.dataBinding.resolve(true);
 			assert.equal(field.innerHTML, "Hi world!", "new content remains in div");
 			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
+			debugger;
 			start();
 		}, 150);
 	});
@@ -964,7 +965,7 @@ QUnit.module("databinding");
 		}, 300);
 	});
 
-	QUnit.test("databinding change div data from DOM", function(assert) {
+	QUnit.test("databinding change div data from DOM for 2 items", function(assert) {
 		var field = document.createElement("DIV");
 		field.setAttribute("data-simply-field", "hello");
 		field.innerHTML = "Hello world";
@@ -979,13 +980,13 @@ QUnit.module("databinding");
 		editor.data.apply(editor.currentData, document);
 
 		stop();
-		field.addEventListener("databind:domchanged", function() { 
+		window.setTimeout(function() { 
 			field.dataBinding.resolve(true);
 			assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
 			assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
 			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
 			start();
-		});
+		}, 150);
 
 		field.innerHTML = "Hi world!";
 	});
