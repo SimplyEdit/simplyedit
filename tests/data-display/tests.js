@@ -772,7 +772,6 @@ QUnit.module("databinding");
 		
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 		
 		assert.equal(editor.pageData._bindings_.hello.elements[0], field);
 	});
@@ -787,7 +786,6 @@ QUnit.module("databinding");
 		
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(field.innerHTML, "Hello world", "initial content remains in div");
 		field.dataBinding.resolve(true);
@@ -804,7 +802,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(field.innerHTML, "Hello world", "initial content remains in div");
 		field.dataBinding.resolve(true);
@@ -821,7 +818,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		field.innerHTML = "Hi world!";
 		stop();
@@ -843,9 +839,10 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello = "Hey world!";
+		field.dataBinding.resolve(true);
+
 		assert.equal(field.innerHTML, "Hey world!", "data is set in div");
 		assert.equal(editor.pageData.hello, "Hey world!", "new content is found in pagedata");
 	});
@@ -860,7 +857,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(JSON.stringify(editor.pageData.hello), "[]", "list starts out empty");
 	});
@@ -875,7 +871,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(JSON.stringify(editor.pageData.page.hello), "[]", "list starts out empty");
 	});
@@ -890,7 +885,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		field.dataBinding.resolve(true);
@@ -908,7 +902,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		editor.pageData.hello[0].item = "Hey world!";
@@ -927,7 +920,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		field.dataBinding.resolve(true);
@@ -955,7 +947,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		field.dataBinding.resolve(true);
@@ -1009,7 +1000,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		editor.pageData.hello.push({item : "Hi world 2!"});
@@ -1030,7 +1020,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		editor.pageData.hello.push({item : "Hi world 2!"});
@@ -1066,7 +1055,6 @@ QUnit.module("databinding");
 
 		editor.currentData = data;
 		editor.data.apply(data, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 		field.dataBinding.resolve(true);
 
 		assert.ok(document.querySelector("#testContent ul").dataBinding === editor.currentData['/']._bindings_.menu);

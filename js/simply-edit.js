@@ -64,7 +64,11 @@
 									return resolver.pathname;
 								}
 							} else {
-								return resolver.href.replace(document.location.origin, ""); // IE11 doesn't resolve ../ or ./ in the path
+								var origin = document.location.origin;
+								if (!origin) {
+									origin = document.location.protocol + "//" + document.location.host; // IE9 doesn't have document.location.origin
+								}
+								return resolver.href.replace(origin, ""); // IE11 doesn't resolve ../ or ./ in the path
 							}
 						}
 						return parentPath;
