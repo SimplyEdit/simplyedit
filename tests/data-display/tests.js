@@ -825,7 +825,6 @@ QUnit.module("databinding");
 			field.dataBinding.resolve(true);
 			assert.equal(field.innerHTML, "Hi world!", "new content remains in div");
 			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
-			debugger;
 			start();
 		}, 150);
 	});
@@ -1368,10 +1367,13 @@ QUnit.module("databinding");
 		editor.currentData['/'].item = {
 			q : "Que"
 		};
-		document.querySelector("#testContent div").innerHTML = "Hello again";
-		document.querySelector("#testContent div").dataBinding.resolve(true);
 
-		assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
+		document.querySelector("#testContent div").innerHTML = "Hello again";
+		stop();
+		window.setTimeout(function() { // give Edge a second to catch up;
+			assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
+			start();
+		}, 0);
 	});
 
 	QUnit.test("databinding, remove a key in 2 steps and then restore it by setting it in the DOM", function(assert) {
@@ -1399,8 +1401,11 @@ QUnit.module("databinding");
 			x : "Ex"
 		};
 		document.querySelector("#testContent div").innerHTML = "Hello again";
-		document.querySelector("#testContent div").dataBinding.resolve(true);
-		assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
+		stop();
+		window.setTimeout(function() { // let it redraw
+			assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
+			start();
+		}, 0);
 	});
 
 QUnit.module("responsive images");
