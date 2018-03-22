@@ -2115,22 +2115,20 @@
 				return false;
 			},
 			stop : function() {
+				var redirect = function() {
+					document.location.href = document.location.href.split("#")[0];
+				};
+				if (typeof editor.storage.disconnect !== "function") {
+					editor.storage.disconnect = redirect;
+				}
 				if (editor.editmode.isDirty()) {
 					var message = "You have made changes to this page, if you log out these changes will not be saved. Log out?";
 					if (confirm(message)) {
 						editor.editmode.isDirty = function() { return false; };
-						editor.storage.disconnect(
-							function() {
-								document.location.href = document.location.href.split("#")[0];
-							}
-						);
+						editor.storage.disconnect(redirect);
 					}
 				} else {
-					editor.storage.disconnect(
-						function() {
-							document.location.href = document.location.href.split("#")[0];
-						}
-					);
+					editor.storage.disconnect(redirect);
 				}
 			},
 			toolbarMonitor : function() {
