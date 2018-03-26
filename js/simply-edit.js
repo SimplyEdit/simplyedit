@@ -75,6 +75,9 @@
 					}
 					parent = parent.parentNode;
 				}
+				if (parent.dataSimplyPath) {
+					return parent.dataSimplyPath;
+				}
 				return location.pathname;
 			},
 			apply : function(data, target) {
@@ -810,6 +813,7 @@
 					listenersRemoved = true;
 				}
 
+				list.dataSimplyPath = editor.data.getDataPath(list);
 				editor.list.detach(list);
 
 				if (list.dataBinding) {
@@ -821,6 +825,8 @@
 				var listIndex = list.querySelectorAll(":scope > [data-simply-list-item]");
 
 				var fragment = document.createDocumentFragment();
+				fragment.dataSimplyPath = editor.data.getDataPath(list);
+
 				list.warnedFieldDataBinding = false;
 
 				if (!list.clones) {
@@ -882,6 +888,7 @@
 							}
 							list.clones[requestedTemplate] = clone.cloneNode(true);
 						}
+						clone.dataSimplyPath = editor.data.getDataPath(list);
 						if (listDataSource) {
 							editor.list.initListItem(clone, false, listData[j]);
 						} else {
