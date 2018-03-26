@@ -1299,7 +1299,12 @@
 											subkeys.shift();
 										}
 										while (subkeys.length) {
-											fieldData[fieldPath] = fieldData[fieldPath][subkeys.shift()];
+											var subkey = subkeys.shift();
+											if (fieldData[fieldPath] && fieldData[fieldPath][subkey]) {
+												fieldData[fieldPath] = fieldData[fieldPath][subkey];
+											} else {
+												fieldData[fieldPath] = {};
+											}
 										}
 										editor.data.apply(fieldData, field.childNodes[i]);
 									} else {
