@@ -78,6 +78,9 @@
 				if (parent.dataSimplyPath) {
 					return parent.dataSimplyPath;
 				}
+				if (field.storedPath && !field.offsetParent) {
+					return field.storedPath;
+				}
 				return location.pathname;
 			},
 			apply : function(data, target) {
