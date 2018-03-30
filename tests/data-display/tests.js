@@ -772,7 +772,6 @@ QUnit.module("databinding");
 		
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 		
 		assert.equal(editor.pageData._bindings_.hello.elements[0], field);
 	});
@@ -787,7 +786,6 @@ QUnit.module("databinding");
 		
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(field.innerHTML, "Hello world", "initial content remains in div");
 		field.dataBinding.resolve(true);
@@ -804,7 +802,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(field.innerHTML, "Hello world", "initial content remains in div");
 		field.dataBinding.resolve(true);
@@ -821,7 +818,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		field.innerHTML = "Hi world!";
 		stop();
@@ -830,7 +826,7 @@ QUnit.module("databinding");
 			assert.equal(field.innerHTML, "Hi world!", "new content remains in div");
 			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
 			start();
-		}, 1);
+		}, 150);
 	});
 
 	QUnit.test("databinding change div data from data", function(assert) {
@@ -843,9 +839,10 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello = "Hey world!";
+		field.dataBinding.resolve(true);
+
 		assert.equal(field.innerHTML, "Hey world!", "data is set in div");
 		assert.equal(editor.pageData.hello, "Hey world!", "new content is found in pagedata");
 	});
@@ -860,7 +857,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(JSON.stringify(editor.pageData.hello), "[]", "list starts out empty");
 	});
@@ -875,7 +871,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		assert.equal(JSON.stringify(editor.pageData.page.hello), "[]", "list starts out empty");
 	});
@@ -890,7 +885,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		field.dataBinding.resolve(true);
@@ -908,7 +902,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		editor.pageData.hello[0].item = "Hey world!";
@@ -927,7 +920,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		field.dataBinding.resolve(true);
@@ -936,7 +928,6 @@ QUnit.module("databinding");
 		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
 
 		field.querySelector("DIV").innerHTML = "Way out there";
-		field.querySelector("DIV").dataBinding.resolve(true);
 		stop();
 		window.setTimeout(function() {
 			field.querySelector("DIV").dataBinding.resolve(true);
@@ -956,7 +947,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		field.dataBinding.resolve(true);
@@ -974,7 +964,7 @@ QUnit.module("databinding");
 		}, 300);
 	});
 
-	QUnit.test("databinding change div data from DOM", function(assert) {
+	QUnit.test("databinding change div data from DOM for 2 items", function(assert) {
 		var field = document.createElement("DIV");
 		field.setAttribute("data-simply-field", "hello");
 		field.innerHTML = "Hello world";
@@ -987,18 +977,17 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
-		field.innerHTML = "Hi world!";
 		stop();
-		window.setTimeout(function() {
+		window.setTimeout(function() { 
 			field.dataBinding.resolve(true);
-
 			assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
 			assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
 			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
 			start();
-		}, 1);
+		}, 150);
+
+		field.innerHTML = "Hi world!";
 	});
 
 	QUnit.test("databinding list push 2 items", function(assert) {
@@ -1011,7 +1000,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		editor.pageData.hello.push({item : "Hi world 2!"});
@@ -1032,7 +1020,6 @@ QUnit.module("databinding");
 
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 
 		editor.pageData.hello.push({item : "Hi world!"});
 		editor.pageData.hello.push({item : "Hi world 2!"});
@@ -1068,7 +1055,6 @@ QUnit.module("databinding");
 
 		editor.currentData = data;
 		editor.data.apply(data, document);
-		editor.pageData = editor.currentData[document.location.pathname];
 		field.dataBinding.resolve(true);
 
 		assert.ok(document.querySelector("#testContent ul").dataBinding === editor.currentData['/']._bindings_.menu);
@@ -1101,7 +1087,6 @@ QUnit.module("databinding");
 		var field = target.querySelector("ul");
 
 		editor.data.apply(data, document);
-		// editor.pageData = editor.currentData[document.location.pathname];
 		field.dataBinding.resolve(true);
 
 		// reorder the 2-depth list items;
@@ -1136,7 +1121,6 @@ QUnit.module("databinding");
 
 		editor.currentData = data;
 		editor.data.apply(data, document);
-		// editor.pageData = editor.currentData[document.location.pathname];
 		field.dataBinding.resolve(true);
 
 		// reorder the 1-depth list items;
@@ -1167,7 +1151,6 @@ QUnit.module("databinding");
 
 		editor.currentData = data;
 		editor.data.apply(data, document);
-		// editor.pageData = editor.currentData[document.location.pathname];
 		field.dataBinding.resolve(true);
 
 		// reorder the 1-depth list items;
@@ -1384,10 +1367,13 @@ QUnit.module("databinding");
 		editor.currentData['/'].item = {
 			q : "Que"
 		};
-		document.querySelector("#testContent div").innerHTML = "Hello again";
-		document.querySelector("#testContent div").dataBinding.resolve(true);
 
-		assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
+		document.querySelector("#testContent div").innerHTML = "Hello again";
+		stop();
+		window.setTimeout(function() { // give Edge a second to catch up;
+			assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
+			start();
+		}, 0);
 	});
 
 	QUnit.test("databinding, remove a key in 2 steps and then restore it by setting it in the DOM", function(assert) {
@@ -1415,8 +1401,11 @@ QUnit.module("databinding");
 			x : "Ex"
 		};
 		document.querySelector("#testContent div").innerHTML = "Hello again";
-		document.querySelector("#testContent div").dataBinding.resolve(true);
-		assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
+		stop();
+		window.setTimeout(function() { // let it redraw
+			assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
+			start();
+		}, 0);
 	});
 
 QUnit.module("responsive images");

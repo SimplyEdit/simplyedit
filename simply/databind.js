@@ -416,6 +416,8 @@ dataBinding = function(config) {
 		}
 		return targetNode.dispatchEvent(event);
 	};
+	this.fireEvent = fireEvent;
+
 	this.set = function (value) {
 		changeStack.push(value);
 		this.resolve();
@@ -697,6 +699,7 @@ dataBinding.prototype.handleEvent = function (event) {
 			}, 1); // allow the rest of the mutation event to occur;
 		break;
 	}
+	self.fireEvent(target, "domchanged");
 };
 
 // Housekeeping, remove references to deleted nodes

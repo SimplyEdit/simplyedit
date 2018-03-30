@@ -56,15 +56,30 @@
 							var resolver = document.createElement("A");
 							var basePath = location.pathname.replace(/(.*)\/.*?$/, "$1/");
 							resolver.href = basePath + parentPath;
-							if (resolver.pathname.indexOf("../") == -1) {
-								return resolver.pathname;
+							if (resolver.pathname.indexOf("./") == -1) {
+								// IE11 doesn't add a leading slash;
+								if (resolver.pathname.indexOf("/") !== 0) {
+									return "/" + resolver.pathname;
+								} else {
+									return resolver.pathname;
+								}
 							} else {
-								return resolver.href.replace(document.location.origin, ""); // IE11 just adds ../ to the end;
+								var origin = document.location.origin;
+								if (!origin) {
+									origin = document.location.protocol + "//" + document.location.host; // IE9 doesn't have document.location.origin
+								}
+								return resolver.href.replace(origin, ""); // IE11 doesn't resolve ../ or ./ in the path
 							}
 						}
 						return parentPath;
 					}
 					parent = parent.parentNode;
+				}
+				if (parent.dataSimplyPath) {
+					return parent.dataSimplyPath;
+				}
+				if (field.storedPath && !field.offsetParent) {
+					return field.storedPath;
 				}
 				return location.pathname;
 			},
@@ -801,6 +816,7 @@
 					listenersRemoved = true;
 				}
 
+				list.dataSimplyPath = editor.data.getDataPath(list);
 				editor.list.detach(list);
 
 				if (list.dataBinding) {
@@ -812,6 +828,8 @@
 				var listIndex = list.querySelectorAll(":scope > [data-simply-list-item]");
 
 				var fragment = document.createDocumentFragment();
+				fragment.dataSimplyPath = editor.data.getDataPath(list);
+
 				list.warnedFieldDataBinding = false;
 
 				if (!list.clones) {
@@ -873,6 +891,7 @@
 							}
 							list.clones[requestedTemplate] = clone.cloneNode(true);
 						}
+						clone.dataSimplyPath = editor.data.getDataPath(list);
 						if (listDataSource) {
 							editor.list.initListItem(clone, false, listData[j]);
 						} else {
@@ -1283,7 +1302,12 @@
 											subkeys.shift();
 										}
 										while (subkeys.length) {
-											fieldData[fieldPath] = fieldData[fieldPath][subkeys.shift()];
+											var subkey = subkeys.shift();
+											if (fieldData[fieldPath] && fieldData[fieldPath][subkey]) {
+												fieldData[fieldPath] = fieldData[fieldPath][subkey];
+											} else {
+												fieldData[fieldPath] = {};
+											}
 										}
 										editor.data.apply(fieldData, field.childNodes[i]);
 									} else {
@@ -2106,22 +2130,20 @@
 				return false;
 			},
 			stop : function() {
+				var redirect = function() {
+					document.location.href = document.location.href.split("#")[0];
+				};
+				if (typeof editor.storage.disconnect !== "function") {
+					editor.storage.disconnect = redirect;
+				}
 				if (editor.editmode.isDirty()) {
 					var message = "You have made changes to this page, if you log out these changes will not be saved. Log out?";
 					if (confirm(message)) {
 						editor.editmode.isDirty = function() { return false; };
-						editor.storage.disconnect(
-							function() {
-								document.location.href = document.location.href.split("#")[0];
-							}
-						);
+						editor.storage.disconnect(redirect);
 					}
 				} else {
-					editor.storage.disconnect(
-						function() {
-							document.location.href = document.location.href.split("#")[0];
-						}
-					);
+					editor.storage.disconnect(redirect);
 				}
 			},
 			toolbarMonitor : function() {
@@ -2276,12 +2298,20 @@
 
 				imgEl.setAttribute("alt", "");
 				imgEl.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // transparent 1x1 gif, this forces a redraw of the image thus recalculating its width;
+				var imageWidth = imgEl.width;
 				if (storedSrc) {
 					imgEl.setAttribute("src", storedSrc);
+					imageWidth = imgEl.width;
 				} else {
 					imgEl.removeAttribute("src");
+					if (imageWidth == 1) {
+						// We didn't have a source to start with and the calculated width is 1 pixel
+						// from the transparent 1x1. This means the width is not resized by the image
+						// tag or css;
+						imageWidth = 0;
+					}
 				}
-				var imageWidth = imgEl.width;
+
 				if (storedAlt) {
 					imgEl.setAttribute("alt", storedAlt);
 				}
@@ -2304,6 +2334,7 @@
 						}
 					}
 				}
+
 				var sizeRatio = parseInt(Math.ceil(100 * imageWidth / window.innerWidth));
 				return sizeRatio;
 			},
