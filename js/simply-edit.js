@@ -1906,21 +1906,6 @@
 					editor.editmode.toolbarMonitor();
 				};
 
-				// Test document import;  make sure we know if importDocument will execute scripts or not;
-				editor.brokenImport = true;
-				var testTemplate = document.createElement("TEMPLATE");
-				testTemplate.innerHTML = "<script> editor.brokenImport = false; </script>";
-				if (!("content" in testTemplate)) {
-					var fragment = document.createDocumentFragment();
-					while(testTemplate.children.length) {
-						fragment.appendChild(testTemplate.children[0]);
-					}
-					testTemplate.content = fragment;
-				}
-
-				var testNode = document.importNode(testTemplate.content, true);
-				toolbarsContainer.appendChild(testNode);
-
 				// Add slip.js for sortable items;
 				editor.loadScript(editor.baseURL + "simply/slip.js" + (editor.profile == "dev" ? "?t=" + (new Date().getTime()) : "?v=" + editor.version));
 
