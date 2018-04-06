@@ -122,7 +122,7 @@
 
 
 	var initTextToolbar = function(config) {
-		var toolbar = document.querySelector("#" + this.name);
+		var toolbar = editor.toolbarsContainer.querySelector("#" + this.name);
 
 		if (typeof config === "object" && toolbar) {
 			// Init blockstyles
@@ -777,7 +777,7 @@
 					}
 					if ((newRange.start == block.range.start) && (newRange.end == block.range.end)) {
 						var tagName = block.tag.split(" ")[0];
-						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
+						if (editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
 						}
 					}

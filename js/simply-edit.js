@@ -265,7 +265,7 @@
 							editor.storage.connect(function() {
 								editor.editmode.init();
 								var checkHope = function() {
-									if (typeof hope !== "undefined" && document.getElementById("simply-main-toolbar")) {
+									if (typeof hope !== "undefined" && editor.toolbarsContainer && editor.toolbarsContainer.getElementById("simply-main-toolbar")) {
 										editor.editmode.makeEditable(document);
 									} else {
 										window.setTimeout(checkHope, 100);
@@ -1775,7 +1775,10 @@
 				document.head.appendChild(scriptTag);
 			}
 		},
-		loadStyleSheet : function(src, attributes) {
+		loadStyleSheet : function(src, attributes, target) {
+			if (!target) {
+				target = document.head;
+			}
 			var styleTag = document.createElement("LINK");
 			styleTag.setAttribute("rel", "stylesheet");
 			styleTag.setAttribute("type", "text/css");
@@ -1785,18 +1788,14 @@
 				}
 			}
 			styleTag.href = src;
-			document.head.appendChild(styleTag);
+			target.appendChild(styleTag);
 		},
 		editmode : {
 			toolbars : [],
 			loadToolbarList : function(toolbarList) {
-				var toolbarsContainer = document.querySelector("#simply-editor");
-				if (!toolbarsContainer) {
-					toolbarsContainer = document.createElement("DIV");
-					toolbarsContainer.id = "simply-editor";
-					document.body.appendChild(toolbarsContainer);
+				if (!editor.toolbarsContainer) {
+					editor.toolbarsContainer = editor.editmode.getToolbarsContainer();
 				}
-
 				var url = toolbarList.shift();
 				var i;
 				var http = new XMLHttpRequest();
@@ -1831,7 +1830,7 @@
 
 							var toolbarNode = document.importNode(toolbars.content, true);
 							var newToolbars = toolbarNode.querySelectorAll(".simply-toolbar,.simply-dialog-body");
-							toolbarsContainer.appendChild(toolbarNode);
+							editor.toolbarsContainer.appendChild(toolbarNode);
 
 							for (i=0; i<scriptTags.length; i++) {
 								var newNode = document.createElement("SCRIPT");
@@ -1866,16 +1865,36 @@
 				};
 				http.send();
 			},
+			getToolbarsContainer : function() {
+				var toolbarsContainer = document.querySelector("#simply-editor");
+				if (!toolbarsContainer) {
+					toolbarsContainer = document.createElement("DIV");
+					toolbarsContainer.id = "simply-editor";
+					if (scriptEl.hasAttribute("data-simply-shadowless")) {
+						toolbarsContainer.attachShadow = false; // this overrides the native code;
+					}
+					document.body.appendChild(toolbarsContainer);
+				}
+
+				if (!toolbarsContainer.shadowRoot && toolbarsContainer.attachShadow) {
+					toolbarsContainer.attachShadow({mode: "open"});
+				}
+				if (toolbarsContainer.shadowRoot) {
+					toolbarsContainer = toolbarsContainer.shadowRoot;
+				}
+				if (!toolbarsContainer.getElementById) {
+					toolbarsContainer.getElementById = function(id) {
+						return document.getElementById(id);
+					};
+				}
+				return toolbarsContainer;
+			},
 			init : function() {
 				if (editor.readOnly) {
 					alert("Can't start editmode, editor is in read only mode. Do you have private browsing on?");
 					return;
 				}
-
-				var toolbarsContainer = document.createElement("DIV");
-				toolbarsContainer.id = "simply-editor";
-				document.body.appendChild(toolbarsContainer);
-
+				editor.toolbarsContainer = editor.editmode.getToolbarsContainer();
 				var loadToolbars = function() {
 					if (!editor.toolbar || (typeof muze === "undefined")) {
 						// Main toolbar code isn't loaded yet, delay a bit;
@@ -1909,13 +1928,22 @@
 				editor.loadScript(editor.baseURL + "hope/hope.packed.js");
 
 				// Add editor stylesheet
-				editor.loadStyleSheet(editor.baseURL + "simply/css/editor.v9.css");
+				editor.loadStyleSheet(editor.baseURL + "simply/css/editor.v9.css", {}, editor.toolbarsContainer);
+
+				// Add editor stylesheet
+				editor.loadStyleSheet(editor.baseURL + "simply/css/editor.v9.css", {}, document.head); // FIXME: split out the fields-styling for the styles that go into the head; Add all the other styles to the toolbars only.
 
 				// Add font awesome
+				// FIXME: font-face directive is not executed in the shadow dom.
 				editor.loadStyleSheet("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css",{
 					'integrity': 'sha256-k2/8zcNbxVIh5mnQ52A0r3a6jAgMGxFJFE2707UxGCk=',
 					'crossorigin':"anonymous"
-				});
+				}, editor.toolbarsContainer);
+
+				editor.loadStyleSheet("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css",{
+					'integrity': 'sha256-k2/8zcNbxVIh5mnQ52A0r3a6jAgMGxFJFE2707UxGCk=',
+					'crossorigin':"anonymous"
+				}, document.head);
 
 				// Add legacy scripts
 				editor.loadScript(editor.baseURL + "simply/scripts.js");
@@ -2147,7 +2175,7 @@
 				}
 			},
 			toolbarMonitor : function() {
-				var target = document.querySelector('#simply-main-toolbar');
+				var target = editor.toolbarsContainer.querySelector('#simply-main-toolbar');
 				if (!target) {
 					window.setTimeout(editor.editmode.toolbarMonitor, 100);
 					return false;
@@ -2162,8 +2190,8 @@
 						style.id = "simply-body-top";
 						document.head.appendChild(style);
 					}
-					if (document.getElementById("simply-main-toolbar")) {
-						var toolbarHeight = document.getElementById("simply-main-toolbar").offsetHeight;
+					if (editor.toolbarsContainer.getElementById("simply-main-toolbar")) {
+						var toolbarHeight = editor.toolbarsContainer.getElementById("simply-main-toolbar").offsetHeight;
 						style.innerHTML = "html:before { display: block; width: 100%; height: " + toolbarHeight + "px; content: ''; }";
 					}
 				};

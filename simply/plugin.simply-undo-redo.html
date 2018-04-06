@@ -185,7 +185,7 @@
 			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-undo"></i>Undo';
 			listItem.appendChild(button);
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+			editor.toolbarsContainer.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
 			listItem = document.createElement("li");
 			button = document.createElement("button");
@@ -193,12 +193,12 @@
 			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-repeat"></i>Redo';
 			listItem.appendChild(button);
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+			editor.toolbarsContainer.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 			document.addEventListener("simply-data-changed", editor.plugins.undoRedo.changeHandler);
 		},
 		update : function() {
-			var undoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
-			var redoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
+			var undoButton = editor.toolbarsContainer.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
+			var redoButton = editor.toolbarsContainer.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
 
 			if (editor.plugins.undoRedo.canUndo()) {
 				if (undoButton && undoButton.getAttribute("disabled")) {

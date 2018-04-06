@@ -126,14 +126,14 @@
 	editor.plugins.about = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-about'));
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-about'));
 				// fetch key info
 				var result = muze.load('https://api.simplyedit.io/0/keys/'+editor.apiKey)
 				.onload(function(result) {
-					var keyEl = document.querySelector('#simply-about-key .simply-info');
-					var hostsEl = document.querySelector('#simply-about-key-domains .simply-info');
-					var validEl = document.getElementById('simply-about-key-valid');
-					var versionEl = document.getElementById('simply-about-version');
+					var keyEl = editor.toolbarsContainer.querySelector('#simply-about-key .simply-info');
+					var hostsEl = editor.toolbarsContainer.querySelector('#simply-about-key-domains .simply-info');
+					var validEl = editor.toolbarsContainer.getElementById('simply-about-key-valid');
+					var versionEl = editor.toolbarsContainer.getElementById('simply-about-version');
 
 					versionEl.innerHTML = 'Version '+editor.version;
 					var majorVersion = parseInt(editor.version.split('.')[0]);
@@ -160,21 +160,21 @@
 						if ( diff < 0 ) {
 							validEl.innerHTML = 'Your trial key has expired.';
 							validEl.style.display = 'block';
-							document.getElementById('simply-buy-button').style.display = 'block';
+							editor.toolbarsContainer.getElementById('simply-buy-button').style.display = 'block';
 						} else {
 							var diffDays = Math.floor( diff / ( 1000 * 3600 * 24 ) );
 							validEl.innerHTML = 'Your trial key expires in '+diffDays+' days.';
 							validEl.style.display = 'block';
-							document.getElementById('simply-buy-button').style.display = 'inline-block';
+							editor.toolbarsContainer.getElementById('simply-buy-button').style.display = 'inline-block';
 						}
 					} else if ( majorVersion < latestVersion ) {
 						// upgrade possible
-						document.getElementById('simply-about-key-upgrade').innerHTML = 'Version '+info['latest-version']+' is available now';
-						document.getElementById('simply-about-key-upgrade').style.display = 'block';
-						document.getElementById('simply-buy-button').style.display = 'inline-block';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').innerHTML = 'Version '+info['latest-version']+' is available now';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').style.display = 'block';
+						editor.toolbarsContainer.getElementById('simply-buy-button').style.display = 'inline-block';
 					} else {
-						document.getElementById('simply-about-key-upgrade').innerHTML = 'This is the latest version.';
-						document.getElementById('simply-about-key-upgrade').style.display = 'block';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').innerHTML = 'This is the latest version.';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').style.display = 'block';
 						
 					}
 				});

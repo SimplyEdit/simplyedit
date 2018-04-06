@@ -68,7 +68,7 @@
 			}
 		},
 		addMarkers : function() {
-			var toolbars = document.querySelectorAll(".simply-toolbar");
+			var toolbars = editor.toolbarsContainer.querySelectorAll(".simply-toolbar");
 
 			for (var i=0; i<toolbars.length; i++) {
 				editor.toolbar.addMarker(toolbars[i]);
@@ -90,7 +90,7 @@
 
 			if (editor.context.hopeEditor) {
 				editor.context.skipUpdate = true;
-				if (!document.querySelector(".simply-dialog.active")) {
+				if (!editor.toolbarsContainer.querySelector(".simply-dialog.active")) {
 					editor.context.hopeEditor.parseHTML();
 				}
 				
@@ -282,8 +282,8 @@
 	};
 
 	var lastEl = null;
-	var lastSection = document.querySelector('.simply-toolbar-status');
-	var simplySections = document.querySelectorAll(".simply-section");
+	var lastSection = editor.toolbarsContainer.querySelector('.simply-toolbar-status');
+	var simplySections = editor.toolbarsContainer.querySelectorAll(".simply-section");
 
 	editor.node = {
 		parents : function(target) {
@@ -693,6 +693,7 @@
 				}
 				var rects = range.getClientRects();
 				var parent = vdSelection.getNode(sel);
+
 				if ( !rects.length ) {
 					muze.event.fire(range.startContainer, "databinding:pause");
 					// insert element at range and get its position, other options aren't exact enough
@@ -759,9 +760,8 @@
 
 				var sel = vdSelectionState.get();
 				var currentContext = editor.context.get();
-				var activeSection = document.getElementById(currentContext);
+				var activeSection = editor.toolbarsContainer.getElementById(currentContext);
 				var pos = editor.context.toolbar.getPosition(sel);
-
 				if ( !pos || !activeSection ) {
 					// editor.context.toolbar.hide = true;
 					return;
@@ -864,7 +864,7 @@
 		show : function() {
 			var currentContext = editor.context.get();
 
-			var sections = document.querySelectorAll("section.simply-section");
+			var sections = editor.toolbarsContainer.querySelectorAll("section.simply-section");
 			for (var i=0; i<sections.length; i++) {
 				if(sections[i].classList.contains("active")) {
 					sections[i].classList.remove("active");
@@ -874,7 +874,7 @@
 			editor.context.initProperties(currentContext);
 
 			var hideIt = function() {
-				var sections = document.querySelectorAll("section.simply-section");
+				var sections = editor.toolbarsContainer.querySelectorAll("section.simply-section");
 				for (var j=0; j<sections.length; j++) {
 					if (!(sections[j].className.match(/active/))) {
 						if (parseInt(sections[j].style.left) > -1) {
@@ -885,7 +885,7 @@
 			};
 			//window.setTimeout(hideIt, 200);
 
-			var activeSection = document.getElementById(currentContext);
+			var activeSection = editor.toolbarsContainer.getElementById(currentContext);
 			// console.log(activeSection);
 
 			if (activeSection && !editor.context.toolbar.hide) {
@@ -908,7 +908,6 @@
 
 				editor.context.toolbar.reposition();
 
-
 				if (editor.context.touching) {
 					// FIXME: Android fix here
 					// restore selection triggers contextupdate, which triggers restore selection - this hopefully prevents that loop.
@@ -928,27 +927,27 @@
 				hideIt();
 			}
 
-			if (document.getElementById("VD_DETAILS")) {
+			if (editor.toolbarsContainer.getElementById("VD_DETAILS")) {
 				if (showBorders) {
-					document.getElementById('VD_DETAILS').classList.add('simply-selected');
+					editor.toolbarsContainer.getElementById('VD_DETAILS').classList.add('simply-selected');
 				} else {
-					document.getElementById('VD_DETAILS').classList.remove('simply-selected');
+					editor.toolbarsContainer.getElementById('VD_DETAILS').classList.remove('simply-selected');
 				}
 			}
 
-			if (document.getElementById('vdShowTagBoundaries')) {
+			if (editor.toolbarsContainer.getElementById('vdShowTagBoundaries')) {
 				if (showTagBoundaries) {
-					document.getElementById('vdShowTagBoundaries').classList.add('simply-selected');
+					editor.toolbarsContainer.getElementById('vdShowTagBoundaries').classList.add('simply-selected');
 				} else {
-					document.getElementById('vdShowTagBoundaries').classList.remove('simply-selected');
+					editor.toolbarsContainer.getElementById('vdShowTagBoundaries').classList.remove('simply-selected');
 				}
 			}
 
-			if (document.getElementById('vdShowTagStack')) {
+			if (editor.toolbarsContainer.getElementById('vdShowTagStack')) {
 				if (showTagStack) {
-					document.getElementById('vdShowTagStack').classList.add('simply-selected');
+					editor.toolbarsContainer.getElementById('vdShowTagStack').classList.add('simply-selected');
 				} else {
-					document.getElementById('vdShowTagStack').classList.remove('simply-selected');
+					editor.toolbarsContainer.getElementById('vdShowTagStack').classList.remove('simply-selected');
 				}
 			}
 		},
@@ -966,7 +965,7 @@
 			
 			if (editor.toolbars[context] && editor.toolbars[context].update) {
 				editor.toolbar.updating = true;
-				editor.toolbars[context].update(document.getElementById(context));
+				editor.toolbars[context].update(editor.toolbarsContainer.getElementById(context));
 				editor.toolbar.updating = false;
 			}
 		},
@@ -1020,7 +1019,7 @@
 			if (editor.context.touching) {
 				return;
 			}
-			if (document.querySelector(".simply-dialog.active")) {
+			if (editor.toolbarsContainer.querySelector(".simply-dialog.active")) {
 				return;
 			}
 
@@ -1034,7 +1033,6 @@
 			}
 			editor.context.show();
 			vdHtmlContextStack = editor.context.getTagStack();
-
 		}
 	};
 
@@ -1067,7 +1065,7 @@
 			}, 10);
 		},
 		close : function(callback) {
-			target = document.querySelector(".simply-dialog.active");
+			target = editor.toolbarsContainer.querySelector(".simply-dialog.active");
 			editor.plugins.dialog.backdrop.style.display = "none";
 			document.body.classList.remove("simply-overflow-hidden");
 			target.classList.remove("active");
@@ -1132,7 +1130,7 @@
 	editor.addAction("simply-dialog-fullscreen", editor.plugins.dialog.fullscreen);
 	editor.addAction("simply-dialog-close", editor.plugins.dialog.close);
 	editor.addAction("simply-main-collapse", function() {
-		document.querySelector("#simply-main-toolbar").classList.toggle("simply-collapse");
+		editor.toolbarsContainer.querySelector("#simply-main-toolbar").classList.toggle("simply-collapse");
 	});
 
 	editor.context.toolbar.hide = false;
@@ -1190,6 +1188,7 @@
 		simply.editor.selectionchange.start(document); // onselectionchange event for Firefox
 
 		editor.selectionChangeTimer = false;
+
 		muze.event.attach( document, 'selectionchange', function() {
 			if (editor.selectionChangeTimer) {
 				return;
@@ -1217,6 +1216,7 @@
 				}
 			}, 0);
 		});
+
 		muze.event.attach( document, 'keyup', function(evt) {
 			// skip context updates when the keyup event is coming from autofilled (username/password) inputs, to prevent looping in chrome when credentials are saved.
 			if (evt.target && evt.target.matches && evt.target.matches(":-webkit-autofill")) {
@@ -1224,6 +1224,7 @@
 			}
 			editor.context.update();
 		});
+
 		muze.event.attach( document, 'mouseup', function(evt) {
 			if (!document.querySelector(":focus")) {
 				// firefox on mac doesn't set focus for the mouseup until after the event;

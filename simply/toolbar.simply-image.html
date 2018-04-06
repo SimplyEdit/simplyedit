@@ -247,12 +247,12 @@
 			}
 
 			// Set the parent icon for alignment as well;
-			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
+			var currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button.simply-selected i");
 			if (!currentIcon || (currentIcon.parentNode.getAttribute("data-value") == "none")) {
-				currentIcon = document.querySelector("div.simply-image-align button i");
+				currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button i");
 			}
 			if (currentIcon) {
-				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+				var icons = editor.toolbarsContainer.querySelectorAll("button[data-simply-section=simply-image-align] i");
 				for (var i=0; i<icons.length; i++) {
 					icons[i].className = currentIcon.className;
 				}
@@ -261,7 +261,7 @@
 
 		},
 		"init" : function(config) {
-			var toolbar = document.querySelector("#" + this.name);
+			var toolbar = editor.toolbarsContainer.querySelector("#" + this.name);
 			if (typeof config === "object" && toolbar) {
 				// Backwards compatibility for classes/styles
 				if (config.class && !config.style) {
@@ -584,19 +584,19 @@
 			}
 
 			// Set the parent icon for alignment as well;
-			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
+			var currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button.simply-selected i");
 			if (!currentIcon || (currentIcon.parentNode.getAttribute("data-value") == "none")) {
-				currentIcon = document.querySelector("div.simply-image-align button i");
+				currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button i");
 			}
 			if (currentIcon) {
-				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+				var icons = editor.toolbarsContainer.querySelectorAll("button[data-simply-section=simply-image-align] i");
 				for (var i=0; i<icons.length; i++) {
 					icons[i].className = currentIcon.className;
 				}
 			}
 		},
 		"init" : function(config) {
-			var toolbar = document.querySelector("#" + this.name);
+			var toolbar = editor.toolbarsContainer.querySelector("#" + this.name);
 			if (typeof config === "object" && toolbar) {
 				// Backwards compatibility for classes/styles
 				if (config.class && !config.style) {

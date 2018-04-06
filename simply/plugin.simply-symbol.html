@@ -28,13 +28,13 @@
 			open : function() {
 				editor.plugins.symbol.currentSel = vdSelectionState.get();
 				editor.plugins.symbol.currentField = editor.node.getEditableField();
-				editor.plugins.dialog.open(document.getElementById('simply-symbol'), editor.plugins.symbol.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-symbol'), editor.plugins.symbol.dialog.update);
 			},
 			update : function() {
 				var parent = vdSelection.getNode(editor.plugins.symbol.currentSel);
 				var styles = editor.node.getAllStyles(parent);
 
-				var targetList = document.querySelector("#simply-symbol .simply-dialog-body");
+				var targetList = editor.toolbarsContainer.querySelector("#simply-symbol .simply-dialog-body");
 				targetList.style.fontFamily = styles['font-family'];
 
 				var charset;
@@ -119,7 +119,7 @@
 		editor.plugins.dialog.close();
 	});
 
-	var inserts = document.querySelectorAll(".simply-toolbar-section.simply-insert > ul");
+	var inserts = editor.toolbarsContainer.querySelectorAll(".simply-toolbar-section.simply-insert > ul");
 	for (var i=0; i<inserts.length; i++) {
 		var symbolLi = document.createElement("LI");
 		var symbolButton = document.createElement("BUTTON");

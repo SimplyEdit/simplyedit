@@ -29,7 +29,7 @@
 			toolbar.data.src = (typeof fieldData.src !== "undefined") ? fieldData.src : '';
 		},
 		"init" : function() {
-			var toolbar = document.querySelector("#simply-iframe");
+			var toolbar = editor.toolbarsContainer.querySelector("#simply-iframe");
 			toolbar.data = {};
 			toolbar.data.src = '';
 			editor.toolbar.bindInput(toolbar.data, 'src', toolbar.querySelector("input[data-simply-action=simply-iframe-src]"));
