@@ -76,22 +76,22 @@
 		dialog : {
 			setSource : function() {
 				var source = editor.plugins.htmlsource.get();
-				document.getElementById('insertHTMLSource').value = source;
+				editor.toolbarsContainer.getElementById('insertHTMLSource').value = source;
 
 				var span = editor.plugins.htmlsource.getSourceSpan();
 
-				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				var button = editor.toolbarsContainer.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button) {
 					if (span) {
 						button.classList.add("simply-selected");
 					} else {
 						button.classList.remove("simply-selected");
 					}
-					document.getElementById('insertHTMLSource').select();
+					editor.toolbarsContainer.getElementById('insertHTMLSource').select();
 				}
 
-				var fullscreen = document.querySelector("[data-simply-action=simply-dialog-fullscreen]");
-				if (document.getElementById('simply-htmlsource').classList.contains("fullscreen")) {
+				var fullscreen = editor.toolbarsContainer.querySelector("[data-simply-action=simply-dialog-fullscreen]");
+				if (editor.toolbarsContainer.getElementById('simply-htmlsource').classList.contains("fullscreen")) {
 					fullscreen.classList.add("simply-selected");
 				} else {
 					fullscreen.classList.remove("simply-selected");
@@ -102,18 +102,18 @@
 				editor.plugins.htmlsource.currentField = editor.node.getEditableField();
 				vdSelectionState.save(editor.plugins.htmlsource.currentSel);
 
-				editor.plugins.dialog.open(document.getElementById('simply-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
 				editor.plugins.htmlsource.dialog.setWarning();
 
 				vdSelectionState.selectAll = false;
 				vdSelectionState.selectedElement = false;
 			},
 			setWarning : function() {
-				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				var button = editor.toolbarsContainer.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
-					document.getElementById('insertHTMLWarning').style.display='none';
+					editor.toolbarsContainer.getElementById('insertHTMLWarning').style.display='none';
 				} else {
-					document.getElementById('insertHTMLWarning').style.display='block';
+					editor.toolbarsContainer.getElementById('insertHTMLWarning').style.display='block';
 				}
 			}
 		},
@@ -127,11 +127,11 @@
 			}
 		},
 		insert : function() {
-			var source = document.getElementById('insertHTMLSource').value;
+			var source = editor.toolbarsContainer.getElementById('insertHTMLSource').value;
 			var tidySource = editor.plugins.htmlsource.tidy(source);
 			if (tidySource != source) {
 				if (confirm("The HTML content does not seem valid and cannot be inserted. Correct it automatically?")) {
-					document.getElementById('insertHTMLSource').value = tidySource;
+					editor.toolbarsContainer.getElementById('insertHTMLSource').value = tidySource;
 				}
 				return;
 			}
@@ -141,7 +141,7 @@
 				vdSelectionState.restore(editor.plugins.htmlsource.currentSel);
 				editor.plugins.htmlsource.currentField.hopeEditor.selection.updateRange();
 
-				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				var button = editor.toolbarsContainer.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
 					var encodedsource = simply.util.base64.encode(source); // this makes sure IE doesn't touch the sourcecode.
 					var decodedsource = source;

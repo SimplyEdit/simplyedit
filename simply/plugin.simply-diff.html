@@ -36,7 +36,7 @@
 	editor.plugins.diff = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-diff'), editor.plugins.diff.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-diff'), editor.plugins.diff.dialog.update);
 			},
 			update : function() {
 				if (!editor.plugins.diff.dmp) {
@@ -54,8 +54,8 @@
 			},
 		},
 		select : function(number) {
-			var theirDiffs = document.querySelectorAll("#diff .theirs span + ins, #diff .theirs span + del");
-			var mineDiffs = document.querySelectorAll("#diff .mine span + ins, #diff .mine span + del");
+			var theirDiffs = editor.toolbarsContainer.querySelectorAll("#diff .theirs span + ins, #diff .theirs span + del");
+			var mineDiffs = editor.toolbarsContainer.querySelectorAll("#diff .mine span + ins, #diff .mine span + del");
 			if (number < 0) {
 				number = theirDiffs.length - 1;
 			}
@@ -64,7 +64,7 @@
 			}
 
 			if (theirDiffs[number]) {
-				var currentSelected = document.querySelectorAll("#diff .selected");
+				var currentSelected = editor.toolbarsContainer.querySelectorAll("#diff .selected");
 				for (var i=0; i<currentSelected.length; i++) {
 					currentSelected[i].className = '';
 				}
@@ -82,12 +82,12 @@
 			editor.plugins.diff.patches = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.lhs, editor.plugins.diff.rhs);
 			editor.plugins.diff.patchesReversed = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.rhs, editor.plugins.diff.lhs);
 
-			document.querySelector("#diff .theirs").innerHTML = editor.plugins.diff.prettyHtml(diff);
-			document.querySelector("#diff .mine").innerHTML = document.querySelector("#diff .theirs").innerHTML;
+			editor.toolbarsContainer.querySelector("#diff .theirs").innerHTML = editor.plugins.diff.prettyHtml(diff);
+			editor.toolbarsContainer.querySelector("#diff .mine").innerHTML = editor.toolbarsContainer.querySelector("#diff .theirs").innerHTML;
 			if (editor.plugins.diff.patches == 0) {
-				document.querySelector("[data-simply-action='simply-diff-save']").removeAttribute("disabled");
+				editor.toolbarsContainer.querySelector("[data-simply-action='simply-diff-save']").removeAttribute("disabled");
 			} else {
-				document.querySelector("[data-simply-action='simply-diff-save']").setAttribute("disabled", true);
+				editor.toolbarsContainer.querySelector("[data-simply-action='simply-diff-save']").setAttribute("disabled", true);
 			}
 		},
 		keepMine : function(number) {
@@ -158,7 +158,7 @@
 					editor.currentData = JSON.parse(editor.plugins.diff.lhs);
 					editor.data.apply(editor.currentData, document);
 					editor.data.stash();
-					document.getElementById('simply-diff').classList.remove("active");
+					editor.toolbarsContainer.getElementById('simply-diff').classList.remove("active");
 					editor.plugins.diff.save();
 				}
 			}

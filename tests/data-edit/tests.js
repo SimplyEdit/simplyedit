@@ -461,7 +461,7 @@ QUnit.module("hope editor behaviour");
 		testContent.innerHTML = "<h1>Hello world</h1>";
 		setCaretPosition(testContent.querySelector("h1"), 5);
 		editor.actions['simply-insert-source']();
-		document.getElementById('insertHTMLSource').value = "<ul><li>1</li><li>2</li></ul>";
+		editor.toolbarsContainer.getElementById('insertHTMLSource').value = "<ul><li>1</li><li>2</li></ul>";
 		editor.actions['simply-htmlsource-insert']();
 		var carets = testContent.querySelectorAll("[data-hope-caret]");
 		assert.equal(carets.length, 0, "zero caret attributes attributes found");
@@ -550,7 +550,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var button = document.querySelector("button[data-value='simply-text-align-right']");
+		var button = editor.toolbarsContainer.querySelector("button[data-value='simply-text-align-right']");
 		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-right">Hello world</p>', "Found align class");
@@ -562,7 +562,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 		
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var button = document.querySelector("button[data-value='simply-text-align-left']");
+		var button = editor.toolbarsContainer.querySelector("button[data-value='simply-text-align-left']");
 		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-left">Hello world</p>', "Found align class");
@@ -575,7 +575,7 @@ QUnit.module("editor text cursor");
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
 
-		var button = document.querySelector("#simply-text-cursor div.simply-text-align button[data-value='none']");
+		var button = editor.toolbarsContainer.querySelector("#simply-text-cursor div.simply-text-align button[data-value='none']");
 		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "Found align class");
@@ -586,7 +586,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var button = document.querySelector("button[data-value='simply-text-align-justify']");
+		var button = editor.toolbarsContainer.querySelector("button[data-value='simply-text-align-justify']");
 		editor.actions[button.getAttribute("data-simply-action")](button);
 
 		assert.equal(testContent.innerHTML, '<p class="simply-text-align-justify">Hello world</p>', "Found align class");
@@ -597,7 +597,7 @@ QUnit.module("editor text cursor");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		var currentStyle = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, "p", "text style is correctly updated");
 	});
 	QUnit.test("text style init h2", function(assert) {
@@ -605,7 +605,7 @@ QUnit.module("editor text cursor");
 		testContent.innerHTML = "<h2>Hello world</h2>";
 		testContent.hopeEditor.parseHTML();
 		setCaretPosition(testContent.querySelector("h2"), 3, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		var currentStyle = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, "h2", "text style is correctly updated");
 	});
 
@@ -1003,7 +1003,7 @@ QUnit.module("editor text selection");
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("em"), 0, 3);
-		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-inline'][data-value='em']");
+		var targetButton = editor.toolbarsContainer.querySelector("#simply-text-selection button[data-simply-action='simply-text-inline'][data-value='em']");
 
 		assert.ok(targetButton.classList.contains("simply-selected"), "text style is correctly updated");
 	});
@@ -1028,7 +1028,7 @@ QUnit.module("editor text selection");
 		setCaretPosition(testContent.querySelector("em"), 1, 2);
 		// setSelectionEnd(testContent.querySelector("em"),1);
 
-		var targetButton = document.querySelector("#simply-text-selection button[data-simply-action='simply-text-inline'][data-value='em']");
+		var targetButton = editor.toolbarsContainer.querySelector("#simply-text-selection button[data-simply-action='simply-text-inline'][data-value='em']");
 		assert.ok(targetButton.classList.contains("simply-selected"), "text style is correctly updated");
 	});
 
@@ -1117,7 +1117,7 @@ QUnit.module("custom text settings");
 		editor.toolbars['simply-text-selection'].init(textSettings);
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		var currentStyle = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, '');
 	});
 
@@ -1135,7 +1135,7 @@ QUnit.module("custom text settings");
 		editor.toolbars['simply-text-selection'].init(textSettings);
 
 		setCaretPosition(testContent.querySelector("blockquote"), 2, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		var currentStyle = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, 'blockquote');
 	});
 	QUnit.test("deprecated class config still works", function(assert) {
@@ -1162,7 +1162,7 @@ QUnit.module("custom text settings");
 		editor.toolbars['simply-text-cursor'].init(textSettings);
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var redButton = document.querySelector("#simply-text-cursor button[data-simply-action='simply-text-class'][data-value='red']");
+		var redButton = editor.toolbarsContainer.querySelector("#simply-text-cursor button[data-simply-action='simply-text-class'][data-value='red']");
 		assert.ok(redButton.className.indexOf("simply-selected") > -1, "red class button is pressed");
 	});
 /*
@@ -1180,7 +1180,7 @@ QUnit.module("custom text settings");
 		editor.toolbars['simply-text-cursor'].init(textSettings);
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		var currentStyle = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, 'p class="test"', "text style is correctly updated");
 	});
 
@@ -1198,7 +1198,7 @@ QUnit.module("custom text settings");
 		editor.toolbars['simply-text-cursor'].init(textSettings);
 
 		setCaretPosition(testContent.querySelector("p"), 2, 0);
-		var currentStyle = document.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
+		var currentStyle = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle']").value;
 		assert.equal(currentStyle, 'p class="test"', "text style is correctly updated");
 	});
 */
@@ -1273,16 +1273,16 @@ QUnit.module("text hyperlinks");
 
 		setCaretPosition(testContent.querySelector("a"), 3);
 
-		var targetInput = document.querySelector("#simply-text-selection #vdHyperlinkHref");
+		var targetInput = editor.toolbarsContainer.querySelector("#simply-text-selection #vdHyperlinkHref");
 		assert.equal(targetInput.value, "test/", "href init done");
 
-		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkName");
+		targetInput = editor.toolbarsContainer.querySelector("#simply-text-selection #vdHyperlinkName");
 		assert.equal(targetInput.value, "mylink", "name init done");
 
-		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkTitle");
+		targetInput = editor.toolbarsContainer.querySelector("#simply-text-selection #vdHyperlinkTitle");
 		assert.equal(targetInput.value, "mytitle", "title init done");
 
-		targetInput = document.querySelector("#simply-text-selection button[data-simply-action='simply-hyperlink-nofollow']");
+		targetInput = editor.toolbarsContainer.querySelector("#simply-text-selection button[data-simply-action='simply-hyperlink-nofollow']");
 		assert.ok(targetInput.classList.contains('simply-selected'), "nofollow init done");
 	});
 
@@ -1294,13 +1294,13 @@ QUnit.module("text hyperlinks");
 		setCaretPosition(testContent.querySelector("a"), 3);
 		editor.context.update();
 		setCaretPosition(testContent.querySelector("p"), 0, 1);
-		var targetInput = document.querySelector("#simply-text-selection #vdHyperlinkHref");
+		var targetInput = editor.toolbarsContainer.querySelector("#simply-text-selection #vdHyperlinkHref");
 		assert.equal(targetInput.value, "", "href is emptied");
 
-		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkName");
+		targetInput = editor.toolbarsContainer.querySelector("#simply-text-selection #vdHyperlinkName");
 		assert.equal(targetInput.value, "", "name is emptied");
 
-		targetInput = document.querySelector("#simply-text-selection #vdHyperlinkTitle");
+		targetInput = editor.toolbarsContainer.querySelector("#simply-text-selection #vdHyperlinkTitle");
 		assert.equal(targetInput.value, "", "title is emptied");
 	});
 
@@ -1375,7 +1375,7 @@ QUnit.module("images");
 		testContent.hopeEditor.parseHTML();
 		selectImage(testContent.querySelector("img"));
 		editor.context.update();
-		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "a");
+		assert.equal(editor.toolbarsContainer.querySelector("#simply-image input.simply-image-src").value, "a");
 		testContent.innerHTML = '';
 	});
 
@@ -1385,7 +1385,7 @@ QUnit.module("images");
 		testContent.hopeEditor.parseHTML();
 		selectImage(testContent.querySelector("img + img"));
 		editor.context.update();
-		assert.equal(document.querySelector("#simply-image input.simply-image-src").value, "b");
+		assert.equal(editor.toolbarsContainer.querySelector("#simply-image input.simply-image-src").value, "b");
 		testContent.innerHTML = '';
 	});
 
@@ -1576,29 +1576,29 @@ QUnit.module("no context");
 
 QUnit.module("plugin buttons");
 	QUnit.test("buttons have list item containers", function(assert) {
-		var buttons = document.querySelectorAll("#simply-main-toolbar .simply-buttons > button");
+		var buttons = editor.toolbarsContainer.querySelectorAll("#simply-main-toolbar .simply-buttons > button");
 		assert.equal(buttons.length, 0);
 	});
 
 
 QUnit.module("browse plugin");
 	QUnit.test("sitemap button is added to main toolbar", function(assert) {
-		var button = document.querySelectorAll('#simply-main-toolbar [data-simply-action="simply-browse-sitemap"]');
+		var button = editor.toolbarsContainer.querySelectorAll('#simply-main-toolbar [data-simply-action="simply-browse-sitemap"]');
 		assert.equal(button.length, 1);
 	});
 
 	QUnit.test("browse images button is added to image field toolbar", function(assert) {		
-		var button = document.querySelectorAll('#simply-image-field [data-simply-action="simply-browse-images"]');
+		var button = editor.toolbarsContainer.querySelectorAll('#simply-image-field [data-simply-action="simply-browse-images"]');
 		assert.equal(button.length, 2);
 	});
 
 	QUnit.test("browse images button is added to image toolbar", function(assert) {		
-		var button = document.querySelectorAll('#simply-image [data-simply-action="simply-browse-images"]');
+		var button = editor.toolbarsContainer.querySelectorAll('#simply-image [data-simply-action="simply-browse-images"]');
 		assert.equal(button.length, 2);
 	});
 
 	QUnit.test("browse files button is added to text/hyperlink toolbar", function(assert) {
-		var button = document.querySelectorAll('#simply-text-selection [data-simply-action="simply-browse"]');
+		var button = editor.toolbarsContainer.querySelectorAll('#simply-text-selection [data-simply-action="simply-browse"]');
 		assert.equal(button.length, 1);
 	});
 

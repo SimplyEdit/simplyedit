@@ -53,12 +53,12 @@
 <script>
 	editor.plugins.save = {
 		beforeSave : function() {
-			document.querySelector("#simply-save .simply-message").innerHTML = "Storing your changes.";
-			editor.plugins.dialog.open(document.getElementById('simply-save'));
+			editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "Storing your changes.";
+			editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-save'));
 		},
 		afterSave : function() {
 			window.setTimeout(function() {
-				document.querySelector("#simply-save .simply-message").innerHTML = "All changes saved.";
+				editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "All changes saved.";
 				window.setTimeout(function() {
 					editor.plugins.dialog.close();
 				}, 800);
@@ -70,7 +70,7 @@
 					var errorEvent = editor.fireEvent("simply-page-save-error", document, result);
 					if (!errorEvent.defaultPrevented) {
 						var message = errorEvent.data.message;
-						document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
+						editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "Error saving: " + message;
 						window.setTimeout(function() {
 							editor.plugins.dialog.close();
 						}, 2000);

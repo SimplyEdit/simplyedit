@@ -29,7 +29,7 @@
 			var img = document.createElement('img');
 			img.src = editor.baseURL + 'graphics/simply-edit-centered.svg';
 			img.alt = 'SimplyEdit';
-			document.getElementById('simply-logo').appendChild(img);
+			editor.toolbarsContainer.getElementById("simply-logo").appendChild(img);
 		}
 	});
 
@@ -159,7 +159,7 @@
 
 
 	var initTextToolbar = function(config) {
-		var toolbar = document.querySelector("#" + this.name);
+		var toolbar = editor.toolbarsContainer.querySelector("#" + this.name);
 
 		if (typeof config === "object" && toolbar) {
 			// Init blockstyles
@@ -814,7 +814,7 @@
 					}
 					if ((newRange.start == block.range.start) && (newRange.end == block.range.end)) {
 						var tagName = block.tag.split(" ")[0];
-						if (document.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
+						if (editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
 						}
 					}
@@ -1254,12 +1254,12 @@
 			}
 
 			// Set the parent icon for alignment as well;
-			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
+			var currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button.simply-selected i");
 			if (!currentIcon || (currentIcon.parentNode.getAttribute("data-value") == "none")) {
-				currentIcon = document.querySelector("div.simply-image-align button i");
+				currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button i");
 			}
 			if (currentIcon) {
-				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+				var icons = editor.toolbarsContainer.querySelectorAll("button[data-simply-section=simply-image-align] i");
 				for (var i=0; i<icons.length; i++) {
 					icons[i].className = currentIcon.className;
 				}
@@ -1268,7 +1268,7 @@
 
 		},
 		"init" : function(config) {
-			var toolbar = document.querySelector("#" + this.name);
+			var toolbar = editor.toolbarsContainer.querySelector("#" + this.name);
 			if (typeof config === "object" && toolbar) {
 				// Backwards compatibility for classes/styles
 				if (config.class && !config.style) {
@@ -1591,19 +1591,19 @@
 			}
 
 			// Set the parent icon for alignment as well;
-			var currentIcon = document.querySelector("div.simply-image-align button.simply-selected i");
+			var currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button.simply-selected i");
 			if (!currentIcon || (currentIcon.parentNode.getAttribute("data-value") == "none")) {
-				currentIcon = document.querySelector("div.simply-image-align button i");
+				currentIcon = editor.toolbarsContainer.querySelector("div.simply-image-align button i");
 			}
 			if (currentIcon) {
-				var icons = document.querySelectorAll("button[data-simply-section=simply-image-align] i");
+				var icons = editor.toolbarsContainer.querySelectorAll("button[data-simply-section=simply-image-align] i");
 				for (var i=0; i<icons.length; i++) {
 					icons[i].className = currentIcon.className;
 				}
 			}
 		},
 		"init" : function(config) {
-			var toolbar = document.querySelector("#" + this.name);
+			var toolbar = editor.toolbarsContainer.querySelector("#" + this.name);
 			if (typeof config === "object" && toolbar) {
 				// Backwards compatibility for classes/styles
 				if (config.class && !config.style) {
@@ -1984,10 +1984,10 @@
 				editor.plugins.browse.currentJail = null;
 
 				vdSelectionState.save(editor.plugins.browse.currentSel);
-				editor.plugins.dialog.open(document.getElementById('simply-browse'), editor.plugins.browse.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-browse'), editor.plugins.browse.dialog.update);
 			},
 			load : function(url) {
-				var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+				var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 				var parser = document.createElement("A");
 				parser.href = url;
 				if (editor.plugins.browse.currentJail === null) {
@@ -2010,7 +2010,7 @@
 
 				editor.storage.list(url, function(data) {
 					var i;
-					var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+					var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 					var newHtml = '';
 					for (i=0; i<data.folders.length; i++) {
 						if (data.folders[i].url.indexOf(editor.plugins.browse.currentJail) === 0) {
@@ -2089,14 +2089,14 @@
 			},
 			updateToolbar : function() {
 				window.setTimeout(function() {
-					var targetList = document.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
-					var uploadButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-upload']");
-					var addPageButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-add-page']");
-					var addFolderButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-add-folder']");
-					var deleteButton = document.querySelector("#simply-browse li [data-simply-action='simply-browse-delete']");
+					var targetList = editor.toolbarsContainer.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
+					var uploadButton = editor.toolbarsContainer.querySelector("#simply-browse li [data-simply-action='simply-browse-upload']");
+					var addPageButton = editor.toolbarsContainer.querySelector("#simply-browse li [data-simply-action='simply-browse-add-page']");
+					var addFolderButton = editor.toolbarsContainer.querySelector("#simply-browse li [data-simply-action='simply-browse-add-folder']");
+					var deleteButton = editor.toolbarsContainer.querySelector("#simply-browse li [data-simply-action='simply-browse-delete']");
 
 					if (targetList.length === 0) {
-						document.querySelector("#simply-browse .simply-dialog-body").classList.remove("simply-selecting");
+						editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body").classList.remove("simply-selecting");
 						if (uploadButton) {
 							uploadButton.parentNode.style.display = "block";
 						}
@@ -2110,7 +2110,7 @@
 							deleteButton.parentNode.style.display = "none";
 						}
 					} else {
-						document.querySelector("#simply-browse .simply-dialog-body").classList.add("simply-selecting");
+						editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body").classList.add("simply-selecting");
 						if (uploadButton) {
 							uploadButton.parentNode.style.display = "none";
 						}
@@ -2168,7 +2168,7 @@
 			button.dataset.simplyAction = "simply-browse-sitemap";
 			button.innerHTML = '<i class="fa fa-sitemap"></i>Sitemap';
 			listItem.appendChild(button);
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+			editor.toolbarsContainer.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
 			editor.plugins.browse.path = editor.storage.endpoint;
 			editor.storage.imagesEndpoint = document.querySelector("[data-simply-images]") ? document.querySelector("[data-simply-images]").getAttribute("data-simply-images") : null;
@@ -2188,33 +2188,33 @@
 			}
 
 			if (editor.storage.file && typeof editor.storage.file.save === "function") {
-				document.querySelector("#simply-browse").addEventListener("drop", function(evt) {
+				editor.toolbarsContainer.querySelector("#simply-browse").addEventListener("drop", function(evt) {
 					evt.preventDefault();
 					editor.plugins.browse.handleFiles(evt.dataTransfer.files);
 				});
-				document.querySelector("#simply-browse input[type='file']").addEventListener("change", function(evt) {
+				editor.toolbarsContainer.querySelector("#simply-browse input[type='file']").addEventListener("change", function(evt) {
 					editor.plugins.browse.handleFiles(this.files);
 					this.value = '';
 				});
 			} else {
-				var uploadButton = document.querySelector('[data-simply-action="simply-browse-upload"]');
+				var uploadButton = editor.toolbarsContainer.querySelector('[data-simply-action="simply-browse-upload"]');
 				uploadButton.parentNode.parentNode.removeChild(uploadButton.parentNode);
 
-				var addButton = document.querySelector('[data-simply-action="simply-browse-add-folder"]');
+				var addButton = editor.toolbarsContainer.querySelector('[data-simply-action="simply-browse-add-folder"]');
 				addButton.parentNode.parentNode.removeChild(addButton.parentNode);
 			}
 
 			if (editor.storage.file && typeof editor.storage.file.delete === "function") {
 				// Do nothing;
 			} else {
-				var deleteButton = document.querySelector('[data-simply-action="simply-browse-delete"]');
+				var deleteButton = editor.toolbarsContainer.querySelector('[data-simply-action="simply-browse-delete"]');
 				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);
 			}
 
-			document.querySelector("#simply-browse").addEventListener("DOMNodeInserted", editor.plugins.browse.dialog.updateToolbar);
-			document.querySelector("#simply-browse").addEventListener("DOMNodeRemoved",editor.plugins.browse.dialog.updateToolbar);
+			editor.toolbarsContainer.querySelector("#simply-browse").addEventListener("DOMNodeInserted", editor.plugins.browse.dialog.updateToolbar);
+			editor.toolbarsContainer.querySelector("#simply-browse").addEventListener("DOMNodeRemoved",editor.plugins.browse.dialog.updateToolbar);
 
-			var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+			var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 			new Slip(targetList); // slip is used for the tap-hold timing;
 			targetList.addEventListener("slip:beforereorder", function(evt) {
 				var targetButton = evt.target;
@@ -2239,7 +2239,7 @@
 			var browseTargets = [];
 			browseTargets.push('[data-simply-action="simply-image-src"]');
 
-			var target = document.querySelectorAll(browseTargets.join(", "));
+			var target = editor.toolbarsContainer.querySelectorAll(browseTargets.join(", "));
 			if (target) {
 				for (var i=0; i<target.length; i++) {
 					var button = document.createElement("div");
@@ -2248,7 +2248,7 @@
 				}
 
 				// Add Browse button to image toolbars;
-				var target = document.querySelectorAll("#simply-image .simply-toolbar .simply-buttons, #simply-image-field .simply-toolbar .simply-buttons");
+				var target = editor.toolbarsContainer.querySelectorAll("#simply-image .simply-toolbar .simply-buttons, #simply-image-field .simply-toolbar .simply-buttons");
 				if (target) {
 					var i;
 					for (i=0; i<target.length; i++) {
@@ -2265,7 +2265,7 @@
 			var browseTargets = [];
 			browseTargets.push('[data-simply-action="simply-hyperlink-href"]');
 
-			var target = document.querySelectorAll(browseTargets.join(", "));
+			var target = editor.toolbarsContainer.querySelectorAll(browseTargets.join(", "));
 			if (target) {
 				for (var i=0; i<target.length; i++) {
 					var button = document.createElement("div");
@@ -2284,7 +2284,7 @@
 			if (files.length) {
 				for (var i=0; i<files.length; i++) {
 					var subpath = editor.plugins.browse.currentPath.replace(editor.storage.endpoint, "");
-					var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+					var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 
 					var newButton = document.createElement("DIV");
 					newButton.className = "simply-button";
@@ -2383,7 +2383,7 @@
 		muze.event.fire(target, "click");
 	});
 	editor.addAction("simply-browse-delete", function(el) {
-		var targetList = document.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
+		var targetList = editor.toolbarsContainer.querySelectorAll("#simply-browse .simply-dialog-body .simply-selected");
 		var subpath;
 		if (editor.plugins.browse.currentPath.indexOf(editor.storage.dataEndpoint) === 0) {
 			if (confirm("Delete all selected pages? This action cannot be reversed and is final after you save.")) {
@@ -2463,7 +2463,7 @@
 		target.parentNode.removeChild(target);
 	});
 	editor.addAction("simply-browse-add-folder", function(el) {
-		var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+		var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 		var addButton = document.createElement("DIV");
 		addButton.classList.add("simply-add-folder");
 		addButton.innerHTML = '<i class="fa fa-folder"></i>';
@@ -2520,7 +2520,7 @@
 		target.parentNode.removeChild(target);
 	});
 	editor.addAction("simply-browse-add-page", function(el) {
-		var targetList = document.querySelector("#simply-browse .simply-dialog-body");
+		var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 		var addButton = document.createElement("DIV");
 		addButton.classList.add("simply-add-page");
 		addButton.innerHTML = '<i class="fa fa-file-text-o"></i>';
@@ -2603,7 +2603,7 @@
 		editor.context.update();
 	});
 	editor.addAction("simply-browse-listmode", function(el) {
-		document.getElementById("simply-browse").classList.toggle("simply-listmode");
+		editor.toolbarsContainer.getElementById("simply-browse").classList.toggle("simply-listmode");
 	});
 
 	editor.plugins.browse.init();
@@ -2639,7 +2639,7 @@
 			toolbar.data.src = (typeof fieldData.src !== "undefined") ? fieldData.src : '';
 		},
 		"init" : function() {
-			var toolbar = document.querySelector("#simply-iframe");
+			var toolbar = editor.toolbarsContainer.querySelector("#simply-iframe");
 			toolbar.data = {};
 			toolbar.data.src = '';
 			editor.toolbar.bindInput(toolbar.data, 'src', toolbar.querySelector("input[data-simply-action=simply-iframe-src]"));
@@ -3403,7 +3403,7 @@ editor.toolbar.scroll = (function() {
 })();
 
 document.addEventListener('simply-toolbars-loaded', function() {
-	editor.toolbar.scroll(document.querySelector('#simply-main-toolbar ul.simply-buttons'));
+	editor.toolbar.scroll(editor.toolbarsContainer.querySelector('#simply-main-toolbar ul.simply-buttons'));
 });
 </script><section id="simply-template" class="simply-dialog simply-modal">
 	<div class="simply-toolbar">
@@ -3468,7 +3468,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	editor.plugins.pageTemplate = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-template'), editor.plugins.pageTemplate.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-template'), editor.plugins.pageTemplate.dialog.update);
 			},
 			update : function() {
 				var pageTemplate = "index.html";
@@ -3477,11 +3477,11 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				} else if (editor.currentData[editor.data.getDataPath()]['data-simply-page-template']) {
 					pageTemplate = editor.currentData[editor.data.getDataPath()]['data-simply-page-template'];
 				}
-				document.getElementById("simply-page-template-list").value = pageTemplate;
+				editor.toolbarsContainer.getElementById("simply-page-template-list").value = pageTemplate;
 			}
 		},
 		apply : function() {
-			var pageTemplate = document.querySelector("#simply-page-template-list").value;
+			var pageTemplate = editor.toolbarsContainer.querySelector("#simply-page-template-list").value;
 			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
 			editor.plugins.dialog.close();
 			var reloadPage = function() {
@@ -3511,9 +3511,9 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				button.dataset.simplyAction = "simply-template";
 				button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
 				listItem.appendChild(button);
-				document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+				editor.toolbarsContainer.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
-				var templateSelect = document.querySelector("#simply-page-template-list");
+				var templateSelect = editor.toolbarsContainer.querySelector("#simply-page-template-list");
 
 				templateSelect.innerHTML = '';
 				for (var i=0; i<config['templates'].length; i++) {
@@ -3588,12 +3588,12 @@ document.addEventListener('simply-toolbars-loaded', function() {
 <script>
 	editor.plugins.save = {
 		beforeSave : function() {
-			document.querySelector("#simply-save .simply-message").innerHTML = "Storing your changes.";
-			editor.plugins.dialog.open(document.getElementById('simply-save'));
+			editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "Storing your changes.";
+			editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-save'));
 		},
 		afterSave : function() {
 			window.setTimeout(function() {
-				document.querySelector("#simply-save .simply-message").innerHTML = "All changes saved.";
+				editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "All changes saved.";
 				window.setTimeout(function() {
 					editor.plugins.dialog.close();
 				}, 800);
@@ -3605,7 +3605,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					var errorEvent = editor.fireEvent("simply-page-save-error", document, result);
 					if (!errorEvent.defaultPrevented) {
 						var message = errorEvent.data.message;
-						document.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
+						editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "Error saving: " + message;
 						window.setTimeout(function() {
 							editor.plugins.dialog.close();
 						}, 2000);
@@ -3690,7 +3690,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	editor.plugins.meta = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-meta'), editor.plugins.meta.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-meta'), editor.plugins.meta.dialog.update);
 			},
 			update : function() {
 				var metaBindingConfig = {
@@ -3732,16 +3732,16 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				var authorElm = document.head.querySelector("meta[name=author]");
 				var robotsElm = document.head.querySelector("meta[name=robots]");
 				if (titleElm && titleElm.dataBinding) {
-					titleElm.dataBinding.bind(document.getElementById("simply-meta-title"));
+					titleElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-title"));
 				}
 				if (descElm && descElm.dataBinding) {
-					descElm.dataBinding.bind(document.getElementById("simply-meta-description"), metaBindingConfig);
+					descElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-description"), metaBindingConfig);
 				}
 				if (authorElm && authorElm.dataBinding) {
-					authorElm.dataBinding.bind(document.getElementById("simply-meta-author"), metaBindingConfig);
+					authorElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-author"), metaBindingConfig);
 				}
 				if (robotsElm && robotsElm.dataBinding) {
-					robotsElm.dataBinding.bind(document.getElementById("simply-meta-robots"), metaRobotsBindingConfig);
+					robotsElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-robots"), metaRobotsBindingConfig);
 				}
 			}
 		},
@@ -3752,7 +3752,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 
 	editor.addAction("simply-metadata", function(el) {
 		el.classList.toggle("simply-selected");
-		document.querySelector("#simply-meta .simply-metadata").classList.toggle("simply-selected");
+		editor.toolbarsContainer.querySelector("#simply-meta .simply-metadata").classList.toggle("simply-selected");
 	});
 
 	editor.addAction("simply-meta-robots", function(el) {
@@ -3839,22 +3839,22 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		dialog : {
 			setSource : function() {
 				var source = editor.plugins.htmlsource.get();
-				document.getElementById('insertHTMLSource').value = source;
+				editor.toolbarsContainer.getElementById('insertHTMLSource').value = source;
 
 				var span = editor.plugins.htmlsource.getSourceSpan();
 
-				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				var button = editor.toolbarsContainer.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button) {
 					if (span) {
 						button.classList.add("simply-selected");
 					} else {
 						button.classList.remove("simply-selected");
 					}
-					document.getElementById('insertHTMLSource').select();
+					editor.toolbarsContainer.getElementById('insertHTMLSource').select();
 				}
 
-				var fullscreen = document.querySelector("[data-simply-action=simply-dialog-fullscreen]");
-				if (document.getElementById('simply-htmlsource').classList.contains("fullscreen")) {
+				var fullscreen = editor.toolbarsContainer.querySelector("[data-simply-action=simply-dialog-fullscreen]");
+				if (editor.toolbarsContainer.getElementById('simply-htmlsource').classList.contains("fullscreen")) {
 					fullscreen.classList.add("simply-selected");
 				} else {
 					fullscreen.classList.remove("simply-selected");
@@ -3865,18 +3865,18 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				editor.plugins.htmlsource.currentField = editor.node.getEditableField();
 				vdSelectionState.save(editor.plugins.htmlsource.currentSel);
 
-				editor.plugins.dialog.open(document.getElementById('simply-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-htmlsource'), editor.plugins.htmlsource.dialog.setSource);
 				editor.plugins.htmlsource.dialog.setWarning();
 
 				vdSelectionState.selectAll = false;
 				vdSelectionState.selectedElement = false;
 			},
 			setWarning : function() {
-				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				var button = editor.toolbarsContainer.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
-					document.getElementById('insertHTMLWarning').style.display='none';
+					editor.toolbarsContainer.getElementById('insertHTMLWarning').style.display='none';
 				} else {
-					document.getElementById('insertHTMLWarning').style.display='block';
+					editor.toolbarsContainer.getElementById('insertHTMLWarning').style.display='block';
 				}
 			}
 		},
@@ -3890,11 +3890,11 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			}
 		},
 		insert : function() {
-			var source = document.getElementById('insertHTMLSource').value;
+			var source = editor.toolbarsContainer.getElementById('insertHTMLSource').value;
 			var tidySource = editor.plugins.htmlsource.tidy(source);
 			if (tidySource != source) {
 				if (confirm("The HTML content does not seem valid and cannot be inserted. Correct it automatically?")) {
-					document.getElementById('insertHTMLSource').value = tidySource;
+					editor.toolbarsContainer.getElementById('insertHTMLSource').value = tidySource;
 				}
 				return;
 			}
@@ -3904,7 +3904,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				vdSelectionState.restore(editor.plugins.htmlsource.currentSel);
 				editor.plugins.htmlsource.currentField.hopeEditor.selection.updateRange();
 
-				var button = document.querySelector("[data-simply-action=simply-htmlsource-editable]");
+				var button = editor.toolbarsContainer.querySelector("[data-simply-action=simply-htmlsource-editable]");
 				if (button && button.classList.contains("simply-selected")) {
 					var encodedsource = simply.util.base64.encode(source); // this makes sure IE doesn't touch the sourcecode.
 					var decodedsource = source;
@@ -3981,13 +3981,13 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			open : function() {
 				editor.plugins.symbol.currentSel = vdSelectionState.get();
 				editor.plugins.symbol.currentField = editor.node.getEditableField();
-				editor.plugins.dialog.open(document.getElementById('simply-symbol'), editor.plugins.symbol.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-symbol'), editor.plugins.symbol.dialog.update);
 			},
 			update : function() {
 				var parent = vdSelection.getNode(editor.plugins.symbol.currentSel);
 				var styles = editor.node.getAllStyles(parent);
 
-				var targetList = document.querySelector("#simply-symbol .simply-dialog-body");
+				var targetList = editor.toolbarsContainer.querySelector("#simply-symbol .simply-dialog-body");
 				targetList.style.fontFamily = styles['font-family'];
 
 				var charset;
@@ -4072,7 +4072,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		editor.plugins.dialog.close();
 	});
 
-	var inserts = document.querySelectorAll(".simply-toolbar-section.simply-insert > ul");
+	var inserts = editor.toolbarsContainer.querySelectorAll(".simply-toolbar-section.simply-insert > ul");
 	for (var i=0; i<inserts.length; i++) {
 		var symbolLi = document.createElement("LI");
 		var symbolButton = document.createElement("BUTTON");
@@ -4583,7 +4583,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-undo"></i>Undo';
 			listItem.appendChild(button);
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+			editor.toolbarsContainer.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
 			listItem = document.createElement("li");
 			button = document.createElement("button");
@@ -4591,12 +4591,12 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			button.setAttribute("disabled", true);
 			button.innerHTML = '<i class="fa fa-repeat"></i>Redo';
 			listItem.appendChild(button);
-			document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+			editor.toolbarsContainer.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 			document.addEventListener("simply-data-changed", editor.plugins.undoRedo.changeHandler);
 		},
 		update : function() {
-			var undoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
-			var redoButton = document.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
+			var undoButton = editor.toolbarsContainer.querySelector("#simply-main-toolbar [data-simply-action=simply-undo]");
+			var redoButton = editor.toolbarsContainer.querySelector("#simply-main-toolbar [data-simply-action=simply-redo]");
 
 			if (editor.plugins.undoRedo.canUndo()) {
 				if (undoButton && undoButton.getAttribute("disabled")) {
@@ -4639,7 +4639,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				event.preventDefault();
 			}
 		} else if (key == 27) { // ESC
-			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-close']");
+			var target = editor.toolbarsContainer.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-close']");
 			if (target) {
 				muze.event.fire(target, "click");
 			} else {
@@ -4666,7 +4666,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				event.preventDefault();
 			}
 		} else if (key == 32 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-space
-			var activeDialog = document.querySelector(".simply-dialog.active");
+			var activeDialog = editor.toolbarsContainer.querySelector(".simply-dialog.active");
 			if (activeDialog) {
 				var firstButton = activeDialog.querySelector("button");
 				if (firstButton) {
@@ -4677,7 +4677,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 
 			editor.context.toolbar.hide = false;
 			editor.context.update();
-			var activeToolbar = document.querySelector(".simply-section.active");
+			var activeToolbar = editor.toolbarsContainer.querySelector(".simply-section.active");
 			if (activeToolbar) {
 				var firstButton = activeToolbar.querySelector("button");
 				if (firstButton) {
@@ -4685,14 +4685,14 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				}
 			}
 
-			var toolbarTarget = document.querySelector(".simply-section.active .simply-buttons > li");
+			var toolbarTarget = editor.toolbarsContainer.querySelector(".simply-section.active .simply-buttons > li");
 			
 			if (toolbarTarget) {
 				toolbarTarget.focus();
 			}
 			event.preventDefault();
 		} else if (key == 77 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-M
-			document.querySelector("#simply-main-toolbar button").focus();
+			editor.toolbarsContainer.querySelector("#simply-main-toolbar button").focus();
 			event.preventDefault();
 		} else if (key == 90 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-Z
 			if (typeof editor.actions["simply-undo"] === "function") {
@@ -4778,7 +4778,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				editor.context.toolbar.hide = true;
 			}
 		} else if (key == 13 && event.altKey) {
-			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-fullscreen']");
+			var target = editor.toolbarsContainer.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-fullscreen']");
 			if (target) {
 				muze.event.fire(target, "click");
 				event.preventDefault();
@@ -4835,7 +4835,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	editor.plugins.diff = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-diff'), editor.plugins.diff.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-diff'), editor.plugins.diff.dialog.update);
 			},
 			update : function() {
 				if (!editor.plugins.diff.dmp) {
@@ -4853,8 +4853,8 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			},
 		},
 		select : function(number) {
-			var theirDiffs = document.querySelectorAll("#diff .theirs span + ins, #diff .theirs span + del");
-			var mineDiffs = document.querySelectorAll("#diff .mine span + ins, #diff .mine span + del");
+			var theirDiffs = editor.toolbarsContainer.querySelectorAll("#diff .theirs span + ins, #diff .theirs span + del");
+			var mineDiffs = editor.toolbarsContainer.querySelectorAll("#diff .mine span + ins, #diff .mine span + del");
 			if (number < 0) {
 				number = theirDiffs.length - 1;
 			}
@@ -4863,7 +4863,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			}
 
 			if (theirDiffs[number]) {
-				var currentSelected = document.querySelectorAll("#diff .selected");
+				var currentSelected = editor.toolbarsContainer.querySelectorAll("#diff .selected");
 				for (var i=0; i<currentSelected.length; i++) {
 					currentSelected[i].className = '';
 				}
@@ -4881,12 +4881,12 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			editor.plugins.diff.patches = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.lhs, editor.plugins.diff.rhs);
 			editor.plugins.diff.patchesReversed = editor.plugins.diff.dmp.patch_make(editor.plugins.diff.rhs, editor.plugins.diff.lhs);
 
-			document.querySelector("#diff .theirs").innerHTML = editor.plugins.diff.prettyHtml(diff);
-			document.querySelector("#diff .mine").innerHTML = document.querySelector("#diff .theirs").innerHTML;
+			editor.toolbarsContainer.querySelector("#diff .theirs").innerHTML = editor.plugins.diff.prettyHtml(diff);
+			editor.toolbarsContainer.querySelector("#diff .mine").innerHTML = editor.toolbarsContainer.querySelector("#diff .theirs").innerHTML;
 			if (editor.plugins.diff.patches == 0) {
-				document.querySelector("[data-simply-action='simply-diff-save']").removeAttribute("disabled");
+				editor.toolbarsContainer.querySelector("[data-simply-action='simply-diff-save']").removeAttribute("disabled");
 			} else {
-				document.querySelector("[data-simply-action='simply-diff-save']").setAttribute("disabled", true);
+				editor.toolbarsContainer.querySelector("[data-simply-action='simply-diff-save']").setAttribute("disabled", true);
 			}
 		},
 		keepMine : function(number) {
@@ -4957,7 +4957,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					editor.currentData = JSON.parse(editor.plugins.diff.lhs);
 					editor.data.apply(editor.currentData, document);
 					editor.data.stash();
-					document.getElementById('simply-diff').classList.remove("active");
+					editor.toolbarsContainer.getElementById('simply-diff').classList.remove("active");
 					editor.plugins.diff.save();
 				}
 			}
@@ -5209,14 +5209,14 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	editor.plugins.about = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-about'));
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-about'));
 				// fetch key info
 				var result = muze.load('https://api.simplyedit.io/0/keys/'+editor.apiKey)
 				.onload(function(result) {
-					var keyEl = document.querySelector('#simply-about-key .simply-info');
-					var hostsEl = document.querySelector('#simply-about-key-domains .simply-info');
-					var validEl = document.getElementById('simply-about-key-valid');
-					var versionEl = document.getElementById('simply-about-version');
+					var keyEl = editor.toolbarsContainer.querySelector('#simply-about-key .simply-info');
+					var hostsEl = editor.toolbarsContainer.querySelector('#simply-about-key-domains .simply-info');
+					var validEl = editor.toolbarsContainer.getElementById('simply-about-key-valid');
+					var versionEl = editor.toolbarsContainer.getElementById('simply-about-version');
 
 					versionEl.innerHTML = 'Version '+editor.version;
 					var majorVersion = parseInt(editor.version.split('.')[0]);
@@ -5243,21 +5243,21 @@ document.addEventListener('simply-toolbars-loaded', function() {
 						if ( diff < 0 ) {
 							validEl.innerHTML = 'Your trial key has expired.';
 							validEl.style.display = 'block';
-							document.getElementById('simply-buy-button').style.display = 'block';
+							editor.toolbarsContainer.getElementById('simply-buy-button').style.display = 'block';
 						} else {
 							var diffDays = Math.floor( diff / ( 1000 * 3600 * 24 ) );
 							validEl.innerHTML = 'Your trial key expires in '+diffDays+' days.';
 							validEl.style.display = 'block';
-							document.getElementById('simply-buy-button').style.display = 'inline-block';
+							editor.toolbarsContainer.getElementById('simply-buy-button').style.display = 'inline-block';
 						}
 					} else if ( majorVersion < latestVersion ) {
 						// upgrade possible
-						document.getElementById('simply-about-key-upgrade').innerHTML = 'Version '+info['latest-version']+' is available now';
-						document.getElementById('simply-about-key-upgrade').style.display = 'block';
-						document.getElementById('simply-buy-button').style.display = 'inline-block';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').innerHTML = 'Version '+info['latest-version']+' is available now';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').style.display = 'block';
+						editor.toolbarsContainer.getElementById('simply-buy-button').style.display = 'inline-block';
 					} else {
-						document.getElementById('simply-about-key-upgrade').innerHTML = 'This is the latest version.';
-						document.getElementById('simply-about-key-upgrade').style.display = 'block';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').innerHTML = 'This is the latest version.';
+						editor.toolbarsContainer.getElementById('simply-about-key-upgrade').style.display = 'block';
 						
 					}
 				});

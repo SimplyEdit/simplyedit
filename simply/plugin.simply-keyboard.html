@@ -9,7 +9,7 @@
 				event.preventDefault();
 			}
 		} else if (key == 27) { // ESC
-			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-close']");
+			var target = editor.toolbarsContainer.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-close']");
 			if (target) {
 				muze.event.fire(target, "click");
 			} else {
@@ -36,7 +36,7 @@
 				event.preventDefault();
 			}
 		} else if (key == 32 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-space
-			var activeDialog = document.querySelector(".simply-dialog.active");
+			var activeDialog = editor.toolbarsContainer.querySelector(".simply-dialog.active");
 			if (activeDialog) {
 				var firstButton = activeDialog.querySelector("button");
 				if (firstButton) {
@@ -47,7 +47,7 @@
 
 			editor.context.toolbar.hide = false;
 			editor.context.update();
-			var activeToolbar = document.querySelector(".simply-section.active");
+			var activeToolbar = editor.toolbarsContainer.querySelector(".simply-section.active");
 			if (activeToolbar) {
 				var firstButton = activeToolbar.querySelector("button");
 				if (firstButton) {
@@ -55,14 +55,14 @@
 				}
 			}
 
-			var toolbarTarget = document.querySelector(".simply-section.active .simply-buttons > li");
+			var toolbarTarget = editor.toolbarsContainer.querySelector(".simply-section.active .simply-buttons > li");
 			
 			if (toolbarTarget) {
 				toolbarTarget.focus();
 			}
 			event.preventDefault();
 		} else if (key == 77 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-M
-			document.querySelector("#simply-main-toolbar button").focus();
+			editor.toolbarsContainer.querySelector("#simply-main-toolbar button").focus();
 			event.preventDefault();
 		} else if (key == 90 && event.ctrlKey && !event.shiftKey && !event.altKey) { // Ctrl-Z
 			if (typeof editor.actions["simply-undo"] === "function") {
@@ -148,7 +148,7 @@
 				editor.context.toolbar.hide = true;
 			}
 		} else if (key == 13 && event.altKey) {
-			var target = document.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-fullscreen']");
+			var target = editor.toolbarsContainer.querySelector(".simply-dialog.active [data-simply-action='simply-dialog-fullscreen']");
 			if (target) {
 				muze.event.fire(target, "click");
 				event.preventDefault();

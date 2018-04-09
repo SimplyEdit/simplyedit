@@ -69,7 +69,7 @@
 	editor.plugins.meta = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-meta'), editor.plugins.meta.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-meta'), editor.plugins.meta.dialog.update);
 			},
 			update : function() {
 				var metaBindingConfig = {
@@ -111,16 +111,16 @@
 				var authorElm = document.head.querySelector("meta[name=author]");
 				var robotsElm = document.head.querySelector("meta[name=robots]");
 				if (titleElm && titleElm.dataBinding) {
-					titleElm.dataBinding.bind(document.getElementById("simply-meta-title"));
+					titleElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-title"));
 				}
 				if (descElm && descElm.dataBinding) {
-					descElm.dataBinding.bind(document.getElementById("simply-meta-description"), metaBindingConfig);
+					descElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-description"), metaBindingConfig);
 				}
 				if (authorElm && authorElm.dataBinding) {
-					authorElm.dataBinding.bind(document.getElementById("simply-meta-author"), metaBindingConfig);
+					authorElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-author"), metaBindingConfig);
 				}
 				if (robotsElm && robotsElm.dataBinding) {
-					robotsElm.dataBinding.bind(document.getElementById("simply-meta-robots"), metaRobotsBindingConfig);
+					robotsElm.dataBinding.bind(editor.toolbarsContainer.getElementById("simply-meta-robots"), metaRobotsBindingConfig);
 				}
 			}
 		},
@@ -131,7 +131,7 @@
 
 	editor.addAction("simply-metadata", function(el) {
 		el.classList.toggle("simply-selected");
-		document.querySelector("#simply-meta .simply-metadata").classList.toggle("simply-selected");
+		editor.toolbarsContainer.querySelector("#simply-meta .simply-metadata").classList.toggle("simply-selected");
 	});
 
 	editor.addAction("simply-meta-robots", function(el) {

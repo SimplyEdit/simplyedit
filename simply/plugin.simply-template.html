@@ -61,7 +61,7 @@
 	editor.plugins.pageTemplate = {
 		dialog : {
 			open : function() {
-				editor.plugins.dialog.open(document.getElementById('simply-template'), editor.plugins.pageTemplate.dialog.update);
+				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-template'), editor.plugins.pageTemplate.dialog.update);
 			},
 			update : function() {
 				var pageTemplate = "index.html";
@@ -70,11 +70,11 @@
 				} else if (editor.currentData[editor.data.getDataPath()]['data-simply-page-template']) {
 					pageTemplate = editor.currentData[editor.data.getDataPath()]['data-simply-page-template'];
 				}
-				document.getElementById("simply-page-template-list").value = pageTemplate;
+				editor.toolbarsContainer.getElementById("simply-page-template-list").value = pageTemplate;
 			}
 		},
 		apply : function() {
-			var pageTemplate = document.querySelector("#simply-page-template-list").value;
+			var pageTemplate = editor.toolbarsContainer.querySelector("#simply-page-template-list").value;
 			editor.plugins.pageTemplate.setMeta("page-template", pageTemplate);
 			editor.plugins.dialog.close();
 			var reloadPage = function() {
@@ -104,9 +104,9 @@
 				button.dataset.simplyAction = "simply-template";
 				button.innerHTML = '<i class="fa fa-paint-brush"></i>Page template';
 				listItem.appendChild(button);
-				document.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
+				editor.toolbarsContainer.querySelector("#simply-main-toolbar .simply-buttons").appendChild(listItem);
 
-				var templateSelect = document.querySelector("#simply-page-template-list");
+				var templateSelect = editor.toolbarsContainer.querySelector("#simply-page-template-list");
 
 				templateSelect.innerHTML = '';
 				for (var i=0; i<config['templates'].length; i++) {

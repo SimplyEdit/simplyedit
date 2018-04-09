@@ -4,7 +4,7 @@
 		init : function() {
 			var button = document.createElement("LI");
 			button.innerHTML = '<button data-simply-action="simply-dropbox-chooser"><i class="fa fa-dropbox"></i>Dropbox</button>';
-			document.querySelector("#simply-image .simply-toolbar .simply-buttons").appendChild(button);
+			editor.toolbarsContainer.querySelector("#simply-image .simply-toolbar .simply-buttons").appendChild(button);
 		}
 	};
 
@@ -15,7 +15,7 @@
 				// var targetLink = files[0].link.replace("www.dropbox", "dl.dropbox");
 				var targetLink = files[0].thumbnailLink.replace("bounding_box=75", "bounding_box=256");
 
-				document.querySelector("#vdImageSrc").value = targetLink;
+				editor.tollbarsContainer.querySelector("#vdImageSrc").value = targetLink;
 				editor.actions["simply-image-src"](targetLink);
 			},
 
