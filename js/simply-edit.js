@@ -1158,8 +1158,8 @@
 						field.contentEditable = true;
 					}
 				},
-				"input[type=text],input:not([type]),input[type=hidden],textarea,input[type=number]" : {
-					get : function(field) {
+				"input[type=text],input:not([type]),input[type=hidden],textarea,input[type=number],input[type=date]"
+					: { get : function(field) {
 						return field.value;
 					},
 					set : function(field, data) {
@@ -2033,6 +2033,10 @@
 						if (editor.node.hasSimplyParent(event.target) || editor.node.isSimplyParent(event.target)) {
 							handleClick(event);
 						}
+					}
+					if (event.target.tagName.toLowerCase() === "input" || event.target.tagName.toLowerCase() === "textarea") {
+						// don't prevent the click on inputs or textareas, allow them to work normally.
+						return;
 					}
 					if (editor.node.isSimplyParent(event.target)) {
 						handleClick(event);
