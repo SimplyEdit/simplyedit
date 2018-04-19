@@ -1384,6 +1384,7 @@
 							newdata[attributes[0]] = data;
 							return editor.field.defaultSetter(field, newdata);
 						}
+						// FIXME: filter attributes that are not in data-simply-attributes;
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
@@ -1495,9 +1496,7 @@
 							result.innerHTML = editor.field.getInnerHTML(field);
 						}
 					} else {
-						if (field.getAttribute(attr) !== null) {
-							result[attr] = field.getAttribute(attr);
-						}
+						result[attr] = field.getAttribute(attr);
 					}
 				}
 				return result;

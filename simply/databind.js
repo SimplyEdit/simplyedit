@@ -64,6 +64,13 @@ dataBinding = function(config) {
 	if (!this.mode) {
 		this.mode = "field";
 	}
+	if (Array.isArray(data[key])) {
+		if (this.mode == "field") {
+			console.log("Warning: databinding started in field mode but array-type data given; Switching to list mode.");
+		}
+		this.mode = "list";
+		this.config.mode = "list";
+	}
 	if (!this.attributeFilter) {
 		this.attributeFilter = [];
 	}
@@ -357,6 +364,7 @@ dataBinding = function(config) {
 		}
 		fireEvent(document, "resolved");
 	};
+
 	var initBindings = function(data, key) {
 		if (typeof data != "object") {
 			console.log("Attempted to bind on non-object data for " + key);
@@ -641,7 +649,7 @@ dataBinding.prototype.handleEvent = function (event) {
 		return;
 	}
 	if (self.mode === "list") {
-		if (target != event.relatedNode) {
+		if (event.relatedNode && (target != event.relatedNode)) {
 			return;
 		}
 	}
