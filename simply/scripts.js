@@ -278,10 +278,11 @@ muze.url = (function() {
 
 	function _parseModulesList( modules ) {
 		// the continuation is a function which is only run if all requirements are met
+		var modulesList;
 		if (typeof modules == 'string') {
-			var modulesList = (/,/.test(modules)) ? modules.split(',') : [ modules ];
+			modulesList = (/,/.test(modules)) ? modules.split(',') : [ modules ];
 		} else if (typeof modules.length != 'undefined') {
-			var modulesList = modules;
+			modulesList = modules;
 		} else {
 			throw('Incorrect argument 1 (required modules): '+modules);
 		}
@@ -315,9 +316,10 @@ muze.url = (function() {
 	muze.require = function( modules, continuation ) {
 		modules = _parseModulesList( modules );
 		var scriptsToLoad = [];
+		var moduleInstance;
 		for (var i=0; i<modules.length; i++) {
 			if ( modules[i].module ) {
-				var moduleInstance = _namespaceWalk( modules[i].module, function(ob, name) {
+				moduleInstance = _namespaceWalk( modules[i].module, function(ob, name) {
 					if (typeof continuation == 'undefined' || !modules[i].url ) {
 						throw 'namespace ' + name + ' not found ';
 					} else {
@@ -388,7 +390,7 @@ muze.url = (function() {
 		return loader;
 	};
 	
-	muze.load = function(url, waitforme, cached, method, arguments) {
+	muze.load = function(url, waitforme, cached, method, args) {
 		var _isCorsURL = function(url) {
 			var urlHelper = document.createElement('a');
 			urlHelper.href = url;
@@ -426,10 +428,10 @@ muze.url = (function() {
 			};
 		}
 		if ( method=="POST" ) {
-			if ( arguments ) {
+			if ( args ) {
 				params = [];
-				for ( var i in arguments ) {
-					params.push( encodeURIComponent( i) + '=' + encodeURIComponent( arguments[i]) );
+				for ( var i in args ) {
+					params.push( encodeURIComponent( i) + '=' + encodeURIComponent( args[i]) );
 				}
 				params = params.join('&');
 				http.setRequestHeader( 'Content-type', 'application/x-www-form-urlencoded' );
@@ -590,12 +592,12 @@ muze.url = (function() {
 
 	//Is the object an element of an HTML/XHTML document (div)
 	Env.isElement = function(o){
-		return (window.Element && o instanceof window.Element) || (!!o.htmlElement || (o.nodeName && o.nodeType === 1));
+		return (window.Element && o instanceof window.Element) || (!!o.htmlElement || (o.nodeName && o.nodeType === document.ELEMENT_NODE));
 	};
 	
 	//Is the object a document object
 	Env.isDocument = function(o){
-		return Object.prototype.toString.call(o) === '[object HTMLDocument]' || o.nodeType === 9;
+		return Object.prototype.toString.call(o) === '[object HTMLDocument]' || o.nodeType === document.DOCUMENT_NODE;
 	};
 	
 	//Is the object an event object (click)
@@ -778,11 +780,12 @@ muze.url = (function() {
 			var cache = {};
 			return function(str){
 				//If the style doesn't exists within the cache, do it
+				//If the string exists within the cache, return the cached value
 				if(!cache[str]){
 					//We use our own feature testing to see if strings will accept functions as a second argument (Safari 2.0.2)
 					if(Env.support.stringReplaceFunction){
 						//If functions are supported, make the new string, cache it, and return it
-						return cache[str] = str.replace(/-([a-z])/g, function(word, letter){
+						cache[str] = str.replace(/-([a-z])/g, function(word, letter){
 							return letter.toUpperCase();
 						});
 					}else{
@@ -795,12 +798,10 @@ muze.url = (function() {
 							}
 						}
 						//Cache it and return it
-						return cache[str] = camel;
+						cache[str] = camel;
 					}
-				}else{
-					//If the string exists within the cache, return the cached value
-					return cache[str];
 				}
+				return cache[str];
 			};
 		})();
 		
@@ -854,7 +855,8 @@ muze.url = (function() {
 					}
 				}
 				//Cache the value and return it
-				return cache[key] = supported;
+				cache[key] = supported;
+				return cache[key];
 			}
 		};
 	})();
@@ -1077,7 +1079,7 @@ muze.url = (function() {
 		var elements = el.getElementsByTagName('*');
 		//Loop the elements and look for comment nodes
 		for(var i=0, length = elements.length; i < length; i++){
-			if(elements[i].nodeType == 8){
+			if(elements[i].nodeType == document.COMMENT_NODE){
 				//If a comment node is found, its a bug
 				return true;
 			}
@@ -1277,7 +1279,7 @@ muze.namespace('muze.event', function() {
 	var event = this;
 
 	
-
+	var evt;
 	if (muze.env.isHostMethod(document, 'createEvent')) {
 		event.create = function( name, maskEvt, win ) {
 			if (!win) {
@@ -1332,7 +1334,7 @@ muze.namespace('muze.event', function() {
 				case 'keydown':
 				case 'keyup':
 					type = 'KeyboardEvents';
-					var evt = win.document.createEvent( type );
+					evt = win.document.createEvent( type );
 					if (muze.env.isHostMethod(evt, 'initKeyboardEvent')) {
 						init = function(evt, mask) {
 							if (mask) {
@@ -1375,7 +1377,7 @@ muze.namespace('muze.event', function() {
 					};
 				break;
 			}
-			var evt =  win.document.createEvent(type);
+			evt =  win.document.createEvent(type);
 			init(evt, maskEvt);
 			return evt;
 		};
@@ -1384,7 +1386,7 @@ muze.namespace('muze.event', function() {
 			if (!win) {
 				win = muze.global;
 			}
-			var evt = win.document.createEventObject(name, evt);
+			evt = win.document.createEventObject(name, evt);
 			return evt;
 		};
 	} else {
@@ -1476,17 +1478,18 @@ muze.namespace('muze.event', function() {
 
 	var getWrapper = function( id ) {
 		return function(evt) {
+			var win;
 			var o = listeners[id].el;
 			if (o.ownerDocument) {
-				var win = o.ownerDocument.defaultView ? o.ownerDocument.defaultView : o.ownerDocument.parentWindow;
+				win = o.ownerDocument.defaultView ? o.ownerDocument.defaultView : o.ownerDocument.parentWindow;
 			} else if (o.defaultView) {
-				var win = o.defaultView;
+				win = o.defaultView;
 			} else if (o.parentWindow) {
-				var win = o.parentWindow;
+				win = o.parentWindow;
 			} else if (o.document) {
-				var win = o;
+				win = o;
 			} else {
-				var win = muze.global;
+				win = muze.global;
 			}
 			evt = event.get(evt, win);
 			var f = listeners[id].listener;
@@ -1588,26 +1591,27 @@ muze.namespace('muze.html', function() {
 	};
 	
 	this.el = function(tagName) { //, attributes, children) {
+		var i;
 		var el = muze.global.document.createElement(tagName);
 		var next = 1;
 		var attributes = arguments[1];
 		if (attributes && getType(attributes)=='object') {
 			next = 2;
 			try {
-				for (var i in attributes ) {
+				for (i in attributes ) {
 					setAttr(el, i, attributes[i]);
 				}
 			} catch(e) {
 				if ( /input/i.test(tagName) ) {
 					var elString = '<'+tagName;
-					for ( var i in attributes ) {
+					for ( i in attributes ) {
 						if ( getType(attributes[i])=='string' ) {
 							elString += ' '+i+'="'+escape(attributes[i])+'"';
 						}
 					}
 					elString += '>';
 					el = muze.global.document.createElement(elString);
-					for ( var i in attributes ) {
+					for ( i in attributes ) {
 						if ( getType(attributes[i])!='string' ) {
 							setAttr(el, i, attributes[i]);
 						}
@@ -1615,7 +1619,7 @@ muze.namespace('muze.html', function() {
 				}
 			}
 		}
-		for (var i=next, l=arguments.length; i<l; i++) {
+		for (i=next, l=arguments.length; i<l; i++) {
 			var subEl = arguments[i];
 			if (getType(subEl)=='string') {
 				subEl = muze.global.document.createTextNode(subEl);
@@ -1752,7 +1756,7 @@ simply.dom= ( function(dom) {
 					} else {
 						parent = range.commonAncestorContainer;
 					}	
-					while( parent.nodeType == 3 ) { // text node
+					while( parent.nodeType == document.TEXT_NODE ) { // text node
 						parent = parent.parentNode;
 					}
 					return parent; 
@@ -1762,8 +1766,9 @@ simply.dom= ( function(dom) {
 			},
 			
 			getNode : function(range) {
+				var node;
 				if( w3c ) {
-					var node = range.commonAncestorContainer;
+					node = range.commonAncestorContainer;
 					if( !range.collapsed ) {
 						/*
 							|    <textnode><selected node><textnode>    |
@@ -1775,19 +1780,19 @@ simply.dom= ( function(dom) {
 							// start en eind punt van selectie zitten in dezelfde node en de node heeft kinderen - dus geen text node - en de offset verschillen
 							// precies 1 - dus er is exact 1 node geselecteerd.
 							node = range.startContainer.childNodes[range.startOffset]; // image achtige control selections.
-						} else if ( range.startContainer.nodeType == 3 && range.startOffset == range.startContainer.data.length && 
-							range.endContainer.nodeType != 3 && range.endContainer == range.startContainer.parentNode ) 
+						} else if ( range.startContainer.nodeType == document.TEXT_NODE && range.startOffset == range.startContainer.data.length &&
+							range.endContainer.nodeType != document.TEXT_NODE && range.endContainer == range.startContainer.parentNode )
 						{
 							// Case 2: tekstnode er voor, niet er achter.
 							// start punt zit in een tekst node maar wel helemaal aan het eind. eindpunt zit in dezelfde container waar de textnode ook in zit.
 							node = range.endContainer.childNodes[ range.endOffset - 1 ];
-						} else if ( range.endContainer.nodeType == 3 && range.endOffset === 0 && 
-							range.startContainer.nodeType != 3 && range.startContainer == range.endContainer.parentNode ) 
+						} else if ( range.endContainer.nodeType == document.TEXT_NODE && range.endOffset === 0 &&
+							range.startContainer.nodeType != document.TEXT_NODE && range.startContainer == range.endContainer.parentNode )
 						{
 							// Case 3: tekstnode er achter, niet er voor;
 							// Eindpunt zit in een textnode helemaal aan het begin. Startpunt zit in dezelfde container waar de eindpunt-textnode ook in zit
 							node = range.startContainer.childNodes[ range.startOffset ];
-						} else if ( range.startContainer.nodeType == 3 && range.endContainer.nodeType == 3 &&
+						} else if ( range.startContainer.nodeType == document.TEXT_NODE && range.endContainer.nodeType == document.TEXT_NODE &&
 							range.startOffset == range.startContainer.data.length && range.endOffset === 0 &&
 							range.startContainer.nextSibling == range.endContainer.previousSibling ) 
 						{
@@ -1798,14 +1803,22 @@ simply.dom= ( function(dom) {
 							// Case 5: bijv. 1 tekstnode met geselecteerde tekst - hierna wordt dan de parentNode als node gezet
 							node = range.startContainer;
 						}
+					} else {
+						if( range.startContainer == range.endContainer && range.startOffset - range.endOffset < 2 && range.startContainer.hasChildNodes() ) {
+							// Case 1: geen tekstnodes.
+							// start en eind punt van selectie zitten in dezelfde node en de node heeft kinderen - dus geen text node - en de offset verschillen
+							// precies 1 - dus er is exact 1 node geselecteerd.
+							node = range.startContainer.childNodes[range.startOffset]; // image achtige control selections.
+						}
 					}
-					while( node && node.nodeType == 3 ) {
+
+					while( node && (node.nodeType == document.TEXT_NODE || node.nodeType == document.DOCUMENT_TYPE_NODE)) {
 						node = node.parentNode;
 					}
 					return node;
 				} else {
-					var node = range.item ? range.item(0) : range.parentElement();
-					while (node && node.nodeType == 3) {
+					node = range.item ? range.item(0) : range.parentElement();
+					while (node && (node.nodeType == document.TEXT_NODE || node.nodeType == document.DOCUMENT_TYPE_NODE)) {
 						node = node.parentNode;
 					}
 					return node;
@@ -1813,7 +1826,7 @@ simply.dom= ( function(dom) {
 			},
 
 			isEmpty : function(range) {
-				return self.getHTMLText(range) == '';
+				return self.getHTMLText(range) === '';
 			},
 			
 			getHTMLText : function(range) {
