@@ -289,6 +289,8 @@
 				}
 				parentBindingConfig.data = dataParent;
 				parentBindingConfig.key = dataKey;
+				parentBindingConfig.setter = editor.field.dataBindingSetter;
+				parentBindingConfig.getter = editor.field.dataBindingGetter;
 				parentDataBinding = new dataBinding(parentBindingConfig);
 			}
 		},
@@ -486,6 +488,9 @@
 				}
 			},
 			dataBindingGetter : function() {
+				if (!this.getAttribute("data-simply-list") && this.getAttribute("data-simply-field")) {
+					return editor.field.dataBindingGetter.call(this);
+				}
 				var dataName = this.getAttribute("data-simply-list");
 				var dataPath = editor.data.getDataPath(this);
 				var stashedFields = this.querySelectorAll("[data-simply-stashed]");
@@ -493,11 +498,14 @@
 					stashedFields[i].removeAttribute("data-simply-stashed");
 				}
 				this.removeAttribute("data-simply-stashed");
-
 				var data = editor.list.get(this);
+
 				return data[dataPath][dataName];
 			},
 			dataBindingSetter : function(value) {
+				if (!this.getAttribute("data-simply-list") && this.getAttribute("data-simply-field")) {
+					return editor.field.dataBindingSetter.call(this, value);
+				}
 
 				var savedBindingParents = editor.bindingParents;
 				if (this.dataBinding) {
@@ -670,6 +678,9 @@
 							var listDataBinding;
 							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
 								listDataBinding = dataParent._bindings_[dataName];
+								if (listDataBinding.config.mode == "field") {
+									console.log("Warning: mixing field and list types for databinding.");
+								}
 							} else {
 								var bindingConfig    = {};
 								for (var i in editor.settings.databind) {
@@ -1025,9 +1036,15 @@
 		},
 		field : {
 			dataBindingGetter : function() {
+				if (!this.getAttribute("data-simply-field") && this.getAttribute("data-simply-list")) {
+					return editor.list.dataBindingGetter.call(this);
+				}
 				return editor.field.get(this);
 			},
 			dataBindingSetter : function(value) {
+				if (!this.getAttribute("data-simply-field") && this.getAttribute("data-simply-list")) {
+					return editor.list.dataBindingSetter.call(this, value);
+				}
 				return editor.field.set(this, value);
 			},
 			fieldTypes : {
