@@ -171,6 +171,17 @@ QUnit.module("editor init");
 		assert.ok(vdSelectionState, "vdSelectionState initialized");
 	});
 
+QUnit.module("legacy selection bevahiour");
+	QUnit.test("getNode returns input", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<input type='text' value='foo'>";
+		var inputNode = testContent.querySelector("input");
+
+		inputNode.focus();
+		var selectionNode = vdSelection.getNode(vdSelectionState.get());
+		assert.equal(selectionNode, inputNode, "input node is returned by getNode");
+	});
+
 QUnit.module("hope editor behaviour");
 	QUnit.test("seperate p stay seperated", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -1036,7 +1047,6 @@ QUnit.module("editor text selection");
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "<p>Hello</p><p>world</p><p>Is it big out there?</p>";
 		testContent.hopeEditor.parseHTML();
-
 		setCaretPosition(testContent.querySelector("p"), 2);
 
 		setSelectionEnd(testContent.querySelectorAll("p")[2].childNodes[0],5);
