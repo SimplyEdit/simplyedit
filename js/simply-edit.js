@@ -289,6 +289,8 @@
 				}
 				parentBindingConfig.data = dataParent;
 				parentBindingConfig.key = dataKey;
+				parentBindingConfig.setter = editor.field.dataBindingSetter;
+				parentBindingConfig.getter = editor.field.dataBindingGetter;
 				parentDataBinding = new dataBinding(parentBindingConfig);
 			}
 		},
@@ -486,6 +488,9 @@
 				}
 			},
 			dataBindingGetter : function() {
+				if (!this.getAttribute("data-simply-list") && this.getAttribute("data-simply-field")) {
+					return editor.field.dataBindingGetter.call(this);
+				}
 				var dataName = this.getAttribute("data-simply-list");
 				var dataPath = editor.data.getDataPath(this);
 				var stashedFields = this.querySelectorAll("[data-simply-stashed]");
@@ -493,11 +498,14 @@
 					stashedFields[i].removeAttribute("data-simply-stashed");
 				}
 				this.removeAttribute("data-simply-stashed");
-
 				var data = editor.list.get(this);
+
 				return data[dataPath][dataName];
 			},
 			dataBindingSetter : function(value) {
+				if (!this.getAttribute("data-simply-list") && this.getAttribute("data-simply-field")) {
+					return editor.field.dataBindingSetter.call(this, value);
+				}
 
 				var savedBindingParents = editor.bindingParents;
 				if (this.dataBinding) {
@@ -670,6 +678,9 @@
 							var listDataBinding;
 							if (dataParent._bindings_ && dataParent._bindings_[dataName]) {
 								listDataBinding = dataParent._bindings_[dataName];
+								if (listDataBinding.config.mode == "field") {
+									console.log("Warning: mixing field and list types for databinding.");
+								}
 							} else {
 								var bindingConfig    = {};
 								for (var i in editor.settings.databind) {
@@ -1025,9 +1036,15 @@
 		},
 		field : {
 			dataBindingGetter : function() {
+				if (!this.getAttribute("data-simply-field") && this.getAttribute("data-simply-list")) {
+					return editor.list.dataBindingGetter.call(this);
+				}
 				return editor.field.get(this);
 			},
 			dataBindingSetter : function(value) {
+				if (!this.getAttribute("data-simply-field") && this.getAttribute("data-simply-list")) {
+					return editor.list.dataBindingSetter.call(this, value);
+				}
 				return editor.field.set(this, value);
 			},
 			fieldTypes : {
@@ -1158,8 +1175,8 @@
 						field.contentEditable = true;
 					}
 				},
-				"input[type=text],input:not([type]),input[type=hidden],textarea,input[type=number]" : {
-					get : function(field) {
+				"input[type=text],input:not([type]),input[type=hidden],textarea,input[type=number],input[type=date]"
+					: { get : function(field) {
 						return field.value;
 					},
 					set : function(field, data) {
@@ -1367,6 +1384,7 @@
 							newdata[attributes[0]] = data;
 							return editor.field.defaultSetter(field, newdata);
 						}
+						// FIXME: filter attributes that are not in data-simply-attributes;
 						return editor.field.defaultSetter(field, data);
 					},
 					makeEditable : function(field) {
@@ -1478,9 +1496,7 @@
 							result.innerHTML = editor.field.getInnerHTML(field);
 						}
 					} else {
-						if (field.getAttribute(attr) !== null) {
-							result[attr] = field.getAttribute(attr);
-						}
+						result[attr] = field.getAttribute(attr);
 					}
 				}
 				return result;
@@ -2033,6 +2049,10 @@
 						if (editor.node.hasSimplyParent(event.target) || editor.node.isSimplyParent(event.target)) {
 							handleClick(event);
 						}
+					}
+					if (event.target.tagName.toLowerCase() === "input" || event.target.tagName.toLowerCase() === "textarea") {
+						// don't prevent the click on inputs or textareas, allow them to work normally.
+						return;
 					}
 					if (editor.node.isSimplyParent(event.target)) {
 						handleClick(event);

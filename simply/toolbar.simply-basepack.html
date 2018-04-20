@@ -1002,7 +1002,7 @@
 		"context" : "simply-text-selection"
 	});
 	editor.addContextFilter("simply-textonly", {
-		"selector" : "[data-simply-content='text']",
+		"selector" : "input,[data-simply-content='text']",
 		"context" : "simply-no-context"
 	});
 </script><section id="simply-image" class="simply-section">
@@ -3588,12 +3588,12 @@ document.addEventListener('simply-toolbars-loaded', function() {
 <script>
 	editor.plugins.save = {
 		beforeSave : function() {
-			editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "Storing your changes.";
+			editor.toolbarsContainer.querySelector("#simply-save .simply-message").innerHTML = "Storing your changes.";
 			editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-save'));
 		},
 		afterSave : function() {
 			window.setTimeout(function() {
-				editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "All changes saved.";
+				editor.toolbarsContainer.querySelector("#simply-save .simply-message").innerHTML = "All changes saved.";
 				window.setTimeout(function() {
 					editor.plugins.dialog.close();
 				}, 800);
@@ -3605,7 +3605,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					var errorEvent = editor.fireEvent("simply-page-save-error", document, result);
 					if (!errorEvent.defaultPrevented) {
 						var message = errorEvent.data.message;
-						editor.toolbarsContainer("#simply-save .simply-message").innerHTML = "Error saving: " + message;
+						editor.toolbarsContainer.querySelector("#simply-save .simply-message").innerHTML = "Error saving: " + message;
 						window.setTimeout(function() {
 							editor.plugins.dialog.close();
 						}, 2000);
