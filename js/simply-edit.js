@@ -2383,7 +2383,7 @@
 			isInDocumentFragment : function(el) {
 				var parent = el.parentNode;
 				while (parent) {
-					if (parent.nodeType === document.DOCUMENT_FRAGMENT_NODE) {
+					if (parent.nodeType === document.DOCUMENT_FRAGMENT_NODE && parent != editor.toolbarsContainer) {
 						return true;
 					}
 					parent = parent.parentNode;
