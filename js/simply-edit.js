@@ -1183,7 +1183,7 @@
 						field.value = data;
 					}
 				},
-				"input[type=radio]" : {
+				"input[type=radio],input[type=checkbox]" : {
 					get : function(field) {
 						if (field.checked) {
 							return field.value;
@@ -1198,21 +1198,6 @@
 							field.checked = false;
 						}
 						field.simplyData = data;
-					}
-				},
-				"input[type=checkbox]" : {
-					get : function(field) {
-						if (field.checked) {
-							return 1;
-						}
-						return 0;
-					},
-					set : function(field, data) {
-						if (data) {
-							field.checked = true;
-						} else {
-							field.checked = false;
-						}
 					}
 				},
 				"select:not([multiple])" : {
