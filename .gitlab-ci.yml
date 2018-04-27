@@ -42,7 +42,7 @@ canary:
     - composer --working-dir=.deploy/ install --no-scripts
     - 'NEXT=$(git for-each-ref  --format="%(refname:short)" **/origin/master-* | sort | tr -d -c "[:digit:]\n" | sort -nr | head -n1)'
     - 'NEXT=$((${NEXT:=-1}+1))'
-    - 'if [ "${CI_BUILD_REF_NAME}" == "master" ] ; then export MAJOR=${NEXT} ; else export MAJOR=$(echo "${CI_BUILD_REF_NAME}" | tr -d -c "[:digit:]" ) ; fi '
+    - 'if [ "${CI_COMMIT_REF_NAME}" == "master" ] ; then export MAJOR=${NEXT} ; else export MAJOR=$(echo "${CI_COMMIT_REF_NAME}" | tr -d -c "[:digit:]" ) ; fi '
   script:
     - dep --file=.deploy/deploy.php -vv deploy canary
 
