@@ -68,14 +68,14 @@ set('rsync',[
 ]);
 
 // Configure servers
-server('canary', 'se-cdn.dc.muze.nl')
+server('canary', 'se-cdn-dc.muze.nl')
 	->user('deployer')
 	->forwardAgent()
 	->stage('canary')
 	->env('deploy_path', '/opt/canary.simplyedit.io/res/');
 
 // Configure servers
-server('cdn1', 'se-cdn.dc.muze.nl')
+server('cdn1', 'se-cdn-dc.muze.nl')
 	->user('deployer')
 	->forwardAgent()
 	->stage('cdn')
