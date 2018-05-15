@@ -779,6 +779,8 @@
 				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
 					editor.list.init(clone, listDataItem, useDataBinding);
 				}
+
+				editor.list.runScripts(clone);
 			},
 			set : function(list, listData) {
 				if (list.dataBinding) {
@@ -802,7 +804,7 @@
 					if (scripts[i].innerHTML) {
 						newNode.innerHTML = scripts[i].innerHTML;
 					}
-					document.head.appendChild(newNode);
+					scripts[i].parentNode.appendChild(newNode);
 					scripts[i].parentNode.removeChild(scripts[i]);
 				}
 			},
