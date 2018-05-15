@@ -791,6 +791,21 @@
 					list.dataBinding.resumeListeners(list);
 				}
 			},
+			runScripts : function(node) {
+				var scripts = node.querySelectorAll("script");
+				var newNode;
+				for (var i=0; i<scripts.length; i++) {
+					newNode = document.createElement("script");
+					if (scripts[i].getAttribute('src')) {
+						newNode.src = scripts[i].getAttribute('src');
+					}
+					if (scripts[i].innerHTML) {
+						newNode.innerHTML = scripts[i].innerHTML;
+					}
+					document.head.appendChild(newNode);
+					scripts[i].parentNode.removeChild(scripts[i]); // prevents double script execution;
+				}
+			},
 			cloneTemplate : function(template) {
 				var clone;
 				if ("importNode" in document) {
@@ -810,6 +825,7 @@
 						clone.appendChild(clonedNode);
 					}
 				}
+				editor.list.runScripts(clone);
 				return clone;
 			},
 			append : function(list, listData) {
