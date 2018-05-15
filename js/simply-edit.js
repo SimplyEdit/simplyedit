@@ -2607,6 +2607,32 @@
 					this.sitemap = storage.default.sitemap;
 					this.page = storage.default.page;
 					this.listSitemap = storage.default.listSitemap;
+
+					if (editor.responsiveImages) {
+						if (
+							editor.settings['simply-image'] &&
+							editor.settings['simply-image'].responsive
+						) {
+							if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+								editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+							} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+								editor.responsiveImages.sizes = (function(sizes) {
+									return function(src) {
+										var result = {};
+										var info = src.split(".");
+										var extension = info.pop().toLowerCase();
+										if (extension === "jpg" || extension === "jpeg" || extension === "png") {
+											for (var i=0; i<sizes.length; i++) {
+												result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+											}
+										}
+										return result;
+									};
+								}(editor.settings['simply-image'].responsive.sizes));
+							}
+						}
+						window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+					}
 				},
 				connect : function(callback) {
 					callback();
