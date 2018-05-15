@@ -1199,7 +1199,7 @@
 						field.value = data;
 					}
 				},
-				"input[type=radio],input[type=checkbox]" : {
+				"input[type=radio]" : {
 					get : function(field) {
 						if (field.checked) {
 							return field.value;
@@ -1214,6 +1214,38 @@
 							field.checked = false;
 						}
 						field.simplyData = data;
+					}
+				},
+				"input[type=checkbox]" : {
+					get : function(field) {
+						if (field.getAttribute('value')) {
+							if (field.checked) {
+								return field.value;
+							} else {
+								return '';
+							}
+						} else {
+							if (field.checked) {
+								return 1;
+							} else {
+								return 0;
+							}
+						}
+					},
+					set : function(field, data) {
+						if (field.hasAttribute('value')) {
+							if (field.getAttribute('value') == data) {
+								field.checked = true;
+							} else {
+								field.checked = false;
+							}
+						} else {
+							if (data == 1) {
+								field.checked = true;
+							} else {
+								field.checked = false;
+							}
+						}
 					}
 				},
 				"select:not([multiple])" : {
