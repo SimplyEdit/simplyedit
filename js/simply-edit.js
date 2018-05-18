@@ -608,6 +608,8 @@
 					var sourceTemplate = templates[t].getAttribute("rel");
 					if (sourceTemplate && document.getElementById(sourceTemplate)) {
 						list.templates[templateName] = document.getElementById(sourceTemplate);
+					} else if (sourceTemplate && editor.toolbarsContainer.getElementById(sourceTemplate)) {
+						list.templates[templateName] = editor.toolbarsContainer.getElementById(sourceTemplate);
 					} else {
 						list.templates[templateName] = templates[t];
 					}
@@ -1921,23 +1923,23 @@
 				if (!toolbarsContainer) {
 					toolbarsContainer = document.createElement("DIV");
 					toolbarsContainer.id = "simply-editor";
-					if (scriptEl.hasAttribute("data-simply-shadowless")) {
-						toolbarsContainer.attachShadow = false; // this overrides the native code;
-					}
 					document.body.appendChild(toolbarsContainer);
 				}
 
-				if (!toolbarsContainer.shadowRoot && toolbarsContainer.attachShadow) {
-					toolbarsContainer.attachShadow({mode: "open"});
-				}
-				if (toolbarsContainer.shadowRoot) {
-					toolbarsContainer = toolbarsContainer.shadowRoot;
+				if (scriptEl.hasAttribute("data-simply-shadow-toolbars")) {
+					if (!toolbarsContainer.shadowRoot && toolbarsContainer.attachShadow) {
+						toolbarsContainer.attachShadow({mode: "open"});
+					}
+					if (toolbarsContainer.shadowRoot) {
+						toolbarsContainer = toolbarsContainer.shadowRoot;
+					}
 				}
 				if (!toolbarsContainer.getElementById) {
 					toolbarsContainer.getElementById = function(id) {
 						return document.getElementById(id);
 					};
 				}
+
 				return toolbarsContainer;
 			},
 			init : function() {
