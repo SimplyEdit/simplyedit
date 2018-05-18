@@ -608,6 +608,8 @@
 					var sourceTemplate = templates[t].getAttribute("rel");
 					if (sourceTemplate && document.getElementById(sourceTemplate)) {
 						list.templates[templateName] = document.getElementById(sourceTemplate);
+					} else if (sourceTemplate && editor.toolbarsContainer.getElementById(sourceTemplate)) {
+						list.templates[templateName] = editor.toolbarsContainer.getElementById(sourceTemplate);
 					} else {
 						list.templates[templateName] = templates[t];
 					}
@@ -779,6 +781,8 @@
 				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
 					editor.list.init(clone, listDataItem, useDataBinding);
 				}
+
+				editor.list.runScripts(clone);
 			},
 			set : function(list, listData) {
 				if (list.dataBinding) {
@@ -802,7 +806,7 @@
 					if (scripts[i].innerHTML) {
 						newNode.innerHTML = scripts[i].innerHTML;
 					}
-					document.head.appendChild(newNode);
+					scripts[i].parentNode.appendChild(newNode);
 					scripts[i].parentNode.removeChild(scripts[i]);
 				}
 			},
@@ -1199,7 +1203,7 @@
 						field.value = data;
 					}
 				},
-				"input[type=radio],input[type=checkbox]" : {
+				"input[type=radio]" : {
 					get : function(field) {
 						if (field.checked) {
 							return field.value;
@@ -1214,6 +1218,38 @@
 							field.checked = false;
 						}
 						field.simplyData = data;
+					}
+				},
+				"input[type=checkbox]" : {
+					get : function(field) {
+						if (field.getAttribute('value')) {
+							if (field.checked) {
+								return field.value;
+							} else {
+								return '';
+							}
+						} else {
+							if (field.checked) {
+								return 1;
+							} else {
+								return 0;
+							}
+						}
+					},
+					set : function(field, data) {
+						if (field.hasAttribute('value')) {
+							if (field.getAttribute('value') == data) {
+								field.checked = true;
+							} else {
+								field.checked = false;
+							}
+						} else {
+							if (data == 1) {
+								field.checked = true;
+							} else {
+								field.checked = false;
+							}
+						}
 					}
 				},
 				"select:not([multiple])" : {
@@ -1887,23 +1923,23 @@
 				if (!toolbarsContainer) {
 					toolbarsContainer = document.createElement("DIV");
 					toolbarsContainer.id = "simply-editor";
-					if (scriptEl.hasAttribute("data-simply-shadowless")) {
-						toolbarsContainer.attachShadow = false; // this overrides the native code;
-					}
 					document.body.appendChild(toolbarsContainer);
 				}
 
-				if (!toolbarsContainer.shadowRoot && toolbarsContainer.attachShadow) {
-					toolbarsContainer.attachShadow({mode: "open"});
-				}
-				if (toolbarsContainer.shadowRoot) {
-					toolbarsContainer = toolbarsContainer.shadowRoot;
+				if (scriptEl.hasAttribute("data-simply-shadow-toolbars")) {
+					if (!toolbarsContainer.shadowRoot && toolbarsContainer.attachShadow) {
+						toolbarsContainer.attachShadow({mode: "open"});
+					}
+					if (toolbarsContainer.shadowRoot) {
+						toolbarsContainer = toolbarsContainer.shadowRoot;
+					}
 				}
 				if (!toolbarsContainer.getElementById) {
 					toolbarsContainer.getElementById = function(id) {
 						return document.getElementById(id);
 					};
 				}
+
 				return toolbarsContainer;
 			},
 			init : function() {
@@ -2575,6 +2611,32 @@
 					this.sitemap = storage.default.sitemap;
 					this.page = storage.default.page;
 					this.listSitemap = storage.default.listSitemap;
+
+					if (editor.responsiveImages) {
+						if (
+							editor.settings['simply-image'] &&
+							editor.settings['simply-image'].responsive
+						) {
+							if (typeof editor.settings['simply-image'].responsive.sizes === "function") {
+								editor.responsiveImages.sizes = editor.settings['simply-image'].responsive.sizes;
+							} else if (typeof editor.settings['simply-image'].responsive.sizes === "object") {
+								editor.responsiveImages.sizes = (function(sizes) {
+									return function(src) {
+										var result = {};
+										var info = src.split(".");
+										var extension = info.pop().toLowerCase();
+										if (extension === "jpg" || extension === "jpeg" || extension === "png") {
+											for (var i=0; i<sizes.length; i++) {
+												result[sizes[i] + "w"] = info.join(".") + "-simply-scaled-" + sizes[i] + "." + extension;
+											}
+										}
+										return result;
+									};
+								}(editor.settings['simply-image'].responsive.sizes));
+							}
+						}
+						window.addEventListener("resize", editor.responsiveImages.resizeHandler);
+					}
 				},
 				connect : function(callback) {
 					callback();
