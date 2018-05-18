@@ -1367,12 +1367,12 @@ QUnit.module("databinding");
 		editor.currentData['/'].item = {
 			q : "Que"
 		};
-
 		document.querySelector("#testContent div").innerHTML = "Hello again";
 		stop();
 		window.setTimeout(function() { // give Edge a second to catch up;
-			assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
 			start();
+			document.querySelector("#testContent div").dataBinding.resolve(true);
+			assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
 		}, 0);
 	});
 
@@ -1403,8 +1403,9 @@ QUnit.module("databinding");
 		document.querySelector("#testContent div").innerHTML = "Hello again";
 		stop();
 		window.setTimeout(function() { // let it redraw
-			assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
 			start();
+			document.querySelector("#testContent div").dataBinding.resolve(true);
+			assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
 		}, 0);
 	});
 
