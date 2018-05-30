@@ -110,9 +110,9 @@
 				}
 				var subFields;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE || !target.parentNode) {
-					subFields = target.querySelectorAll("[data-simply-list] [data-simply-field]");
+					subFields = target.querySelectorAll("[data-simply-list] [data-simply-field], template [data-simply-field]");
 				} else {
-					subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+					subFields = target.querySelectorAll(":scope [data-simply-list] [data-simply-field], :scope template [data-simply-field]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
 
 				// prepare this as an array so we can use indexOf to check for elements;
@@ -547,9 +547,9 @@
 				var dataLists = target.querySelectorAll("[data-simply-list]");
 				var subLists;
 				if (target.nodeType == document.DOCUMENT_NODE || target.nodeType == document.DOCUMENT_FRAGMENT_NODE || !target.parentNode) {
-					subLists = target.querySelectorAll("template [data-simply-list], [data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]");
+					subLists = target.querySelectorAll("template [data-simply-list], [data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']):not([data-simply-content='fixed']) [data-simply-list]");
 				} else {
-					subLists = target.querySelectorAll(":scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content='attributes']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
+					subLists = target.querySelectorAll(":scope template [data-simply-list], :scope [data-simply-list] [data-simply-list], :scope [data-simply-field]:not([data-simply-content='attributes']):not([data-simply-content='fixed']) [data-simply-list]"); // use :scope here, otherwise it will also return items that are a part of a outside-scope-list
 				}
 				var subListsArr = [];
 				for (var a=0; a<subLists.length; a++) {
