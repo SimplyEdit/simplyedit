@@ -1869,6 +1869,7 @@
 				var url = toolbarList.shift();
 				var i;
 				var http = new XMLHttpRequest();
+				var editorCss;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
 				} else {
@@ -1876,9 +1877,6 @@
 				}
 
 				http.open("GET", url, true);
-				http.onerror = function() {
-					alert("Unable to load SimplyEdit, please check that your API key is valid for this domain.");
-				};
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
@@ -1916,9 +1914,10 @@
 							for (i=0; i<newToolbars.length; i++) {
 								editor.toolbar.init(newToolbars[i]);
 							}
-						} else if (http.status === 0) {
-							console.log("Toolbar load got status 0, XHR probably failed because of an invalid API key.");
-							var editorCss = document.head.querySelector("link[href='" + editor.baseURL + "simply/css/editor.v9.css" + "']");
+						} else if (http.status === 0 || http.status === 403) {
+							console.log("Toolbar load got status 0, XHR probably failed because of an invalid or expired API key.");
+							alert("Unable to load SimplyEdit, please check that your API key is valid for this domain.");
+							editorCss = document.head.querySelector("link[href='" + editor.baseURL + "simply/css/editor.v9.css" + "']");
 							if (editorCss) {
 								editorCss.parentNode.removeChild(editorCss);
 							}
