@@ -1421,13 +1421,14 @@
 							newdata[attributes[0]] = data;
 							return editor.field.defaultSetter(field, newdata);
 						}
-						// FIXME: filter attributes that are not in data-simply-attributes;
-						return editor.field.defaultSetter(field, data);
+
+						return editor.field.defaultSetter(field, data, attributes);
 					},
 					makeEditable : function(field) {
 						field.setAttribute("data-simply-selectable", true);
 					}
-				}
+				},
+
 			},
 			initHopeEditor : function(field) {
 				if (typeof hope === "undefined") {
@@ -1531,6 +1532,10 @@
 					if (attr == "innerHTML") {
 						if (field.getAttribute("data-simply-content") != "fixed") {
 							result.innerHTML = editor.field.getInnerHTML(field);
+							if (field.querySelector("[data-simply-field]")) {
+								console.log("Warning: This field contains another field in its innerHTML - did you mean to set the data-simply-content attribute for this field to 'fixed' or 'attributes'?");
+								console.log(field);
+							}
 						}
 					} else {
 						result[attr] = field.getAttribute(attr);
@@ -1538,24 +1543,22 @@
 				}
 				return result;
 			},
-			defaultSetter : function(field, data) {
+			defaultSetter : function(field, data, attributes) {
 				var contentType = field.getAttribute("data-simply-content");
-				if (typeof data === "string") {
-					if (contentType == "attributes" &&  field.hasAttribute("data-simply-attributes")) {
-						var attrs = field.getAttribute("data-simply-attributes").split(" ");
-						if (attrs.length == 1) {
-							field.simplyString = true;
-							var newData = {};
-							newData[attrs[0]] = data;
-							data = newData;
-						}
-					}
+				if (typeof data === "string" && attributes && attributes.length == 1) {
+					field.simplyString = true;
+					var newData = {};
+					newData[attributes[0]] = data;
+					data = newData;
 				}
 				if (typeof data === "string") {
 					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
 					return;
 				}
 				for (var attr in data) {
+					if (attributes && attributes.indexOf(attr) < 0) {
+						continue;
+					}
 					if (attr == "innerHTML") {
 						if (contentType != "fixed") {
 							if (contentType == "text") {
@@ -1603,6 +1606,14 @@
 						}
 					}
 				}
+
+				var transformer = field.getAttribute('data-simply-transformer');
+				if (transformer) {
+					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
+						data = editor.transformers[transformer].render.call(field, data);
+					}
+				}
+
 				if (field.simplySetter) {
 					return field.simplySetter(field, data);
 				} else {
@@ -1640,10 +1651,20 @@
 						}
 					}
 				}
+				var result;
 				if (field.simplyGetter) {
-					return field.simplyGetter(field);
+					result = field.simplyGetter(field);
+				} else {
+					result = editor.field.getInnerHTML(field);
 				}
-				return editor.field.getInnerHTML(field);
+
+				var transformer = field.getAttribute('data-simply-transformer');
+				if (transformer) {
+					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
+						result = editor.transformers[transformer].extract.call(field, result);
+					}
+				}
+				return result;
 			},
 			makeEditable : function(field) {
 				if (field.dataBinding) {
@@ -1852,6 +1873,7 @@
 				var url = toolbarList.shift();
 				var i;
 				var http = new XMLHttpRequest();
+				var editorCss;
 				if (editor.profile == "dev") {
 					url += "?t=" + (new Date().getTime());
 				} else {
@@ -1859,9 +1881,6 @@
 				}
 
 				http.open("GET", url, true);
-				http.onerror = function() {
-					alert("Unable to load SimplyEdit, please check that your API key is valid for this domain.");
-				};
 
 				http.onreadystatechange = function() {//Call a function when the state changes.
 					if(http.readyState == 4) {
@@ -1899,9 +1918,10 @@
 							for (i=0; i<newToolbars.length; i++) {
 								editor.toolbar.init(newToolbars[i]);
 							}
-						} else if (http.status === 0) {
-							console.log("Toolbar load got status 0, XHR probably failed because of an invalid API key.");
-							var editorCss = document.head.querySelector("link[href='" + editor.baseURL + "simply/css/editor.v9.css" + "']");
+						} else if (http.status === 0 || http.status === 403) {
+							console.log("Toolbar load got status 0, XHR probably failed because of an invalid or expired API key.");
+							alert("Unable to load SimplyEdit, please check that your API key is valid for this domain.");
+							editorCss = document.head.querySelector("link[href='" + editor.baseURL + "simply/css/editor.v9.css" + "']");
 							if (editorCss) {
 								editorCss.parentNode.removeChild(editorCss);
 							}
