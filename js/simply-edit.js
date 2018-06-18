@@ -1532,6 +1532,10 @@
 					if (attr == "innerHTML") {
 						if (field.getAttribute("data-simply-content") != "fixed") {
 							result.innerHTML = editor.field.getInnerHTML(field);
+							if (result.innerHTML.indexOf("data-simply-field") > -1) {
+								console.log("Warning: This field contains another field in its innerHTML - did you mean to set the data-simply-content attribute for this field to 'fixed' or 'attributes'?");
+								console.log(field);
+							}
 						}
 					} else {
 						result[attr] = field.getAttribute(attr);
