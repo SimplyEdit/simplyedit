@@ -1603,6 +1603,14 @@
 						}
 					}
 				}
+
+				var transformer = field.getAttribute('data-simply-transformer');
+				if (transformer) {
+					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
+						data = editor.transformers[transformer].render.call(field, data);
+					}
+				}
+
 				if (field.simplySetter) {
 					return field.simplySetter(field, data);
 				} else {
@@ -1640,10 +1648,20 @@
 						}
 					}
 				}
+				var result;
 				if (field.simplyGetter) {
-					return field.simplyGetter(field);
+					result = field.simplyGetter(field);
+				} else {
+					result = editor.field.getInnerHTML(field);
 				}
-				return editor.field.getInnerHTML(field);
+
+				var transformer = field.getAttribute('data-simply-transformer');
+				if (transformer) {
+					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
+						result = editor.transformers[transformer].extract.call(field, result);
+					}
+				}
+				return result;
 			},
 			makeEditable : function(field) {
 				if (field.dataBinding) {
