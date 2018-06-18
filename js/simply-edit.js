@@ -1421,13 +1421,14 @@
 							newdata[attributes[0]] = data;
 							return editor.field.defaultSetter(field, newdata);
 						}
-						// FIXME: filter attributes that are not in data-simply-attributes;
-						return editor.field.defaultSetter(field, data);
+
+						return editor.field.defaultSetter(field, data, attributes);
 					},
 					makeEditable : function(field) {
 						field.setAttribute("data-simply-selectable", true);
 					}
-				}
+				},
+
 			},
 			initHopeEditor : function(field) {
 				if (typeof hope === "undefined") {
@@ -1538,24 +1539,22 @@
 				}
 				return result;
 			},
-			defaultSetter : function(field, data) {
+			defaultSetter : function(field, data, attributes) {
 				var contentType = field.getAttribute("data-simply-content");
-				if (typeof data === "string") {
-					if (contentType == "attributes" &&  field.hasAttribute("data-simply-attributes")) {
-						var attrs = field.getAttribute("data-simply-attributes").split(" ");
-						if (attrs.length == 1) {
-							field.simplyString = true;
-							var newData = {};
-							newData[attrs[0]] = data;
-							data = newData;
-						}
-					}
+				if (typeof data === "string" && attributes && attributes.length == 1) {
+					field.simplyString = true;
+					var newData = {};
+					newData[attributes[0]] = data;
+					data = newData;
 				}
 				if (typeof data === "string") {
 					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
 					return;
 				}
 				for (var attr in data) {
+					if (attributes && attributes.indexOf(attr) < 0) {
+						continue;
+					}
 					if (attr == "innerHTML") {
 						if (contentType != "fixed") {
 							if (contentType == "text") {
