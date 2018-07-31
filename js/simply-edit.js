@@ -46,6 +46,7 @@
 		baseURL : getBaseURL(scriptEl.src),
 		baseURLClean : getKeylessBaseURL(scriptEl.src),
 		bindingParents : [],
+		transformers: {},
 		data : {
 			getDataPath : function(field) {
 				var parent = field;
