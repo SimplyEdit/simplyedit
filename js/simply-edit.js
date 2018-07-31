@@ -75,7 +75,7 @@
 					}
 					parent = parent.parentNode;
 				}
-				if (parent.dataSimplyPath) {
+				if (parent && parent.dataSimplyPath) {
 					return parent.dataSimplyPath;
 				}
 				if (field.storedPath && !field.offsetParent) {
