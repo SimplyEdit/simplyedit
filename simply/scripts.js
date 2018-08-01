@@ -317,23 +317,34 @@ muze.url = (function() {
 		modules = _parseModulesList( modules );
 		var scriptsToLoad = [];
 		var moduleInstance;
-		for (var i=0; i<modules.length; i++) {
-			if ( modules[i].module ) {
-				moduleInstance = _namespaceWalk( modules[i].module, function(ob, name) {
-					if (typeof continuation == 'undefined' || !modules[i].url ) {
+
+		var moduleWalker = function(module) {
+			if (module.module) {
+				moduleInstance = _namespaceWalk( module.module, function(ob, name) {
+					if (typeof continuation == 'undefined' || !module.url ) {
 						throw 'namespace ' + name + ' not found ';
 					} else {
-						scriptsToLoad[ scriptsToLoad.length ] = modules[i];
+						scriptsToLoad[ scriptsToLoad.length ] = module;
 					}
 				});
-			} else if ( !included[ modules[i].url ] ) {
-				if (typeof continuation == 'undefined' || !modules[i].url ) {
+			} else if ( !included[ module.url ] ) {
+				if (typeof continuation == 'undefined' || !module.url ) {
 					throw 'namespace ' + name + ' not found ';
 				} else {
-					scriptsToLoad[ scriptsToLoad.length ] = modules[i];
+					scriptsToLoad[ scriptsToLoad.length ] = module;
 				}
 			}
+			return moduleInstance;
+		};
+
+		var result;
+		for (var i=0; i<modules.length; i++) {
+			result = moduleWalker(modules[i]);
+			if (result) {
+				moduleInstance = result;
+			}
 		}
+
 		dependencies[ dependencies.length ] = {
 			'continuation' : continuation,
 			'scriptsToLoad' : scriptsToLoad
