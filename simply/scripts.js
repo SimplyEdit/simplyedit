@@ -1808,7 +1808,11 @@ simply.dom= ( function(dom) {
 							// Case 1: geen tekstnodes.
 							// start en eind punt van selectie zitten in dezelfde node en de node heeft kinderen - dus geen text node - en de offset verschillen
 							// precies 1 - dus er is exact 1 node geselecteerd.
-							node = range.startContainer.childNodes[range.startOffset]; // image achtige control selections.
+							if (range.startContainer.childNodes[range.startOffset]) {
+								node = range.startContainer.childNodes[range.startOffset]; // image achtige control selections. cursor is voor de image dus pak de node na de cursor.
+							} else {
+								node = range.startContainer.childNodes[range.startOffset-1]; // cursor is na de image, dus pak de node er voor.
+							}
 						}
 					}
 
