@@ -76,7 +76,7 @@
 					}
 					parent = parent.parentNode;
 				}
-				if (parent.dataSimplyPath) {
+				if (parent && parent.dataSimplyPath) {
 					return parent.dataSimplyPath;
 				}
 				if (field.storedPath && !field.offsetParent) {
@@ -611,6 +611,13 @@
 						list.templates[templateName] = document.getElementById(sourceTemplate);
 					} else if (sourceTemplate && editor.toolbarsContainer.getElementById(sourceTemplate)) {
 						list.templates[templateName] = editor.toolbarsContainer.getElementById(sourceTemplate);
+					} else if (templates[t].tagName.toLowerCase() !== "template") {
+						/* If it is not a template tag, the element itself should be used as a template, instead of the contents. */
+						var templateNode = document.createElement("div");
+						templateNode.setAttribute("data-simply-template", templates[t].getAttribute("data-simply-template"));
+						templates[t].removeAttribute("data-simply-template");
+						templateNode.appendChild(templates[t].cloneNode(true));
+						list.templates[templateName] = templateNode;
 					} else {
 						list.templates[templateName] = templates[t];
 					}

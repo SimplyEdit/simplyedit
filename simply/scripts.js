@@ -317,23 +317,34 @@ muze.url = (function() {
 		modules = _parseModulesList( modules );
 		var scriptsToLoad = [];
 		var moduleInstance;
-		for (var i=0; i<modules.length; i++) {
-			if ( modules[i].module ) {
-				moduleInstance = _namespaceWalk( modules[i].module, function(ob, name) {
-					if (typeof continuation == 'undefined' || !modules[i].url ) {
+
+		var moduleWalker = function(module) {
+			if (module.module) {
+				moduleInstance = _namespaceWalk( module.module, function(ob, name) {
+					if (typeof continuation == 'undefined' || !module.url ) {
 						throw 'namespace ' + name + ' not found ';
 					} else {
-						scriptsToLoad[ scriptsToLoad.length ] = modules[i];
+						scriptsToLoad[ scriptsToLoad.length ] = module;
 					}
 				});
-			} else if ( !included[ modules[i].url ] ) {
-				if (typeof continuation == 'undefined' || !modules[i].url ) {
+			} else if ( !included[ module.url ] ) {
+				if (typeof continuation == 'undefined' || !module.url ) {
 					throw 'namespace ' + name + ' not found ';
 				} else {
-					scriptsToLoad[ scriptsToLoad.length ] = modules[i];
+					scriptsToLoad[ scriptsToLoad.length ] = module;
 				}
 			}
+			return moduleInstance;
+		};
+
+		var result;
+		for (var i=0; i<modules.length; i++) {
+			result = moduleWalker(modules[i]);
+			if (result) {
+				moduleInstance = result;
+			}
 		}
+
 		dependencies[ dependencies.length ] = {
 			'continuation' : continuation,
 			'scriptsToLoad' : scriptsToLoad
@@ -1808,7 +1819,11 @@ simply.dom= ( function(dom) {
 							// Case 1: geen tekstnodes.
 							// start en eind punt van selectie zitten in dezelfde node en de node heeft kinderen - dus geen text node - en de offset verschillen
 							// precies 1 - dus er is exact 1 node geselecteerd.
-							node = range.startContainer.childNodes[range.startOffset]; // image achtige control selections.
+							if (range.startContainer.childNodes[range.startOffset-1]) {
+								node = range.startContainer.childNodes[range.startOffset-1]; // image achtige control selections. cursor is na de image dus pak de node voor de cursor
+							} else {
+								node = range.startContainer.childNodes[range.startOffset]; // er is geen node voor de cursor, dus pak dan maar die er na staat.
+							}
 						}
 					}
 
