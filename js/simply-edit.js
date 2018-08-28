@@ -79,7 +79,7 @@
 				if (parent && parent.dataSimplyPath) {
 					return parent.dataSimplyPath;
 				}
-				if (field.storedPath && !field.offsetParent) {
+				if (field && field.storedPath && !field.offsetParent) {
 					return field.storedPath;
 				}
 				return location.pathname;
