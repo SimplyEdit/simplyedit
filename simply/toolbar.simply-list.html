@@ -58,14 +58,20 @@
 	</div>
 </section>
 <script>
-	var currentList, currentListItem;
+	var currentList, currentListItem, currentListIndex;
 
 	editor.plugins.list = {
 		item : {
 			add : function(el) {
 				var targetNode = currentListItem;
-				
 				var targetObjectList = targetNode.parentNode;
+				if (!targetObjectList) {
+					targetObjectList = currentList;
+					targetNode = currentList.children[currentListIndex-1];
+					var sel = vdSelectionState.get();
+					sel.selectNode(targetNode);
+				}
+
 				if (targetObjectList.getAttribute("data-simply-list")) {
 					var template = el.getAttribute("data-simply-value");
 					if (template === null) {
@@ -193,6 +199,7 @@
 				} else {
 					listIndex = 0;
 				}
+				currentListIndex = listIndex;
 
 				if (list.dataBinding) {
 					editor.bindingParents.push(listIndex);
