@@ -501,7 +501,18 @@
 				this.removeAttribute("data-simply-stashed");
 				var data = editor.list.get(this);
 
-				return data[dataPath][dataName];
+				var dataParent = data[dataPath];
+				var dataKeys = dataName.split(".");
+				dataName = dataKeys.pop();
+				for (var j=0; j<dataKeys.length; j++) {
+					if (!dataParent[dataKeys[j]]) {
+						dataParent[dataKeys[j]] = {};
+					}
+					editor.data.bindAsParent(dataParent, dataKeys[j]);
+					dataParent = dataParent[dataKeys[j]];
+				}
+
+				return dataParent[dataName];
 			},
 			dataBindingSetter : function(value) {
 				if (!this.getAttribute("data-simply-list") && this.getAttribute("data-simply-field")) {
