@@ -1230,10 +1230,13 @@
 					return;
 				}
 			} catch(e) {
-				if (!e.message.match("':-webkit-autofill' is not a valid selector")) {
-					// catch the error for SyntaxError: ':-webkit-autofill' is not a valid selector, let the rest bubble up;
+				if (e.code !== e.SYNTAX_ERR) {
 					throw e;
 				}
+				if (!e.message.match(":-webkit-autofill")) {
+					throw e;
+				}
+				// catch the error for SyntaxError: ':-webkit-autofill' is not a valid selector, let the rest bubble up;
 			}
 			editor.context.update();
 		});
