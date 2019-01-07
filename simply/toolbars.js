@@ -847,6 +847,12 @@
 							// no more scroll space, so add it.
 							document.body.classList.add('simply-footer-space');
 						}
+
+						/*
+						if ( top + toolbarRect.height > editPaneRect.height ) {
+							// FIXME: even after adding footer space, we still don't fit. Now what?
+						}
+						*/
 					}
 				}
 
@@ -1219,8 +1225,15 @@
 
 		muze.event.attach( document, 'keyup', function(evt) {
 			// skip context updates when the keyup event is coming from autofilled (username/password) inputs, to prevent looping in chrome when credentials are saved.
-			if (evt.target && evt.target.matches && evt.target.matches(":-webkit-autofill")) {
-				return;
+			try {
+				if (evt.target && evt.target.matches && evt.target.matches(":-webkit-autofill")) {
+					return;
+				}
+			} catch(e) {
+				if (!e.message.match("':-webkit-autofill' is not a valid selector")) {
+					// catch the error for SyntaxError: ':-webkit-autofill' is not a valid selector, let the rest bubble up;
+					throw e;
+				}
 			}
 			editor.context.update();
 		});
