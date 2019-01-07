@@ -618,10 +618,14 @@
 
 					// Allow the 'rel' attribute to point to the contents of another (global) template;
 					var sourceTemplate = templates[t].getAttribute("rel");
-					if (sourceTemplate && document.getElementById(sourceTemplate)) {
-						list.templates[templateName] = document.getElementById(sourceTemplate);
-					} else if (sourceTemplate && editor.toolbarsContainer.getElementById(sourceTemplate)) {
-						list.templates[templateName] = editor.toolbarsContainer.getElementById(sourceTemplate);
+					if (sourceTemplate) {
+						if (document.getElementById(sourceTemplate)) {
+							list.templates[templateName] = document.getElementById(sourceTemplate);
+						} else if (editor.toolbarsContainer && editor.toolbarsContainer.getElementById(sourceTemplate)) {
+							list.templates[templateName] = editor.toolbarsContainer.getElementById(sourceTemplate);
+						} else {
+							console.log("Warning: could not find a template with ID '" + sourceTemplate + "'");
+						}
 					} else if (templates[t].tagName.toLowerCase() !== "template") {
 						/* If it is not a template tag, the element itself should be used as a template, instead of the contents. */
 						var templateNode = document.createElement("div");
@@ -632,6 +636,12 @@
 					} else {
 						list.templates[templateName] = templates[t];
 					}
+
+					if (typeof list.templates[templateName] === "undefined") {
+						console.log("Warning: template '" + templateName + "' was not defined.");
+						return;
+					}
+
 					if (!("content" in list.templates[templateName])) {
 						var fragment = document.createDocumentFragment();
 						var fragmentNode = document.createElement("FRAGMENT");
