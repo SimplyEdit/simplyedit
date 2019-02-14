@@ -761,16 +761,16 @@
 					if (annotation) {
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, "ul");
 						hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, value);
-						return;
-					}
-
-					annotation = hopeEditor.fragment.has(range, "ol");
-					if (annotation) {
-						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, "ol");
-						hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, value);
 						hopeEditor.update();
 						return;
-
+					} else {
+						annotation = hopeEditor.fragment.has(range, "ol");
+						if (annotation) {
+							hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, "ol");
+							hopeEditor.fragment = hopeEditor.fragment.apply(annotation.range, value);
+							hopeEditor.update();
+							return;
+						}
 					}
 
 					if (blocks.length === 0) {
@@ -815,6 +815,8 @@
 					if ((newRange.start == block.range.start) && (newRange.end == block.range.end)) {
 						var tagName = block.tag.split(" ")[0];
 						if (editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
+							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
+						} else if (tagName.toLowerCase() === "li" && editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']")) {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
 						}
 					}
