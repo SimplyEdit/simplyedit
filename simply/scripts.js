@@ -1645,7 +1645,7 @@ muze.namespace('muze.html', function() {
 });
 
 
-simply = ( function(simply) {
+window.simply = ( function(simply) {
 	return simply;
 })(window.simply || {});
 
