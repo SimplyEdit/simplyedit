@@ -178,6 +178,7 @@ hope.register( 'hope.editor', function() {
 		this.fragment = hope.fragment.create( text, annotations );
 		this.refs.output.contentEditable = true;
 		this.update();
+		this.initDone = true;
 //		initEvents(this);
 	}
 
@@ -456,8 +457,9 @@ hope.register( 'hope.editor', function() {
 	hopeEditor.prototype.update = function() {
 		var html = hope.render.html.render( this.fragment );
 		this.refs.output.innerHTML = html;
-		this.showCursor();
-
+		if (this.initDone) {
+			this.showCursor();
+		}
 		if ( this.refs.text ) {
 			this.refs.text.value = ''+this.fragment.text;
 		}
