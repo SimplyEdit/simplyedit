@@ -1553,8 +1553,11 @@
 			},
 			defaultGetter : function(field, attributes) {
 				var result = {};
-				if (field.dataBinding && typeof field.dataBinding.get() === "object") {
-					result = JSON.parse(JSON.stringify(field.dataBinding.get())); // Start with the existing data if there to prevent destroying data that is not part of our scope;
+				if (field.dataBinding) {
+					var currentValue = field.dataBinding.get();
+					if (typeof currentValue === "object" && currentValue !== null) {
+						result = JSON.parse(JSON.stringify(currentValue)); // Start with the existing data if there to prevent destroying data that is not part of our scope;
+					}
 				}
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
@@ -1574,13 +1577,17 @@
 			},
 			defaultSetter : function(field, data, attributes) {
 				var contentType = field.getAttribute("data-simply-content");
-				if (typeof data === "string" && attributes && attributes.length == 1) {
+				if ((typeof data === "string" || data instanceof String) && attributes && attributes.length == 1) {
 					field.simplyString = true;
 					var newData = {};
 					newData[attributes[0]] = data;
 					data = newData;
 				}
 				if (typeof data === "string") {
+					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
+					return;
+				}
+				if (data instanceof String) {
 					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
 					return;
 				}
