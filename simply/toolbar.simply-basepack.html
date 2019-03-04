@@ -4092,8 +4092,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	}
 </script><script type="text/javascript">
 	var spanListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -4107,8 +4106,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	};
 
 	var fontListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -4148,8 +4146,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	};
 
 	var noTagsAllowedListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -4163,8 +4160,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	};
 
 	var divListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -4332,8 +4328,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			document.addEventListener("DOMNodeInserted", fontListener);
 
 			document.addEventListener("keydown", function(event) {
-				var simplyParent = editor.node.getSimplyParent(event.target);
-				if (!simplyParent) {
+				if (!editor.node.getSimplyField(event.target)) {
 					return;
 				}
 				switch (event.keyCode) {
@@ -4354,17 +4349,18 @@ document.addEventListener('simply-toolbars-loaded', function() {
 						addParagraphs(event.target.childNodes);
 
 						var simplyParent = editor.node.getSimplyParent(event.target);
-						if (simplyParent && simplyParent.hopeEditor) {
-							simplyParent.hopeEditor.needsUpdate = true;
+						if (simplyParent) {
+							event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
+							if (simplyParent.hopeEditor) {
+								simplyParent.hopeEditor.needsUpdate = true;
+							}
 						}
-						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
 					break;
 				}
 			});
 
 			document.addEventListener("keyup", function(event) {
-				var simplyParent = editor.node.getSimplyParent(event.target);
-				if (!simplyParent) {
+				if (!editor.node.getSimplyField(event.target)) {
 					return;
 				}
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
@@ -4373,8 +4369,7 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			});
 
 			document.addEventListener("paste", function(event) {
-				var simplyParent = editor.node.getSimplyParent(event.target);
-				if (!simplyParent) {
+				if (!editor.node.getSimplyField(event.target)) {
 					return;
 				}
 				var pastedText = undefined;

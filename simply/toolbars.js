@@ -288,8 +288,7 @@
 	editor.node = {
 		parents : function(target) {
 			var result = [];
-			// while(target && (target.nodeType == 1) && !target.classList.contains("editable")) {
-			while(target && (target.nodeType == 1)) {
+			while(target && (target.nodeType == document.ELEMENT_NODE)) {
 				result.push(target);
 				target = target.parentNode;
 			}
@@ -341,6 +340,27 @@
 					return true;
 				}
 				if (elm.getAttribute("data-simply-selectable")) {
+					return true;
+				}
+			}
+			return false;
+		},
+		getSimplyField : function(checkParent) {
+			if (editor.node.isSimplyField(checkParent)) {
+				return checkParent;
+			}
+			var parent = checkParent;
+			while (parent && parent.parentNode) {
+				if (editor.node.isSimplyField(parent.parentNode)) {
+					return parent.parentNode;
+				}
+				parent = parent.parentNode;
+			}
+			return false;
+		},
+		isSimplyField : function(elm) {
+			if (elm.getAttribute) {
+				if (elm.getAttribute("data-simply-field")) {
 					return true;
 				}
 			}

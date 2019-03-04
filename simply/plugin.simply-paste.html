@@ -1,7 +1,6 @@
 <script type="text/javascript">
 	var spanListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -15,8 +14,7 @@
 	};
 
 	var fontListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -56,8 +54,7 @@
 	};
 
 	var noTagsAllowedListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -71,8 +68,7 @@
 	};
 
 	var divListener = function(event) {
-		var simplyParent = editor.node.getSimplyParent(event.target);
-		if (!simplyParent) {
+		if (!editor.node.getSimplyField(event.target)) {
 			return;
 		}
 
@@ -240,8 +236,7 @@
 			document.addEventListener("DOMNodeInserted", fontListener);
 
 			document.addEventListener("keydown", function(event) {
-				var simplyParent = editor.node.getSimplyParent(event.target);
-				if (!simplyParent) {
+				if (!editor.node.getSimplyField(event.target)) {
 					return;
 				}
 				switch (event.keyCode) {
@@ -262,17 +257,18 @@
 						addParagraphs(event.target.childNodes);
 
 						var simplyParent = editor.node.getSimplyParent(event.target);
-						if (simplyParent && simplyParent.hopeEditor) {
-							simplyParent.hopeEditor.needsUpdate = true;
+						if (simplyParent) {
+							event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
+							if (simplyParent.hopeEditor) {
+								simplyParent.hopeEditor.needsUpdate = true;
+							}
 						}
-						event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
 					break;
 				}
 			});
 
 			document.addEventListener("keyup", function(event) {
-				var simplyParent = editor.node.getSimplyParent(event.target);
-				if (!simplyParent) {
+				if (!editor.node.getSimplyField(event.target)) {
 					return;
 				}
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
@@ -281,8 +277,7 @@
 			});
 
 			document.addEventListener("paste", function(event) {
-				var simplyParent = editor.node.getSimplyParent(event.target);
-				if (!simplyParent) {
+				if (!editor.node.getSimplyField(event.target)) {
 					return;
 				}
 				var pastedText = undefined;
