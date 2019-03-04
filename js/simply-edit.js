@@ -1864,6 +1864,17 @@
 						editor.currentData[path] = {};
 					}
 					return editor.currentData[path];
+				},
+				set : function(data) {
+					var path = editor.data.getDataPath(document);
+					if (typeof editor.currentData[path] === "undefined") {
+						editor.currentData[path] = {};
+					}
+					if (typeof data === "object") {
+						for (var i in data) {
+							editor.currentData[path][i] = data[i];
+						}
+					}
 				}
 			});
 
