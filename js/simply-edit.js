@@ -1661,7 +1661,7 @@
 			},
 			getInnerHTML : function(field) {
 				// misc cleanups to revert any changes made by simply edit - this should return a pristine version of the content;
-				if (!field.querySelectorAll("img[data-simply-src]")) {
+				if (!field.querySelectorAll("img[data-simply-src]").length) {
 					return field.innerHTML;
 				} else {
 					// There are responsive images in the field; clean them up to return to a pristine state and return that;
@@ -2451,7 +2451,7 @@
 						if (computed.maxWidth.indexOf("%") != -1) {
 							imageWidth = parseFloat(computed.maxWidth) / 100.0;
 							var offsetParent = imgEl.offsetParent ? imgEl.offsetParent : imgEl.parentNode;
-							imageWidth = offsetParent.offsetWidth * imageWidth;
+							imageWidth = offsetParent ? offsetParent.offsetWidth * imageWidth : 0;
 						}
 						if (computed.maxWidth.indexOf("px") != -1) {
 							imageWidth = parseInt(computed.maxWidth);
