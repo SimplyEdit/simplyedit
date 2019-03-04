@@ -2696,7 +2696,7 @@
 					callback();
 				},
 				save: function(data,callback) {
-					editor.storage.file.save("data.json", data, callback);
+					editor.storage.file.save(this.dataEndpoint, data, callback);
 				},
 				saveTemplate : function(pageTemplate, callback) {
 					var dataPath = location.pathname.split(/\//, 3)[2];
@@ -3077,9 +3077,9 @@
 					this.endpoint = endpoint;
 					this.dataPath = "data/data.json";
 					this.dataEndpoint = this.url + this.dataPath;
-                                        if (document.querySelector("[data-storage-get-post-only]")) {
-                                                this.getPostOnly = true;
-                                        }
+					if (document.querySelector("[data-storage-get-post-only]")) {
+						this.getPostOnly = true;
+					}
 
 					if (editor.responsiveImages) {
 						if (
