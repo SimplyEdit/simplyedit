@@ -1418,6 +1418,10 @@ QUnit.module("responsive images");
 
 
 QUnit.module("data path");
+	QUnit.test("get the documents datapath", function(assert) {
+		assert.equal(editor.data.getDataPath(), location.pathname);
+	});
+
 	QUnit.test("unset data path", function(assert) {
 		document.body.removeAttribute("data-simply-path");
 		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), location.pathname);
