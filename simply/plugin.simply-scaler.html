@@ -22,7 +22,7 @@
 		}
 
 		var normalList = editor.storage.list;
-		var sizesRegexp = new RegExp("\\-simply-scaled-(" + sizes.join("|") + ")\\.(jpg|png)$", "i");
+		var sizesRegexp = new RegExp("\\-simply-scaled-(" + sizes.join("|") + ")\\.(jpeg|jpg|png)$", "i");
 
 		var isSizedImageUrl = function(url) {
 			if (url.match(sizesRegexp)) {
