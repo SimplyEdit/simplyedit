@@ -4091,9 +4091,14 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		inserts[i].appendChild(symbolLi);
 	}
 </script><script type="text/javascript">
-	var spanListener = function(ev) {
-		if (ev.target.tagName && ev.target.tagName.toLowerCase()=='span') {
-			editor.node.unwrap(ev.target);
+	var spanListener = function(event) {
+		var simplyParent = editor.node.getSimplyParent(event.target);
+		if (!simplyParent) {
+			return;
+		}
+
+		if (event.target.tagName && event.target.tagName.toLowerCase()=='span') {
+			editor.node.unwrap(event.target);
 			var sel = window.getSelection();
 			var range = sel.getRangeAt(0);
 			sel.removeAllRanges();
@@ -4101,9 +4106,14 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		}
 	};
 
-	var fontListener = function(ev) {
-		if (ev.target.tagName && ev.target.tagName.toLowerCase()=='font') {
-			editor.node.unwrap(ev.target);
+	var fontListener = function(event) {
+		var simplyParent = editor.node.getSimplyParent(event.target);
+		if (!simplyParent) {
+			return;
+		}
+
+		if (event.target.tagName && event.target.tagName.toLowerCase()=='font') {
+			editor.node.unwrap(event.target);
 			var sel = window.getSelection();
 			var range = sel.getRangeAt(0);
 			sel.removeAllRanges();
@@ -4117,18 +4127,18 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		}
 
 		// Chrome remembers that a text was bold or italic, this will remove those tags when they are inserted.
-		if (ev.target.tagName && (ev.target.tagName.toLowerCase()=='b' || ev.target.tagName.toLowerCase()=='i')) {
-			if (ev.target.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
+		if (event.target.tagName && (event.target.tagName.toLowerCase()=='b' || event.target.tagName.toLowerCase()=='i')) {
+			if (event.target.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
 				// replace 'b' tags with 'strong; 'i' tags with 'em'; doing this on the childNodes so that the selection doesn't break for safari;
-				for (var i=ev.target.childNodes.length-1; i > -1; i--) {
-					if (ev.target.tagName.toLowerCase()=='b') {
-						editor.node.wrap(ev.target.childNodes[i], "strong");
-					} else if (ev.target.tagName.toLowerCase()=='i') {
-						editor.node.wrap(ev.target.childNodes[i], "em");
+				for (var i=event.target.childNodes.length-1; i > -1; i--) {
+					if (event.target.tagName.toLowerCase()=='b') {
+						editor.node.wrap(event.target.childNodes[i], "strong");
+					} else if (event.target.tagName.toLowerCase()=='i') {
+						editor.node.wrap(event.target.childNodes[i], "em");
 					}
 				}
 
-				editor.node.unwrap(ev.target);
+				editor.node.unwrap(event.target);
 				var sel = window.getSelection();
 				var range = sel.getRangeAt(0);
 				sel.removeAllRanges();
@@ -4137,9 +4147,14 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		}
 	};
 
-	var noTagsAllowedListener = function(ev) {
-		if (ev.target.tagName) {
-			editor.node.unwrap(ev.target);
+	var noTagsAllowedListener = function(event) {
+		var simplyParent = editor.node.getSimplyParent(event.target);
+		if (!simplyParent) {
+			return;
+		}
+
+		if (event.target.tagName) {
+			editor.node.unwrap(event.target);
 			var sel = window.getSelection();
 			var range = sel.getRangeAt(0);
 			sel.removeAllRanges();
@@ -4147,18 +4162,23 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		}
 	};
 
-	var divListener = function(ev) {
+	var divListener = function(event) {
+		var simplyParent = editor.node.getSimplyParent(event.target);
+		if (!simplyParent) {
+			return;
+		}
+
 		if (
-			ev.target.tagName && (ev.target.tagName.toLowerCase()=='div')
+			event.target.tagName && (event.target.tagName.toLowerCase()=='div')
 		) {
 			window.setTimeout(function() {
 				// allow a bit of time before unwrapping - chrome is still moving elements around at this point
-				if (ev.target.innerHTML == '') {
-					ev.target.innerHTML = "<br>";
+				if (event.target.innerHTML == '') {
+					event.target.innerHTML = "<br>";
 				}
 
 				// var siblings = newP.parentNode.childNodes;
-				var parent = ev.target.parentNode;
+				var parent = event.target.parentNode;
 				if (!parent) {
 					return;
 				}
@@ -4172,12 +4192,12 @@ document.addEventListener('simply-toolbars-loaded', function() {
 
 				if (parent.tagName.toLowerCase() =='p') { // replace the div with a 'br' element when we are in a paragraph
 					var breakEl = document.createElement("BR");
-					ev.target.parentNode.insertBefore(breakEl, ev.target);
+					event.target.parentNode.insertBefore(breakEl, event.target);
 				}
 
-				editor.node.unwrap(ev.target);
+				editor.node.unwrap(event.target);
 				var siblings = parent.childNodes;
-				editor.node.unwrap(ev.target);
+				editor.node.unwrap(event.target);
 				addParagraphs(siblings);
 				if (caretNode) {
 					range = document.createRange();
@@ -4186,12 +4206,12 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					sel.addRange(range);
 				}
 			}, 10);
-		} else if (ev.target.tagName && (ev.target.tagName.toLowerCase() == 'h1')) {
+		} else if (event.target.tagName && (event.target.tagName.toLowerCase() == 'h1')) {
 			window.setTimeout(function() {
 				// special case for H1 - we don't want it inserted as a result of an enter key. The first one should be a H1, the others should be a paragraph.
 				// Firefox inserts the new element in front of the original; Chrome inserts the new H1 behind the original.
 
-				var parent = ev.target.parentNode;
+				var parent = event.target.parentNode;
 				if (!parent) {
 					return;
 				}
@@ -4312,13 +4332,10 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			document.addEventListener("DOMNodeInserted", fontListener);
 
 			document.addEventListener("keydown", function(event) {
-				if (
-					editor.toolbar.getSectionEl(event.target) ||
-					editor.toolbar.getDialogEl(event.target)
-				) {
+				var simplyParent = editor.node.getSimplyParent(event.target);
+				if (!simplyParent) {
 					return;
 				}
-
 				switch (event.keyCode) {
 					case 8:		// backspace
 					case 46: 	// delete
@@ -4346,26 +4363,20 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			});
 
 			document.addEventListener("keyup", function(event) {
-				if (
-					editor.toolbar.getSectionEl(event.target) ||
-					editor.toolbar.getDialogEl(event.target)
-				) {
+				var simplyParent = editor.node.getSimplyParent(event.target);
+				if (!simplyParent) {
 					return;
 				}
-
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
 				event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
 			});
 
 			document.addEventListener("paste", function(event) {
-				if (
-					editor.toolbar.getSectionEl(event.target) ||
-					editor.toolbar.getDialogEl(event.target)
-				) {
+				var simplyParent = editor.node.getSimplyParent(event.target);
+				if (!simplyParent) {
 					return;
 				}
-
 				var pastedText = undefined;
 				var pastedHtml = undefined;
 					
