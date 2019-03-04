@@ -1350,8 +1350,7 @@
 							return field.storedData;
 						}
 						if (field.getAttribute("data-simply-default-value")) {
-							editor.field.set(field, field.getAttribute("data-simply-default-value"));
-							return field.storedData;
+							return field.getAttribute("data-simply-default-value");
 						}
 					},
 					set : function(field, data) {
@@ -1457,7 +1456,6 @@
 						field.setAttribute("data-simply-selectable", true);
 					}
 				},
-
 			},
 			initHopeEditor : function(field) {
 				if (typeof hope === "undefined") {
