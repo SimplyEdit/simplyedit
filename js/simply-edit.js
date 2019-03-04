@@ -261,8 +261,8 @@
 					editor.data.apply(editor.currentData, document);
 					editor.fireEvent("simply-content-loaded", document);
 
-					var checkEdit = function() {
-						if ((document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
+					var checkEdit = function(evt) {
+						if ((evt && evt.newURL.match(/#simply-edit$/) || document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
 							editor.storage.connect(function() {
 								editor.editmode.init();
 								var checkHope = function() {
