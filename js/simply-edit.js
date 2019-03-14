@@ -711,6 +711,10 @@
 								listDataBinding = dataParent._bindings_[dataName];
 								if (listDataBinding.config.mode == "field") {
 									console.log("Warning: mixing field and list types for databinding.");
+									if (Array.isArray(dataParent[dataName])) {
+										listDataBinding.config.mode = "list";
+										listDataBinding.mode = "list";
+									}
 								}
 							} else {
 								var bindingConfig    = {};
