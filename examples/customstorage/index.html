@@ -46,8 +46,8 @@
 				}
 				callback(localStorage.simplyData);
 			},
-			connect : function() {
-				return true;
+			connect : function(callback) {
+				callback();
 			},
 			disconnect : function() {
 				return true;
