@@ -1344,6 +1344,33 @@
 						}
 					}
 				},
+				"[data-simply-content='text']" : {
+					get : function(field) {
+						var data = editor.field.defaultGetter(field, ["innerHTML"]);
+						data = data.innerHTML;
+
+						var div = document.createElement("div");
+						data = data.replace(/\/p>/g, "\/p>\n\n");
+						data = data.replace(/br>/g, 'br>\n');
+						data = data.replace(/\n\n$/, '');
+						div.innerHTML = data;
+						data = div.innerText;
+
+						return data;
+					},
+					set : function(field, data) {
+						field.style.whiteSpace = "pre";
+
+						var div = document.createElement("div");
+						data = data.replace(/\/p>/g, "\/p>\n\n");
+						data = data.replace(/br>/g, 'br>\n');
+						data = data.replace(/\n\n$/, '');
+						div.innerHTML = data;
+						data = div.innerText;
+
+						editor.field.defaultSetter(field, data, ["innerHTML"]);
+					}
+				},
 				"[data-simply-content='template']" : {
 					get : function(field) {
 						if (editor.data.getDataPath(field) == field.storedPath) {
@@ -2163,7 +2190,6 @@
 
 				// FIXME: Have a way to now init plugins as well;
 				editor.editmode.sortable(target);
-				editor.editmode.textonly(target);
 
 				// Disable object resizing for Firefox;
 				document.execCommand("enableObjectResizing", false, false);
@@ -2234,25 +2260,6 @@
 					document.simplyRemoveBeforeOrderEvent = removeBeforeOrderEvent;
 					document.addEventListener("mouseup", removeBeforeOrderEvent, false);
 					document.addEventListener("touchend", removeBeforeOrderEvent, false);
-				}
-			},
-			textonly : function(target) {
-				var textonly = target.querySelectorAll("[data-simply-content='text']");
-				var preventNodeInsert = function(evt) {
-					if (evt.target.tagName) {
-						if (evt.target.tagName.toLowerCase() == "br") {
-							// Firefox 54 goes wonky with contenteditable divs when the <br> element it expects at the end is removed; Replacing the <br> with a placebo &shy will keep it happy.
-							if(!evt.target.nextSibling) {
-								var node = document.createTextNode("\u00AD");
-								evt.target.parentNode.insertBefore(node, evt.target);
-							}
-						}
-						editor.node.unwrap(evt.target);
-					}
-				};
-
-				for (var i=0; i<textonly.length; i++) {
-					textonly[i].addEventListener("DOMNodeInserted", preventNodeInsert);
 				}
 			},
 			isDirty : function() {
