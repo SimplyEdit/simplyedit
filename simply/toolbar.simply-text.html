@@ -459,6 +459,17 @@
 			toolbar.querySelector("[data-simply-section='simply-text-style']").parentNode.style.display = "none";
 		}
 
+		// Disable the block style options that are not allowed as a child of the field;
+		var blockStyles = toolbar.querySelectorAll('select[data-simply-action=simply-text-blockstyle] option');
+		var fieldTag = field.tagName.toLowerCase();
+		for (var i=0; i<blockStyles.length; i++) {
+			if (hope.render.html.rules.nesting[fieldTag] && (hope.render.html.rules.nesting[fieldTag].indexOf(blockStyles[i].value) < 0)) {
+				blockStyles[i].setAttribute("disabled", true);
+			} else {
+				blockStyles[i].removeAttribute("disabled");
+			}
+		}
+
 		return true;
 	};
 
