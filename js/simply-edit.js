@@ -1672,12 +1672,13 @@
 				var div = document.createElement('div');
 				div.innerHTML = field.innerHTML;
 				var els = div.querySelectorAll('br,p');
-				els.forEach(function(el) {
+				for (var i=0,l=els.length; i<l; i++) {
+					var el = els.item(i);
 					if (el.nextSibling) {
 						var newLine = document.createTextNode("\n");
 						el.parentElement.insertBefore(newLine, el.nextSibling);
 					}
-				});
+				}
 				return div.textContent;
 			},
 			getInnerHTML : function(field) {
