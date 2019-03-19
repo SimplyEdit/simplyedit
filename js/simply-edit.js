@@ -1348,15 +1348,6 @@
 						}
 					}
 				},
-				"[data-simply-content='text']" : {
-					get : function(field) {
-						var data = editor.field.defaultGetter(field, ["innerHTML"]);
-						return data.innerHTML;
-					},
-					set : function(field, data) {
-						editor.field.defaultSetter(field, data, ["innerHTML"]);
-					}
-				},
 				"[data-simply-content='template']" : {
 					get : function(field) {
 						if (editor.data.getDataPath(field) == field.storedPath) {
@@ -1719,7 +1710,8 @@
 				if (field.simplyGetter) {
 					result = field.simplyGetter(field);
 				} else {
-					result = editor.field.getInnerHTML(field);
+					result = editor.field.defaultGetter(field, ['innerHTML']);
+					result = result.innerHTML;
 				}
 
 				var transformer = field.getAttribute('data-simply-transformer');
@@ -2733,6 +2725,9 @@
 				},
 				file : {
 					save : function(path, data, callback) {
+						if (path.indexOf("dat://") === 0 ) {
+							path = path.replace(editor.storage.endpoint, '/');
+						}
 						if (!editor.storage.archive) {
 							callback({
 								error : true,
