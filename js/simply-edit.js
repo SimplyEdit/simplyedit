@@ -1380,7 +1380,7 @@
 						if (editor.data.getDataPath(field) == field.storedPath) {
 							return field.storedData;
 						}
-						if (field.getAttribute("data-simply-default-value")) {
+						if (field.hasAttribute("data-simply-default-value")) {
 							return field.getAttribute("data-simply-default-value");
 						}
 					},
