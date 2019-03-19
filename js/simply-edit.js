@@ -2734,6 +2734,9 @@
 				},
 				file : {
 					save : function(path, data, callback) {
+						if (path.indexOf("dat://") === 0) {
+							path = path.replace(editor.storage.endpoint, '/');
+						}
 						if (!editor.storage.archive) {
 							callback({
 								error : true,
