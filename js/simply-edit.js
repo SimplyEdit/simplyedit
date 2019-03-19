@@ -1348,33 +1348,6 @@
 						}
 					}
 				},
-				"[data-simply-content='text']" : {
-					get : function(field) {
-						var data = editor.field.defaultGetter(field, ["innerHTML"]);
-						data = data.innerHTML;
-
-						var div = document.createElement("div");
-						data = data.replace(/\/p>/g, "\/p>\n\n");
-						data = data.replace(/br>/g, 'br>\n');
-						data = data.replace(/\n\n$/, '');
-						div.innerHTML = data;
-						data = div.innerText;
-
-						return data;
-					},
-					set : function(field, data) {
-						field.style.whiteSpace = "pre";
-
-						var div = document.createElement("div");
-						data = data.replace(/\/p>/g, "\/p>\n\n");
-						data = data.replace(/br>/g, 'br>\n');
-						data = data.replace(/\n\n$/, '');
-						div.innerHTML = data;
-						data = div.innerText;
-
-						editor.field.defaultSetter(field, data, ["innerHTML"]);
-					}
-				},
 				"[data-simply-content='template']" : {
 					get : function(field) {
 						if (editor.data.getDataPath(field) == field.storedPath) {
@@ -1582,6 +1555,7 @@
 			},
 			defaultGetter : function(field, attributes) {
 				var result = {};
+				var contentType = field.getAttribute('data-simply-content');
 				if (field.dataBinding) {
 					var currentValue = field.dataBinding.get();
 					if (typeof currentValue === "object" && currentValue !== null) {
@@ -1591,11 +1565,15 @@
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
 					if (attr == "innerHTML") {
-						if (field.getAttribute("data-simply-content") != "fixed") {
-							result.innerHTML = editor.field.getInnerHTML(field);
-							if (field.querySelector("[data-simply-field]")) {
-								console.log("Warning: This field contains another field in its innerHTML - did you mean to set the data-simply-content attribute for this field to 'fixed' or 'attributes'?");
-								console.log(field);
+						if (contentType != "fixed") {
+							if (contentType == 'text') {
+								result.innerHTML = editor.field.getTextContent(field);
+							} else {
+								result.innerHTML = editor.field.getInnerHTML(field);
+								if (field.querySelector("[data-simply-field]")) {
+									console.log("Warning: This field contains another field in its innerHTML - did you mean to set the data-simply-content attribute for this field to 'fixed' or 'attributes'?");
+									console.log(field);
+								}
 							}
 						}
 					} else {
@@ -1690,6 +1668,19 @@
 					field.hopeEditor.needsUpdate = true;
 				}
 			},
+			getTextContent : function(field) {
+				var div = document.createElement('div');
+				div.innerHTML = field.innerHTML;
+				var els = div.querySelectorAll('br,p');
+				for (var i=0,l=els.length; i<l; i++) {
+					var el = els.item(i);
+					if (el.nextSibling) {
+						var newLine = document.createTextNode("\n");
+						el.parentElement.insertBefore(newLine, el.nextSibling);
+					}
+				}
+				return div.textContent;
+			},
 			getInnerHTML : function(field) {
 				// misc cleanups to revert any changes made by simply edit - this should return a pristine version of the content;
 				if (!field.querySelectorAll("img[data-simply-src]").length) {
@@ -1720,7 +1711,8 @@
 				if (field.simplyGetter) {
 					result = field.simplyGetter(field);
 				} else {
-					result = editor.field.getInnerHTML(field);
+					result = editor.field.defaultGetter(field, ['innerHTML']);
+					result = result.innerHTML;
 				}
 
 				var transformer = field.getAttribute('data-simply-transformer');
@@ -2734,7 +2726,7 @@
 				},
 				file : {
 					save : function(path, data, callback) {
-						if (path.indexOf("dat://") === 0) {
+						if (path.indexOf("dat://") === 0 ) {
 							path = path.replace(editor.storage.endpoint, '/');
 						}
 						if (!editor.storage.archive) {
