@@ -1683,3 +1683,9 @@ QUnit.module("scaler plugin");
 		assert.equal(true, true, "Loading scaler plugin for syntax check");
 	});
 
+QUnit.module("page template plugin");
+	QUnit.test("load current page template in the dialog", function(assert) {
+		editor.plugins.pageTemplate.dialog.open();
+		assert.equal("index.html", editor.toolbarsContainer.getElementById("simply-page-template-list").value);
+		editor.plugins.dialog.close();
+	});

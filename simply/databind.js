@@ -193,13 +193,23 @@ dataBinding = function(config) {
 			};
 
 			for (var i in valueBindings) {
-				shadowValue._bindings_[i] = valueBindings[i];
 				if (typeof shadowValue[i] === "undefined") {
+					if (typeof valueBindings[i].get() === "string") {
+						valueBindings[i].set("");
+					} else if (typeof valueBindings[i].get() === "object") {
+						if (valueBindings[i].get() instanceof Array) {
+							valueBindings[i].config.data[i] = [];
+						} else {
+							valueBindings[i].config.data[i] = {};
+						}
+					}
+
 					setRestoreTrigger(shadowValue, i, valueBindings[i]);
 				} else {
 					valueBindings[i].set(shadowValue[i]);
-					valueBindings[i].resolve();
+					valueBindings[i].resolve(true);
 				}
+				shadowValue._bindings_[i] = valueBindings[i];
 			}
 		}
 

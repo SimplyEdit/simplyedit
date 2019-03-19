@@ -2,7 +2,7 @@
 	Simply edit the Web
 
 	Written by Yvo Brevoort
-	Copyright Muze 2015-2018, all rights reserved.
+	Copyright Muze 2015-2019, all rights reserved.
 */
 (function() {
 	if (window.editor) {
@@ -261,8 +261,8 @@
 					editor.data.apply(editor.currentData, document);
 					editor.fireEvent("simply-content-loaded", document);
 
-					var checkEdit = function() {
-						if ((document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
+					var checkEdit = function(evt) {
+						if ((evt && evt.newURL.match(/#simply-edit$/) || document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
 							editor.storage.connect(function() {
 								editor.editmode.init();
 								var checkHope = function() {
@@ -711,6 +711,10 @@
 								listDataBinding = dataParent._bindings_[dataName];
 								if (listDataBinding.config.mode == "field") {
 									console.log("Warning: mixing field and list types for databinding.");
+									if (Array.isArray(dataParent[dataName])) {
+										listDataBinding.config.mode = "list";
+										listDataBinding.mode = "list";
+									}
 								}
 							} else {
 								var bindingConfig    = {};
@@ -1344,14 +1348,40 @@
 						}
 					}
 				},
+				"[data-simply-content='text']" : {
+					get : function(field) {
+						var data = editor.field.defaultGetter(field, ["innerHTML"]);
+						data = data.innerHTML;
+
+						var div = document.createElement("div");
+						data = data.replace(/\/p>/g, "\/p>\n\n");
+						data = data.replace(/br>/g, 'br>\n');
+						data = data.replace(/\n\n$/, '');
+						div.innerHTML = data;
+						data = div.innerText;
+
+						return data;
+					},
+					set : function(field, data) {
+						field.style.whiteSpace = "pre";
+
+						var div = document.createElement("div");
+						data = data.replace(/\/p>/g, "\/p>\n\n");
+						data = data.replace(/br>/g, 'br>\n');
+						data = data.replace(/\n\n$/, '');
+						div.innerHTML = data;
+						data = div.innerText;
+
+						editor.field.defaultSetter(field, data, ["innerHTML"]);
+					}
+				},
 				"[data-simply-content='template']" : {
 					get : function(field) {
 						if (editor.data.getDataPath(field) == field.storedPath) {
 							return field.storedData;
 						}
-						if (field.getAttribute("data-simply-default-value")) {
-							editor.field.set(field, field.getAttribute("data-simply-default-value"));
-							return field.storedData;
+						if (field.hasAttribute("data-simply-default-value")) {
+							return field.getAttribute("data-simply-default-value");
 						}
 					},
 					set : function(field, data) {
@@ -1457,7 +1487,6 @@
 						field.setAttribute("data-simply-selectable", true);
 					}
 				},
-
 			},
 			initHopeEditor : function(field) {
 				if (typeof hope === "undefined") {
@@ -1553,8 +1582,11 @@
 			},
 			defaultGetter : function(field, attributes) {
 				var result = {};
-				if (field.dataBinding && typeof field.dataBinding.get() === "object") {
-					result = JSON.parse(JSON.stringify(field.dataBinding.get())); // Start with the existing data if there to prevent destroying data that is not part of our scope;
+				if (field.dataBinding) {
+					var currentValue = field.dataBinding.get();
+					if (typeof currentValue === "object" && currentValue !== null) {
+						result = JSON.parse(JSON.stringify(currentValue)); // Start with the existing data if there to prevent destroying data that is not part of our scope;
+					}
 				}
 				for (var i=0; i<attributes.length; i++) {
 					attr = attributes[i];
@@ -1574,13 +1606,17 @@
 			},
 			defaultSetter : function(field, data, attributes) {
 				var contentType = field.getAttribute("data-simply-content");
-				if (typeof data === "string" && attributes && attributes.length == 1) {
+				if ((typeof data === "string" || data instanceof String) && attributes && attributes.length == 1) {
 					field.simplyString = true;
 					var newData = {};
 					newData[attributes[0]] = data;
 					data = newData;
 				}
 				if (typeof data === "string") {
+					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
+					return;
+				}
+				if (data instanceof String) {
 					console.log("Warning: A string was given to a field that expects an object - did you maybe use the same field name on different kinds of elements?");
 					return;
 				}
@@ -1656,7 +1692,7 @@
 			},
 			getInnerHTML : function(field) {
 				// misc cleanups to revert any changes made by simply edit - this should return a pristine version of the content;
-				if (!field.querySelectorAll("img[data-simply-src]")) {
+				if (!field.querySelectorAll("img[data-simply-src]").length) {
 					return field.innerHTML;
 				} else {
 					// There are responsive images in the field; clean them up to return to a pristine state and return that;
@@ -1859,6 +1895,17 @@
 						editor.currentData[path] = {};
 					}
 					return editor.currentData[path];
+				},
+				set : function(data) {
+					var path = editor.data.getDataPath(document);
+					if (typeof editor.currentData[path] === "undefined") {
+						editor.currentData[path] = {};
+					}
+					if (typeof data === "object") {
+						for (var i in data) {
+							editor.currentData[path][i] = data[i];
+						}
+					}
 				}
 			});
 
@@ -2147,7 +2194,6 @@
 
 				// FIXME: Have a way to now init plugins as well;
 				editor.editmode.sortable(target);
-				editor.editmode.textonly(target);
 
 				// Disable object resizing for Firefox;
 				document.execCommand("enableObjectResizing", false, false);
@@ -2218,25 +2264,6 @@
 					document.simplyRemoveBeforeOrderEvent = removeBeforeOrderEvent;
 					document.addEventListener("mouseup", removeBeforeOrderEvent, false);
 					document.addEventListener("touchend", removeBeforeOrderEvent, false);
-				}
-			},
-			textonly : function(target) {
-				var textonly = target.querySelectorAll("[data-simply-content='text']");
-				var preventNodeInsert = function(evt) {
-					if (evt.target.tagName) {
-						if (evt.target.tagName.toLowerCase() == "br") {
-							// Firefox 54 goes wonky with contenteditable divs when the <br> element it expects at the end is removed; Replacing the <br> with a placebo &shy will keep it happy.
-							if(!evt.target.nextSibling) {
-								var node = document.createTextNode("\u00AD");
-								evt.target.parentNode.insertBefore(node, evt.target);
-							}
-						}
-						editor.node.unwrap(evt.target);
-					}
-				};
-
-				for (var i=0; i<textonly.length; i++) {
-					textonly[i].addEventListener("DOMNodeInserted", preventNodeInsert);
 				}
 			},
 			isDirty : function() {
@@ -2446,7 +2473,7 @@
 						if (computed.maxWidth.indexOf("%") != -1) {
 							imageWidth = parseFloat(computed.maxWidth) / 100.0;
 							var offsetParent = imgEl.offsetParent ? imgEl.offsetParent : imgEl.parentNode;
-							imageWidth = offsetParent.offsetWidth * imageWidth;
+							imageWidth = offsetParent ? offsetParent.offsetWidth * imageWidth : 0;
 						}
 						if (computed.maxWidth.indexOf("px") != -1) {
 							imageWidth = parseInt(computed.maxWidth);
@@ -2691,7 +2718,7 @@
 					callback();
 				},
 				save: function(data,callback) {
-					editor.storage.file.save("data.json", data, callback);
+					editor.storage.file.save(this.dataEndpoint, data, callback);
 				},
 				saveTemplate : function(pageTemplate, callback) {
 					var dataPath = location.pathname.split(/\//, 3)[2];
@@ -3072,9 +3099,9 @@
 					this.endpoint = endpoint;
 					this.dataPath = "data/data.json";
 					this.dataEndpoint = this.url + this.dataPath;
-                                        if (document.querySelector("[data-storage-get-post-only]")) {
-                                                this.getPostOnly = true;
-                                        }
+					if (document.querySelector("[data-storage-get-post-only]")) {
+						this.getPostOnly = true;
+					}
 
 					if (editor.responsiveImages) {
 						if (
