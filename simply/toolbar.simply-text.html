@@ -299,7 +299,7 @@
 			var range = hopeEditor.selection.getRange();
 			hopeEditor.currentRange = range;
 
-			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start).get(0);
 			var hyperlink = hopeEditor.fragment.has(range, "a");
 
 			if (blockAnnotation && (blockAnnotation.range.end == range.start)) {
@@ -398,7 +398,7 @@
 
 
 			// Check aligment
-			blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+			blockAnnotation = hopeEditor.getBlockAnnotation(range.start).get(0);
 			var textAlign = toolbar.querySelector(".simply-text-align [data-type=simply-buttongroup-radio]");
 			if (blockAnnotation && textAlign) {
 				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
@@ -582,11 +582,12 @@
 				var hopeEditor = field.hopeEditor;
 
 				var blocks = [];
+				var blockAnnotations;
 				if (range.start != range.end) {
 					var noBlockStart = -1;
 					for (var i=range.start; i<range.end+1; i++) {
-						var blockAnnotation = hopeEditor.getBlockAnnotation(i);
-						if (blockAnnotation) {
+						blockAnnotations = hopeEditor.getBlockAnnotation(i);
+						if (blockAnnotations.length()) {
 							if (noBlockStart > -1) {
 								blocks.push({
 									range : {
@@ -598,8 +599,10 @@
 								noBlockStart = -1;
 							}
 
-							if (blocks.indexOf(blockAnnotation) === -1) {
-								blocks.push(blockAnnotation);
+							for (var j=0; j<blockAnnotations.length(); j++) {
+								if (blocks.indexOf(blockAnnotations.get(j)) === -1) {
+									blocks.push(blockAnnotations.get(j));
+								}
 							}
 						} else {
 							if (noBlockStart == -1) {
@@ -608,9 +611,11 @@
 						}
 					}
 				} else {
-					blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
-					if (blockAnnotation) {
-						blocks.push(blockAnnotation);
+					blockAnnotations = hopeEditor.getBlockAnnotation(range.start);
+					if (blockAnnotations.length()) {
+						for (var j=0; j<blockAnnotations.length(); j++) {
+							blocks.push(blockAnnotations.get(j));
+						}
 					} else {
 						var sel = window.getSelection();
 						if (sel.rangeCount) {
