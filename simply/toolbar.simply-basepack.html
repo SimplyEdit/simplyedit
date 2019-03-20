@@ -336,7 +336,7 @@
 			var range = hopeEditor.selection.getRange();
 			hopeEditor.currentRange = range;
 
-			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start).get(0);
+			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start).last();
 			var hyperlink = hopeEditor.fragment.has(range, "a");
 
 			if (blockAnnotation && (blockAnnotation.range.end == range.start)) {
@@ -435,7 +435,7 @@
 
 
 			// Check aligment
-			blockAnnotation = hopeEditor.getBlockAnnotation(range.start).get(0);
+			blockAnnotation = hopeEditor.getBlockAnnotation(range.start).last();
 			var textAlign = toolbar.querySelector(".simply-text-align [data-type=simply-buttongroup-radio]");
 			if (blockAnnotation && textAlign) {
 				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
@@ -650,9 +650,7 @@
 				} else {
 					blockAnnotations = hopeEditor.getBlockAnnotation(range.start);
 					if (blockAnnotations.length()) {
-						for (var j=0; j<blockAnnotations.length(); j++) {
-							blocks.push(blockAnnotations.get(j));
-						}
+						blocks.push(blockAnnotations.last());
 					} else {
 						var sel = window.getSelection();
 						if (sel.rangeCount) {
@@ -832,8 +830,10 @@
 						var tagName = block.tag.split(" ")[0];
 						if (editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
-						} else if (tagName.toLowerCase() === "li" && editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']")) {
+						} else if (tagName.toLowerCase() === "li") {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
+							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, "ul");
+							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, "ol");
 						}
 					}
 					var nodeInfo = false;

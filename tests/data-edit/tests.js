@@ -716,6 +716,26 @@ QUnit.module("editor text cursor");
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>');
 	});
 
+	QUnit.test("text style unnumbered list 3 list items, one to paragraph", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>foo</li><li>Hello world</li><li>bar</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelectorAll("li")[1], 2, 0);
+		editor.actions['simply-text-blockstyle']('p');
+		assert.equal(testContent.innerHTML, '<ul><li>foo</li></ul><p>Hello world</p><ul><li>bar</li></ul>');
+	});
+
+	QUnit.test("text style unnumbered list to numbered list", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>foo</li><li>Hello world</li><li>bar</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelectorAll("li")[1], 2, 0);
+		editor.actions['simply-text-blockstyle']('ol');
+		assert.equal(testContent.innerHTML, '<ol><li>foo</li><li>Hello world</li><li>bar</li></ol>');
+	});
+
 	QUnit.test("text split clean text to two lines", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello world";

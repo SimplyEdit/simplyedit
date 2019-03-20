@@ -430,7 +430,7 @@ hope.register( 'hope.editor', function() {
 		'Enter' : function(range) {
 			var br = this.fragment.has( [range.start-1, range.start], 'br' );
 			if ( br ) {
-				var blockAnnotation = this.getBlockAnnotation( range.start ).get(0);
+				var blockAnnotation = this.getBlockAnnotation( range.start ).last();
 				// close it and find which annotation to apply next
 				var closingAnnotation = hope.annotation.create( [ blockAnnotation.range.start, br.range.start ], blockAnnotation.tag );
 				var openingAnnotation = hope.annotation.create( [ range.start, blockAnnotation.range.end + 1 ], this.getNextBlockTag( blockAnnotation.tag ) );
