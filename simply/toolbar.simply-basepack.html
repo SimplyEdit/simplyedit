@@ -4202,7 +4202,9 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
 				}
 
-				if (parent.tagName.toLowerCase() =='p') { // replace the div with a 'br' element when we are in a paragraph
+				var nestingRules = hope.render.html.rules.nesting[parent.tagName.toLowerCase()];
+				if (nestingRules && nestingRules.indexOf("p") === -1) {
+					// replace the div with a 'br' element when we are in an element that does not allow paragraphs
 					var breakEl = document.createElement("BR");
 					event.target.parentNode.insertBefore(breakEl, event.target);
 				}
@@ -4313,10 +4315,14 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	var addParagraphs = function(nodes) {
 		nodes = [].slice.call(nodes);
 
-		var previousNode = "p";
 		if (nodes[0] && nodes[0].parentNode.tagName.toLowerCase() === "p") {
 			return;
 		}
+		var nestingRules = hope.render.html.rules.nesting[nodes[0].parentNode.tagName.toLowerCase()];
+		if (nestingRules && nestingRules.indexOf("p") === -1) {
+			return;
+		}
+		var previousNode = "p";
 
 		for (var i=0; i<nodes.length; i++) {
 			if (!previousNode) {
@@ -4362,8 +4368,10 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					break;
 					case 13:	// enter
 						// this forces the text into structured paragraphs/headings, so that firefox will behave more sanely with inserting breaks
-						addParagraphs(event.target.childNodes);
-
+						var nestingRules = hope.render.html.rules.nesting[event.target.tagName.toLowerCase()];
+						if (nestingRules && nestingRules.indexOf("p") !== -1) {
+							addParagraphs(event.target.childNodes);
+						}
 						var simplyParent = editor.node.getSimplyParent(event.target);
 						if (simplyParent) {
 							event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);

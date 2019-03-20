@@ -960,6 +960,23 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
+	QUnit.test("text press return in text node in header field", function(assert) {
+		var testContent = document.querySelector("#testHeader");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 5, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, 'Hello<br>&nbsp;world');
+			done1();
+		}, 100);
+	});
+
+
 QUnit.module("editor text selection");
 	QUnit.test("text set bold", function(assert) {
 		var testContent = document.querySelector("#testContent");
