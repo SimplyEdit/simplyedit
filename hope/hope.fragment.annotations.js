@@ -305,6 +305,10 @@ hope.register( 'hope.fragment.annotations', function() {
 		return this.list[index];
 	};
 
+	hopeAnnotationList.prototype.last = function( ) {
+		return this.list[this.list.length-1];
+	};
+
 	hopeAnnotationList.prototype.filter = function(f) {
 		var list = this.list.slice();
 		list = list.filter( f );

@@ -336,7 +336,7 @@
 			var range = hopeEditor.selection.getRange();
 			hopeEditor.currentRange = range;
 
-			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start).last();
 			var hyperlink = hopeEditor.fragment.has(range, "a");
 
 			if (blockAnnotation && (blockAnnotation.range.end == range.start)) {
@@ -435,7 +435,7 @@
 
 
 			// Check aligment
-			blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+			blockAnnotation = hopeEditor.getBlockAnnotation(range.start).last();
 			var textAlign = toolbar.querySelector(".simply-text-align [data-type=simply-buttongroup-radio]");
 			if (blockAnnotation && textAlign) {
 				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
@@ -619,11 +619,12 @@
 				var hopeEditor = field.hopeEditor;
 
 				var blocks = [];
+				var blockAnnotations;
 				if (range.start != range.end) {
 					var noBlockStart = -1;
 					for (var i=range.start; i<range.end+1; i++) {
-						var blockAnnotation = hopeEditor.getBlockAnnotation(i);
-						if (blockAnnotation) {
+						blockAnnotations = hopeEditor.getBlockAnnotation(i);
+						if (blockAnnotations.length()) {
 							if (noBlockStart > -1) {
 								blocks.push({
 									range : {
@@ -635,8 +636,10 @@
 								noBlockStart = -1;
 							}
 
-							if (blocks.indexOf(blockAnnotation) === -1) {
-								blocks.push(blockAnnotation);
+							for (var j=0; j<blockAnnotations.length(); j++) {
+								if (blocks.indexOf(blockAnnotations.get(j)) === -1) {
+									blocks.push(blockAnnotations.get(j));
+								}
 							}
 						} else {
 							if (noBlockStart == -1) {
@@ -645,9 +648,9 @@
 						}
 					}
 				} else {
-					blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
-					if (blockAnnotation) {
-						blocks.push(blockAnnotation);
+					blockAnnotations = hopeEditor.getBlockAnnotation(range.start);
+					if (blockAnnotations.length()) {
+						blocks.push(blockAnnotations.last());
 					} else {
 						var sel = window.getSelection();
 						if (sel.rangeCount) {
@@ -827,8 +830,10 @@
 						var tagName = block.tag.split(" ")[0];
 						if (editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='" + tagName + "']")) {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
-						} else if (tagName.toLowerCase() === "li" && editor.toolbarsContainer.querySelector("[data-simply-action='simply-text-blockstyle'] option[value='ul']")) {
+						} else if (tagName.toLowerCase() === "li") {
 							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, block.tag);
+							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, "ul");
+							hopeEditor.fragment = hopeEditor.fragment.remove(newRange, "ol");
 						}
 					}
 					var nodeInfo = false;
@@ -4197,7 +4202,9 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
 				}
 
-				if (parent.tagName.toLowerCase() =='p') { // replace the div with a 'br' element when we are in a paragraph
+				var nestingRules = hope.render.html.rules.nesting[parent.tagName.toLowerCase()];
+				if (nestingRules && nestingRules.indexOf("p") === -1) {
+					// replace the div with a 'br' element when we are in an element that does not allow paragraphs
 					var breakEl = document.createElement("BR");
 					event.target.parentNode.insertBefore(breakEl, event.target);
 				}
@@ -4308,10 +4315,14 @@ document.addEventListener('simply-toolbars-loaded', function() {
 	var addParagraphs = function(nodes) {
 		nodes = [].slice.call(nodes);
 
-		var previousNode = "p";
 		if (nodes[0] && nodes[0].parentNode.tagName.toLowerCase() === "p") {
 			return;
 		}
+		var nestingRules = hope.render.html.rules.nesting[nodes[0].parentNode.tagName.toLowerCase()];
+		if (nestingRules && nestingRules.indexOf("p") === -1) {
+			return;
+		}
+		var previousNode = "p";
 
 		for (var i=0; i<nodes.length; i++) {
 			if (!previousNode) {
@@ -4357,8 +4368,10 @@ document.addEventListener('simply-toolbars-loaded', function() {
 					break;
 					case 13:	// enter
 						// this forces the text into structured paragraphs/headings, so that firefox will behave more sanely with inserting breaks
-						addParagraphs(event.target.childNodes);
-
+						var nestingRules = hope.render.html.rules.nesting[event.target.tagName.toLowerCase()];
+						if (nestingRules && nestingRules.indexOf("p") !== -1) {
+							addParagraphs(event.target.childNodes);
+						}
 						var simplyParent = editor.node.getSimplyParent(event.target);
 						if (simplyParent) {
 							event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);

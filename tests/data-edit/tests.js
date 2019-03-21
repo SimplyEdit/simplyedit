@@ -696,6 +696,46 @@ QUnit.module("editor text cursor");
 		assert.equal(testContent.innerHTML, '<ul><li>Hello world</li></ul>');
 	});
 
+	QUnit.test("text style unnumbered list to unset", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>Hello world</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("li"), 2, 0);
+		editor.actions['simply-text-blockstyle']('');
+		assert.equal(testContent.innerHTML, 'Hello world');
+	});
+
+	QUnit.test("text style unnumbered list to paragraph", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>Hello world</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("li"), 2, 0);
+		editor.actions['simply-text-blockstyle']('p');
+		assert.equal(testContent.innerHTML, '<p>Hello world</p>');
+	});
+
+	QUnit.test("text style unnumbered list 3 list items, one to paragraph", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>foo</li><li>Hello world</li><li>bar</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelectorAll("li")[1], 2, 0);
+		editor.actions['simply-text-blockstyle']('p');
+		assert.equal(testContent.innerHTML, '<ul><li>foo</li></ul><p>Hello world</p><ul><li>bar</li></ul>');
+	});
+
+	QUnit.test("text style unnumbered list to numbered list", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>foo</li><li>Hello world</li><li>bar</li></ul>";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelectorAll("li")[1], 2, 0);
+		editor.actions['simply-text-blockstyle']('ol');
+		assert.equal(testContent.innerHTML, '<ol><li>foo</li><li>Hello world</li><li>bar</li></ol>');
+	});
+
 	QUnit.test("text split clean text to two lines", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello world";
@@ -920,6 +960,23 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
+	QUnit.test("text press return in text node in header field", function(assert) {
+		var testContent = document.querySelector("#testHeader");
+		testContent.innerHTML = "Hello world";
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 5, 0);
+		simulateKeyDown(testContent, 13);
+		document.execCommand('insertParagraph',false);
+		simulateKeyUp(testContent, 13);
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(testContent.innerHTML, 'Hello<br>&nbsp;world');
+			done1();
+		}, 100);
+	});
+
+
 QUnit.module("editor text selection");
 	QUnit.test("text set bold", function(assert) {
 		var testContent = document.querySelector("#testContent");
@@ -1063,7 +1120,6 @@ QUnit.module("editor text selection");
 
 		setCaretPosition(testContent.querySelector("p"), 2);
 		setSelectionEnd(testContent.querySelectorAll("p")[1].childNodes[0],5);
-
 		editor.actions['simply-text-blockstyle']('h1');
 
 		assert.equal(testContent.innerHTML, '<p>He</p><h1>llo</h1><h1>world</h1><h1>Is it</h1><p> still big out there?</p>');
@@ -1107,9 +1163,20 @@ QUnit.module("editor text selection");
 		testContent.innerHTML = "<h2>Foo</h2><p>bar</p>";
 		testContent.hopeEditor.parseHTML();
 
-		setCaretPosition(testContent, 0, 0, 3);
+		setCaretPosition(testContent, 0, 0);
 		editor.actions['simply-text-blockstyle']('h3');
 		assert.equal(testContent.innerHTML, "<h3>Foo</h3><p>bar</p>");
+	});
+
+	QUnit.test("converting multiple unnumbered list items to paragraph", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "<ul><li>foo</li><li>bar</li></ul>";
+		testContent.hopeEditor.parseHTML();
+		setCaretPosition(testContent.querySelector('li').childNodes[0], 0);
+		setSelectionEnd(testContent.querySelector('li+li').childNodes[0], 3);
+
+		editor.actions['simply-text-blockstyle']('p');
+		assert.equal(testContent.innerHTML, "<p>foo</p><p>bar</p>");
 	});
 
 QUnit.module("custom text settings");
