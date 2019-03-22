@@ -591,6 +591,50 @@ QUnit.module("editor text cursor");
 
 		assert.equal(testContent.innerHTML, '<p>Hello world</p>', "Found align class");
 	});
+
+	QUnit.test("plain text option in block text is available", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<p>Hello world</p>';
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("p"), 2, 0);
+
+		var plainTextOption = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle'] option[value='']");
+
+		var disabled = plainTextOption.hasAttribute("disabled");
+
+		assert.equal(disabled, false, "Option is enabled");
+	});
+
+	QUnit.test("paragraph option in block text is not available in a paragraph", function(assert) {
+		var testContent = document.querySelector("#testParagraph");
+		testContent.innerHTML = 'Hello world';
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 2, 0);
+
+		var plainTextOption = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle'] option[value='p']");
+
+		var disabled = plainTextOption.hasAttribute("disabled");
+
+		assert.equal(disabled, true, "Option is disabled");
+	});
+
+	QUnit.test("plain text option in block text is available in a paragraph", function(assert) {
+		var testContent = document.querySelector("#testParagraph");
+		testContent.innerHTML = 'Hello world';
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent, 2, 0);
+
+		var plainTextOption = editor.toolbarsContainer.querySelector("#simply-text-cursor select[data-simply-action='simply-text-blockstyle'] option[value='']");
+
+		var disabled = plainTextOption.hasAttribute("disabled");
+
+		assert.equal(disabled, false, "Option is enabled");
+	});
+
+
 	QUnit.test("text set align from center to justify within paragraph", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = '<p class="simply-text-align-center">Hello world</p>';
