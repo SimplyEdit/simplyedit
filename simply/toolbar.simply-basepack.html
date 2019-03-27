@@ -500,7 +500,7 @@
 		var blockStyles = toolbar.querySelectorAll('select[data-simply-action=simply-text-blockstyle] option');
 		var fieldTag = field.tagName.toLowerCase();
 		for (var i=0; i<blockStyles.length; i++) {
-			if (hope.render.html.rules.nesting[fieldTag] && (hope.render.html.rules.nesting[fieldTag].indexOf(blockStyles[i].value) < 0)) {
+			if (blockStyles[i].value != "" && hope.render.html.rules.nesting[fieldTag] && (hope.render.html.rules.nesting[fieldTag].indexOf(blockStyles[i].value) < 0)) {
 				blockStyles[i].setAttribute("disabled", true);
 			} else {
 				blockStyles[i].removeAttribute("disabled");
@@ -4004,8 +4004,10 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		currentField : null,
 		dialog : {
 			open : function() {
-				editor.plugins.symbol.currentSel = vdSelectionState.get();
-				editor.plugins.symbol.currentField = editor.node.getEditableField();
+				if (editor.node.getEditableField()) {
+					editor.plugins.symbol.currentSel = vdSelectionState.get();
+					editor.plugins.symbol.currentField = editor.node.getEditableField();
+				}
 				editor.plugins.dialog.open(editor.toolbarsContainer.getElementById('simply-symbol'), editor.plugins.symbol.dialog.update);
 			},
 			update : function() {
