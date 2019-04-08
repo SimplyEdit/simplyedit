@@ -2742,6 +2742,16 @@
 			return false;
 		};
 
+		var canHaveCaret = function(element) {
+			if (element.hasAttribute("contenteditable")) {
+				return true;
+			}
+			var tagName = element.tagName.toLowerCase();
+			if (tagName == "textarea" || tagName == "input") {
+				return true;
+			}
+		};
+
 		var handleItemSelect = function(event) {
 			if (!this.clickStart) {
 				return;
@@ -2758,11 +2768,9 @@
 				}
 			}
 			var target = muze.event.target(event);
-			if (target.getAttribute("contenteditable")) {
-				if (clickedInside(target)) {
-					// click was in the element;
-					return;
-				}
+			if (clickedInside(target) && canHaveCaret(target)) {
+				// click was in the element;
+				return;
 			}
 
 			while(!target.getAttribute("data-simply-selectable") && target.parentNode) {
@@ -2778,16 +2786,13 @@
 				target = target.parentNode;
 			}
 			// FIXME: This is the third time for this check so this could be written in a better way;
-			if (target.getAttribute("contenteditable")) {
-				if (clickedInside(target)) {
-					// click was in the editable element;
-					return;
-				}
+			if (clickedInside(target) && canHaveCaret(target)) {
+				// click was in the element;
+				return;
 			}
 
 			event.stopPropagation();
 			event.cancelBubble = true;
-
 			selectTarget(target);
 		
 			window.setTimeout(function() {

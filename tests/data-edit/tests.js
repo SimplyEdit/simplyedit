@@ -1602,6 +1602,28 @@ QUnit.module("lists");
 		assert.equal(context, "simply-list-item");
 	});
 
+	QUnit.test("click on textarea in list item, textarea gets focus", function(assert) {
+		var testList = document.querySelector("#testList3");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+
+		var target = testList.querySelector("textarea");
+
+		editor.context.toolbar.hide = true;
+		editor.context.update();
+		editor.context.toolbar.hide = false;
+		simulateClick(target, 10, 15);
+
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(document.activeElement, target);
+			done1();
+                }, 100);
+	});
+
 	QUnit.test("add list item, databinding", function(assert) {
 		var testList = document.querySelector("#testList");
 		currentList = testList;
