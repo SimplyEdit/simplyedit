@@ -1383,10 +1383,11 @@
 										fieldData[fieldPath] = editor.currentData[fieldPath];
 
 										// split the binding parents into seperate entries and remove the first empty entry;
-										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
+										var subkeys = field.dataBinding.parentKey.replace(/\/$/,'').split("/");
 										if (subkeys[0] === "") {
 											subkeys.shift();
 										}
+
 										while (subkeys.length) {
 											var subkey = subkeys.shift();
 											if (fieldData[fieldPath] && fieldData[fieldPath][subkey]) {
