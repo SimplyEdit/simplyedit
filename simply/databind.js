@@ -502,6 +502,7 @@ dataBinding = function(config) {
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
+		binding.cleanupBindings();
 	};
 
 	this.rebind = function(element, config) {
@@ -522,6 +523,7 @@ dataBinding = function(config) {
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
+		binding.cleanupBindings();
 	};
 
 	this.unbind = function(element) {
@@ -529,6 +531,42 @@ dataBinding = function(config) {
 			binding.removeListeners(element);
 			binding.elements.splice(binding.elements.indexOf(element), 1);
 		}
+	};
+
+	this.cleanupBindings = function() {
+		var inDocument = function(element) {
+			if (document.contains(element)) {
+				return true;
+			}
+			var parent = element.parentNode;
+			while (parent) {
+				if (parent.nodeType === document.DOCUMENT_FRAGMENT_NODE) {
+					if (parent.host && inDocument(parent.host)) {
+						return true;
+					}
+				}
+				parent = parent.parentNode;
+			}
+			return false;
+		};
+
+		binding.elements.forEach(function(element) {
+			if (!inDocument(element)) {
+				element.markedForRemoval = true;
+			} else {
+				element.markedForRemoval = false;
+			}
+		});
+		window.setTimeout(function() {
+			binding.elements.filter(function(element) {
+				if (element.markedForRemoval && !inDocument(element)) {
+					element.dataBinding.unbind(element);
+					return false;
+				}
+				element.markedForRemoval = false;
+				return true;
+			});
+		}, 1000); // If after 1 second the element is still not in the dom, remove the binding;
 	};
 
 	initBindings(data, key);
