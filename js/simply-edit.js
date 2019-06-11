@@ -907,11 +907,10 @@
 						continue;
 					}
 					if (listEntryMapping) {
-						if (!listData[j].simplyConverted) {
+						if (!listData[j]._simplyConverted) {
 							var entry = new Object(listData[j]);
 							entry[listEntryMapping] = listData[j];
-							entry.simplyConverted = true;
-							entry.parent = listData;
+							entry._simplyConverted = true;
 							listData[j] = entry;
 						}
 					}
