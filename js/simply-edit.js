@@ -1380,9 +1380,9 @@
 										// Bind the subfields of the template to the same data-level as this field;
 										var fieldData = {};
 										fieldData[fieldPath] = editor.currentData[fieldPath];
-
 										// split the binding parents into seperate entries and remove the first empty entry;
-										var subkeys = field.dataBinding.parentKey.replace(/\/$/,'').split("/");
+//										var subkeys = field.dataBinding.parentKey.replace(/\/$/,'').split("/");
+										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
 										if (subkeys[0] === "") {
 											subkeys.shift();
 										}
@@ -2727,7 +2727,7 @@
 				file : {
 					save : function(path, data, callback) {
 						if (path.indexOf("dat://") === 0 ) {
-							path = path.replace(editor.storage.endpoint, '/');
+							path = path.replace("dat://" + document.location.host + "/", '');
 						}
 						if (!editor.storage.archive) {
 							callback({
@@ -2748,39 +2748,56 @@
 							}
 
 							var executeSave = function(path, data) {
-								createDirectories(path);
-								if (path.match(/\/$/)) {
-									// path points to a directory;
-									callback({});
-								} else {
-									editor.storage.archive.writeFile(editor.storage.meta.web_root + path, data).then(function() {
-										editor.storage.archive.commit().then(function() {
-											var saveResult = {path : path, response: "Saved."};
-											callback(saveResult);
+								createDirectories(path)
+								.then(function() {
+									if (path.match(/\/$/)) {
+										// path points to a directory;
+										callback({});
+									} else {
+										editor.storage.archive.writeFile(editor.storage.meta.web_root + path, data).then(function() {
+											editor.storage.archive.commit().then(function() {
+												var saveResult = {path : path, response: "Saved."};
+												callback(saveResult);
+											});
 										});
-									});
-								}
+									}
+								});
 							};
 							var createDirectory = function(path, callback) {
-								editor.storage.archive.readdir(path).then(null, function () {
-									editor.storage.archive.mkdir(path).then(function() {
-										editor.storage.archive.commit();
+								return new Promise(function(resolve, reject) {
+									path = path.replace(/^\/\//, "/");
+									path = path.replace(/\/$/, "");
+									editor.storage.archive.readdir(path).then(null, function () {
+										editor.storage.archive.mkdir(path).then(function() {
+											editor.storage.archive.commit().then(function() {
+												resolve('created');
+											});
+										});
 									});
 								});
 							};
 							var createDirectories = function(path, callback) {
-								var parts = path.split("/");
-								if (!path.match(/\/$/)) {
-									parts.pop(); // last part is the filename
-								}
-								var dirToCreate = '/';
-
-								for (var i=0; i<parts.length; i++) {
-									if (parts[i] !== "") {
-										dirToCreate += parts[i] + "/";
+								return new Promise(function(resolve, reject) {
+									var parts = path.split("/");
+									if (!path.match(/\/$/)) {
+										parts.pop(); // last part is the filename
 									}
-									createDirectory(editor.storage.meta.web_root + dirToCreate);
-								}
+									var dirToCreate = '/';
+
+									var promises = [];
+
+									for (var i=0; i<parts.length; i++) {
+										if (parts[i] !== "") {
+											dirToCreate += parts[i] + "/";
+										}
+										if (dirToCreate != "/") {
+											promises.push(createDirectory(editor.storage.meta.web_root + dirToCreate));
+										}
+									}
+									Promise.all(promises).then(function() {
+										resolve('created');
+									});
+								});
 							};
 							if (data instanceof File) {
 								var fileReader = new FileReader();

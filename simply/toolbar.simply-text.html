@@ -299,7 +299,11 @@
 			var range = hopeEditor.selection.getRange();
 			hopeEditor.currentRange = range;
 
-			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start).last();
+			var blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+			if (blockAnnotation) {
+				blockAnnotation = blockAnnotation.last();
+			}
+
 			var hyperlink = hopeEditor.fragment.has(range, "a");
 
 			if (blockAnnotation && (blockAnnotation.range.end == range.start)) {
@@ -398,7 +402,10 @@
 
 
 			// Check aligment
-			blockAnnotation = hopeEditor.getBlockAnnotation(range.start).last();
+            blockAnnotation = hopeEditor.getBlockAnnotation(range.start);
+            if (blockAnnotation) {
+                blockAnnotation = blockAnnotation.last();
+            };
 			var textAlign = toolbar.querySelector(".simply-text-align [data-type=simply-buttongroup-radio]");
 			if (blockAnnotation && textAlign) {
 				var tempNode = editor.plugins.hope.annotation.explode(blockAnnotation.tag);
