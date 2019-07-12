@@ -716,6 +716,10 @@
 
 				if ( !rects.length ) {
 					muze.event.fire(range.startContainer, "databinding:pause");
+					var focusedElement = document.querySelector(":focus");
+					var selStart = focusedElement ? focusedElement.selectionStart : 0;
+					var selEnd = focusedElement ? focusedElement.selectionEnd : selStart;
+
 					// insert element at range and get its position, other options aren't exact enough
 					var span = document.createElement('span');
 					if ( span.getClientRects ) {
@@ -730,8 +734,16 @@
 							// Glue any broken text nodes back together
 							spanParent.normalize();
 						} catch(e) {
+							console.log(e);
+						}
+						if (focusedElement) {
+							focusedElement.focus(); // Restore focus after chrome lost it when inserting the span.
+							focusedElement.selectionStart = selStart;
+							focusedElement.selectionEnd = selEnd;
 						}
 					}
+
+
 					muze.event.fire(range.startContainer, "databinding:resume");
 				}
 				if ( rects.length ) {
@@ -1178,7 +1190,12 @@
 
 	function monitorIframe() {
 		// monitor for iframes that get focus;
-		var monitor = setInterval(function(){
+		if (editor.monitor) {
+			// already monitoring iframes;
+			return;
+		}
+
+		editor.monitor = setInterval(function(){
 			var elem = document.activeElement;
 			if(elem && elem.tagName == 'IFRAME'){
 				if (editor.context.currentIframe != elem) {
