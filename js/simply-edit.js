@@ -262,7 +262,7 @@
 					editor.fireEvent("simply-content-loaded", document);
 
 					var checkEdit = function(evt) {
-						if ((evt && evt.newURL.match(/#simply-edit$/) || document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
+						if ((evt && evt.newURL && evt.newURL.match(/#simply-edit$/) || document.location.hash == "#simply-edit" || document.location.search == "?simply-edit") && !document.body.getAttribute("data-simply-edit")) {
 							editor.storage.connect(function() {
 								editor.editmode.init();
 								var checkHope = function() {
