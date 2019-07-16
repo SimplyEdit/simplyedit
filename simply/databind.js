@@ -535,11 +535,14 @@ dataBinding = function(config) {
 
 	this.cleanupBindings = function() {
 		var inDocument = function(element) {
-			if (document.contains(element)) {
+			if (document.contains && document.contains(element)) {
 				return true;
 			}
 			var parent = element.parentNode;
 			while (parent) {
+				if (parent === document) {
+					return true;
+				}
 				if (parent.nodeType === document.DOCUMENT_FRAGMENT_NODE) {
 					if (parent.host && inDocument(parent.host)) {
 						return true;
