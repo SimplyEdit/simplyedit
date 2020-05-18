@@ -821,8 +821,12 @@
 				if (list.dataBinding) {
 					list.dataBinding.pauseListeners(list);
 				}
+
+				var previousStyle = list.getAttribute("style");
+				list.style.height = list.offsetHeight + "px"; // this will prevent the screen from bouncing and messing up the scroll offset.
 				editor.list.clear(list);
 				editor.list.append(list, listData);
+				list.setAttribute("style", previousStyle);
 				editor.list.emptyClass(list);
 				if (list.dataBinding) {
 					list.dataBinding.resumeListeners(list);
