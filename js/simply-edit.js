@@ -902,15 +902,23 @@
 
 				var listEntryMapping = list.getAttribute("data-simply-entry");
 				var listDataSource = list.getAttribute("data-simply-data");
+
+				var listDataGetter = function() {
+					return listData;
+				};
+
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
 						continue;
 					}
 					if (listEntryMapping) {
 						if (!listData[j]._simplyConverted) {
-							var entry = new Object(listData[j]);
+							var entry = new Object(JSON.parse(JSON.stringify(listData[j])));
 							entry[listEntryMapping] = listData[j];
 							entry._simplyConverted = true;
+							Object.defineProperty(entry, "_simplyConvertedParent", {
+								get : listDataGetter
+							});
 							listData[j] = entry;
 						}
 					}
