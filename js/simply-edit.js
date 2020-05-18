@@ -896,7 +896,7 @@
 				var listIndex = list.querySelectorAll(":scope > [data-simply-list-item]");
 
 				var fragment = document.createDocumentFragment();
-				fragment.dataSimplyPath = editor.data.getDataPath(list);
+				fragment.dataSimplyPath = list.dataSimplyPath;
 
 				list.warnedFieldDataBinding = false;
 
@@ -966,7 +966,8 @@
 							}
 							list.clones[requestedTemplate] = clone.cloneNode(true);
 						}
-						clone.dataSimplyPath = editor.data.getDataPath(list);
+
+						clone.dataSimplyPath = list.dataSimplyPath;
 						if (listDataSource) {
 							editor.list.initListItem(clone, false, listData[j]);
 						} else {
@@ -975,11 +976,8 @@
 
 						editor.list.fixFirstElementChild(clone);
 
-						counter = 0;
-						for (t in list.templates) {
-							counter++;
-						}
-						
+						counter = Object.keys(list.templates).length;
+
 						if (counter > 1) {
 							clone.firstElementChild.setAttribute("data-simply-template", requestedTemplate);
 						}
@@ -1774,6 +1772,9 @@
 
 				var dataName = field.getAttribute("data-simply-field");
 
+				var fieldDataParent = dataParent;
+				field.fieldDataParent = fieldDataParent;
+
 				var dataKeys = dataName.split(".");
 				dataName = dataKeys.pop();
 				for (var j=0; j<dataKeys.length; j++) {
@@ -1817,6 +1818,9 @@
 								// bindingConfig.parentKey = list.getAttribute("data-simply-list") + "/" + j + "/";
 								bindingConfig.data   = dataParent;
 								bindingConfig.key    = dataName;
+
+								bindingConfig.fieldDataParent = fieldDataParent;
+
 								bindingConfig.dataPath = editor.data.getDataPath(field);
 								bindingConfig.getter = editor.field.dataBindingGetter;
 								bindingConfig.setter = editor.field.dataBindingSetter;
