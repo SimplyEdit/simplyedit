@@ -1371,6 +1371,7 @@
 						field.innerHTML = '';
 
 						var savedBindingParents = editor.bindingParents;
+						var savedParentKey = editor.settings.databind.parentKey;
 						var fieldPath = editor.data.getDataPath(field);
 
 						if (!field.templates[data]) {
@@ -1388,23 +1389,39 @@
 								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
 									if (field.dataBinding) {
 										// Bind the subfields of the template to the same data-level as this field;
+
+										var fieldData = {};
+										fieldData[fieldPath] = field.fieldDataParent;
+/*
 										var fieldData = {};
 										fieldData[fieldPath] = editor.currentData[fieldPath];
 										// split the binding parents into seperate entries and remove the first empty entry;
-//										var subkeys = field.dataBinding.parentKey.replace(/\/$/,'').split("/");
-										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
+										var subkeys = field.dataBinding.parentKey.replace(/\/$/,'').split("/");
+
+//										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
 										if (subkeys[0] === "") {
 											subkeys.shift();
 										}
 
-										while (subkeys.length) {
+										if (savedParentKey != field.dataBinding.parentKey) {
+											editor.bindingParents = ["/" + subkeys.join("/")];
+											editor.settings.databind.parentKey = field.dataBinding.parentKey;
+										}
+
+//										var fieldKeys = field.getAttribute('data-simply-field').split(".");
+//										fieldKeys.pop();
+
+//										if (fieldKeys.length && (subkeys.join(".") == fieldKeys.join("."))) {
+//										} else {
 											var subkey = subkeys.shift();
 											if (fieldData[fieldPath] && fieldData[fieldPath][subkey]) {
 												fieldData[fieldPath] = fieldData[fieldPath][subkey];
 											} else {
 												fieldData[fieldPath] = {};
 											}
-										}
+//										}
+
+*/
 										editor.data.apply(fieldData, field.childNodes[i]);
 									} else {
 										editor.data.apply(editor.currentData, field.childNodes[i]);
@@ -1418,6 +1435,7 @@
 							editor.editmode.makeEditable(field);
 						}
 						editor.bindingParents = savedBindingParents;
+						editor.settings.databind.parentKey = savedParentKey;
 					},
 					makeEditable : function(field) {
 						return true;
@@ -1456,7 +1474,9 @@
 								}
 							}
 						}
-
+						if (typeof data === "boolean") {
+							data = data.toString();
+						}
 						if ((typeof data === "string") && (attributes.length === 1)) {
 							field.simplyString = true;
 							var newdata = {};
