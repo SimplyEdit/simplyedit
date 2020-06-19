@@ -94,6 +94,8 @@
 		#simply-editor {
 			font-family: arial;
 			font-variant-caps: normal;
+			letter-spacing: initial;
+			text-transform: initial;
 		}
 		#simply-logo {
 			width: 60px;

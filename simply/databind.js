@@ -467,10 +467,12 @@ dataBinding = function(config) {
 		}
 
 		setShadowValue(value);		// Update the shadowValue to the new value;
-		if (binding.config.data.simplyConverted) {
+
+		if (binding.config.data._simplyConverted) {
 			// Update the reference in the parent to the new value as well;
-			binding.config.data.parent[binding.config.data.parent.indexOf(binding.config.data)] = value;
+			binding.config.data._simplyConvertedParent[binding.config.data._simplyConvertedParent.indexOf(binding.config.data)] = value;
 		}
+
 		if (instant) {
 			setElements();
 		} else {
