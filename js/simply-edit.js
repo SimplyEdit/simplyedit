@@ -438,6 +438,15 @@
 						stashedFields[i].removeAttribute("data-simply-stashed");
 					}
 				});
+
+				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-transformer")) {
+					var transformer = target.getAttribute('data-simply-transformer');
+					if (transformer) {
+						if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
+							data = editor.transformers[transformer].extract.call(target, data);
+						}
+					}
+				}
 				return data;
 			},
 			keyDownHandler : function(evt) {
@@ -822,11 +831,22 @@
 					list.dataBinding.pauseListeners(list);
 				}
 
+				var transformer = list.getAttribute('data-simply-transformer');
+				if (transformer) {
+					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
+						listData = editor.transformers[transformer].render.call(list, listData);
+					}
+				}
+
 				var previousStyle = list.getAttribute("style");
 				list.style.height = list.offsetHeight + "px"; // this will prevent the screen from bouncing and messing up the scroll offset.
 				editor.list.clear(list);
 				editor.list.append(list, listData);
-				list.setAttribute("style", previousStyle);
+				if (previousStyle) {
+					list.setAttribute("style", previousStyle);
+				} else {
+					list.removeAttribute("style");
+				}
 				editor.list.emptyClass(list);
 				if (list.dataBinding) {
 					list.dataBinding.resumeListeners(list);
@@ -932,7 +952,9 @@
 					if (typeof currentBinding !== "undefined") {
 						if (currentBinding.mode == "list") {
 							if (currentBinding.get() != listData) {
-								currentBinding.get().push(listData[j]);
+								if (currentBinding.get().push) {
+									currentBinding.get().push(listData[j]);
+								}
 							//	console.log("Appending items to existing data");
 							}
 						} else {
@@ -1084,6 +1106,10 @@
 					} else {
 						list.className.replace(/ simply-empty/g, '');
 					}
+				}
+				if (list.hasAttribute("data-simply-data") && list.dataBinding) {
+					list.dataBinding.set(list.dataBinding.get());
+					list.dataBinding.resolve(true);
 				}
 				list.reattach();
 				if (list.dataBinding) {
@@ -1477,7 +1503,8 @@
 						if (typeof data === "boolean") {
 							data = data.toString();
 						}
-						if ((typeof data === "string") && (attributes.length === 1)) {
+
+						if ((typeof data === "string" || typeof data === "number") && (attributes.length === 1)) {
 							field.simplyString = true;
 							var newdata = {};
 							newdata[attributes[0]] = data;
@@ -1489,7 +1516,7 @@
 					makeEditable : function(field) {
 						field.setAttribute("data-simply-selectable", true);
 					}
-				},
+				}
 			},
 			initHopeEditor : function(field) {
 				if (typeof hope === "undefined") {
@@ -1821,7 +1848,6 @@
 								field.dataBinding = false;
 							}
 						}
-
 						if (field.dataBinding) {
 							field.dataBinding.setData(dataParent);
 							field.dataBinding.set(dataParent[dataName]);
