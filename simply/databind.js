@@ -320,6 +320,11 @@ dataBinding = function(config) {
 							shadowValue[i] = shadowValue[i]; // this will force a renumber/reindex for the parentKeys;
 						}
 						binding.runningArrayFunction = false;
+
+						//for (var j=0; j<binding.elements.length; j++) {
+						//	binding.bind(binding.elements[j]);
+						//}
+
 						newValue = shadowValue;
 						shadowValue = null;
 						binding.set(newValue);
@@ -496,11 +501,20 @@ dataBinding = function(config) {
 		element.getter 		= (config && typeof config.getter === "function") ? config.getter : binding.getter;
 		element.setter 		= (config && typeof config.setter === "function") ? config.setter : binding.setter;
 		element.dataBinding 	= binding;
+		element.dataBindingPaused = 0;
 
 		element.setter(shadowValue);
-//		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
+		var elementValue = element.getter();
+		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
 			binding.addListeners(element);
-//		}, 0);
+			// find out if our value / element changed since we bound, if so, update;
+			if (!isEqual(element.getter(), shadowValue)) {
+				changeStack.push(shadowValue);
+			}
+			if (!isEqual(element.getter(), elementValue)) {
+				changeStack.push(element.getter());
+			}
+		}, 0);
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
@@ -512,15 +526,23 @@ dataBinding = function(config) {
 		if (element.dataBinding) {
 			element.dataBinding.unbind(element);
 		}
-
 		binding.elements.push(element);
 		element.getter 		= (config && typeof config.getter === "function") ? config.getter : binding.getter;
 		element.setter 		= (config && typeof config.setter === "function") ? config.setter : binding.setter;
 		element.dataBinding 	= binding;
+		element.dataBindingPaused = 0;
 
-//		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
+		var elementValue = element.getter();
+		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
 			binding.addListeners(element);
-//		}, 0);
+			// find out if our value / element changed since we bound, if so, update;
+			if (!isEqual(element.getter(), shadowValue)) {
+				changeStack.push(shadowValue);
+			}
+			if (!isEqual(element.getter(), elementValue)) {
+				changeStack.push(element.getter());
+			}
+		}, 0);
 
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
@@ -536,6 +558,10 @@ dataBinding = function(config) {
 	};
 
 	this.cleanupBindings = function() {
+		if (binding.elements.length < 2) {
+			return;
+		}
+
 		var inDocument = function(element) {
 			if (document.contains && document.contains(element)) {
 				return true;
@@ -562,7 +588,12 @@ dataBinding = function(config) {
 				element.markedForRemoval = false;
 			}
 		});
-		window.setTimeout(function() {
+
+		if (binding.cleanupTimer) {
+			clearTimeout(binding.cleanupTimer);
+		}
+
+		binding.cleanupTimer = window.setTimeout(function() {
 			binding.elements.filter(function(element) {
 				if (element.markedForRemoval && !inDocument(element)) {
 					element.dataBinding.unbind(element);
@@ -627,7 +658,6 @@ dataBinding.prototype.addListeners = function(element) {
 	element.addEventListener("databinding:resume", function() {
 		this.dataBinding.resumeListeners(this);
 	});
-	element.dataBindingPaused = 0;
 };
 dataBinding.prototype.resumeListeners = function(element) {
 	element.dataBindingPaused--;
@@ -699,6 +729,7 @@ dataBinding.prototype.handleEvent = function (event) {
 		return;
 	}
 	if (target.dataBindingPaused) {
+		event.stopPropagation();
 		return;
 	}
 	if (self.mode === "list") {
