@@ -2694,27 +2694,17 @@
 				init : function(endpoint) {
 					this.endpoint = endpoint;
 					this.dataEndpoint = endpoint + "data.json";
-					if (this.endpoint.indexOf("dat://") === 0 && window.DatArchive) {
-						this.archive = new DatArchive(this.endpoint);
-						this.archive.readFile("dat.json").then(function(data) {
-							try {
-								editor.storage.meta = JSON.parse(data);
-								if (!editor.storage.meta.web_root) {
-									editor.storage.meta.web_root = "/";
-								}
-								if (!editor.storage.meta.web_root.match(/\/$/)) {
-									editor.storage.meta.web_root += "/";
-								}
-							} catch (e) {
-								console.log("Warning: could not parse archive metadata (dat.json)");
-							}
+					if (this.endpoint.indexOf("hyper://") === 0 && window.beaker) {
+						this.hyperdrive = beaker.hyperdrive.drive(this.endpoint);
+						this.hyperdrive.getInfo().then(function(meta) {
+							editor.storage.meta = meta;
+							editor.storage.meta.web_root = "/";
 						});
 					}
-					this.load = storage.default.load;
-					this.list = storage.default.list;
-					this.sitemap = storage.default.sitemap;
-					this.page = storage.default.page;
-					this.listSitemap = storage.default.listSitemap;
+					this.load = editor.storageConnectors.default.load;
+					this.sitemap = editor.storageConnectors.default.sitemap;
+					this.page = editor.storageConnectors.default.page;
+					this.listSitemap = editor.storageConnectors.default.listSitemap;
 
 					if (editor.responsiveImages) {
 						if (
@@ -2754,32 +2744,93 @@
 						dataPath += "index.html";
 					}
 
-					editor.storage.archive.readFile(editor.storage.meta.web_root + pageTemplate).then(function(result) {
+					editor.storage.hyperdrive.readFile(editor.storage.meta.web_root + pageTemplate).then(function(result) {
 						if (result) {
 							editor.storage.file.save(dataPath, result, callback);
 						}
 					});
 				},
+				list : function(url, callback) {
+						if (url.indexOf(editor.storage.dataEndpoint) === 0) {
+							return this.listSitemap(url, callback);
+						}
+						if (url == editor.storage.endpoint) {
+							var result = {
+								images : [],
+								folders : [],
+								files : []
+							};
+							result.folders.push({url : editor.storage.dataEndpoint, name : 'My pages'});
+							var parser = document.createElement("A");
+
+							if (document.querySelector("[data-simply-images]")) {
+								var imagesEndpoint = document.querySelector("[data-simply-images]").getAttribute("data-simply-images");
+								parser.href = imagesEndpoint;
+								imagesEndpoint = parser.href;
+								result.folders.push({url : imagesEndpoint, name : 'My images'});
+							}
+							if (document.querySelector("[data-simply-files]")) {
+								var filesEndpoint = document.querySelector("[data-simply-files]").getAttribute("data-simply-files");
+								parser.href = filesEndpoint;
+								filesEndpoint = parser.href;
+								result.folders.push({url : filesEndpoint, name : 'My files'});
+							}
+							return callback(result);
+						}
+
+						var files = beaker.hyperdrive.readdir(url)
+						.then(function(files) {
+							var result = {
+								images : [],
+								folders : [],
+								files : []
+							};
+							files.forEach(function(file) {
+								var targetUrl = url + file;
+								if (targetUrl.substring(-1) === "/") {
+									result.folders.push({url : targetUrl, name : file});
+								} else {
+									if (targetUrl === editor.storage.dataEndpoint) {
+											result.folders.push({url : targetUrl, name: "My pages"});
+									} else {
+										result.files.push({url : targetUrl, name : file});
+										if (targetUrl.match(/(jpg|jpeg|gif|png|bmp|tif|svg)$/i)) {
+											result.images.push({url : targetUrl, name : file});
+										}
+									}
+								}
+							});
+
+							return result;
+						})
+						.then(function(files) {
+							callback(files);
+						})
+						.catch(function(error) {
+							console.log("The target endpoint could not be accessed.");
+							console.log(error);
+						});
+					},
 				file : {
 					save : function(path, data, callback) {
-						if (path.indexOf("dat://") === 0 ) {
-							path = path.replace("dat://" + document.location.host + "/", '');
+						if (path.indexOf("hyper://") === 0 ) {
+							path = path.replace("hyper://" + document.location.host + "/", '');
 						}
-						if (!editor.storage.archive) {
+						if (!editor.storage.hyperdrive) {
 							callback({
 								error : true,
-								message : "No connection to dat archive (are you on https?)"
+								message : "No connection to hyperdrive (are you on https?)"
 							});
-							console.log("Warning: no connection to dat archive (are you on https?)");
+							console.log("Warning: no connection to hyperdrive (are you on https?)");
 							return;
 						}
-						editor.storage.archive.getInfo().then(function(info) {
-							if (!info.isOwner) {
+						editor.storage.hyperdrive.getInfo().then(function(info) {
+							if (!info.writable) {
 								callback({
 									error : true,
-									message : "Not the owner."
+									message : "Not writable."
 								});
-								console.log("Warning: Save failed because we are not owner for this archive.");
+								console.log("Warning: Save failed the hyperdrive is not writable.");
 								return;
 							}
 
@@ -2790,11 +2841,9 @@
 										// path points to a directory;
 										callback({});
 									} else {
-										editor.storage.archive.writeFile(editor.storage.meta.web_root + path, data).then(function() {
-											editor.storage.archive.commit().then(function() {
-												var saveResult = {path : path, response: "Saved."};
-												callback(saveResult);
-											});
+										editor.storage.hyperdrive.writeFile(editor.storage.meta.web_root + path, data).then(function() {
+											var saveResult = {path : path, response: "Saved."};
+											callback(saveResult);
 										});
 									}
 								});
@@ -2803,13 +2852,18 @@
 								return new Promise(function(resolve, reject) {
 									path = path.replace(/^\/\//, "/");
 									path = path.replace(/\/$/, "");
-									editor.storage.archive.readdir(path).then(null, function () {
-										editor.storage.archive.mkdir(path).then(function() {
-											editor.storage.archive.commit().then(function() {
-												resolve('created');
+									editor.storage.hyperdrive.readdir(path).then(
+										function() {
+											resolve('already exists');
+										},
+										function () {
+											editor.storage.hyperdrive.mkdir(path).then(function() {
+												editor.storage.hyperdrive.commit().then(function() {
+													resolve('created');
+												});
 											});
-										});
-									});
+										}
+									);
 								});
 							};
 							var createDirectories = function(path, callback) {
@@ -2849,16 +2903,12 @@
 					delete : function(path, callback) {
 						if (path.match(/\/$/)) {
 							// path points to a directory;
-							editor.storage.archive.rmdir(editor.storage.meta.web_root + path, {recursive: true}).then(function() {
-								editor.storage.archive.commit().then(function() {
-									callback();
-								});
+							editor.storage.hyperdrive.rmdir(editor.storage.meta.web_root + path, {recursive: true}).then(function() {
+								callback();
 							});
 						} else {
-							editor.storage.archive.unlink(editor.storage.meta.web_root + path).then(function() {
-								editor.storage.archive.commit().then(function() {
-									callback();
-								});
+							editor.storage.hyperdrive.unlink(editor.storage.meta.web_root + path).then(function() {
+								callback();
 							});
 						}
 					}
