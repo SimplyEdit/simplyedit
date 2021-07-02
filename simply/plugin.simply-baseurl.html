@@ -7,17 +7,17 @@
 		if (typeof host === "undefined") {
 			host = document.location.host;
 		}
-
-		var re = new RegExp("('|\")(http|https):\/\/" + host + "([#?])", 'g'); 
+console.log(host);
+		var re = new RegExp("('|\")(http|https|hyper):\/\/" + host + "([#?])", 'g'); 
 		data = data.replace(re, "$1/$3");
 
-		re = new RegExp("('|\")(http|https):\/\/" + host + "([/#?])", 'g'); 
+		re = new RegExp("('|\")(http|https|hyper):\/\/" + host + "([/#?])", 'g'); 
 		data = data.replace(re, "$1$3");
 
-		re = new RegExp("(')(http|https):\/\/" + host + "'", 'g');
+		re = new RegExp("(')(http|https|hyper):\/\/" + host + "'", 'g');
 		data = data.replace(re, "$1/$1");
 
-		re = new RegExp("(\")(http|https):\/\/" + host + "\"", 'g');
+		re = new RegExp("(\")(http|https|hyper):\/\/" + host + "\"", 'g');
 		data = data.replace(re, "$1/$1");
 
 		return data;
