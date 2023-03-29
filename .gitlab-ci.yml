@@ -1,6 +1,5 @@
-image: muze/phantomjs:v2latest
-
 unittest:
+  image: ghcr.io/puppeteer/puppeteer:latest
   before_script:
     - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} update
     - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} --no-install-recommends -y install git
@@ -16,6 +15,7 @@ unittest:
   stage: test
 
 syntaxtest:
+  image: muze/phantomjs:v2latest
   before_script:
     - npm -g install jshint
     - npm -g install csslint
