@@ -1,13 +1,9 @@
 unittest:
   image: ghcr.io/puppeteer/puppeteer:latest
   before_script:
-    - apt-get update
-    - apt-get --no-install-recommends -y install git
-#    - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} update
-#    - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} --no-install-recommends -y install git
-    - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
-    - ( php -S 0.0.0.0:80  & )
-    - ( cd /tmp/simply-test-store ; bash server.sh )
+#    - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
+#    - ( php -S 0.0.0.0:80  & )
+#    - ( cd /tmp/simply-test-store ; bash server.sh )
     - npm -g install node-qunit-puppeteer
   script:
      - node-qunit-puppeteer http://localhost/tests/data-display/ci.html
