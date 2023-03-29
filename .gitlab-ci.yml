@@ -4,7 +4,7 @@ unittest:
 #    - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
 #    - ( php -S 0.0.0.0:80  & )
 #    - ( cd /tmp/simply-test-store ; bash server.sh )
-    - npm -g install node-qunit-puppeteer
+    - npm install node-qunit-puppeteer
   script:
      - node-qunit-puppeteer http://localhost/tests/data-display/ci.html
      - node-qunit-puppeteer http://localhost/tests/data-edit/ci.html
