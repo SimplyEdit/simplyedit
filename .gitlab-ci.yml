@@ -6,8 +6,8 @@ unittest:
 #    - ( cd /tmp/simply-test-store ; bash server.sh )
     - npm install node-qunit-puppeteer
   script:
-     - ./node_modules/.bin/node-qunit-puppeteer --no-sandbox http://localhost/tests/data-display/ci.html
-     - ./node_modules/.bin/node-qunit-puppeteer --no-sandbox http://localhost/tests/data-edit/ci.html
+     - ./node_modules/.bin/node-qunit-puppeteer http://localhost/tests/data-display/ci.html 60000 --no-sandbox
+     - ./node_modules/.bin/node-qunit-puppeteer http://localhost/tests/data-edit/ci.html 60000 --no-sandbox
   tags:
     - docker
   stage: test
