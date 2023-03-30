@@ -18,7 +18,8 @@ syntaxtest:
     - npm -g install jshint
     - npm -g install csslint
   script:
-    - jshint $(find js simply  -name \*.js | grep -v -E '^(simply/slip.js|simply/scripts.js)$')
+    - echo '{"esversion":6}' > .jshintrc
+    - jshint --config .jshintrc $(find js simply  -name \*.js | grep -v -E '^(simply/slip.js|simply/scripts.js)$')
     - csslint .
   tags:
     - docker
