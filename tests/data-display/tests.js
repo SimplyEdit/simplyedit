@@ -1475,3 +1475,107 @@ QUnit.module("data path");
 		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), "/bar/../foo/"); 
 		document.body.removeAttribute("data-simply-path");
 	});
+
+QUnit.module("simply components");
+	QUnit.test("simple component render plain text", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'>Hello there</template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+
+		var mainContents = document.querySelector("main").innerHTML;
+		assert.equal(mainContents, "Hello there", "component is rendered");
+	});
+
+	QUnit.test("simple component render field", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div data-simply-field='hello'></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : "world"
+		};
+		var mainContents = document.querySelector("main > div").innerHTML;
+		assert.equal(mainContents, "world", "component is rendered");
+	});
+
+	QUnit.test("simple component render nested component with plain text", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML += "<template id='bar'>Hello world</template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		var mainContents = document.querySelector("main").innerHTML;
+		assert.equal(mainContents, "Hello world", "component is rendered");
+	});
+
+	QUnit.test("simple component render nested component with field", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML += "<template id='bar'><div data-simply-field='hello'></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : "world"
+		};
+		var mainContents = document.querySelector("main > div").innerHTML;
+		assert.equal(mainContents, "world", "component is rendered");
+	});
+
+	QUnit.test("simple component render nested component with list", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML += "<template id='bar'><div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry'></span></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : ["world", "there", "you"]
+		};
+		var mainContents = document.querySelector("main > div").innerText;
+		assert.equal(mainContents, "worldthereyou", "component is rendered");
+	});
