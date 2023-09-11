@@ -1579,3 +1579,33 @@ QUnit.module("simply components");
 		var mainContents = document.querySelector("main > div").innerText;
 		assert.equal(mainContents, "worldthereyou", "component is rendered");
 	});
+
+	QUnit.test("databinding for lists with data-simply-entry", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry'></span></template></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : ["world", "there", "you"]
+		};
+		var mainContents = document.querySelector("main > div").innerText;
+		assert.equal(mainContents, "worldthereyou", "list is rendered");
+
+		var world = document.querySelector("#testContent span:first-child");
+		world.innerText = "another world";
+
+		var list = document.querySelector("#testContent div[data-simply-list]");
+		list.dataBinding.resolve(true)
+
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.hello), '["another world","there","you"]');
+			done();
+		}, 100);
+	})

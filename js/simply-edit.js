@@ -327,6 +327,7 @@
 						dataParent[dataName] = [];
 					}
 
+					var listEntryMapping = list.getAttribute('data-simply-entry')
 					listItems = list.querySelectorAll("[data-simply-list-item]");
 					var counter = 0;
 					for (j=0; j<listItems.length; j++) {
@@ -341,6 +342,10 @@
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
 								console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
+							}
+							if (listEntryMapping) {
+								console.log('Doing the thing',listEntryMapping);
+								subData[subPath] = subData[subPath][listEntryMapping];
 							}
 							dataParent[dataName][counter] = subData[subPath];
 						}
