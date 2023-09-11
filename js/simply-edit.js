@@ -327,7 +327,7 @@
 						dataParent[dataName] = [];
 					}
 
-					var listEntryMapping = list.getAttribute('data-simply-entry')
+					var listEntryMapping = list.getAttribute('data-simply-entry');
 					listItems = list.querySelectorAll("[data-simply-list-item]");
 					var counter = 0;
 					for (j=0; j<listItems.length; j++) {
