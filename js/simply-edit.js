@@ -935,6 +935,9 @@
 				var listDataGetter = function() {
 					return listData;
 				};
+				var listEntryMappingGetter = function() {
+					return listEntryMapping;
+				}
 
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
@@ -945,20 +948,10 @@
 							var entry = new Object(JSON.parse(JSON.stringify(listData[j])));
 							entry[listEntryMapping] = listData[j];
 							Object.defineProperty(entry, "_simplyConvertedParent", {
-								get : function() {
-									/* jshint ignore:start */
-									// Ignoring this: Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.
-									return listData;
-									/* jshint ignore:end */
-								}
+								get : listDataGetter
 							});
 							Object.defineProperty(entry, "_simplyListEntryMapping", {
-								get : function() {
-									/* jshint ignore:start */
-									// Ignoring this: Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.
-									return listEntryMapping;
-									/* jshint ignore:end */
-								}
+								get : listEntryMappingGetter
 							});
 							listData[j] = entry;
 						}
