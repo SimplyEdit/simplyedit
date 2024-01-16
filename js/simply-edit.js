@@ -937,7 +937,7 @@
 				};
 				var listEntryMappingGetter = function() {
 					return listEntryMapping;
-				}
+				};
 
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
