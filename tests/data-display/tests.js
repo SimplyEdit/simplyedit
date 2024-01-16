@@ -1601,10 +1601,9 @@ QUnit.module("simply components");
 		var world = document.querySelector("#testContent span:first-child");
 		world.innerText = "another world";
 
-		var list = document.querySelector("#testContent div[data-simply-list]");
-		list.dataBinding.resolve(true);
-
 		window.setTimeout(function() {
+			var list = document.querySelector("#testContent div[data-simply-list]");
+			list.dataBinding.resolve(true);
 			assert.equal(JSON.stringify(editor.pageData.hello), '["another world","there","you"]');
 			done();
 		}, 100);
