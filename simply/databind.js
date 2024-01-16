@@ -229,13 +229,13 @@ dataBinding = function(config) {
 			var convertedParent = binding.config.data._parentBindings_[binding.key].config.data._simplyConvertedParent;
 			var arrayPaths = binding.config.data._parentBindings_[binding.key].config.data[listEntryMapping]._parentBindings_[binding.key].parentKey.split("/");
 			var arrayIndex = arrayPaths.pop();
-			var arrayIndex = arrayPaths.pop();
+			arrayIndex = arrayPaths.pop();
 			binding.config.data._parentBindings_[binding.key].config.data[binding.key] = data;
 			var parentData = convertedParent._parentBindings_[arrayIndex].config.data;
 			var parentKey = arrayPaths.pop();
 			parentData[parentKey][arrayIndex][binding.key] = data;
 		}
-	}
+	};
 
 	var monitorChildData = function(data) {
 		// Watch for changes in our child data, because these also need to register as changes in the databound data/elements;
