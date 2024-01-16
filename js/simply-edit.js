@@ -946,14 +946,18 @@
 							entry[listEntryMapping] = listData[j];
 							Object.defineProperty(entry, "_simplyConvertedParent", {
 								get : function() {
+									/* jshint ignore:start */
 									// Ignoring this: Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.
-									return listData; // jshint ignore:line
+									return listData;
+									/* jshint ignore:end */
 								}
 							});
 							Object.defineProperty(entry, "_simplyListEntryMapping", {
 								get : function() {
+									/* jshint ignore:start */
 									// Ignoring this: Functions declared within loops referencing an outer scoped variable may lead to confusing semantics.
-									return listEntryMapping; // jshint ignore:line
+									return listEntryMapping;
+									/* jshint ignore:end */
 								}
 							});
 							listData[j] = entry;
