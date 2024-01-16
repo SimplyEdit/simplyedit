@@ -344,7 +344,6 @@
 								console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
 							}
 							if (listEntryMapping) {
-								console.log('Doing the thing',listEntryMapping);
 								subData[subPath] = subData[subPath][listEntryMapping];
 							}
 							dataParent[dataName][counter] = subData[subPath];
@@ -444,7 +443,7 @@
 					}
 				});
 
-				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-transformer")) {
+				if ((target.nodeType == document.ELEMENT_NODE) && target.getAttribute("data-simply-list") && target.getAttribute("data-simply-transformer")) {
 					var transformer = target.getAttribute('data-simply-transformer');
 					if (transformer) {
 						if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
@@ -452,6 +451,7 @@
 						}
 					}
 				}
+
 				return data;
 			},
 			keyDownHandler : function(evt) {
@@ -941,12 +941,18 @@
 						continue;
 					}
 					if (listEntryMapping) {
-						if (!listData[j]._simplyConverted) {
+						if (!listData[j]._simplyListEntryMapping) {
 							var entry = new Object(JSON.parse(JSON.stringify(listData[j])));
 							entry[listEntryMapping] = listData[j];
-							entry._simplyConverted = true;
 							Object.defineProperty(entry, "_simplyConvertedParent", {
-								get : listDataGetter
+								get : function() {
+									return listData;
+								}
+							});
+							Object.defineProperty(entry, "_simplyListEntryMapping", {
+								get : function() {
+									return listEntryMapping;
+								}
 							});
 							listData[j] = entry;
 						}
