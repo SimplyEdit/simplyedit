@@ -972,7 +972,7 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
-	QUnit.test("text press return at end of text nodes and inline tag", function(assert) {
+	QUnit.test("text press return at end of text nodes and inline tag in paragraph field", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello <em>little</em> world";
 		testContent.hopeEditor.parseHTML();
@@ -988,7 +988,7 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
-	QUnit.test("text press return at end of text nodes and inline tag in paragraph field", function(assert) {
+	QUnit.test("text press return at end of text nodes and inline tag", function(assert) {
 		var testContent = document.querySelector("#testParagraph");
 		testContent.innerHTML = "Hello <em>little</em> world";
 		testContent.hopeEditor.parseHTML();
