@@ -1486,7 +1486,7 @@ QUnit.module("simply components");
 		target.appendChild(templatesField);
 
 		var field = document.createElement("main");
-		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		field.innerHTML = "<simply-component rel='foo'></simply-component>";
 		target.appendChild(field);
 
 		editor.currentData = {};
@@ -1505,7 +1505,7 @@ QUnit.module("simply components");
 		target.appendChild(templatesField);
 
 		var field = document.createElement("main");
-		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		field.innerHTML = "<simply-component rel='foo'></simply-component>";
 		target.appendChild(field);
 
 		editor.currentData = {};
@@ -1522,12 +1522,12 @@ QUnit.module("simply components");
 		target.innerHTML = '';
 
 		var templatesField = document.createElement("div");
-		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML = "<template id='foo'><simply-component rel='bar'></simply-component></template>";
 		templatesField.innerHTML += "<template id='bar'>Hello world</template>";
 		target.appendChild(templatesField);
 
 		var field = document.createElement("main");
-		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		field.innerHTML = "<simply-component rel='foo'></simply-component>";
 		target.appendChild(field);
 
 		editor.currentData = {};
@@ -1541,12 +1541,12 @@ QUnit.module("simply components");
 		target.innerHTML = '';
 
 		var templatesField = document.createElement("div");
-		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML = "<template id='foo'><simply-component rel='bar'></simply-component></template>";
 		templatesField.innerHTML += "<template id='bar'><div data-simply-field='hello'></div></template>";
 		target.appendChild(templatesField);
 
 		var field = document.createElement("main");
-		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		field.innerHTML = "<simply-component rel='foo'></simply-component>";
 		target.appendChild(field);
 
 		editor.currentData = {};
@@ -1563,12 +1563,12 @@ QUnit.module("simply components");
 		target.innerHTML = '';
 
 		var templatesField = document.createElement("div");
-		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML = "<template id='foo'><simply-component rel='bar'></simply-component></template>";
 		templatesField.innerHTML += "<template id='bar'><div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry'></span></div></template>";
 		target.appendChild(templatesField);
 
 		var field = document.createElement("main");
-		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		field.innerHTML = "<simply-component rel='foo'></simply-component>";
 		target.appendChild(field);
 
 		editor.currentData = {};
