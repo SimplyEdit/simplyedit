@@ -3709,7 +3709,7 @@
 		profile : 'live'
 	});
 
-	class SimplyComponent extends HTMLDivElement {
+	class SimplyComponent extends HTMLElement {
 		constructor() {
 			var self = super();
 			var templateId = self.getAttribute("rel");
@@ -3730,6 +3730,5 @@
 		}
 	}
 	// Define the new element
-	customElements.define('simply-component', SimplyComponent, { extends: 'div' });
+	customElements.define('simply-component', SimplyComponent);
 }());
-
