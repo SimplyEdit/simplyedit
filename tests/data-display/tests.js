@@ -1706,11 +1706,95 @@ QUnit.module("simply components");
 		var world = document.querySelector("#testContent span:first-child");
 		world.innerText = "another world";
 
-		var list = document.querySelector("#testContent div[data-simply-list]");
-		list.dataBinding.resolve(true)
-
 		window.setTimeout(function() {
+			var list = document.querySelector("#testContent div[data-simply-list]");
+			list.dataBinding.resolve(true);
 			assert.equal(JSON.stringify(editor.pageData.hello), '["another world","there","you"]');
 			done();
 		}, 100);
-	})
+	});
+
+	QUnit.test("databinding for lists with data-simply-entry with objects", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry.title'></span></template></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : [{"title" : "world"}, {"title" : "there"}, {"title" : "you"}]
+		};
+		var mainContents = document.querySelector("main > div").innerText;
+		assert.equal(mainContents, "worldthereyou", "list is rendered");
+
+		var world = document.querySelector("#testContent span:first-child");
+		world.innerText = "another world";
+
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.hello), '[{"title":"another world"},{"title":"there"},{"title":"you"}]');
+			done();
+		}, 100);
+	});
+
+	QUnit.test("databinding for lists with data-simply-entry with objects and templates", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+		  <div data-simply-list="things" data-simply-entry="entry">
+    <template>
+      <div data-simply-field="entry" data-simply-content="template" data-simply-transformer="thingType" data-simply-default-value="de
+fault">
+        <template data-simply-template="default"></template>
+        <template data-simply-template="thing">
+          <div class="ds-form-group ds-grid">
+            <label>Thing type:
+              <select data-simply-field="entry.thing">
+                <option value="">Select a thing</option>
+                <option value="001-001">Thing 1</option>
+                <option value="002-002">Thing 2</option>
+                <option value="003-003">Thing 3</option>
+                <option value="004-004">Thing 4</option>
+              </select>
+            </label>
+          </div>
+        </template>
+    </template>
+  </div>
+`;
+
+		target.appendChild(field);
+		editor.transformers = {
+			thingType: {
+				render: function (data) {
+					this.simplyData = data;
+					return Object.keys(data)[0];
+				},
+				extract: function (data) {
+					return this.simplyData;
+				}
+			}
+		};
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"things" : [{ "thing": "001-001" },{ "thing": "001-001" }]
+		};
+
+		document.querySelectorAll("#testContent select")[0].value = "003-003";
+		document.querySelectorAll("#testContent select")[1].value = "002-002";
+
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.things), '[{"thing":"003-003"},{"thing":"002-002"}]');
+			done();
+		}, 100);
+	});
