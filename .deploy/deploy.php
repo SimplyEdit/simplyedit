@@ -69,6 +69,7 @@ set('rsync',[
 
 // Configure servers
 server('canary', 'mz-webserver-01.muze.nl')
+	->port(2223)
 	->user('canary.simplyedit.io')
 	->forwardAgent()
 	->stage('canary')
@@ -76,6 +77,7 @@ server('canary', 'mz-webserver-01.muze.nl')
 
 // Configure servers
 server('cdn1', 'mz-webserver-01.muze.nl')
+	->port(2223)
 	->user('cdn.simplyedit.io')
 	->forwardAgent()
 	->stage('cdn')
