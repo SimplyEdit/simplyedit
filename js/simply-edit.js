@@ -822,9 +822,23 @@
 				}
 
 				var dataLists = clone.querySelectorAll("[data-simply-list]");
-				for (k=0; k<dataLists.length; k++) {
-					editor.list.init(dataLists[k], listDataItem, useDataBinding);
+
+				// FIXME: We need to skip sublists to prevent initing them twice!
+				var subLists;
+				subLists = clone.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']):not([data-simply-content='fixed']) [data-simply-list]");
+				var subListsArr = [];
+				for (var a=0; a<subLists.length; a++) {
+					subListsArr.unshift(subLists[a]);
 				}
+
+				for (var i=0; i<dataLists.length; i++) {
+					var isSub = (subListsArr.indexOf(dataLists[i]) > -1);
+					if (isSub) {
+						continue;
+					}
+					editor.list.init(dataLists[i], listDataItem, useDataBinding);
+				}
+
 				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
 					editor.list.init(clone, listDataItem, useDataBinding);
 				}
