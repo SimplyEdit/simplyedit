@@ -38,11 +38,7 @@ canary:
   before_script:
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
-    - ssh-add -l
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-    - echo "LogLevel Debug" > ~/.ssh/config
-    - chmod 0600 ~/.ssh/id_ed25519
     - composer --working-dir=.deploy/ install --no-scripts
     - 'NEXT=$(git for-each-ref  --format="%(refname:short)" **/origin/master-* | sort | tr -d -c "[:digit:]\n" | sort -nr | head -n1)'
     - 'NEXT=$((${NEXT:=-1}+1))'
