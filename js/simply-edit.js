@@ -3711,6 +3711,7 @@
 
 	class SimplyComponent extends HTMLDivElement {
 		constructor() {
+			console.warn('simply-component is deprecated, use simply-render instead');
 			var self = super();
 			var templateId = self.getAttribute("rel");
 			var template = document.getElementById(templateId);
@@ -3731,5 +3732,29 @@
 	}
 	// Define the new element
 	customElements.define('simply-component', SimplyComponent, { extends: 'div' });
-}());
+	
+	class SimplyRender extends HTMLElement {
+		constructor() {
+			var self = super();
+			var templateId = self.getAttribute("rel");
+			var template = document.getElementById(templateId);
+			if (template) {
+				var content = editor.list.cloneTemplate(template);
+				for (var i=0; i<content.childNodes.length; i++) {
+					var clone = content.childNodes[i].cloneNode(true);
+					if (clone.nodeType == document.ELEMENT_NODE) {
+						clone.querySelectorAll("template").forEach(function(t) {
+							t.setAttribute("simply-component", "");
+						});
+					}
+					self.parentNode.insertBefore(clone, self);
+				}
+				self.parentNode.removeChild(self);
+			}
+		}
+	}
 
+	// Define the new element
+	customElements.define('simply-render', SimplyRender);
+
+}());
