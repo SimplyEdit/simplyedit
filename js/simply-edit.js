@@ -1026,7 +1026,7 @@
 							stashedFields[i].removeAttribute("data-simply-stashed");
 						}
 
-						if (!listData[j]._bindings_) {
+						if (!listDataSource && !listData[j]._bindings_) {
 							newData = editor.list.get(clone.firstElementChild);
 							dataPath = editor.data.getDataPath(clone.firstElementChild);
 							editor.data.apply(newData, clone.firstElementChild);
@@ -1068,7 +1068,7 @@
 								stashedFields[i].removeAttribute("data-simply-stashed");
 							}
 
-							if (!listData[j]._bindings_) {
+							if (!listDataSource && !listData[j]._bindings_) {
 								newData = editor.list.get(clone);
 								dataPath = editor.data.getDataPath(clone);
 								editor.data.apply(newData, clone);
