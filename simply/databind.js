@@ -432,7 +432,7 @@ dataBinding = function(config) {
 					binding.resolve(true);
 				}
 				if (data._parentBindings_ && data._parentBindings_[key]) {
-					if (data._parentBindings_[key].get()[key] !== value) {
+					if (!isEqual(data._parentBindings_[key].get()[key], value)) {
 						data._parentBindings_[key].get()[key] = value;
 						data._parentBindings_[key].resolve(true);
 					}
