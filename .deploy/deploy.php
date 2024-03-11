@@ -71,7 +71,6 @@ set('rsync',[
 server('canary', 'mz-webserver-01.muze.nl')
 	->port(2223)
 	->user('canary.simplyedit.io')
-	->forwardAgent()
 	->stage('canary')
 	->env('deploy_path', '/var/www/vhosts/canary.simplyedit.io/site/res/');
 
@@ -79,7 +78,6 @@ server('canary', 'mz-webserver-01.muze.nl')
 server('cdn1', 'mz-webserver-01.muze.nl')
 	->port(2223)
 	->user('cdn.simplyedit.io')
-	->forwardAgent()
 	->stage('cdn')
 	->env('deploy_path', '/var/www/vhosts/cdn.simplyedit.io/site/res/');
 
