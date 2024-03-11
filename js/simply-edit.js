@@ -1423,16 +1423,10 @@
 							field.appendChild(clone);
 							for (var i=0; i<field.childNodes.length; i++) {
 								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
-									if (field.dataBinding) {
-										// Bind the subfields of the template to the same data-level as this field;
-
-										var fieldData = {};
-										fieldData[fieldPath] = field.fieldDataParent;
-
-										editor.data.apply(fieldData, field.childNodes[i]);
-									} else {
-										editor.data.apply(editor.currentData, field.childNodes[i]);
-									}
+									// Bind the subfields of the template to the same data-level as this field;
+									var fieldData = {};
+									fieldData[fieldPath] = field.fieldDataParent;
+									editor.data.apply(fieldData, field.childNodes[i]);
 								}
 							}
 						}
