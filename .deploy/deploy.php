@@ -68,18 +68,18 @@ set('rsync',[
 ]);
 
 // Configure servers
-server('canary', 'se-cdn-dc.muze.nl')
-	->user('deployer')
+server('canary', 'mz-webserver-01.muze.nl')
+	->user('canary.simplyedit.io')
 	->forwardAgent()
 	->stage('canary')
-	->env('deploy_path', '/opt/canary.simplyedit.io/res/');
+	->env('deploy_path', '/var/www/vhosts/canary.simplyedit.io/site/res/');
 
 // Configure servers
-server('cdn1', 'se-cdn-dc.muze.nl')
-	->user('deployer')
+server('cdn1', 'mz-webserver-01.muze.nl')
+	->user('cdn.simplyedit.io')
 	->forwardAgent()
 	->stage('cdn')
-	->env('deploy_path', '/opt/cdn.simplyedit.io/res/');
+	->env('deploy_path', '/var/www/vhosts/cdn.simplyedit.io/site/res/');
 
 task('prepare:workdir', function() {
 	runLocally('git archive --prefix=release/ HEAD | tar -C {{workspace}} -xf -');
