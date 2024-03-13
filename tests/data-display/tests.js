@@ -1798,3 +1798,46 @@ fault">
 			done();
 		}, 100);
 	});
+
+	QUnit.test("rendering datasource lists with datasource sublists", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-list="second" data-simply-data="second">
+          <template>
+            <hr>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{}];
+				callback(result);
+			}
+		});
+		editor.addDataSource("second", {
+			load : function(el, callback) {
+				renderCounter++;
+				console.log("this should happen only once");
+				callback();
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(renderCounter, 1);
+			done();
+		}, 100);
+	});
