@@ -1841,3 +1841,40 @@ fault">
 			done();
 		}, 100);
 	});
+
+	QUnit.test("rendering datasource lists with fields in them", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-field="field" data-simply-content="template" data-simply-default-template="default">
+          <template data-simply-template="default">
+            <h1 data-simply-field="field"></h1>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{
+				  "field" : "thing"
+				}];
+				callback(result);
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(typeof editor.pageData.field, "undefined");
+			done();
+		}, 100);
+	});
