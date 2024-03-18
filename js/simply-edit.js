@@ -822,9 +822,23 @@
 				}
 
 				var dataLists = clone.querySelectorAll("[data-simply-list]");
-				for (k=0; k<dataLists.length; k++) {
-					editor.list.init(dataLists[k], listDataItem, useDataBinding);
+
+				// FIXME: We need to skip sublists to prevent initing them twice!
+				var subLists;
+				subLists = clone.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']):not([data-simply-content='fixed']) [data-simply-list]");
+				var subListsArr = [];
+				for (var a=0; a<subLists.length; a++) {
+					subListsArr.unshift(subLists[a]);
 				}
+
+				for (var i=0; i<dataLists.length; i++) {
+					var isSub = (subListsArr.indexOf(dataLists[i]) > -1);
+					if (isSub) {
+						continue;
+					}
+					editor.list.init(dataLists[i], listDataItem, useDataBinding);
+				}
+
 				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
 					editor.list.init(clone, listDataItem, useDataBinding);
 				}
@@ -1026,7 +1040,7 @@
 							stashedFields[i].removeAttribute("data-simply-stashed");
 						}
 
-						if (!listData[j]._bindings_) {
+						if (!listDataSource && !listData[j]._bindings_) {
 							newData = editor.list.get(clone.firstElementChild);
 							dataPath = editor.data.getDataPath(clone.firstElementChild);
 							editor.data.apply(newData, clone.firstElementChild);
@@ -1068,7 +1082,7 @@
 								stashedFields[i].removeAttribute("data-simply-stashed");
 							}
 
-							if (!listData[j]._bindings_) {
+							if (!listDataSource && !listData[j]._bindings_) {
 								newData = editor.list.get(clone);
 								dataPath = editor.data.getDataPath(clone);
 								editor.data.apply(newData, clone);
@@ -1423,16 +1437,10 @@
 							field.appendChild(clone);
 							for (var i=0; i<field.childNodes.length; i++) {
 								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
-									if (field.dataBinding) {
-										// Bind the subfields of the template to the same data-level as this field;
-
-										var fieldData = {};
-										fieldData[fieldPath] = field.fieldDataParent;
-
-										editor.data.apply(fieldData, field.childNodes[i]);
-									} else {
-										editor.data.apply(editor.currentData, field.childNodes[i]);
-									}
+									// Bind the subfields of the template to the same data-level as this field;
+									var fieldData = {};
+									fieldData[fieldPath] = field.fieldDataParent;
+									editor.data.apply(fieldData, field.childNodes[i]);
 								}
 							}
 						}

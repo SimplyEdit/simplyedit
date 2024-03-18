@@ -1798,3 +1798,157 @@ fault">
 			done();
 		}, 100);
 	});
+
+	QUnit.test("rendering datasource lists with datasource sublists", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-list="second" data-simply-data="second">
+          <template>
+            <hr>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{}];
+				callback(result);
+			}
+		});
+		editor.addDataSource("second", {
+			load : function(el, callback) {
+				renderCounter++;
+				console.log("this should happen only once");
+				callback();
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(renderCounter, 1);
+			done();
+		}, 100);
+	});
+
+	QUnit.test("rendering datasource lists with fields in them", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-field="field" data-simply-content="template" data-simply-default-template="default">
+          <template data-simply-template="default">
+            <h1 data-simply-field="field"></h1>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{
+				  "field" : "thing"
+				}];
+				callback(result);
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(typeof editor.pageData.field, "undefined");
+			done();
+		}, 100);
+	});
+
+	QUnit.test("rendering datasource lists with datasource sublists", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-field="field" data-simply-content="template" data-simply-default-template="default">
+          <template data-simply-template="default">
+            <div data-simply-field="field" data-simply-content="attributes" data-simply-attributes="data-field">
+              <h1 data-simply-field="field"></h1>
+              <div data-simply-list="second" data-simply-data="second">
+                <template>
+                  <div data-simply-field="hello" data-simply-content="template" data-simply-default-template="default">
+                    <template data-simply-template="default">
+                      <h1 data-simply-field="hello"></h1>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{
+					"field" : "thing"
+				}];
+				callback(result);
+			}
+		});
+		editor.addDataSource("second", {
+			load : function(el, callback) {
+				if (renderCounter > 100) {
+					callback();
+				}
+				
+				let fieldName = el.parentNode.getAttribute("data-field");
+				switch (fieldName) {
+					case "thing":
+						callback([
+							{
+								"hello" : "world",
+							},
+							{
+								"hello" : "other world"
+							}
+						]);
+					break;
+				}
+				
+				renderCounter++;
+				console.log("this should happen only once");
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(renderCounter, 1);
+			done();
+		}, 100);
+	});
+
