@@ -1952,3 +1952,31 @@ fault">
 		}, 100);
 	});
 
+	QUnit.test("undefined data parent", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-field="page" data-simply-content="template">
+      <template data-simply-template="page">
+        <span data-simply-field="count.commands" data-simply-content="attributes" data-simply-attributes="data-count"></span>
+      </template>
+    </div>
+`;
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData.count = {
+			"foo" : "bar"
+		};
+		editor.pageData.page = "page";
+		window.setTimeout(function() {
+			assert.equal(1, 1);
+			done();
+		}, 100);
+	});
+
