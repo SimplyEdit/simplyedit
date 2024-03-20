@@ -224,7 +224,11 @@ dataBinding = function(config) {
 	};
 
 	var updateConvertedDataParent = function(data) {
-		if (binding.config.data._parentBindings_ && binding.config.data._parentBindings_[binding.key].config.data._simplyListEntryMapping) {
+		if (
+			binding.config.data._parentBindings_ &&
+			binding.config.data._parentBindings_[binding.key] &&
+			binding.config.data._parentBindings_[binding.key].config.data._simplyListEntryMapping
+		) {
 			var listEntryMapping = binding.config.data._parentBindings_[binding.key].config.data._simplyListEntryMapping;
 			var convertedParent = binding.config.data._parentBindings_[binding.key].config.data._simplyConvertedParent;
 			var arrayPaths = binding.config.data._parentBindings_[binding.key].config.data[listEntryMapping]._parentBindings_[binding.key].parentKey.split("/");
