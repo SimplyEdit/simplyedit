@@ -1980,3 +1980,33 @@ fault">
 		}, 100);
 	});
 
+	QUnit.test("attributes child", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <main id="main" data-simply-field="page" data-simply-content="template">
+      <template data-simply-template="page">
+        <div id="div" data-simply-field="subject" data-simply-content="attributes" data-simply-attributes="about">
+	  <h1 id="h1" data-simply-field="subject">Subject</h1>
+        </div>
+      </template>
+    </main>
+`;
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData.subject = "Things";
+		editor.pageData.page = "page";
+		window.setTimeout(function() {
+			var renderedSubject = document.querySelector("#h1").innerText;
+			var renderedAbout = document.querySelector("#div").getAttribute("about");
+			assert.equal(renderedSubject, "Things");
+			done();
+		}, 100);
+	});
+

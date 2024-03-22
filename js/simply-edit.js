@@ -100,7 +100,10 @@
 				var dataFields;
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
 					dataFields = [target];
-					if (target.getAttribute("data-simply-content") === 'fixed') { // special case - if the target field has content fixed, we need to handle its children as well.
+					if (
+						(target.getAttribute("data-simply-content") === 'fixed') ||
+						(target.getAttribute("data-simply-content") === 'attributes')
+					) { // special case - if the target field has content fixed or attributes, we need to handle its children as well.
 						var extraFields = target.querySelectorAll("[data-simply-field]");
 						for (var x=0; x<extraFields.length; x++) {
 							dataFields.push(extraFields[x]);
