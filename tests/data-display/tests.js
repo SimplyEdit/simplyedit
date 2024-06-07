@@ -2010,3 +2010,58 @@ fault">
 		}, 100);
 	});
 
+	QUnit.test("rendering transformer lists", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+      <div data-simply-list="menuSections" data-simply-transformer="rdfPredicate">
+        <template>
+          <div>
+            <span data-simply-field="name"></span>
+            <span data-simply-field="value"></span>
+          </div>
+        </template>
+      </div>
+`;
+		editor.transformers = {
+			"rdfPredicate" : {
+				render : function(data) {
+					renderCounter++;
+					console.log("render called");
+					if (renderCounter > 10) {
+						throw new Error("Rendering too many times");
+					}
+					var result	= [
+						{
+							"value" : "foo"
+						},
+						{
+							"value" : "bar"
+						}
+					];
+					
+					if (this.dataBinding && (this.dataBinding.mode == "field")) {
+						return result[0].value;
+					} else {
+						return result;
+					}
+				},
+				extract : function(data) {
+					return data;
+				}
+			}
+		}
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(renderCounter, 2);
+			done();
+		}, 1000);
+	});
