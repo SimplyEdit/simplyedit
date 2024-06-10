@@ -860,6 +860,14 @@
 					}
 				}
 
+				if (list.previousValue == JSON.stringify(listData)) {
+					if (list.dataBinding) {
+						list.dataBinding.resumeListeners(list);
+					}
+					return; // value is the same as the previous time we set it, just keep it;
+				}
+
+				list.previousValue = JSON.stringify(listData);
 				var previousStyle = list.getAttribute("style");
 				list.style.height = list.offsetHeight + "px"; // this will prevent the screen from bouncing and messing up the scroll offset.
 				editor.list.clear(list);
