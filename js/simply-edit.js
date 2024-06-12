@@ -3727,11 +3727,6 @@
 	editor.data.list = editor.list;
 	editor.data.list.applyTemplates = editor.list.set;
 
-	editor.init({
-		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
-		toolbars : defaultToolbars,
-		profile : 'live'
-	});
 
 	class SimplyComponent extends HTMLDivElement {
 		constructor() {
@@ -3781,4 +3776,17 @@
 	// Define the new element
 	customElements.define('simply-render', SimplyRender);
 
+	var initSimply = function() {
+		editor.init({
+			endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
+			toolbars : defaultToolbars,
+			profile : 'live'
+		});
+	}
+
+	if (scriptEl.hasAttribute("data-simply-initOnEvent")) {
+		document.addEventListener("simply-init", initSimply);
+	} else {
+		initSimply();
+	}
 }());
