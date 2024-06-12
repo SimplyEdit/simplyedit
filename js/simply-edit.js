@@ -451,6 +451,8 @@
 					if (transformer) {
 						if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
 							data = editor.transformers[transformer].extract.call(target, data);
+						} else {
+							console.log("Warning: transformer " + transformer + " is not defined");
 						}
 					}
 				}
@@ -857,6 +859,8 @@
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
 						listData = editor.transformers[transformer].render.call(list, listData);
+					} else {
+						console.log("Warning: transformer " + transformer + " is not defined");
 					}
 				}
 
@@ -1711,6 +1715,8 @@
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
 						data = editor.transformers[transformer].render.call(field, data);
+					} else {
+						console.log("Warning: transformer " + transformer + " is not defined");
 					}
 				}
 
@@ -1776,6 +1782,8 @@
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
 						result = editor.transformers[transformer].extract.call(field, result);
+					} else {
+						console.log("Warning: transformer " + transformer + " is not defined");
 					}
 				}
 				return result;
