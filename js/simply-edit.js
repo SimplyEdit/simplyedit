@@ -3782,7 +3782,7 @@
 			toolbars : defaultToolbars,
 			profile : 'live'
 		});
-	}
+	};
 
 	if (scriptEl.hasAttribute("data-simply-initOnEvent")) {
 		document.addEventListener("simply-init", initSimply);
