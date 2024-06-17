@@ -773,7 +773,7 @@ QUnit.module("databinding");
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
 		
-		assert.equal(editor.pageData._bindings_.hello.elements[0], field);
+		assert.equal(editor.pageData._bindings_.hello.elements[0].element, field);
 	});
 
 	QUnit.test("databinding set div data", function(assert) {
