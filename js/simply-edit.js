@@ -932,9 +932,9 @@
 				if (!listData) {
 					listData = [];
 				}
-				if (list.dataBinding) {
+				if (list.elementBinding) {
 				//	list.dataBinding.pauseListeners(list);
-					list.dataBinding.removeListeners(list);
+					list.elementBinding.removeListeners(list);
 					listenersRemoved = true;
 				}
 
@@ -1151,10 +1151,10 @@
 					list.dataBinding.resolve(true);
 				}
 				list.reattach();
-				if (list.dataBinding) {
+				if (list.elementBinding) {
 					if (listenersRemoved) {
 						var pauseCount = list.dataBindingPaused;
-						list.dataBinding.addListeners(list);
+						list.elementBinding.addListeners();
 						list.dataBindingPaused = pauseCount;
 					}
 					// list.dataBinding.resumeListeners(list);
