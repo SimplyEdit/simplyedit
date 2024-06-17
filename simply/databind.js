@@ -203,7 +203,7 @@ elementBinding = function(element, config, dataBinding) {
 			}
 		}
 
-		if (self.mode === "list" && event.type == "DOMNodeInserted") {
+		if (dataBinding.mode === "list" && event.type == "DOMNodeInserted") {
 			// find the index of the inserted target node;
 			items = this.querySelectorAll(":scope > [data-simply-list-item]");
 			for (i=0; i<items.length; i++) {
@@ -500,7 +500,7 @@ dataBinding = function(config) {
 							newparent = parentBinding.parentKey + parentBinding.key + "/" + key + "/";
 							// console.log(oldparent + " => " + newparent);
 							value._bindings_[subbinding].parentKey = newparent;
-							if (value[subbinding] && value[subbinding].length) {
+							if (value[subbinding] && value[subbinding].length && (typeof value[subbinding] !== "string")) {
 								for (var i=0; i<value[subbinding].length; i++) {
 									renumber(i, value[subbinding][i], value._bindings_[subbinding]);
 								}
@@ -736,14 +736,13 @@ dataBinding = function(config) {
 	};
 
 	this.bind = function(element, config) {
+		if (element.elementBinding) {
+			element.elementBinding.unbind();
+		}
 		if (element.nodeType && (element.nodeType == document.ELEMENT_NODE)) {
 			element = new elementBinding(element, config, binding);
 		} else {
 			throw new Error("Not an element node");
-		}
-
-		if (element.dataBinding) {
-			element.unbind();
 		}
 
 		binding.elements.push(element);
@@ -767,15 +766,15 @@ dataBinding = function(config) {
 	};
 
 	this.rebind = function(element, config) {
+		if (element.elementBinding) {
+			element.elementBinding.unbind();
+		}
 		if (element.nodeType && (element.nodeType == document.ELEMENT_NODE)) {
 			element = new elementBinding(element, config, binding);
 		} else {
 			throw new Error("Not an element node");
 		}
 		// Use this when a DOM node is cloned and the clone needs to be registered with the databinding, without setting its data.
-		if (element.dataBinding) {
-			element.unbind();
-		}
 		binding.elements.push(element);
 		var elementValue = element.getter();
 		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
