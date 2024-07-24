@@ -55,8 +55,7 @@ elementBinding = function(element, config, dataBinding) {
 			this.dataBinding.unbind(this);
 		}
 	};
-	this.dataBindingPaused = 0;
-
+	element.dataBindingPaused = 0;
 	this.elementGetter = (config && typeof config.getter === "function") ? config.getter : this.dataBinding.getter;
 	this.elementSetter = (config && typeof config.setter === "function") ? config.setter : this.dataBinding.setter;
 	element.getter = this.elementGetter;
@@ -741,24 +740,31 @@ dataBinding = function(config) {
 		}
 		if (element.nodeType && (element.nodeType == document.ELEMENT_NODE)) {
 			element = new elementBinding(element, config, binding);
+		} else if (element.simplyDataBindingElement) {
+			// already a data binding element, just add it to the list;
 		} else {
 			throw new Error("Not an element node");
 		}
 
 		binding.elements.push(element);
 
-		element.setter(shadowValue);
-		var elementValue = element.getter();
 		window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
 			element.addListeners();
-			// find out if our value / element changed since we bound, if so, update;
-			if (!isEqual(element.getter(), shadowValue)) {
-				changeStack.push(shadowValue);
-			}
-			if (!isEqual(element.getter(), elementValue)) {
-				changeStack.push(element.getter());
-			}
-		}, 0);
+		}, 1);
+		if (typeof shadowValue !== "undefined") {
+			element.setter(shadowValue);
+			var elementValue = element.getter();
+			window.setTimeout(function() { // defer adding listeners until the run is done, this is a big performance improvement;
+				// element.addListeners();
+				// find out if our value / element changed since we bound, if so, update;
+				if (!isEqual(element.getter(), shadowValue)) {
+					changeStack.push(shadowValue);
+				}
+				if (!isEqual(element.getter(), elementValue)) {
+					changeStack.push(element.getter());
+				}
+			}, 0);
+		}
 		if (!binding.resolveTimer) {
 			binding.resolveTimer = window.setTimeout(this.resolve, 100);
 		}
@@ -766,11 +772,13 @@ dataBinding = function(config) {
 	};
 
 	this.rebind = function(element, config) {
-		if (element.elementBinding) {
-			element.elementBinding.unbind();
-		}
 		if (element.nodeType && (element.nodeType == document.ELEMENT_NODE)) {
+			if (element.elementBinding) {
+				element.elementBinding.unbind();
+			}
 			element = new elementBinding(element, config, binding);
+		} else if (element.simplyDataBindingElement) {
+			// already a data binding element, just add it to the list;
 		} else {
 			throw new Error("Not an element node");
 		}
@@ -807,7 +815,7 @@ dataBinding = function(config) {
 		}
 
 		binding.elements.forEach(function(element) {
-			if (!element.isInDocument(element)) {
+			if (!element.isInDocument()) {
 				element.markedForRemoval = true;
 			} else {
 				element.markedForRemoval = false;
@@ -820,7 +828,7 @@ dataBinding = function(config) {
 
 		binding.cleanupTimer = window.setTimeout(function() {
 			binding.elements.filter(function(element) {
-				if (element.markedForRemoval && !element.isInDocument(element)) {
+				if (element.markedForRemoval && !element.isInDocument()) {
 					element.dataBinding.unbind(element);
 					return false;
 				}
@@ -868,11 +876,14 @@ document.addEventListener("DOMNodeRemoved", function(evt) {
 		return;
 	}
 	window.setTimeout(function() { // chrome sometimes 'helpfully' removes the element and then inserts it back, probably as a rendering optimalization. We're fine cleaning up in a bit, if still needed.
-		if (!target.parentNode && target.dataBinding) {
-			target.dataBinding.unbind(target);
+		if (!target.parentNode && target.dataBinding && target.elementBinding) {
+			target.dataBinding.unbind(target.elementBinding);
+			if (target.dataBinding.mode == "field") {
+				target.dataBinding.set();
+			}
 			delete target.dataBinding;
 		}
-	}, 1000);
+	}, 400);
 });
 
 // polyfill to add :scope selector for IE
