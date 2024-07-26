@@ -851,6 +851,317 @@ QUnit.module("Read turtle file");
                 		let turtle = $rdf.serialize(undefined, simplyApp.rdfStore, editor.pageData.todo, "text/turtle");
                 		assert.equal(turtle, expectedTurtle);
 	               		done();
-                        }, 500);
+                        }, 500); // FIXME: going too early, at 100ms, will give a rdf:Seq as the type for the todoItem instead of ical:Vtodo
 		}, 500);
 	});
+
+	QUnit.test("todo list example, reorder in HTML reflects in turtle", async function(assert) {
+		const done = assert.async();
+
+		simplyApp = {};
+		if (!simplyApp.rdfStore) {
+		  simplyApp.rdfStore = new $rdf.graph();
+		}
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+      <div data-simply-field="todo" typeof="rdf:Seq" data-simply-content="attributes" data-simply-attributes="about">
+      <h3 data-simply-field="name" property="schema:name">My Todo List</h3>
+      <div data-simply-list="todoItems" property="rdfs:member">
+        <template>
+          <div class="todoItem" data-simply-field="value" typeof="ical:Vtodo" data-simply-content="attributes" data-simply-attributes="about">
+            <input data-simply-field="completed" type="checkbox" property="ical:completed" data-simply-transformer="dateNow">
+            <input data-simply-field="name" property="schema:name">
+          </div>
+        </template>
+      </div>
+`;
+
+                editor.transformers.dateNow = {
+			render : function(data) {
+				if (data) {
+					return 1;
+				} else {
+					return 0;
+				}
+			},
+			extract : function(data) {
+				if (data == 1) {
+				        return $rdf.Literal.fromDate(new Date(1722023424604));
+				} else {
+					return;
+				}
+	        	}
+	        };
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.pageData.todo = "https://example.com";
+		editor.pageData.todoItems = [
+		    {
+		        "name" : "Todo item 1",
+                    },
+                    {
+                        "name" : "Todo item 2"
+                    }
+                ];
+		editor.data.apply(editor.currentData, document);
+		
+		let expectedTurtle = `@prefix : <#>.
+@prefix cal: <http://www.w3.org/2002/12/cal/ical#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schem: <https://schema.org/>.
+
+<>
+    a rdf:Seq;
+    rdfs:member
+            ( [ a cal:Vtodo; schem:name "Todo item 2" ]
+            [ a cal:Vtodo; schem:name "Todo item 1" ] );
+    schem:name "My Todo List".
+`;
+        	window.setTimeout(function() {
+        	        let firstItem = document.querySelector("#testContent .todoItem");
+        	        firstItem.parentNode.appendChild(firstItem);
+        		window.setTimeout(function() {
+                		let turtle = $rdf.serialize(undefined, simplyApp.rdfStore, editor.pageData.todo, "text/turtle");
+                		assert.equal(turtle, expectedTurtle);
+	               		done();
+                        }, 200);
+		}, 200);
+	});
+
+	QUnit.test("todo list example, push todoItem to data reflects in turtle", async function(assert) {
+		const done = assert.async();
+
+		simplyApp = {};
+		if (!simplyApp.rdfStore) {
+		  simplyApp.rdfStore = new $rdf.graph();
+		}
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+      <div data-simply-field="todo" typeof="rdf:Seq" data-simply-content="attributes" data-simply-attributes="about">
+      <h3 data-simply-field="name" property="schema:name">My Todo List</h3>
+      <div data-simply-list="todoItems" property="rdfs:member">
+        <template>
+          <div class="todoItem" data-simply-field="value" typeof="ical:Vtodo" data-simply-content="attributes" data-simply-attributes="about">
+            <input data-simply-field="completed" type="checkbox" property="ical:completed" data-simply-transformer="dateNow">
+            <input data-simply-field="name" property="schema:name">
+          </div>
+        </template>
+      </div>
+`;
+
+                editor.transformers.dateNow = {
+			render : function(data) {
+				if (data) {
+					return 1;
+				} else {
+					return 0;
+				}
+			},
+			extract : function(data) {
+				if (data == 1) {
+				        return $rdf.Literal.fromDate(new Date(1722023424604));
+				} else {
+					return;
+				}
+	        	}
+	        };
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.pageData.todo = "https://example.com";
+		editor.pageData.todoItems = [
+		    {
+		        "name" : "Todo item 1",
+                    },
+                    {
+                        "name" : "Todo item 2"
+                    }
+                ];
+		editor.data.apply(editor.currentData, document);
+		
+		let expectedTurtle = `@prefix : <#>.
+@prefix cal: <http://www.w3.org/2002/12/cal/ical#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schem: <https://schema.org/>.
+
+<>
+    a rdf:Seq;
+    rdfs:member
+            ( [ a cal:Vtodo; schem:name "Todo item 1" ]
+            [ a cal:Vtodo; schem:name "Todo item 2" ]
+            [ a cal:Vtodo; schem:name "Todo item 3" ] );
+    schem:name "My Todo List".
+`;
+        	window.setTimeout(function() {
+        		editor.pageData.todoItems.push({
+        			"name" : "Todo item 3"
+			});
+        		window.setTimeout(function() {
+                		let turtle = $rdf.serialize(undefined, simplyApp.rdfStore, editor.pageData.todo, "text/turtle");
+                		assert.equal(turtle, expectedTurtle);
+	               		done();
+                        }, 500); // FIXME: This needs a big delay, can we get it faster?
+		}, 500);
+	});
+
+	QUnit.test("todo list example, delete in HTML reflects in turtle", async function(assert) {
+		const done = assert.async();
+
+		simplyApp = {};
+		if (!simplyApp.rdfStore) {
+		  simplyApp.rdfStore = new $rdf.graph();
+		}
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+      <div data-simply-field="todo" typeof="rdf:Seq" data-simply-content="attributes" data-simply-attributes="about">
+      <h3 data-simply-field="name" property="schema:name">My Todo List</h3>
+      <div data-simply-list="todoItems" property="rdfs:member">
+        <template>
+          <div class="todoItem" data-simply-field="value" typeof="ical:Vtodo" data-simply-content="attributes" data-simply-attributes="about">
+            <input data-simply-field="completed" type="checkbox" property="ical:completed" data-simply-transformer="dateNow">
+            <input data-simply-field="name" property="schema:name">
+          </div>
+        </template>
+      </div>
+`;
+
+                editor.transformers.dateNow = {
+			render : function(data) {
+				if (data) {
+					return 1;
+				} else {
+					return 0;
+				}
+			},
+			extract : function(data) {
+				if (data == 1) {
+				        return $rdf.Literal.fromDate(new Date(1722023424604));
+				} else {
+					return;
+				}
+	        	}
+	        };
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.pageData.todo = "https://example.com";
+		editor.pageData.todoItems = [
+		    {
+		        "name" : "Todo item 1",
+                    },
+                    {
+                        "name" : "Todo item 2"
+                    }
+                ];
+		editor.data.apply(editor.currentData, document);
+		
+		let expectedTurtle = `@prefix : <#>.
+@prefix cal: <http://www.w3.org/2002/12/cal/ical#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schem: <https://schema.org/>.
+
+<>
+    a rdf:Seq;
+    rdfs:member ( [ a cal:Vtodo; schem:name "Todo item 2" ] );
+    schem:name "My Todo List".
+`;
+        	window.setTimeout(function() {
+        	        let firstItem = document.querySelector("#testContent .todoItem");
+        	        firstItem.parentNode.removeChild(firstItem);
+        		window.setTimeout(function() {
+                		let turtle = $rdf.serialize(undefined, simplyApp.rdfStore, editor.pageData.todo, "text/turtle");
+                		assert.equal(turtle, expectedTurtle);
+	               		done();
+                        }, 200);
+		}, 200);
+	});
+
+	QUnit.test("todo list example, delete in data reflects in turtle", async function(assert) {
+		const done = assert.async();
+
+		simplyApp = {};
+		if (!simplyApp.rdfStore) {
+		  simplyApp.rdfStore = new $rdf.graph();
+		}
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+      <div data-simply-field="todo" typeof="rdf:Seq" data-simply-content="attributes" data-simply-attributes="about">
+      <h3 data-simply-field="name" property="schema:name">My Todo List</h3>
+      <div data-simply-list="todoItems" property="rdfs:member">
+        <template>
+          <div class="todoItem" data-simply-field="value" typeof="ical:Vtodo" data-simply-content="attributes" data-simply-attributes="about">
+            <input data-simply-field="completed" type="checkbox" property="ical:completed" data-simply-transformer="dateNow">
+            <input data-simply-field="name" property="schema:name">
+          </div>
+        </template>
+      </div>
+`;
+
+                editor.transformers.dateNow = {
+			render : function(data) {
+				if (data) {
+					return 1;
+				} else {
+					return 0;
+				}
+			},
+			extract : function(data) {
+				if (data == 1) {
+				        return $rdf.Literal.fromDate(new Date(1722023424604));
+				} else {
+					return;
+				}
+	        	}
+	        };
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.pageData.todo = "https://example.com";
+		editor.pageData.todoItems = [
+		    {
+		        "name" : "Todo item 1",
+                    },
+                    {
+                        "name" : "Todo item 2"
+                    }
+                ];
+		editor.data.apply(editor.currentData, document);
+		
+		let expectedTurtle = `@prefix : <#>.
+@prefix cal: <http://www.w3.org/2002/12/cal/ical#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schem: <https://schema.org/>.
+
+<>
+    a rdf:Seq;
+    rdfs:member ( [ a cal:Vtodo; schem:name "Todo item 2" ] );
+    schem:name "My Todo List".
+`;
+        	window.setTimeout(function() {
+        	        let firstItem = document.querySelector("#testContent .todoItem");
+        	        editor.pageData.todoItems.shift();
+        		window.setTimeout(function() {
+                		let turtle = $rdf.serialize(undefined, simplyApp.rdfStore, editor.pageData.todo, "text/turtle");
+                		assert.equal(turtle, expectedTurtle);
+	               		done();
+                        }, 200);
+		}, 200);
+	});
+
