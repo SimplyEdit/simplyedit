@@ -212,7 +212,7 @@ tripleBinding = function(triple, dataBinding) {
 				}
 				predicate = resolveNameSpace(predicate);
 
-				self.triple.store.add(blankNode, $rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), $rdf.sym(resolveNameSpace(self.getFirstElementBinding(item._bindings_['value']).element.getAttribute("typeof"))));
+				self.triple.store.add(blankNode, $rdf.sym("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"), $rdf.sym(resolveNameSpace(self.getFirstElementBinding(item._bindings_.value).element.getAttribute("typeof"))));
 				self.triple.store.subjectIndex[subject].every(function(triple) {
 					if (triple.predicate.value != predicate) {
 						return true; // continue
@@ -392,7 +392,7 @@ tripleBinding = function(triple, dataBinding) {
 			
 			var triples = this.getTriples();
 			if (triples.length === 0 && dataNodes.length > 0) {
-				self.triple.store.add($rdf.sym(self.triple.subject), $rdf.sym(self.triple.predicate), new $rdf.Collection);
+				self.triple.store.add($rdf.sym(self.triple.subject), $rdf.sym(self.triple.predicate), new $rdf.Collection());
 			}
 
 			triples.forEach(function(entry) {
