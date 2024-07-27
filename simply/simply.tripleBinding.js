@@ -110,7 +110,7 @@ tripleBinding = function(triple, dataBinding) {
 			triples.push(triple);
 		});
 		return triples;
-	}
+	};
 
 	this.getter = function() {
 		var self = this;
@@ -137,16 +137,16 @@ tripleBinding = function(triple, dataBinding) {
 								contents: item.contents
 							};
 						});
-					break;
+					// break;
 					case "Literal":
 						return object;
-					break;
+					// break;
 					case "BlankNode":
 						return {
 							value: "[_:" + object.value + "]",
 							contents: self.getBlankNode(self, object.value)
-						}
-					break;
+						};
+					// break;
 				}
 			});
 			return result;
@@ -201,11 +201,11 @@ tripleBinding = function(triple, dataBinding) {
 					keys.unshift("value");
 				}
 				var blankNode = new $rdf.BlankNode();
-				item['value'] = "[_:" + blankNode.value + "]";
+				item.value = "[_:" + blankNode.value + "]";
 				// console.log("created blank node " + blankNode.value + " as parent");
-				var predicate = self.getFirstElementBinding(item._bindings_['value']).element.getAttribute("property");
+				var predicate = self.getFirstElementBinding(item._bindings_.value).element.getAttribute("property");
 				if (!predicate) {
-					predicate = self.getFirstElementBinding(item._bindings_['value']).element.parentNode.getAttribute("property");
+					predicate = self.getFirstElementBinding(item._bindings_.value).element.parentNode.getAttribute("property");
 				}
 				if (!predicate) {
 					return;
@@ -311,7 +311,7 @@ tripleBinding = function(triple, dataBinding) {
 		if ((typeof data === "object") && (typeof data.about !== "undefined") && (data.about === null)) {
 			return;
 		}
-
+		var subject = this.triple.subject;
 		var objects = this.getObjects();
 		if (this.dataBinding.mode == "field") {
 		/*
@@ -349,7 +349,6 @@ tripleBinding = function(triple, dataBinding) {
 				console.log("create a new triple for value");
 				console.log(data);
 				console.log(this.triple);
-				var subject = this.triple.subject;
 				if (!this.triple.store.subjectIndex[subject]) {
 					if (this.triple.store.subjectIndex["<" + subject + ">"]) {
 						subject = "<" + subject + ">";
@@ -376,7 +375,6 @@ tripleBinding = function(triple, dataBinding) {
 			}
 		} else {
 			var self = this;
-			var subject = this.triple.subject;
 			if (!this.triple.store.subjectIndex[subject]) {
 				if (this.triple.store.subjectIndex["<" + subject + ">"]) {
 					subject = "<" + subject + ">";
@@ -544,13 +542,13 @@ var initRdflibTriple = function(element) {
 			);
 		}
 	}
-}
+};
 
 editor.field.init = function(field, dataParent, useDataBinding) {
 	editor.field.storedInit(field, dataParent, useDataBinding);
 	initRdflibTriple(field);
-}
+};
 editor.list.init = function(list, dataParent, useDataBinding) {
 	editor.list.storedInit(list, dataParent, useDataBinding);
 	initRdflibTriple(list);
-}
+};
