@@ -67,6 +67,22 @@ tripleBinding = function(triple, dataBinding) {
 		});
 		return result;
 	};
+	this.getNamedNode = function(self, subject) {
+		var result = {};
+		if (!self.triple.store.subjectIndex[subject]) {
+			subject = "<" + subject + ">";
+		}
+		if (!self.triple.store.subjectIndex[subject]) {
+			return;
+		}
+		self.triple.store.subjectIndex[subject].forEach(function(triple) {
+			if (typeof result[triple.predicate.value] === "undefined") {
+				result[triple.predicate.value] = [];
+			}
+			result[triple.predicate.value].push(triple.object);
+		});
+		return result;
+	};
 	
 	this.getObjects = function() {
 		var triples = this.getTriples();
@@ -145,6 +161,12 @@ tripleBinding = function(triple, dataBinding) {
 						return {
 							value: "[_:" + object.value + "]",
 							contents: self.getBlankNode(self, object.value)
+						};
+					// break;
+					case "NamedNode":
+						return {
+							value: object.value,
+							contents: self.getNamedNode(self, object.value)
 						};
 					// break;
 				}
@@ -385,7 +407,6 @@ tripleBinding = function(triple, dataBinding) {
 			if (!this.triple.store.subjectIndex[subject]) {
 				return;
 			}
-			
 			var dataNodes = data.map(function(entry) {
 				return entry.value;
 			});

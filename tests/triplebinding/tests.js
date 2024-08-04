@@ -312,7 +312,7 @@ QUnit.module("Read turtle file");
 		const done = assert.async();
 		window.setTimeout(function() {
 			assert.equal(editor.pageData.name, "Hello world", "Value is set from turtle to data");
-			assert.equal(document.querySelector("h3").innerHTML, "Hello world", "Value is set from turtle to HTML");
+			assert.equal(document.querySelector("#testContent h3").innerHTML, "Hello world", "Value is set from turtle to HTML");
 			done();
 		}, 100);
 	});
@@ -461,9 +461,9 @@ QUnit.module("Read turtle file");
 		window.setTimeout(function() {
 			let menuNode = simplyApp.rdfStore.match($rdf.sym("https://example.com"), $rdf.sym("https://schema.org/hasMenu"))[0].object.value;
 			assert.equal("[_:" + menuNode + "]", editor.pageData.menu);
-			assert.equal(editor.pageData.menu, document.querySelector(".menu").getAttribute("about"), "About is set on the menu");
+			assert.equal(editor.pageData.menu, document.querySelector("#testContent .menu").getAttribute("about"), "About is set on the menu");
 			assert.equal(editor.pageData.menuSections[0].title, "Broodjes", "menuSection name is in the HTML");
-			assert.equal(editor.pageData.menuSections[0].value, document.querySelector(".menuSection").getAttribute("about"), "About is set on the menuSection");
+			assert.equal(editor.pageData.menuSections[0].value, document.querySelector("#testContent .menuSection").getAttribute("about"), "About is set on the menuSection");
 			done();
 		}, 100);
 	});
@@ -1165,3 +1165,61 @@ QUnit.module("Read turtle file");
 		}, 200);
 	});
 
+	QUnit.test("vcard with named addresses", async function(assert) {
+		simplyApp = {};
+		if (!simplyApp.rdfStore) {
+		  simplyApp.rdfStore = new $rdf.graph();
+		}
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+<div data-simply-field="vcard" typeof="schema:Person" data-simply-content="attributes" data-simply-attributes="about">
+  <ul data-simply-list="addresses" property="http://www.w3.org/2006/vcard/ns#hasAddress">
+    <template>
+      <li class="address" data-simply-field="value" data-simply-content="attributes" data-simply-attributes="about">
+        <p data-simply-field="street" property="http://www.w3.org/2006/vcard/ns#street-address"></p>
+        <p data-simply-field="locality" property="http://www.w3.org/2006/vcard/ns#locality"></p>
+      </li>
+    </template>
+  </ul>
+</div>
+`;
+		let initialTurtle = `@prefix : <#>.
+@prefix schema: <http://schema.org/>.
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#>.
+
+<>
+    a schema:Person;
+    vcard:hasAddress :id1592420074747, :id1592420295381.
+
+:id1592420074747 vcard:locality "locality"; vcard:street-address "street".
+:id1592420295381 vcard:locality "another place"; vcard:street-address "another street".
+
+`;
+		await $rdf.parse(
+		    initialTurtle,
+		    simplyApp.rdfStore,
+		    "https://example.com",
+		    "text/turtle"
+		);
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.pageData.vcard = "https://example.com";
+		editor.data.apply(editor.currentData, document);
+
+		const done = assert.async();
+		window.setTimeout(function() {
+			assert.equal(editor.pageData.addresses[0].street, "street", "Value is set from turtle to data");
+			assert.equal(editor.pageData.addresses[0].locality, "locality", "Value is set from turtle to data");
+			assert.equal(editor.pageData.addresses[1].street, "another street", "Value is set from turtle to data");
+			assert.equal(editor.pageData.addresses[1].locality, "another place", "Value is set from turtle to data");
+			assert.equal(document.querySelector("#testContent p").innerHTML, "street", "Value is set from turtle to HTML");
+			assert.equal(document.querySelector("#testContent p ~ p").innerHTML, "locality", "Value is set from turtle to HTML");
+			assert.equal(document.querySelector("#testContent li ~ li p").innerHTML, "another street", "Value is set from turtle to HTML");
+			assert.equal(document.querySelector("#testContent li ~ li p ~ p").innerHTML, "another place", "Value is set from turtle to HTML");
+			done();
+		}, 100);
+	});
