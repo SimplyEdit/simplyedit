@@ -219,28 +219,8 @@ dataBinding = function(config) {
 		//if (typeof shadowValue === "object") {
 		//	shadowValue = dereference(shadowValue);
 		//}
-		updateConvertedDataParent(shadowValue);
 		monitorChildData(shadowValue);
 	};
-
-	var updateConvertedDataParent = function(data) {
-		if (
-			binding.config.data._parentBindings_ &&
-			binding.config.data._parentBindings_[binding.key] &&
-			binding.config.data._parentBindings_[binding.key].config.data._simplyListEntryMapping
-		) {
-			var listEntryMapping = binding.config.data._parentBindings_[binding.key].config.data._simplyListEntryMapping;
-			var convertedParent = binding.config.data._parentBindings_[binding.key].config.data._simplyConvertedParent;
-			var arrayPaths = binding.config.data._parentBindings_[binding.key].config.data[listEntryMapping]._parentBindings_[binding.key].parentKey.split("/");
-			var arrayIndex = arrayPaths.pop();
-			arrayIndex = arrayPaths.pop();
-			binding.config.data._parentBindings_[binding.key].config.data[binding.key] = data;
-			var parentData = convertedParent._parentBindings_[arrayIndex].config.data;
-			var parentKey = arrayPaths.pop();
-			parentData[parentKey][arrayIndex][binding.key] = data;
-		}
-	};
-
 	var monitorChildData = function(data) {
 		// Watch for changes in our child data, because these also need to register as changes in the databound data/elements;
 		// This allows the use of simple data structures (1 key deep) as databound values and still resolve changes on a specific entry;
@@ -436,7 +416,7 @@ dataBinding = function(config) {
 					binding.resolve(true);
 				}
 				if (data._parentBindings_ && data._parentBindings_[key]) {
-					if (!isEqual(data._parentBindings_[key].get()[key], value)) {
+					if (data._parentBindings_[key].get()[key] !== value) {
 						data._parentBindings_[key].get()[key] = value;
 						data._parentBindings_[key].resolve(true);
 					}
@@ -652,23 +632,25 @@ dataBinding.prototype.addListeners = function(element) {
 	}
 	if (typeof element.mutationObserver === "undefined") {
 		if (typeof MutationObserver === "function") {
-			element.mutationObserver = new MutationObserver(this.handleMutation);
+			element.mutationObserver = new MutationObserver(this.handleAllMutations);
 		}
 	}
 	if (this.mode == "field") {
 		if (element.mutationObserver) {
-			element.mutationObserver.observe(element, {attributes: true});
+			element.mutationObserver.observe(element, {attributes: true, childList: true, subtree: true, characterData: true});
+		} else {
+			element.addEventListener("DOMSubtreeModified", this.handleEvent);
+			element.addEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		}
-		element.addEventListener("DOMSubtreeModified", this.handleEvent);
-		element.addEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		element.addEventListener("change", this.handleEvent);
 	}
 	if (this.mode == "list") {
 		if (element.mutationObserver) {
-			element.mutationObserver.observe(element, {attributes: true});
+			element.mutationObserver.observe(element, {attributes: true, childList: true, substree: true, characterData: true});
+		} else {
+			element.addEventListener("DOMNodeRemoved", this.handleEvent);
+			element.addEventListener("DOMNodeInserted", this.handleEvent);
 		}
-		element.addEventListener("DOMNodeRemoved", this.handleEvent);
-		element.addEventListener("DOMNodeInserted", this.handleEvent);
 	}
 	element.addEventListener("databinding:valuechanged", this.handleEvent);
 
@@ -693,17 +675,19 @@ dataBinding.prototype.removeListeners = function(element) {
 	if (this.mode == "field") {
 		if (element.mutationObserver) {
 			element.mutationObserver.disconnect();
+		} else {
+			element.removeEventListener("DOMSubtreeModified", this.handleEvent);
+			element.removeEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		}
-		element.removeEventListener("DOMSubtreeModified", this.handleEvent);
-		element.removeEventListener("DOMNodeRemoved", fieldNodeRemovedHandler);
 		element.removeEventListener("change", this.handleEvent);
 	}
 	if (this.mode == "list") {
 		if (element.mutationObserver) {
 			element.mutationObserver.disconnect();
+		} else {
+			element.removeEventListener("DOMNodeRemoved", this.handleEvent);
+			element.removeEventListener("DOMNodeInserted", this.handleEvent);
 		}
-		element.removeEventListener("DOMNodeRemoved", this.handleEvent);
-		element.removeEventListener("DOMNodeInserted", this.handleEvent);
 	}
 	element.removeEventListener("databinding:valuechanged", this.handleEvent);
 };
@@ -814,22 +798,118 @@ dataBinding.prototype.handleEvent = function (event) {
 	self.fireEvent(target, "domchanged");
 };
 
-// Housekeeping, remove references to deleted nodes
-document.addEventListener("DOMNodeRemoved", function(evt) {
-	var target = evt.target;
-	if (target.nodeType != document.ELEMENT_NODE) { // We don't care about removed text nodes;
+dataBinding.prototype.handleAllMutations = function (records, observer) {
+	let target = records[0].target
+	while(target && !target.dataBinding) {
+		target = target.parentElement
+	}
+	if (!target) {
+		console.error('no databinding target for mutation record', records[0])
+	}
+	let self = target.dataBinding
+	if (self.paused) {
 		return;
 	}
-	if (!target.dataBinding) { // nor any element that doesn't have a databinding;
+	if (target.dataBindingPaused || target.dataBinding.paused) {
 		return;
 	}
-	window.setTimeout(function() { // chrome sometimes 'helpfully' removes the element and then inserts it back, probably as a rendering optimalization. We're fine cleaning up in a bit, if still needed.
-		if (!target.parentNode && target.dataBinding) {
-			target.dataBinding.unbind(target);
-			delete target.dataBinding;
+	let handleAttributes = false;
+	let handleList = false;
+	for (const record of records) {
+		switch(record.type) {
+			case 'attributes':
+				if (target.dataBinding.attributeFilter.indexOf(record.attributeName) == -1) {
+					handleAttributes = true; // only handle the event 
+				}
+			break
+			case 'childList':
+				if (record.removedNodes?.length && self.mode === 'list') {
+					if (record.target.nodeType != document.ELEMENT_NODE) {
+						break;
+					}
+					// FIXME: this no longer works, since the target has already been removed
+					// use previousSibling or nextSibling instead (note these can be text nodes)
+					let removedIndex = null
+					let previousSiblingNode = record.previousSibling;
+					if (previousSiblingNode && previousSiblingNode.nodeType!=Node.ELEMENT_NODE) {
+						previousSiblingNode = previousSiblingNode.previousElementSibling;
+					}
+					let items = target.querySelectorAll(":scope > [data-simply-list-item]");
+					if (!previousSiblingNode) {
+						removedIndex = 0;
+						handleList = true;
+					} else {
+						// find the index of the removed target node;
+						for (i=0; i<items.length; i++) {
+							if (items[i] == previousSiblingNode) {
+								removedIndex = i+1;
+								handleList = true;
+								break;
+							}
+						}
+					}
+					if (removedIndex!==null) {
+						data = target.dataBinding.get();
+						data.splice(removedIndex, 1)
+					}
+				}
+				if (record.addedNodes?.length) {
+					// find the index of the inserted target node;
+					items = target.querySelectorAll(":scope > [data-simply-list-item]");
+					for (i=0; i<items.length; i++) {
+						if (items[i] == record.target) {
+							if (items[i].simplyData) {
+								data = target.dataBinding.get();
+								data.splice(i, 0, items[i].simplyData);
+								handleList = true;
+								break;
+							}
+						}
+					}
+				}
+			break
+			case 'characterData':
+			break
 		}
-	}, 1000);
-});
+	}
+	self.fireEvent(target, "domchanged");
+};
+
+
+// Housekeeping, remove references to deleted nodes
+if (typeof MutationObserver != 'undefined') {
+	const houseKeeping = new MutationObserver(function(records, observer) {
+		for (const record of records) {
+			if (record.removedNodes) {
+				window.setTimeout(function() {
+					for (const removedNode of record.removedNodes) {
+						if (!removedNode.parentNode && removedNode.dataBinding) {
+							removedNode.dataBinding.unbind(removedNode);
+							delete removedNode.dataBinding;
+						}
+					}
+				}, 1000);
+			}
+		}
+	});
+	houseKeeping.observe(document.body, {childList: true, subtree: true})
+} else {
+	document.addEventListener("DOMNodeRemoved", function(evt) {
+		var target = evt.target;
+		if (target.nodeType != document.ELEMENT_NODE) { // We don't care about removed text nodes;
+			return;
+		}
+		if (!target.dataBinding) { // nor any element that doesn't have a databinding;
+			return;
+		}
+		window.setTimeout(function() { // chrome sometimes 'helpfully' removes the element and then inserts it back, probably as a rendering optimalization. We're fine cleaning up in a bit, if still needed.
+			if (!target.parentNode && target.dataBinding) {
+				target.dataBinding.unbind(target);
+				delete target.dataBinding;
+			}
+		}, 1000);
+	});	
+}
 
 // polyfill to add :scope selector for IE
 (function() {
