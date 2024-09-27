@@ -894,16 +894,6 @@ muze.url = (function() {
 	//Does the browser XPath queries on the HTML/XHTML document
 	Env.support.xpath = !!document.evaluate;
 	
-	//Default to false, their support must be proved
-	//Mutation event fired when an attribute is changed
-	Env.support.DOMAttrModified = false;
-	//Mutation event fired when a node is inserted into the DOM
-	Env.support.DOMNodeInserted = false;
-	//Mutation event fired when a node is removed from the DOM
-	Env.support.DOMNodeRemoved = false;
-	//Mutation event fired when something changes to one of the elements descendents
-	Env.support.DOMSubtreeModified = false;
-	
 	//Does the browser support VML (vector graphics)
 	//Inspired by Google Maps (http://maps.google.com/intl/en_ALL/mapfiles/73/maps2.api/main.js)
 	Env.support.vml = (function(){
@@ -1054,17 +1044,7 @@ muze.url = (function() {
 	el.innerHTML = '<div class="TEST unique" style="width:2px ; height:2px ; padding:1px;"></div><div class="random"></div>';
 	//Add a comment node to the element
 	el.appendChild(document.createComment('test'));
-	
-	//Test support for these various mutation events
-	//Does the browser support DOMAttrModified
-	addEvent(el, 'DOMAttrModified', handler);
-	//Does the browser support DOMNodeInserted
-	addEvent(el, 'DOMNodeInserted', handler);
-	//Does the browser support DOMNodeRemoved
-	addEvent(el, 'DOMNodeRemoved', handler);
-	//Does the browser support DOMSubtreeModified
-	addEvent(el, 'DOMSubtreeModified', handler);
-			
+
 	//Does the browser support cssFloat as the proxy for CSS float
 	Env.support.cssFloat = "cssFloat" in el.style;
 	//Does the browser support CSS transforms
