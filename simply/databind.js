@@ -93,6 +93,7 @@ elementBinding = function(element, config, dataBinding) {
 				});
 			}
 		}
+		this.element.addEventListener("change", this.handleEvent);
 		this.element.addEventListener("databinding:valuechanged", this.handleEvent);
 		this.element.addEventListener("databinding:pause", function() {
 			this.elementBinding.pauseListeners();
@@ -113,6 +114,7 @@ elementBinding = function(element, config, dataBinding) {
 				this.element.mutationObserver.disconnect();
 			}
 		}
+		this.element.removeEventListener("change", this.handleEvent);
 		this.element.removeEventListener("databinding:valuechanged", this.handleEvent);
 	};
 
@@ -252,6 +254,7 @@ elementBinding = function(element, config, dataBinding) {
 		var i, data, items;
 
 		switch (event.type) {
+			case "change":
 			case "databinding:valuechanged":
 				// Allow the browser to fix what it thinks needs to be fixed (node to be removed, cleaned etc) before setting the new data;
 
