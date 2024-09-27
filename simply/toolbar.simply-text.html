@@ -508,41 +508,43 @@
 				var annotation = hopeEditor.fragment.has(range, tag);
 
 				if (range.start === range.end) {
-					var addTag = function(event) {
-						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag); // remove it now, setting textContent can trigger it again and mess up;
-						var newValue = event.newValue.replace(/ $/, "\xa0"); // replace ending space with nbsp;
-						var rangeLength = newValue.length - event.prevValue.length;
-						event.preventDefault();
-						event.target.textContent = newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
-						// ... and messes up the cursor position;
+					var addTag = function(mutations) {
+						mutations.forEach(function(mutation) {
+							hopeEditor.field.observer.disconnect(); // remove it now, setting textContent can trigger it again and mess up;
+							var newValue = mutation.newValue.replace(/ $/, "\xa0"); // replace ending space with nbsp;
+							var rangeLength = newValue.length - event.prevValue.length;
+							// FIXME: There used to be an event.preventDefault here;
+							mutation.target.textContent = newValue; // Note: this will trigger another CharacterDataModified if the change wasn't applied yet;
+							// ... and messes up the cursor position;
 
-						hopeEditor.parseHTML();
-						hopeEditor.selection.move(rangeLength);
-						var newRange = hope.range.create(range.start, range.start + rangeLength);
+							hopeEditor.parseHTML();
+							hopeEditor.selection.move(rangeLength);
+							var newRange = hope.range.create(range.start, range.start + rangeLength);
 
-						for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
-							if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
-								hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
-							} else {
-								hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+							for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
+								if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
+									hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+								} else {
+									hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+								}
 							}
-						}
-						hopeEditor.update();
+							hopeEditor.update();
 
-						window.setTimeout(function() {
-							// this resets the cursor position to where it was; Chrome 54 is still busy doing stuff when the update is running, so give it a cycle to get its stuff together;
-							hopeEditor.selection.updateRange(newRange.end, newRange.end);
-							hopeEditor.showCursor();
-						}, 0);
+							window.setTimeout(function() {
+								// this resets the cursor position to where it was; Chrome 54 is still busy doing stuff when the update is running, so give it a cycle to get its stuff together;
+								hopeEditor.selection.updateRange(newRange.end, newRange.end);
+								hopeEditor.showCursor();
+							}, 0);
 
-						editor.plugins.hope.annotation.tagToggle = [];
+							editor.plugins.hope.annotation.tagToggle = [];
+						});
 					};
 
 					if (editor.plugins.hope.annotation.tagToggle.length === 0) {
-						hopeEditor.field.addEventListener("DOMCharacterDataModified", addTag);
-						var removeAddTagListener = function() {
-							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
-						};
+						hopeEditor.field.observer = new MutationObserver(addTag);
+						hopeEditor.field.observer.observe(hopeEditor.field, {
+							"characterData" : true
+						});
 					}
 				}
 
@@ -557,7 +559,7 @@
 							editor.plugins.hope.annotation.tagToggle.push(tag);
 						}
 						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
-							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+							hopeEditor.field.observer.disconnect();
 						}
 						// hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					} else {
@@ -576,7 +578,7 @@
 							editor.plugins.hope.annotation.tagToggle.push(tag);
 						}
 						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
-							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+							hopeEditor.field.observer.disconnect();
 						}
 					} else {
 						hopeEditor.fragment = hopeEditor.fragment.apply(range, tag);
