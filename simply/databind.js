@@ -71,27 +71,27 @@ elementBinding = function(element, config, dataBinding) {
 	this.addListeners = function() {
 		this.removeListeners();
 		if (typeof this.element.mutationObserver === "undefined") {
-			if (typeof MutationObserver === "function") {
-				this.element.mutationObserver = new MutationObserver(this.handleMutation);
-			}
+			this.element.mutationObserver = new MutationObserver(this.handleMutation);
 		}
 		if (this.dataBinding.mode == "field") {
 			if (this.element.mutationObserver) {
-				this.element.mutationObserver.observe(this.element, {
+				this.element.mutationObserverConfig = {
 					attributes: true,
                                         characterData: true,
                                         subtree: true,
                                         childList: true
-				});
+				};
+				this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
 			}
 			this.element.addEventListener("change", this.handleEvent);
 		}
 		if (this.dataBinding.mode == "list") {
 			if (this.element.mutationObserver) {
-				this.element.mutationObserver.observe(this.element, {
+				this.element.mutationObserverConfig = {
 					attributes: true,
-					childList: true
-				});
+                                        childList: true
+				};
+				this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
 			}
 		}
 		this.element.addEventListener("databinding:valuechanged", this.handleEvent);
@@ -106,12 +106,14 @@ elementBinding = function(element, config, dataBinding) {
 	this.removeListeners = function() {
 		if (this.dataBinding.mode == "field") {
 			if (this.element.mutationObserver) {
+				this.element.mutationObserver.takeRecords();
 				this.element.mutationObserver.disconnect();
 			}
 			this.element.removeEventListener("change", this.handleEvent);
 		}
 		if (this.dataBinding.mode == "list") {
 			if (this.element.mutationObserver) {
+				this.element.mutationObserver.takeRecords();
 				this.element.mutationObserver.disconnect();
 			}
 		}
@@ -124,73 +126,85 @@ elementBinding = function(element, config, dataBinding) {
 			console.log("Warning: resume called of non-paused databinding");
 			this.element.dataBindingPaused = 0;
 		}
+		if (this.element.dataBindingPaused === 0) {
+			if (this.element.mutationObserver) {
+				this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
+			} else {
+				console.log("Warning: no mutation observer found");
+			}
+		}
 	};
 	this.pauseListeners = function() {
 		this.element.dataBindingPaused++;
+		if (this.element.mutationObserver) {
+			this.element.mutationObserver.takeRecords();
+			this.element.mutationObserver.disconnect();
+		}
 	};
 
 	this.handleMutation = function(mutations) {
+
 		// FIXME: assuming that one set of mutation events always have the same target; this might not be the case;
 		mutations.forEach(function(mutation) {
 			var target = mutation.target;
 			if (!target.dataBinding) {
 				return;
 			}
-			if (target.dataBindingPaused) {
-				return;
-			}
+			//if (target.dataBindingPaused) {
+			//	return;
+			//}
 
 			if (target.dataBinding.paused) {
 				return;
 			}
-
 			var elementBinding = target.elementBinding;
-			if (dataBinding.mode == "field") {
+			elementBinding.pauseListeners();
+			window.setTimeout(function() {
+				elementBinding.resumeListeners();
+			}, 1); // allow the rest of the mutation event to occur;
+
+			if (target.dataBinding.mode == "field") {
 				switch (mutation.type) {
 					case "attributes":
 						if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
 							return; // only handle the attribute mutation if the attribute changed is in our set
 						}
-						window.setTimeout(function() {
-							elementBinding.pauseListeners();	// prevent possible looping, getter sometimes also triggers an attribute change;
-							elementBinding.dataBinding.set(elementBinding.getter());
-							elementBinding.resumeListeners();
-						}, 0); // allow the rest of the mutation event to occur;
+						elementBinding.dataBinding.set(elementBinding.getter());
+					break;
+					case "childList":
 					break;
 					default:
 						// there are needed to keep the focus in an element while typing;
-						elementBinding.pauseListeners();
 						dataBinding.set(elementBinding.getter());
-						elementBinding.resumeListeners();
-
-						// these are needed to update after the browser is done doing its thing;
-						window.setTimeout(function() {
-							elementBinding.pauseListeners();
-							dataBinding.set(elementBinding.getter());
-							elementBinding.resumeListeners();
-						}, 1); // allow the rest of the mutation event to occur;
 					break;
 				}
 			}
-			if (dataBinding.mode == "list") {
+			if (target.dataBinding.mode == "list") {
 				switch (mutation.type) {
 					case "attributes":
 						if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
 							return; // only handle the attribute mutation if the attribute changed is in our set
 						}
+						elementBinding.dataBinding.set(elementBinding.getter());
 						window.setTimeout(function() {
-							elementBinding.pauseListeners();	// prevent possible looping, getter sometimes also triggers an attribute change;
-							elementBinding.dataBinding.set(elementBinding.getter());
 							elementBinding.resumeListeners();
-						}, 0); // allow the rest of the mutation event to occur;
+						}, 1); // allow the rest of the mutation event to occur;
 					break;
 					case "childList":
 						mutation.removedNodes.forEach(function(removedNode) {
 							if (removedNode.nodeType != document.ELEMENT_NODE) {
 								return;
 							}
+							if (removedNode.simplyRemoved) {
+								return;
+							}
+							removedNode.simplyRemoved = true;
 							// find the index of the removed target node;
 							data = target.dataBinding.get();
+							items = target.querySelectorAll(":scope > [data-simply-list-item]");
+							for (i=0; i<items.length; i++) {
+								items[i].simplyRemoved = true;
+							}
 							removedNode.simplyData = data.splice(removedNode.simplyListIndex, 1)[0];
 						});
 						mutation.addedNodes.forEach(function(addedNode) {
@@ -204,6 +218,7 @@ elementBinding = function(element, config, dataBinding) {
 									if (addedNode.simplyData) {
 										data = target.dataBinding.get();
 										data.splice(i, 0, addedNode.simplyData);
+										delete addedNode.simplyRemoved;
 										return;
 									}
 								}
@@ -212,20 +227,10 @@ elementBinding = function(element, config, dataBinding) {
 					break;
 					default:
 						// there are needed to keep the focus in an element while typing;
-						elementBinding.pauseListeners();
 						dataBinding.set(elementBinding.getter());
-						elementBinding.resumeListeners();
-
-						// these are needed to update after the browser is done doing its thing;
-						window.setTimeout(function() {
-							elementBinding.pauseListeners();
-							dataBinding.set(elementBinding.getter());
-							elementBinding.resumeListeners();
-						}, 1); // allow the rest of the mutation event to occur;
 					break;
 				}
 			}
-
 			elementBinding.fireEvent("domchanged");
 		});
 	};
@@ -885,17 +890,22 @@ dataBinding = function(config) {
 	}
 };
 
-
 dataBinding.prototype.resumeListeners = function(element) {
 	element.dataBindingPaused--;
 	if (element.dataBindingPaused < 0) {
 		console.log("Warning: resume called of non-paused databinding");
 		element.dataBindingPaused = 0;
+		element.mutationObserver.observe(element, element.mutationObserverConfig);
 	}
 };
 dataBinding.prototype.pauseListeners = function(element) {
 	element.dataBindingPaused++;
+	if (element.mutationObserver) {
+		element.mutationObserver.takeRecords();
+		element.mutationObserver.disconnect();
+	}
 };
+
 
 // Housekeeping, remove references to deleted nodes
 var removalObserver = new MutationObserver(function(mutations) {
@@ -911,9 +921,9 @@ var removalObserver = new MutationObserver(function(mutations) {
 				window.setTimeout(function() { // chrome sometimes 'helpfully' removes the element and then inserts it back, probably as a rendering optimalization. We're fine cleaning up in a bit, if still needed.
 					if (!target.parentNode && target.dataBinding && target.elementBinding) {
 						target.dataBinding.unbind(target.elementBinding);
-						if (target.dataBinding.mode == "field") {
-							target.dataBinding.set();
-						}
+						// if (target.dataBinding.mode == "field") {
+						//	target.dataBinding.set();
+						// }
 						delete target.dataBinding;
 					}
 				}, 400);
