@@ -84,6 +84,7 @@ elementBinding = function(element, config, dataBinding) {
                                         childList: true
 				});
 			}
+			this.element.addEventListener("change", this.handleEvent);
 		}
 		if (this.dataBinding.mode == "list") {
 			if (this.element.mutationObserver) {
@@ -93,7 +94,6 @@ elementBinding = function(element, config, dataBinding) {
 				});
 			}
 		}
-		this.element.addEventListener("change", this.handleEvent);
 		this.element.addEventListener("databinding:valuechanged", this.handleEvent);
 		this.element.addEventListener("databinding:pause", function() {
 			this.elementBinding.pauseListeners();
@@ -108,13 +108,13 @@ elementBinding = function(element, config, dataBinding) {
 			if (this.element.mutationObserver) {
 				this.element.mutationObserver.disconnect();
 			}
+			this.element.removeEventListener("change", this.handleEvent);
 		}
 		if (this.dataBinding.mode == "list") {
 			if (this.element.mutationObserver) {
 				this.element.mutationObserver.disconnect();
 			}
 		}
-		this.element.removeEventListener("change", this.handleEvent);
 		this.element.removeEventListener("databinding:valuechanged", this.handleEvent);
 	};
 
@@ -923,7 +923,8 @@ var removalObserver = new MutationObserver(function(mutations) {
 });
 
 removalObserver.observe(document.body, {
-	"childList" : true
+	"childList" : true,
+	"subtree" : true
 });
 
 // polyfill to add :scope selector for IE
