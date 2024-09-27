@@ -71,6 +71,7 @@ elementBinding = function(element, config, dataBinding) {
 	this.addListeners = function() {
 		this.removeListeners();
 		if (typeof this.element.mutationObserver === "undefined") {
+			console.log("Creating mutation observer on element " + this.dataBinding.config.key);
 			this.element.mutationObserver = new MutationObserver(this.handleMutation);
 		}
 		if (this.dataBinding.mode == "field") {
@@ -81,7 +82,9 @@ elementBinding = function(element, config, dataBinding) {
                                         subtree: true,
                                         childList: true
 				};
-				this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
+				if (this.element.dataBindingPaused === 0) {
+					this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
+				}
 			}
 			this.element.addEventListener("change", this.handleEvent);
 		}
@@ -91,7 +94,9 @@ elementBinding = function(element, config, dataBinding) {
 					attributes: true,
                                         childList: true
 				};
-				this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
+				if (this.element.dataBindingPaused === 0) {
+					this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
+				}
 			}
 		}
 		this.element.addEventListener("databinding:valuechanged", this.handleEvent);
@@ -101,19 +106,23 @@ elementBinding = function(element, config, dataBinding) {
 		this.element.addEventListener("databinding:resume", function() {
 			this.elementBinding.resumeListeners();
 		});
+		this.element.addEventListener("databind:pause", function() {
+			this.elementBinding.pauseListeners();
+		});
+		this.element.addEventListener("databind:resume", function() {
+			this.elementBinding.resumeListeners();
+		});
 	};
 
 	this.removeListeners = function() {
 		if (this.dataBinding.mode == "field") {
 			if (this.element.mutationObserver) {
-				this.element.mutationObserver.takeRecords();
 				this.element.mutationObserver.disconnect();
 			}
 			this.element.removeEventListener("change", this.handleEvent);
 		}
 		if (this.dataBinding.mode == "list") {
 			if (this.element.mutationObserver) {
-				this.element.mutationObserver.takeRecords();
 				this.element.mutationObserver.disconnect();
 			}
 		}
@@ -122,52 +131,68 @@ elementBinding = function(element, config, dataBinding) {
 
 	this.resumeListeners = function() {
 		this.element.dataBindingPaused--;
+		console.log("resuming mutation observer " + self.dataBinding.config.key + ":" + this.element.dataBindingPaused);
 		if (this.element.dataBindingPaused < 0) {
 			console.log("Warning: resume called of non-paused databinding");
 			this.element.dataBindingPaused = 0;
 		}
 		if (this.element.dataBindingPaused === 0) {
 			if (this.element.mutationObserver) {
+				this.element.mutationObserver.status = "observing";
 				this.element.mutationObserver.observe(this.element, this.element.mutationObserverConfig);
 			} else {
 				console.log("Warning: no mutation observer found");
 			}
 		}
+		this.fireParent("resume");
 	};
 	this.pauseListeners = function() {
 		this.element.dataBindingPaused++;
+		console.log("pausing mutation observer " + self.dataBinding.config.key + ":" + this.element.dataBindingPaused);
 		if (this.element.mutationObserver) {
-			this.element.mutationObserver.takeRecords();
+			console.log(this.element);
+			this.element.mutationObserver.status = "disconnected";
 			this.element.mutationObserver.disconnect();
 		}
+		this.fireParent("pause");
 	};
 
 	this.handleMutation = function(mutations) {
-
+		if (!mutations[0].target.dataBinding) {
+			console.log("Skipped, no binding");
+			return;
+		}
+		if (mutations[0].target.dataBindingPaused) {
+			console.log("Skipped, dbpaused");
+			return;
+		}
+		if (mutations[0].target.dataBinding.paused) {
+			console.log("Skipped, paused");
+			return;
+		}
+		
 		// FIXME: assuming that one set of mutation events always have the same target; this might not be the case;
 		mutations.forEach(function(mutation) {
 			var target = mutation.target;
 			if (!target.dataBinding) {
 				return;
 			}
-			//if (target.dataBindingPaused) {
-			//	return;
-			//}
+			if (target.dataBindingPaused) {
+				return;
+			}
 
 			if (target.dataBinding.paused) {
 				return;
 			}
 			var elementBinding = target.elementBinding;
+			console.log("[[1]]");
 			elementBinding.pauseListeners();
-			window.setTimeout(function() {
-				elementBinding.resumeListeners();
-			}, 1); // allow the rest of the mutation event to occur;
 
 			if (target.dataBinding.mode == "field") {
 				switch (mutation.type) {
 					case "attributes":
 						if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
-							return; // only handle the attribute mutation if the attribute changed is in our set
+							break; // only handle the attribute mutation if the attribute changed is in our set
 						}
 						elementBinding.dataBinding.set(elementBinding.getter());
 					break;
@@ -183,12 +208,9 @@ elementBinding = function(element, config, dataBinding) {
 				switch (mutation.type) {
 					case "attributes":
 						if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
-							return; // only handle the attribute mutation if the attribute changed is in our set
+							break;  // only handle the attribute mutation if the attribute changed is in our set
 						}
 						elementBinding.dataBinding.set(elementBinding.getter());
-						window.setTimeout(function() {
-							elementBinding.resumeListeners();
-						}, 1); // allow the rest of the mutation event to occur;
 					break;
 					case "childList":
 						mutation.removedNodes.forEach(function(removedNode) {
@@ -202,9 +224,9 @@ elementBinding = function(element, config, dataBinding) {
 							// find the index of the removed target node;
 							data = target.dataBinding.get();
 							items = target.querySelectorAll(":scope > [data-simply-list-item]");
-							for (i=0; i<items.length; i++) {
-								items[i].simplyRemoved = true;
-							}
+							//for (i=0; i<items.length; i++) {
+							//	items[i].simplyRemoved = true;
+							//}
 							removedNode.simplyData = data.splice(removedNode.simplyListIndex, 1)[0];
 						});
 						mutation.addedNodes.forEach(function(addedNode) {
@@ -231,6 +253,8 @@ elementBinding = function(element, config, dataBinding) {
 					break;
 				}
 			}
+			console.log("[[2]]");
+			elementBinding.resumeListeners();
 			elementBinding.fireEvent("domchanged");
 		});
 	};
@@ -280,6 +304,9 @@ elementBinding = function(element, config, dataBinding) {
 	};
 	this.fireEvent = function(event) {
 		self.dataBinding.fireEvent(self.element, event);
+	};
+	this.fireParent = function(event) {
+		self.dataBinding.fireEvent(self.element.parentNode, event);
 	};
 	this.isInDocument = function() {
 		if (document.contains && document.contains(this.element)) {
@@ -642,8 +669,10 @@ dataBinding = function(config) {
 				// FIXME: Always setting a list element will make a loop - find a better way to setup the bindings;
 				(!isEqual(binding.elements[i].getter(), shadowValue))
 			) {
+				console.log("[[3]]");
 				binding.elements[i].pauseListeners();
 				binding.elements[i].setter(shadowValue);
+				console.log("[[4]]");
 				binding.elements[i].resumeListeners();
 			}
 			binding.elements[i].fireEvent("elementresolved");
@@ -708,6 +737,9 @@ dataBinding = function(config) {
 		});
 	};
 	var fireEvent = function(targetNode, eventName, detail) {
+		if (!targetNode) {
+			return;
+		}
 		var event = document.createEvent('CustomEvent');
 		if (event && event.initCustomEvent) {
 			event.initCustomEvent('databind:' + eventName, true, true, detail);
@@ -892,20 +924,30 @@ dataBinding = function(config) {
 
 dataBinding.prototype.resumeListeners = function(element) {
 	element.dataBindingPaused--;
+	console.log("resuming mutation observer " + this.config.key + "[:]" + element.dataBindingPaused);
 	if (element.dataBindingPaused < 0) {
 		console.log("Warning: resume called of non-paused databinding");
 		element.dataBindingPaused = 0;
-		element.mutationObserver.observe(element, element.mutationObserverConfig);
 	}
+	if (element.dataBindingPaused === 0) {
+		if (element.mutationObserver) {
+			element.mutationObserver.observe(element, element.mutationObserverConfig);
+			element.mutationObserver.status = "observing";
+		} else {
+			console.log("Warning: no mutation observer found");
+		}
+	}
+	this.fireEvent(element.parentNode, "resume");
 };
 dataBinding.prototype.pauseListeners = function(element) {
 	element.dataBindingPaused++;
+	console.log("pausing mutation observer " + this.config.key + "[:]" + element.dataBindingPaused);
 	if (element.mutationObserver) {
-		element.mutationObserver.takeRecords();
+                element.mutationObserver.status = "disconnected";
 		element.mutationObserver.disconnect();
 	}
+	this.fireEvent(element.parentNode, "pause");
 };
-
 
 // Housekeeping, remove references to deleted nodes
 var removalObserver = new MutationObserver(function(mutations) {
