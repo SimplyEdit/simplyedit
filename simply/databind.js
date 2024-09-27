@@ -183,14 +183,12 @@ elementBinding = function(element, config, dataBinding) {
 						}, 0); // allow the rest of the mutation event to occur;
 					break;
 					case "childList":
-						console.log(mutation);
 						mutation.removedNodes.forEach(function(removedNode) {
 							if (removedNode.nodeType != document.ELEMENT_NODE) {
 								return;
 							}
 							// find the index of the removed target node;
 							data = target.dataBinding.get();
-							console.log("[M] Removed node: splicing data from the set at " + removedNode.simplyListIndex);
 							removedNode.simplyData = data.splice(removedNode.simplyListIndex, 1)[0];
 						});
 						mutation.addedNodes.forEach(function(addedNode) {
@@ -203,7 +201,6 @@ elementBinding = function(element, config, dataBinding) {
 								if (items[i] == addedNode) {
 									if (addedNode.simplyData) {
 										data = target.dataBinding.get();
-										console.log("[M] Added node: splicing data into the set at " + i);
 										data.splice(i, 0, addedNode.simplyData);
 										return;
 									}
