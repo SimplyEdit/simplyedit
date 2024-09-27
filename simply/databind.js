@@ -142,7 +142,6 @@ elementBinding = function(element, config, dataBinding) {
 				console.log("Warning: no mutation observer found");
 			}
 		}
-		this.fireParent("resume");
 	};
 	this.pauseListeners = function() {
 		this.element.dataBindingPaused++;
@@ -150,7 +149,6 @@ elementBinding = function(element, config, dataBinding) {
 			this.element.mutationObserver.status = "disconnected";
 			this.element.mutationObserver.disconnect();
 		}
-		this.fireParent("pause");
 	};
 
 	this.handleMutation = function(mutations) {
@@ -651,7 +649,9 @@ dataBinding = function(config) {
 				(!isEqual(binding.elements[i].getter(), shadowValue))
 			) {
 				binding.elements[i].pauseListeners();
+				binding.elements[i].fireEvent("pause");
 				binding.elements[i].setter(shadowValue);
+				binding.elements[i].fireEvent("resume");
 				binding.elements[i].resumeListeners();
 			}
 			binding.elements[i].fireEvent("elementresolved");
@@ -915,7 +915,6 @@ dataBinding.prototype.resumeListeners = function(element) {
 			console.log("Warning: no mutation observer found");
 		}
 	}
-	this.fireEvent(element.parentNode, "resume");
 };
 dataBinding.prototype.pauseListeners = function(element) {
 	element.dataBindingPaused++;
@@ -923,7 +922,6 @@ dataBinding.prototype.pauseListeners = function(element) {
                 element.mutationObserver.status = "disconnected";
 		element.mutationObserver.disconnect();
 	}
-	this.fireEvent(element.parentNode, "pause");
 };
 
 // Housekeeping, remove references to deleted nodes
