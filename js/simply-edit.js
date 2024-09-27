@@ -1548,8 +1548,11 @@
 				field.hopeRenderedSource = document.createElement("DIV");
 				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 				field.hopeEditor.field = field;
-				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+				field.hopeEditor.field.characterObserver = new MutationObserver(function() {
 					field.hopeEditor.needsUpdate = true;
+				});
+				field.hopeEditor.field.characterObserver.observe(field.hopeEditor.field, {
+					"characterData" : true
 				});
 				field.addEventListener("slip:beforereorder", function(evt) {
 					var rect = this.getBoundingClientRect();
