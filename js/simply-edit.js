@@ -1045,7 +1045,7 @@
 
 						clone.firstElementChild.setAttribute("data-simply-list-item", true);
 						clone.firstElementChild.setAttribute("data-simply-selectable", true);
-
+						clone.firstElementChild.simplyListIndex = j;
 						if (list.templateIcons[requestedTemplate]) {
 							clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 						}
@@ -1087,7 +1087,8 @@
 							}
 							clone.setAttribute("data-simply-list-item", true);
 							clone.setAttribute("data-simply-selectable", true);
-							
+							clone.simplyListIndex = j;
+
 							if (list.templateIcons[requestedTemplate]) {
 								clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 							}
