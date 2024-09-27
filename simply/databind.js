@@ -71,7 +71,6 @@ elementBinding = function(element, config, dataBinding) {
 	this.addListeners = function() {
 		this.removeListeners();
 		if (typeof this.element.mutationObserver === "undefined") {
-			console.log("Creating mutation observer on element " + this.dataBinding.config.key);
 			this.element.mutationObserver = new MutationObserver(this.handleMutation);
 		}
 		if (this.dataBinding.mode == "field") {
@@ -131,7 +130,6 @@ elementBinding = function(element, config, dataBinding) {
 
 	this.resumeListeners = function() {
 		this.element.dataBindingPaused--;
-		console.log("resuming mutation observer " + self.dataBinding.config.key + ":" + this.element.dataBindingPaused);
 		if (this.element.dataBindingPaused < 0) {
 			console.log("Warning: resume called of non-paused databinding");
 			this.element.dataBindingPaused = 0;
@@ -148,9 +146,7 @@ elementBinding = function(element, config, dataBinding) {
 	};
 	this.pauseListeners = function() {
 		this.element.dataBindingPaused++;
-		console.log("pausing mutation observer " + self.dataBinding.config.key + ":" + this.element.dataBindingPaused);
 		if (this.element.mutationObserver) {
-			console.log(this.element);
 			this.element.mutationObserver.status = "disconnected";
 			this.element.mutationObserver.disconnect();
 		}
@@ -158,19 +154,6 @@ elementBinding = function(element, config, dataBinding) {
 	};
 
 	this.handleMutation = function(mutations) {
-		if (!mutations[0].target.dataBinding) {
-			console.log("Skipped, no binding");
-			return;
-		}
-		if (mutations[0].target.dataBindingPaused) {
-			console.log("Skipped, dbpaused");
-			return;
-		}
-		if (mutations[0].target.dataBinding.paused) {
-			console.log("Skipped, paused");
-			return;
-		}
-		
 		// FIXME: assuming that one set of mutation events always have the same target; this might not be the case;
 		mutations.forEach(function(mutation) {
 			var target = mutation.target;
@@ -185,7 +168,6 @@ elementBinding = function(element, config, dataBinding) {
 				return;
 			}
 			var elementBinding = target.elementBinding;
-			console.log("[[1]]");
 			elementBinding.pauseListeners();
 
 			if (target.dataBinding.mode == "field") {
@@ -253,7 +235,6 @@ elementBinding = function(element, config, dataBinding) {
 					break;
 				}
 			}
-			console.log("[[2]]");
 			elementBinding.resumeListeners();
 			elementBinding.fireEvent("domchanged");
 		});
@@ -669,10 +650,8 @@ dataBinding = function(config) {
 				// FIXME: Always setting a list element will make a loop - find a better way to setup the bindings;
 				(!isEqual(binding.elements[i].getter(), shadowValue))
 			) {
-				console.log("[[3]]");
 				binding.elements[i].pauseListeners();
 				binding.elements[i].setter(shadowValue);
-				console.log("[[4]]");
 				binding.elements[i].resumeListeners();
 			}
 			binding.elements[i].fireEvent("elementresolved");
@@ -924,7 +903,6 @@ dataBinding = function(config) {
 
 dataBinding.prototype.resumeListeners = function(element) {
 	element.dataBindingPaused--;
-	console.log("resuming mutation observer " + this.config.key + "[:]" + element.dataBindingPaused);
 	if (element.dataBindingPaused < 0) {
 		console.log("Warning: resume called of non-paused databinding");
 		element.dataBindingPaused = 0;
@@ -941,7 +919,6 @@ dataBinding.prototype.resumeListeners = function(element) {
 };
 dataBinding.prototype.pauseListeners = function(element) {
 	element.dataBindingPaused++;
-	console.log("pausing mutation observer " + this.config.key + "[:]" + element.dataBindingPaused);
 	if (element.mutationObserver) {
                 element.mutationObserver.status = "disconnected";
 		element.mutationObserver.disconnect();
