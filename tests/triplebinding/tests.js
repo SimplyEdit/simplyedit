@@ -745,9 +745,6 @@ QUnit.module("Read turtle file");
                     }
                 ];
 		editor.data.apply(editor.currentData, document);
-
-		document.querySelector("#testContent input").checked = true 
-       		editor.fireEvent("change", document.querySelector("#testContent input"));
 		
 		let expectedTurtle = `@prefix : <#>.
 @prefix cal: <http://www.w3.org/2002/12/cal/ical#>.
@@ -768,10 +765,15 @@ QUnit.module("Read turtle file");
             [ a cal:Vtodo; schem:name "Todo item 2" ] );
     schem:name "My Todo List".
 `;
-        	window.setTimeout(function() {
-        		let turtle = $rdf.serialize(undefined, simplyApp.rdfStore, editor.pageData.todo, "text/turtle");
-        		assert.equal(turtle, expectedTurtle);
-			done();
+
+		window.setTimeout(function() {
+			document.querySelector("#testContent input").checked = true;
+			editor.fireEvent("change", document.querySelector("#testContent input"));
+			window.setTimeout(function() {
+				let turtle = $rdf.serialize(undefined, simplyApp.rdfStore, editor.pageData.todo, "text/turtle");
+				assert.equal(turtle, expectedTurtle);
+				done();
+			}, 100);
 		}, 100);
 	});
 
