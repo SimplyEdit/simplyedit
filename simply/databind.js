@@ -71,7 +71,7 @@ elementBinding = function(element, config, dataBinding) {
 	this.addListeners = function() {
 		this.removeListeners();
 		if (typeof this.element.mutationObserver === "undefined") {
-			this.element.mutationObserver = new MutationObserver(this.handleMutation);
+			this.element.mutationObserver = new MutationObserver(this.getMutationHandler(this.element));
 		}
 		if (this.dataBinding.mode == "field") {
 			if (this.element.mutationObserver) {
@@ -151,91 +151,91 @@ elementBinding = function(element, config, dataBinding) {
 		}
 	};
 
-	this.handleMutation = function(mutations) {
-		// FIXME: assuming that one set of mutation events always have the same target; this might not be the case;
-		mutations.forEach(function(mutation) {
-			var target = mutation.target;
-			if (!target.dataBinding) {
-				return;
-			}
-			if (target.dataBindingPaused) {
-				return;
-			}
-
-			if (target.dataBinding.paused) {
-				return;
-			}
-			var elementBinding = target.elementBinding;
-			elementBinding.pauseListeners();
-
-			if (target.dataBinding.mode == "field") {
-				switch (mutation.type) {
-					case "attributes":
-						if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
-							break; // only handle the attribute mutation if the attribute changed is in our set
-						}
-						elementBinding.dataBinding.set(elementBinding.getter());
-					break;
-					case "childList":
-					break;
-					default:
-						// there are needed to keep the focus in an element while typing;
-						dataBinding.set(elementBinding.getter());
-					break;
+	this.getMutationHandler = function(target) {
+		return function(mutations) {
+			mutations.forEach(function(mutation) {
+				if (!target.dataBinding) {
+					return;
 				}
-			}
-			if (target.dataBinding.mode == "list") {
-				switch (mutation.type) {
-					case "attributes":
-						if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
-							break;  // only handle the attribute mutation if the attribute changed is in our set
-						}
-						elementBinding.dataBinding.set(elementBinding.getter());
-					break;
-					case "childList":
-						mutation.removedNodes.forEach(function(removedNode) {
-							if (removedNode.nodeType != document.ELEMENT_NODE) {
-								return;
+				if (target.dataBindingPaused) {
+					return;
+				}
+
+				if (target.dataBinding.paused) {
+					return;
+				}
+				var elementBinding = target.elementBinding;
+				elementBinding.pauseListeners();
+
+				if (target.dataBinding.mode == "field") {
+					switch (mutation.type) {
+						case "attributes":
+							if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
+								break; // only handle the attribute mutation if the attribute changed is in our set
 							}
-							if (removedNode.simplyRemoved) {
-								return;
+							elementBinding.dataBinding.set(elementBinding.getter());
+						break;
+						case "childList":
+						break;
+						default:
+							// there are needed to keep the focus in an element while typing;
+							dataBinding.set(elementBinding.getter());
+						break;
+					}
+				}
+				if (target.dataBinding.mode == "list") {
+					switch (mutation.type) {
+						case "attributes":
+							if (target.dataBinding.attributeFilter.indexOf(mutation.attributeName) !== -1) {
+								break;  // only handle the attribute mutation if the attribute changed is in our set
 							}
-							removedNode.simplyRemoved = true;
-							// find the index of the removed target node;
-							data = target.dataBinding.get();
-							items = target.querySelectorAll(":scope > [data-simply-list-item]");
-							//for (i=0; i<items.length; i++) {
-							//	items[i].simplyRemoved = true;
-							//}
-							removedNode.simplyData = data.splice(removedNode.simplyListIndex, 1)[0];
-						});
-						mutation.addedNodes.forEach(function(addedNode) {
-							if (addedNode.nodeType != document.ELEMENT_NODE) {
-								return;
-							}
-							// find the index of the inserted target node;
-							items = target.querySelectorAll(":scope > [data-simply-list-item]");
-							for (i=0; i<items.length; i++) {
-								if (items[i] == addedNode) {
-									if (addedNode.simplyData) {
-										data = target.dataBinding.get();
-										data.splice(i, 0, addedNode.simplyData);
-										delete addedNode.simplyRemoved;
-										return;
+							elementBinding.dataBinding.set(elementBinding.getter());
+						break;
+						case "childList":
+							mutation.removedNodes.forEach(function(removedNode) {
+								if (removedNode.nodeType != document.ELEMENT_NODE) {
+									return;
+								}
+								if (removedNode.simplyRemoved) {
+									return;
+								}
+								removedNode.simplyRemoved = true;
+								// find the index of the removed target node;
+								data = target.dataBinding.get();
+								items = target.querySelectorAll(":scope > [data-simply-list-item]");
+								//for (i=0; i<items.length; i++) {
+								//	items[i].simplyRemoved = true;
+								//}
+								removedNode.simplyData = data.splice(removedNode.simplyListIndex, 1)[0];
+							});
+							mutation.addedNodes.forEach(function(addedNode) {
+								if (addedNode.nodeType != document.ELEMENT_NODE) {
+									return;
+								}
+								// find the index of the inserted target node;
+								items = target.querySelectorAll(":scope > [data-simply-list-item]");
+								for (i=0; i<items.length; i++) {
+									if (items[i] == addedNode) {
+										if (addedNode.simplyData) {
+											data = target.dataBinding.get();
+											data.splice(i, 0, addedNode.simplyData);
+											delete addedNode.simplyRemoved;
+											return;
+										}
 									}
 								}
-							}
-						});
-					break;
-					default:
-						// there are needed to keep the focus in an element while typing;
-						dataBinding.set(elementBinding.getter());
-					break;
+							});
+						break;
+						default:
+							// there are needed to keep the focus in an element while typing;
+							dataBinding.set(elementBinding.getter());
+						break;
+					}
 				}
-			}
-			elementBinding.resumeListeners();
-			elementBinding.fireEvent("domchanged");
-		});
+				elementBinding.resumeListeners();
+				elementBinding.fireEvent("domchanged");
+			});
+		};
 	};
 
 	this.handleEvent = function (event) {
