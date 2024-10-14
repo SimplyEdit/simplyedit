@@ -450,7 +450,12 @@
 					var transformer = target.getAttribute('data-simply-transformer');
 					if (transformer) {
 						if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
-							data = editor.transformers[transformer].extract.call(target, data);
+							try {
+								data = editor.transformers[transformer].extract.call(target, data);
+							} catch(e) {
+								console.log("Error thrown in transformer " + transformer);
+								console.log(e);
+							}
 						} else {
 							console.log("Warning: transformer " + transformer + " is not defined");
 						}
@@ -858,7 +863,12 @@
 				var transformer = list.getAttribute('data-simply-transformer');
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
-						listData = editor.transformers[transformer].render.call(list, listData);
+						try {
+							listData = editor.transformers[transformer].render.call(list, listData);
+						} catch(e) {
+							console.log("Error thrown in transformer " + transformer);
+							console.log(e);
+						}
 					} else {
 						console.log("Warning: transformer " + transformer + " is not defined");
 					}
@@ -1718,7 +1728,12 @@
 				var transformer = field.getAttribute('data-simply-transformer');
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
-						data = editor.transformers[transformer].render.call(field, data);
+						try {
+							data = editor.transformers[transformer].render.call(field, data);
+						} catch(e) {
+							console.log("Error thrown in transformer " + transformer);
+							console.log(e);
+						}
 					} else {
 						console.log("Warning: transformer " + transformer + " is not defined");
 					}
@@ -1785,7 +1800,12 @@
 				var transformer = field.getAttribute('data-simply-transformer');
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
-						result = editor.transformers[transformer].extract.call(field, result);
+						try {
+							result = editor.transformers[transformer].extract.call(field, result);
+						} catch(e) {
+							console.log("Error thrown in transformer " + transformer);
+							console.log(e);
+						}
 					} else {
 						console.log("Warning: transformer " + transformer + " is not defined");
 					}
