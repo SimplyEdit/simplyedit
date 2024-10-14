@@ -1045,7 +1045,7 @@
 
 						clone.firstElementChild.setAttribute("data-simply-list-item", true);
 						clone.firstElementChild.setAttribute("data-simply-selectable", true);
-
+						clone.firstElementChild.simplyListIndex = j;
 						if (list.templateIcons[requestedTemplate]) {
 							clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 						}
@@ -1087,7 +1087,8 @@
 							}
 							clone.setAttribute("data-simply-list-item", true);
 							clone.setAttribute("data-simply-selectable", true);
-							
+							clone.simplyListIndex = j;
+
 							if (list.templateIcons[requestedTemplate]) {
 								clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 							}
@@ -1547,8 +1548,11 @@
 				field.hopeRenderedSource = document.createElement("DIV");
 				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 				field.hopeEditor.field = field;
-				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+				field.hopeEditor.field.characterObserver = new MutationObserver(function() {
 					field.hopeEditor.needsUpdate = true;
+				});
+				field.hopeEditor.field.characterObserver.observe(field.hopeEditor.field, {
+					"characterData" : true
 				});
 				field.addEventListener("slip:beforereorder", function(evt) {
 					var rect = this.getBoundingClientRect();
