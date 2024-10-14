@@ -773,7 +773,7 @@ QUnit.module("databinding");
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
 		
-		assert.equal(editor.pageData._bindings_.hello.elements[0], field);
+		assert.equal(editor.pageData._bindings_.hello.elements[0].element, field);
 	});
 
 	QUnit.test("databinding set div data", function(assert) {
@@ -1092,11 +1092,14 @@ QUnit.module("databinding");
 		// reorder the 2-depth list items;
 		field.querySelector("li").appendChild(field.querySelector("li > span"));
 		field.querySelector("li+li").appendChild(field.querySelector("li + li > span"));
-
-		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
-		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
-		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
-		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+			assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+			assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+			assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+			done();
+		});
 	});
 
 
@@ -1125,8 +1128,12 @@ QUnit.module("databinding");
 
 		// reorder the 1-depth list items;
 		field.appendChild(field.querySelector("li"));
-		assert.equal(document.querySelector("#testContent li").dataBinding.parentKey, "/menu/0/");
-		assert.equal(document.querySelector("#testContent li + li").dataBinding.parentKey, "/menu/1/");
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(document.querySelector("#testContent li").dataBinding.parentKey, "/menu/0/");
+			assert.equal(document.querySelector("#testContent li + li").dataBinding.parentKey, "/menu/1/");
+			done();
+		});
 	});
 
 
@@ -1155,10 +1162,14 @@ QUnit.module("databinding");
 
 		// reorder the 1-depth list items;
 		field.appendChild(field.querySelector("li"));
-		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
-		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
-		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
-		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+			assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+			assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+			assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+			done();
+		});
 	});
 
 	QUnit.test("databinding for subkeys", function(assert) {
