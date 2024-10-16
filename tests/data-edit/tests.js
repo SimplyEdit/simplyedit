@@ -1732,7 +1732,7 @@ QUnit.module("lists");
 			editor.context.toolbar.hide = true;
 			editor.context.update();
 			editor.context.toolbar.hide = false;
-			simulateClick(target, -5, 50);
+			simulateClick(target, -5, 50); // click on the list-item toolbar thingy to activate the list-item toolbar
 			setTimeout(function() {
 				document.querySelector(".simply-section.active [data-simply-action=simply-list-item-delete]").click();
 				setTimeout(function() {
