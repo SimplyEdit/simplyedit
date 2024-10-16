@@ -3094,6 +3094,7 @@
 				}
 				editor.data.apply(newData, newListItem);
 				var dataPath = editor.data.getDataPath(newListItem);
+				newListItem.simplyListIndex = listIndex;
 				newListItem.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 
 				if ( targetNode ) {
