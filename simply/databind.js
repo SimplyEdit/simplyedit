@@ -202,6 +202,9 @@ elementBinding = function(element, config, dataBinding) {
 								if (removedNode.simplyRemoved) {
 									return;
 								}
+								if (typeof removedNode.simplyListIndex === "undefined") {
+									return;
+								}
 								removedNode.simplyRemoved = true;
 								// find the index of the removed target node;
 								data = target.dataBinding.get();
