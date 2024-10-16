@@ -1712,6 +1712,41 @@ QUnit.module("lists");
 		editor.data.apply(data, document);
 		assert.equal(editor.currentData['/'].menu[0].items[0]._bindings_.item, list.querySelector("[data-simply-field=item]").dataBinding);
 	});
+
+	QUnit.test("click on list item marker, then list item delete", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		editor.actions["simply-list-add"](button);
+
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(editor.pageData.testList.length, 2);
+			assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 2);
+			assert.equal(editor.pageData.testList[0].item, "Hello world");
+			assert.equal(editor.pageData.testList[1].item, "Hello world");
+			var target = testList.querySelectorAll("[data-simply-list-item]")[1];
+			editor.context.toolbar.hide = true;
+			editor.context.update();
+			editor.context.toolbar.hide = false;
+			simulateClick(target, -5, 50);
+			setTimeout(function() {
+				document.querySelector(".simply-section.active [data-simply-action=simply-list-item-delete]").click();
+				setTimeout(function() {
+					assert.equal(editor.pageData.testList.length, 1);
+					assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
+					assert.equal(editor.pageData.testList[0].item, "Hello world");
+					done1();
+				}, 100);
+			}, 100);
+		}, 100);
+	});
+
+
+
 /* FIXME: Decide how this should work and make it so */
 /*QUnit.module("static link with editable content");
 	QUnit.test("click on link", function(assert) {
