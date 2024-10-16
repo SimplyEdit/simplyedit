@@ -71,7 +71,8 @@ elementBinding = function(element, config, dataBinding) {
 	this.addListeners = function() {
 		this.removeListeners();
 		if (typeof this.element.mutationObserver === "undefined") {
-			this.element.mutationObserver = new MutationObserver(this.getMutationHandler(this.element));
+			this.element.mutationHandler = this.getMutationHandler(this.element);
+			this.element.mutationObserver = new MutationObserver(this.element.mutationHandler);
 		}
 		if (this.dataBinding.mode == "field") {
 			if (this.element.mutationObserver) {
@@ -144,11 +145,13 @@ elementBinding = function(element, config, dataBinding) {
 		}
 	};
 	this.pauseListeners = function() {
-		this.element.dataBindingPaused++;
 		if (this.element.mutationObserver) {
+			// Disconnecting will flush the queue of records and trash them - if we have things that we need to handle, do so.
+			this.element.mutationHandler(this.element.mutationObserver.takeRecords());
 			this.element.mutationObserver.status = "disconnected";
 			this.element.mutationObserver.disconnect();
 		}
+		this.element.dataBindingPaused++;
 	};
 
 	this.getMutationHandler = function(target) {
@@ -197,6 +200,9 @@ elementBinding = function(element, config, dataBinding) {
 									return;
 								}
 								if (removedNode.simplyRemoved) {
+									return;
+								}
+								if (typeof removedNode.simplyListIndex === "undefined") {
 									return;
 								}
 								removedNode.simplyRemoved = true;
