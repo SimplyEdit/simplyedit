@@ -34,6 +34,11 @@ env('version', function() {
 		return $version;
 	}
 
+	$version = getenv('CI_COMMIT_TAG');
+	if (! empty($version)) {
+		return $version;
+	}
+
 	//use build ref
 	$version = getenv('CI_BUILD_REF');
 	if (!empty($version)) {
