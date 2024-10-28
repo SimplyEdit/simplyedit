@@ -1536,6 +1536,17 @@ QUnit.module("images");
 		testContent.innerHTML = '';
 	});
 
+	QUnit.test("update image field src", function(assert) {
+		var testImage = document.querySelector("#testImage");
+		selectImage(testImage);
+		editor.context.update();
+		editor.actions["simply-image-src"]("HelloWorld.png");
+
+		assert.equal(testImage.getAttribute("data-simply-src"), "HelloWorld.png");
+		assert.equal(testImage.getAttribute("src"), "HelloWorld.png");
+		assert.equal(editor.pageData.testImage.src, "HelloWorld.png");
+	});
+
 QUnit.module("lists");
 	QUnit.test("add list item", function(assert) {
 		var testList = document.querySelector("#testList");
