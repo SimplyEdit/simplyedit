@@ -482,6 +482,7 @@
 					editor.responsiveImages.initImage(hopeEditor.field);
 					editor.plugins.image.reselect();
 					editor.context.update();
+					editor.fireEvent("databinding:valuechanged", hopeEditor.field);
 				}
 			},
 			"simply-insert-image" : function() {
