@@ -1,0 +1,12 @@
+{
+  "name": "simplyedit",
+  "description": "The first CMS designed for the decentralized web ",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimplyEdit/simplyedit.git"
+  },
+  "author": "SimplyEdit",
+  "license": "MIT",
+  "homepage": "https://simplyedit.io/"
+}
+
