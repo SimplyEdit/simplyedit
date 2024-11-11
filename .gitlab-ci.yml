@@ -1,25 +1,26 @@
-image: muze/phantomjs:v2latest
-
 unittest:
+  image: ghcr.io/puppeteer/puppeteer:latest
   before_script:
-    - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} update
-    - apt-get -qq -o Acquire::http::Proxy=${APTPROXY} --no-install-recommends -y install git
-    - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
-    - ( php -S 0.0.0.0:80  & )
-    - ( cd /tmp/simply-test-store ; bash server.sh )
+#    - git clone https://gitlab.muze.nl/muze/simply-test-store.git /tmp/simply-test-store
+#    - ( php -S 0.0.0.0:80  & )
+#    - ( cd /tmp/simply-test-store ; bash server.sh )
+    - npm install node-qunit-puppeteer
   script:
-     - phantomjs tests/runner.js http://localhost/tests/data-display/ci.html
-     - phantomjs tests/runner.js http://localhost/tests/data-edit/ci.html
+     - ./node_modules/.bin/node-qunit-puppeteer ./tests/data-display/ci.html 60000 "--no-sandbox --allow-file-access-from-files"
+     - ./node_modules/.bin/node-qunit-puppeteer ./tests/data-edit/ci.html 60000 "--no-sandbox --allow-file-access-from-files"
+     - ./node_modules/.bin/node-qunit-puppeteer ./tests/triplebinding/ci.html 60000 "--no-sandbox --allow-file-access-from-files"
   tags:
     - docker
   stage: test
 
 syntaxtest:
+  image: muze/phantomjs:v2latest
   before_script:
     - npm -g install jshint
     - npm -g install csslint
   script:
-    - jshint $(find js simply  -name \*.js | grep -v -E '^(simply/slip.js|simply/scripts.js)$')
+    - echo '{"esversion":6}' > .jshintrc
+    - jshint --config .jshintrc $(find js simply  -name \*.js | grep -v -E '^(simply/slip.js|simply/scripts.js)$')
     - csslint .
   tags:
     - docker

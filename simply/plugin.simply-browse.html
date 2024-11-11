@@ -532,8 +532,11 @@
 				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);
 			}
 
-			editor.toolbarsContainer.querySelector("#simply-browse").addEventListener("DOMNodeInserted", editor.plugins.browse.dialog.updateToolbar);
-			editor.toolbarsContainer.querySelector("#simply-browse").addEventListener("DOMNodeRemoved",editor.plugins.browse.dialog.updateToolbar);
+			browseTreeObserver = new MutationObserver(editor.plugins.browse.dialog.updateToolbar);
+			browseTreeObserver.observe(editor.toolbarsContainer.querySelector("#simply-browse"), {
+				"childList": true,
+				"subtree": true
+			});
 
 			var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 			new Slip(targetList); // slip is used for the tap-hold timing;

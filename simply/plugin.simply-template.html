@@ -65,10 +65,11 @@
 			},
 			update : function() {
 				var pageTemplate = "index.html";
+				var path = editor.data.getDataPath();
 				if (document.head.querySelector("meta[name=page-template]")) {
 					pageTemplate = document.head.querySelector("meta[name=page-template]").getAttribute("content");
-				} else if (editor.currentData[editor.data.getDataPath()]['data-simply-page-template']) {
-					pageTemplate = editor.currentData[editor.data.getDataPath()]['data-simply-page-template'];
+				} else if (typeof editor.currentData[path] != 'undefined' && editor.currentData[path]['data-simply-page-template']) {
+					pageTemplate = editor.currentData[path]['data-simply-page-template'];
 				}
 				editor.toolbarsContainer.getElementById("simply-page-template-list").value = pageTemplate;
 			}
@@ -91,7 +92,11 @@
 		},
 		setMeta : function(name, value) {
 			// just set the data, databinding will take care of the rest if needed.
-			editor.currentData[editor.data.getDataPath()]['data-simply-' + name] = value;
+			var path = editor.data.getDataPath();
+			if (typeof editor.currentData[path] == 'undefined') {
+				editor.currentData[path] = {};
+			}
+			editor.currentData[path]['data-simply-' + name] = value;
 		},
 		init : function(config) {
 			if (

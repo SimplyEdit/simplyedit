@@ -773,7 +773,7 @@ QUnit.module("databinding");
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
 		
-		assert.equal(editor.pageData._bindings_.hello.elements[0], field);
+		assert.equal(editor.pageData._bindings_.hello.elements[0].element, field);
 	});
 
 	QUnit.test("databinding set div data", function(assert) {
@@ -1092,11 +1092,14 @@ QUnit.module("databinding");
 		// reorder the 2-depth list items;
 		field.querySelector("li").appendChild(field.querySelector("li > span"));
 		field.querySelector("li+li").appendChild(field.querySelector("li + li > span"));
-
-		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
-		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
-		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
-		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+			assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+			assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+			assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+			done();
+		});
 	});
 
 
@@ -1125,8 +1128,12 @@ QUnit.module("databinding");
 
 		// reorder the 1-depth list items;
 		field.appendChild(field.querySelector("li"));
-		assert.equal(document.querySelector("#testContent li").dataBinding.parentKey, "/menu/0/");
-		assert.equal(document.querySelector("#testContent li + li").dataBinding.parentKey, "/menu/1/");
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(document.querySelector("#testContent li").dataBinding.parentKey, "/menu/0/");
+			assert.equal(document.querySelector("#testContent li + li").dataBinding.parentKey, "/menu/1/");
+			done();
+		});
 	});
 
 
@@ -1155,10 +1162,14 @@ QUnit.module("databinding");
 
 		// reorder the 1-depth list items;
 		field.appendChild(field.querySelector("li"));
-		assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
-		assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
-		assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
-		assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(document.querySelector("#testContent li > span").dataBinding.parentKey, "/menu/0/items/0/");
+			assert.equal(document.querySelector("#testContent li + li > span").dataBinding.parentKey, "/menu/1/items/0/");
+			assert.equal(document.querySelector("#testContent li > span + span").dataBinding.parentKey, "/menu/0/items/1/");
+			assert.equal(document.querySelector("#testContent li + li > span + span").dataBinding.parentKey, "/menu/1/items/1/");
+			done();
+		});
 	});
 
 	QUnit.test("databinding for subkeys", function(assert) {
@@ -1474,4 +1485,594 @@ QUnit.module("data path");
 		document.body.setAttribute("data-simply-path", "/bar/../foo/");
 		assert.equal(editor.data.getDataPath(document.querySelector("#testContent")), "/bar/../foo/"); 
 		document.body.removeAttribute("data-simply-path");
+	});
+
+QUnit.module("simply components");
+	QUnit.test("simple component render plain text", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'>Hello there</template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+
+		var mainContents = document.querySelector("main").innerHTML;
+		assert.equal(mainContents, "Hello there", "component is rendered");
+	});
+
+	QUnit.test("simple component render field", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div data-simply-field='hello'></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : "world"
+		};
+		var mainContents = document.querySelector("main > div").innerHTML;
+		assert.equal(mainContents, "world", "component is rendered");
+	});
+
+	QUnit.test("simple component render nested component with plain text", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML += "<template id='bar'>Hello world</template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		var mainContents = document.querySelector("main").innerHTML;
+		assert.equal(mainContents, "Hello world", "component is rendered");
+	});
+
+	QUnit.test("simple component render nested component with field", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML += "<template id='bar'><div data-simply-field='hello'></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : "world"
+		};
+		var mainContents = document.querySelector("main > div").innerHTML;
+		assert.equal(mainContents, "world", "component is rendered");
+	});
+
+	QUnit.test("simple component render nested component with list", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div is='simply-component' rel='bar'></div></template>";
+		templatesField.innerHTML += "<template id='bar'><div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry'></span></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div is='simply-component' rel='foo'></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : ["world", "there", "you"]
+		};
+		var mainContents = document.querySelector("main > div").innerText;
+		assert.equal(mainContents, "worldthereyou", "component is rendered");
+	});
+
+	QUnit.test("simple render plain text", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'>Hello there</template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<simply-render rel='foo'></simply-render>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+
+		var mainContents = document.querySelector("main").innerHTML;
+		assert.equal(mainContents, "Hello there", "component is rendered");
+	});
+
+	QUnit.test("simple render field", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><div data-simply-field='hello'></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<simply-render rel='foo'></simply-render>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : "world"
+		};
+		var mainContents = document.querySelector("main > div").innerHTML;
+		assert.equal(mainContents, "world", "component is rendered");
+	});
+
+	QUnit.test("simple render nested component with plain text", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><simply-render rel='bar'></simply-render></template>";
+		templatesField.innerHTML += "<template id='bar'>Hello world</template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<simply-render rel='foo'></simply-render>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		var mainContents = document.querySelector("main").innerHTML;
+		assert.equal(mainContents, "Hello world", "component is rendered");
+	});
+
+	QUnit.test("simple render nested component with field", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><simply-render rel='bar'></simply-render></template>";
+		templatesField.innerHTML += "<template id='bar'><div data-simply-field='hello'></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<simply-render rel='foo'></simply-render>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : "world"
+		};
+		var mainContents = document.querySelector("main > div").innerHTML;
+		assert.equal(mainContents, "world", "component is rendered");
+	});
+
+	QUnit.test("simple render nested component with list", function(assert) {
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var templatesField = document.createElement("div");
+		templatesField.innerHTML = "<template id='foo'><simply-render rel='bar'></simply-render></template>";
+		templatesField.innerHTML += "<template id='bar'><div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry'></span></div></template>";
+		target.appendChild(templatesField);
+
+		var field = document.createElement("main");
+		field.innerHTML = "<simply-render rel='foo'></simply-render>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : ["world", "there", "you"]
+		};
+		var mainContents = document.querySelector("main > div").innerText;
+		assert.equal(mainContents, "worldthereyou", "component is rendered");
+	});
+
+
+
+	QUnit.test("databinding for lists with data-simply-entry", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry'></span></template></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : ["world", "there", "you"]
+		};
+		var mainContents = document.querySelector("main > div").innerText;
+		assert.equal(mainContents, "worldthereyou", "list is rendered");
+
+		var world = document.querySelector("#testContent span:first-child");
+		world.innerText = "another world";
+
+		window.setTimeout(function() {
+			var list = document.querySelector("#testContent div[data-simply-list]");
+			list.dataBinding.resolve(true);
+			assert.equal(JSON.stringify(editor.pageData.hello), '["another world","there","you"]');
+			done();
+		}, 100);
+	});
+
+	QUnit.test("databinding for lists with data-simply-entry with objects", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = "<div data-simply-list='hello' data-simply-entry='entry'><template><span data-simply-field='entry.title'></span></template></div>";
+		target.appendChild(field);
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"hello" : [{"title" : "world"}, {"title" : "there"}, {"title" : "you"}]
+		};
+		var mainContents = document.querySelector("main > div").innerText;
+		assert.equal(mainContents, "worldthereyou", "list is rendered");
+
+		var world = document.querySelector("#testContent span:first-child");
+		world.innerText = "another world";
+
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.hello), '[{"title":"another world"},{"title":"there"},{"title":"you"}]');
+			done();
+		}, 100);
+	});
+
+	QUnit.test("databinding for lists with data-simply-entry with objects and templates", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+		  <div data-simply-list="things" data-simply-entry="entry">
+    <template>
+      <div data-simply-field="entry" data-simply-content="template" data-simply-transformer="thingType" data-simply-default-value="de
+fault">
+        <template data-simply-template="default"></template>
+        <template data-simply-template="thing">
+          <div class="ds-form-group ds-grid">
+            <label>Thing type:
+              <select data-simply-field="entry.thing">
+                <option value="">Select a thing</option>
+                <option value="001-001">Thing 1</option>
+                <option value="002-002">Thing 2</option>
+                <option value="003-003">Thing 3</option>
+                <option value="004-004">Thing 4</option>
+              </select>
+            </label>
+          </div>
+        </template>
+    </template>
+  </div>
+`;
+
+		target.appendChild(field);
+		editor.transformers = {
+			thingType: {
+				render: function (data) {
+					this.simplyData = data;
+					return Object.keys(data)[0];
+				},
+				extract: function (data) {
+					return this.simplyData;
+				}
+			}
+		};
+
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData = {
+			"things" : [{ "thing": "001-001" },{ "thing": "001-001" }]
+		};
+
+		document.querySelectorAll("#testContent select")[0].value = "003-003";
+		document.querySelectorAll("#testContent select")[1].value = "002-002";
+
+		window.setTimeout(function() {
+			assert.equal(JSON.stringify(editor.pageData.things), '[{"thing":"003-003"},{"thing":"002-002"}]');
+			done();
+		}, 100);
+	});
+
+	QUnit.test("rendering datasource lists with datasource sublists", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-list="second" data-simply-data="second">
+          <template>
+            <hr>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{}];
+				callback(result);
+			}
+		});
+		editor.addDataSource("second", {
+			load : function(el, callback) {
+				renderCounter++;
+				console.log("this should happen only once");
+				callback();
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(renderCounter, 1);
+			done();
+		}, 100);
+	});
+
+	QUnit.test("rendering datasource lists with fields in them", function(assert) {
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-field="field" data-simply-content="template" data-simply-default-template="default">
+          <template data-simply-template="default">
+            <h1 data-simply-field="field"></h1>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{
+				  "field" : "thing"
+				}];
+				callback(result);
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(typeof editor.pageData.field, "undefined");
+			done();
+		}, 100);
+	});
+
+	QUnit.test("rendering datasource lists with datasource sublists", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-list="first" data-simply-data="first">
+      <template>
+        <div data-simply-field="field" data-simply-content="template" data-simply-default-template="default">
+          <template data-simply-template="default">
+            <div data-simply-field="field" data-simply-content="attributes" data-simply-attributes="data-field">
+              <h1 data-simply-field="field"></h1>
+              <div data-simply-list="second" data-simply-data="second">
+                <template>
+                  <div data-simply-field="hello" data-simply-content="template" data-simply-default-template="default">
+                    <template data-simply-template="default">
+                      <h1 data-simply-field="hello"></h1>
+                    </template>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+`;
+
+		editor.addDataSource("first", {
+			load : function(el, callback) {
+				var result = [{
+					"field" : "thing"
+				}];
+				callback(result);
+			}
+		});
+		editor.addDataSource("second", {
+			load : function(el, callback) {
+				if (renderCounter > 100) {
+					callback();
+				}
+				
+				let fieldName = el.parentNode.getAttribute("data-field");
+				switch (fieldName) {
+					case "thing":
+						callback([
+							{
+								"hello" : "world",
+							},
+							{
+								"hello" : "other world"
+							}
+						]);
+					break;
+				}
+				
+				renderCounter++;
+				console.log("this should happen only once");
+			}
+		});
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(renderCounter, 1);
+			done();
+		}, 100);
+	});
+
+	QUnit.test("undefined data parent", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <div data-simply-field="page" data-simply-content="template">
+      <template data-simply-template="page">
+        <span data-simply-field="count.commands" data-simply-content="attributes" data-simply-attributes="data-count"></span>
+      </template>
+    </div>
+`;
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData.count = {
+			"foo" : "bar"
+		};
+		editor.pageData.page = "page";
+		window.setTimeout(function() {
+			assert.equal(1, 1);
+			done();
+		}, 100);
+	});
+
+	QUnit.test("attributes child", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+    <main id="main" data-simply-field="page" data-simply-content="template">
+      <template data-simply-template="page">
+        <div id="div" data-simply-field="subject" data-simply-content="attributes" data-simply-attributes="about">
+	  <h1 id="h1" data-simply-field="subject">Subject</h1>
+        </div>
+      </template>
+    </main>
+`;
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		editor.pageData.subject = "Things";
+		editor.pageData.page = "page";
+		window.setTimeout(function() {
+			var renderedSubject = document.querySelector("#h1").innerText;
+			var renderedAbout = document.querySelector("#div").getAttribute("about");
+			assert.equal(renderedSubject, "Things");
+			done();
+		}, 100);
+	});
+
+	QUnit.test("rendering transformer lists", function(assert) {
+		var renderCounter = 0;
+		const done = assert.async();
+
+		var target = document.querySelector("#testContent");
+		target.innerHTML = '';
+
+		var field = document.createElement("main");
+		field.innerHTML = `
+      <div data-simply-list="menuSections" data-simply-transformer="rdfPredicate">
+        <template>
+          <div>
+            <span data-simply-field="name"></span>
+            <span data-simply-field="value"></span>
+          </div>
+        </template>
+      </div>
+`;
+		editor.transformers = {
+			"rdfPredicate" : {
+				render : function(data) {
+					renderCounter++;
+					console.log("render called");
+					if (renderCounter > 10) {
+						throw new Error("Rendering too many times");
+					}
+					var result	= [
+						{
+							"value" : "foo"
+						},
+						{
+							"value" : "bar"
+						}
+					];
+					
+					if (this.dataBinding && (this.dataBinding.mode == "field")) {
+						return result[0].value;
+					} else {
+						return result;
+					}
+				},
+				extract : function(data) {
+					return data;
+				}
+			}
+		}
+
+		target.appendChild(field);
+		editor.currentData = {};
+		editor.data.apply(editor.currentData, document);
+		window.setTimeout(function() {
+			assert.equal(renderCounter, 2);
+			done();
+		}, 1000);
 	});

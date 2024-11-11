@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html
+  xmlns:schema="https://schema.org/"
+  xmlns:ical="http://www.w3.org/2002/12/cal/ical#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+<head>
+	<meta charset="utf-8">
+	<title>QUnit Example</title>
+	<link rel="stylesheet" href="../qunit-1.19.0.css">
+	<script src="../qunit-1.19.0.js"></script>
+	<script src="rdflib.min.js"></script>
+	<script src="tests.js"></script>
+</head>
+<body>
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+	<div id="testContent">
+	</div>
+	<script>
+		var myCustomStorage = {
+			init : function(endpoint) {
+				return true;
+			},
+			save : function(data, callback) {
+				return true;
+			},
+			load : function(callback) {
+				return true;
+			},
+			connect : function() {
+				return true;
+			},
+			disconnect : function() {
+				return true;
+			},
+			list : function(url, callback) {
+				var result = {
+					folders : [],
+					files : [],
+					images : []
+				};
+				callback(result);
+			}
+		};
+	</script>
+	<script src="../../js/simply-edit.js" data-api-key="" data-simply-storage="myCustomStorage"  data-simply-endpoint="http://localhost:8080/"></script>
+	<script src="../../simply/simply.tripleBinding.js"></script>
+</body>
+</html>

@@ -100,7 +100,10 @@
 				var dataFields;
 				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-field")) {
 					dataFields = [target];
-					if (target.getAttribute("data-simply-content") === 'fixed') { // special case - if the target field has content fixed, we need to handle its children as well.
+					if (
+						(target.getAttribute("data-simply-content") === 'fixed') ||
+						(target.getAttribute("data-simply-content") === 'attributes')
+					) { // special case - if the target field has content fixed or attributes, we need to handle its children as well.
 						var extraFields = target.querySelectorAll("[data-simply-field]");
 						for (var x=0; x<extraFields.length; x++) {
 							dataFields.push(extraFields[x]);
@@ -327,6 +330,7 @@
 						dataParent[dataName] = [];
 					}
 
+					var listEntryMapping = list.getAttribute('data-simply-entry');
 					listItems = list.querySelectorAll("[data-simply-list-item]");
 					var counter = 0;
 					for (j=0; j<listItems.length; j++) {
@@ -341,6 +345,9 @@
 						for (var subPath in subData) {
 							if (subPath != dataPath) {
 								console.log("Notice: use of data-simply-path in subitems is not permitted, translated " + subPath + " to " + dataPath);
+							}
+							if (listEntryMapping) {
+								subData[subPath] = subData[subPath][listEntryMapping];
 							}
 							dataParent[dataName][counter] = subData[subPath];
 						}
@@ -439,14 +446,22 @@
 					}
 				});
 
-				if (target.nodeType == document.ELEMENT_NODE && target.getAttribute("data-simply-transformer")) {
+				if ((target.nodeType == document.ELEMENT_NODE) && target.getAttribute("data-simply-list") && target.getAttribute("data-simply-transformer")) {
 					var transformer = target.getAttribute('data-simply-transformer');
 					if (transformer) {
 						if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
-							data = editor.transformers[transformer].extract.call(target, data);
+							try {
+								data = editor.transformers[transformer].extract.call(target, data);
+							} catch(e) {
+								console.log("Error thrown in transformer " + transformer);
+								console.log(e);
+							}
+						} else {
+							console.log("Warning: transformer " + transformer + " is not defined");
 						}
 					}
 				}
+
 				return data;
 			},
 			keyDownHandler : function(evt) {
@@ -817,9 +832,23 @@
 				}
 
 				var dataLists = clone.querySelectorAll("[data-simply-list]");
-				for (k=0; k<dataLists.length; k++) {
-					editor.list.init(dataLists[k], listDataItem, useDataBinding);
+
+				// FIXME: We need to skip sublists to prevent initing them twice!
+				var subLists;
+				subLists = clone.querySelectorAll("[data-simply-list] [data-simply-list], [data-simply-field]:not([data-simply-content='attributes']):not([data-simply-content='fixed']) [data-simply-list]");
+				var subListsArr = [];
+				for (var a=0; a<subLists.length; a++) {
+					subListsArr.unshift(subLists[a]);
 				}
+
+				for (var i=0; i<dataLists.length; i++) {
+					var isSub = (subListsArr.indexOf(dataLists[i]) > -1);
+					if (isSub) {
+						continue;
+					}
+					editor.list.init(dataLists[i], listDataItem, useDataBinding);
+				}
+
 				if (clone.nodeType == document.ELEMENT_NODE && clone.getAttribute("data-simply-list")) {
 					editor.list.init(clone, listDataItem, useDataBinding);
 				}
@@ -834,10 +863,25 @@
 				var transformer = list.getAttribute('data-simply-transformer');
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
-						listData = editor.transformers[transformer].render.call(list, listData);
+						try {
+							listData = editor.transformers[transformer].render.call(list, listData);
+						} catch(e) {
+							console.log("Error thrown in transformer " + transformer);
+							console.log(e);
+						}
+					} else {
+						console.log("Warning: transformer " + transformer + " is not defined");
 					}
 				}
 
+				if (list.previousValue == JSON.stringify(listData)) {
+					if (list.dataBinding) {
+						list.dataBinding.resumeListeners(list);
+					}
+					return; // value is the same as the previous time we set it, just keep it;
+				}
+
+				list.previousValue = JSON.stringify(listData);
 				var previousStyle = list.getAttribute("style");
 				list.style.height = list.offsetHeight + "px"; // this will prevent the screen from bouncing and messing up the scroll offset.
 				editor.list.clear(list);
@@ -874,7 +918,7 @@
 
 					// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
 					var originalTemplates = template.content.querySelectorAll("template");
-					var importedTemplates = clone.querySelectorAll("template");
+					var importedTemplates = clone.querySelectorAll("template:not([simply-component])");
 
 					for (i=0; i<importedTemplates.length; i++) {
 						importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
@@ -898,9 +942,9 @@
 				if (!listData) {
 					listData = [];
 				}
-				if (list.dataBinding) {
+				if (list.elementBinding) {
 				//	list.dataBinding.pauseListeners(list);
-					list.dataBinding.removeListeners(list);
+					list.elementBinding.removeListeners(list);
 					listenersRemoved = true;
 				}
 
@@ -930,18 +974,23 @@
 				var listDataGetter = function() {
 					return listData;
 				};
+				var listEntryMappingGetter = function() {
+					return listEntryMapping;
+				};
 
 				for (j=0; j<listData.length; j++) {
 					if (!listData[j]) {
 						continue;
 					}
 					if (listEntryMapping) {
-						if (!listData[j]._simplyConverted) {
+						if (!listData[j]._simplyListEntryMapping) {
 							var entry = new Object(JSON.parse(JSON.stringify(listData[j])));
 							entry[listEntryMapping] = listData[j];
-							entry._simplyConverted = true;
 							Object.defineProperty(entry, "_simplyConvertedParent", {
 								get : listDataGetter
+							});
+							Object.defineProperty(entry, "_simplyListEntryMapping", {
+								get : listEntryMappingGetter
 							});
 							listData[j] = entry;
 						}
@@ -981,7 +1030,7 @@
 							clone = document.importNode(list.templates[requestedTemplate].content, true);
 							// Grr... android browser imports the nodes, except the contents of subtemplates. Find them and put them back where they belong.
 							var originalTemplates = list.templates[requestedTemplate].content.querySelectorAll("template");
-							var importedTemplates = clone.querySelectorAll("template");
+							var importedTemplates = clone.querySelectorAll("template:not([simply-component])");
 
 							for (i=0; i<importedTemplates.length; i++) {
 								importedTemplates[i].innerHTML = originalTemplates[i].innerHTML;
@@ -1006,7 +1055,7 @@
 
 						clone.firstElementChild.setAttribute("data-simply-list-item", true);
 						clone.firstElementChild.setAttribute("data-simply-selectable", true);
-
+						clone.firstElementChild.simplyListIndex = j;
 						if (list.templateIcons[requestedTemplate]) {
 							clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 						}
@@ -1016,7 +1065,7 @@
 							stashedFields[i].removeAttribute("data-simply-stashed");
 						}
 
-						if (!listData[j]._bindings_) {
+						if (!listDataSource && !listData[j]._bindings_) {
 							newData = editor.list.get(clone.firstElementChild);
 							dataPath = editor.data.getDataPath(clone.firstElementChild);
 							editor.data.apply(newData, clone.firstElementChild);
@@ -1048,7 +1097,8 @@
 							}
 							clone.setAttribute("data-simply-list-item", true);
 							clone.setAttribute("data-simply-selectable", true);
-							
+							clone.simplyListIndex = j;
+
 							if (list.templateIcons[requestedTemplate]) {
 								clone.firstElementChild.setAttribute("data-simply-list-icon", list.templateIcons[requestedTemplate]);
 							}
@@ -1058,7 +1108,7 @@
 								stashedFields[i].removeAttribute("data-simply-stashed");
 							}
 
-							if (!listData[j]._bindings_) {
+							if (!listDataSource && !listData[j]._bindings_) {
 								newData = editor.list.get(clone);
 								dataPath = editor.data.getDataPath(clone);
 								editor.data.apply(newData, clone);
@@ -1112,10 +1162,10 @@
 					list.dataBinding.resolve(true);
 				}
 				list.reattach();
-				if (list.dataBinding) {
+				if (list.elementBinding) {
 					if (listenersRemoved) {
 						var pauseCount = list.dataBindingPaused;
-						list.dataBinding.addListeners(list);
+						list.elementBinding.addListeners();
 						list.dataBindingPaused = pauseCount;
 					}
 					// list.dataBinding.resumeListeners(list);
@@ -1413,45 +1463,10 @@
 							field.appendChild(clone);
 							for (var i=0; i<field.childNodes.length; i++) {
 								if (field.childNodes[i].nodeType == document.ELEMENT_NODE) {
-									if (field.dataBinding) {
-										// Bind the subfields of the template to the same data-level as this field;
-
-										var fieldData = {};
-										fieldData[fieldPath] = field.fieldDataParent;
-/*
-										var fieldData = {};
-										fieldData[fieldPath] = editor.currentData[fieldPath];
-										// split the binding parents into seperate entries and remove the first empty entry;
-										var subkeys = field.dataBinding.parentKey.replace(/\/$/,'').split("/");
-
-//										var subkeys = savedBindingParents.join("/").replace(/\/$/,'').split("/");
-										if (subkeys[0] === "") {
-											subkeys.shift();
-										}
-
-										if (savedParentKey != field.dataBinding.parentKey) {
-											editor.bindingParents = ["/" + subkeys.join("/")];
-											editor.settings.databind.parentKey = field.dataBinding.parentKey;
-										}
-
-//										var fieldKeys = field.getAttribute('data-simply-field').split(".");
-//										fieldKeys.pop();
-
-//										if (fieldKeys.length && (subkeys.join(".") == fieldKeys.join("."))) {
-//										} else {
-											var subkey = subkeys.shift();
-											if (fieldData[fieldPath] && fieldData[fieldPath][subkey]) {
-												fieldData[fieldPath] = fieldData[fieldPath][subkey];
-											} else {
-												fieldData[fieldPath] = {};
-											}
-//										}
-
-*/
-										editor.data.apply(fieldData, field.childNodes[i]);
-									} else {
-										editor.data.apply(editor.currentData, field.childNodes[i]);
-									}
+									// Bind the subfields of the template to the same data-level as this field;
+									var fieldData = {};
+									fieldData[fieldPath] = field.fieldDataParent;
+									editor.data.apply(fieldData, field.childNodes[i]);
 								}
 							}
 						}
@@ -1543,8 +1558,11 @@
 				field.hopeRenderedSource = document.createElement("DIV");
 				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 				field.hopeEditor.field = field;
-				field.hopeEditor.field.addEventListener("DOMCharacterDataModified", function() {
+				field.hopeEditor.field.characterObserver = new MutationObserver(function() {
 					field.hopeEditor.needsUpdate = true;
+				});
+				field.hopeEditor.field.characterObserver.observe(field.hopeEditor.field, {
+					"characterData" : true
 				});
 				field.addEventListener("slip:beforereorder", function(evt) {
 					var rect = this.getBoundingClientRect();
@@ -1710,7 +1728,14 @@
 				var transformer = field.getAttribute('data-simply-transformer');
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].render === "function")) {
-						data = editor.transformers[transformer].render.call(field, data);
+						try {
+							data = editor.transformers[transformer].render.call(field, data);
+						} catch(e) {
+							console.log("Error thrown in transformer " + transformer);
+							console.log(e);
+						}
+					} else {
+						console.log("Warning: transformer " + transformer + " is not defined");
 					}
 				}
 
@@ -1775,7 +1800,14 @@
 				var transformer = field.getAttribute('data-simply-transformer');
 				if (transformer) {
 					if (editor.transformers[transformer] && (typeof editor.transformers[transformer].extract === "function")) {
-						result = editor.transformers[transformer].extract.call(field, result);
+						try {
+							result = editor.transformers[transformer].extract.call(field, result);
+						} catch(e) {
+							console.log("Error thrown in transformer " + transformer);
+							console.log(e);
+						}
+					} else {
+						console.log("Warning: transformer " + transformer + " is not defined");
 					}
 				}
 				return result;
@@ -3727,9 +3759,66 @@
 	editor.data.list = editor.list;
 	editor.data.list.applyTemplates = editor.list.set;
 
-	editor.init({
-		endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
-		toolbars : defaultToolbars,
-		profile : 'live'
-	});
+
+	class SimplyComponent extends HTMLDivElement {
+		constructor() {
+			console.warn('simply-component is deprecated, use simply-render instead');
+			var self = super();
+			var templateId = self.getAttribute("rel");
+			var template = document.getElementById(templateId);
+			if (template) {
+				var content = editor.list.cloneTemplate(template);
+				for (var i=0; i<content.childNodes.length; i++) {
+					var clone = content.childNodes[i].cloneNode(true);
+					if (clone.nodeType == document.ELEMENT_NODE) {
+						clone.querySelectorAll("template").forEach(function(t) {
+							t.setAttribute("simply-component", "");
+						});
+					}
+					self.parentNode.insertBefore(clone, self);
+				}
+				self.parentNode.removeChild(self);
+			}
+		}
+	}
+	// Define the new element
+	customElements.define('simply-component', SimplyComponent, { extends: 'div' });
+	
+	class SimplyRender extends HTMLElement {
+		constructor() {
+			var self = super();
+			var templateId = self.getAttribute("rel");
+			var template = document.getElementById(templateId);
+			if (template) {
+				var content = editor.list.cloneTemplate(template);
+				for (var i=0; i<content.childNodes.length; i++) {
+					var clone = content.childNodes[i].cloneNode(true);
+					if (clone.nodeType == document.ELEMENT_NODE) {
+						clone.querySelectorAll("template").forEach(function(t) {
+							t.setAttribute("simply-component", "");
+						});
+					}
+					self.parentNode.insertBefore(clone, self);
+				}
+				self.parentNode.removeChild(self);
+			}
+		}
+	}
+
+	// Define the new element
+	customElements.define('simply-render', SimplyRender);
+
+	var initSimply = function() {
+		editor.init({
+			endpoint : document.querySelector("[data-simply-endpoint]") ? document.querySelector("[data-simply-endpoint]").getAttribute("data-simply-endpoint") : null,
+			toolbars : defaultToolbars,
+			profile : 'live'
+		});
+	};
+
+	if (scriptEl.hasAttribute("data-simply-initOnEvent")) {
+		document.addEventListener("simply-init", initSimply);
+	} else {
+		initSimply();
+	}
 }());

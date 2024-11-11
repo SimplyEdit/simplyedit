@@ -972,7 +972,7 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
-	QUnit.test("text press return at end of text nodes and inline tag", function(assert) {
+	QUnit.test("text press return at end of text nodes and inline tag in paragraph field", function(assert) {
 		var testContent = document.querySelector("#testContent");
 		testContent.innerHTML = "Hello <em>little</em> world";
 		testContent.hopeEditor.parseHTML();
@@ -988,7 +988,7 @@ QUnit.module("editor text cursor");
 		}, 100);
 	});
 
-	QUnit.test("text press return at end of text nodes and inline tag in paragraph field", function(assert) {
+	QUnit.test("text press return at end of text nodes and inline tag", function(assert) {
 		var testContent = document.querySelector("#testParagraph");
 		testContent.innerHTML = "Hello <em>little</em> world";
 		testContent.hopeEditor.parseHTML();
@@ -1536,6 +1536,17 @@ QUnit.module("images");
 		testContent.innerHTML = '';
 	});
 
+	QUnit.test("update image field src", function(assert) {
+		var testImage = document.querySelector("#testImage");
+		selectImage(testImage);
+		editor.context.update();
+		editor.actions["simply-image-src"]("HelloWorld.png");
+
+		assert.equal(testImage.getAttribute("data-simply-src"), "HelloWorld.png");
+		assert.equal(testImage.getAttribute("src"), "HelloWorld.png");
+		assert.equal(editor.pageData.testImage.src, "HelloWorld.png");
+	});
+
 QUnit.module("lists");
 	QUnit.test("add list item", function(assert) {
 		var testList = document.querySelector("#testList");
@@ -1631,10 +1642,14 @@ QUnit.module("lists");
 
 		var button = document.createElement("button");
 		editor.actions["simply-list-add"](button);
-		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
-		assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
-		assert.equal(testList.querySelector("[data-simply-field=item]").dataBinding.parentKey, "/testList/0/");
-		assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
+			assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
+			assert.equal(testList.querySelector("[data-simply-field=item]").dataBinding.parentKey, "/testList/0/");
+			assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);
+			done();
+		});
 	});
 
 	QUnit.test("add list item (list item is field), databinding", function(assert) {
@@ -1644,10 +1659,14 @@ QUnit.module("lists");
 
 		var button = document.createElement("button");
 		editor.actions["simply-list-add"](button);
-		assert.equal(testList2.querySelectorAll("[data-simply-list-item]").length, 1);
-		assert.equal(editor.pageData.testList2[0].item, testList2.querySelector("[data-simply-field=item]").innerHTML);
-		assert.equal(testList2.querySelector("[data-simply-field=item]").dataBinding.parentKey, "/testList2/0/");
-		assert.equal(editor.pageData.testList2[0]._bindings_.item, testList2.querySelector("[data-simply-field=item]").dataBinding);
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(testList2.querySelectorAll("[data-simply-list-item]").length, 1);
+			assert.equal(editor.pageData.testList2[0].item, testList2.querySelector("[data-simply-field=item]").innerHTML);
+			assert.equal(testList2.querySelector("[data-simply-field=item]").dataBinding.parentKey, "/testList2/0/");
+			assert.equal(editor.pageData.testList2[0]._bindings_.item, testList2.querySelector("[data-simply-field=item]").dataBinding);
+			done();
+		});
 	});
 
 	QUnit.test("add 2 list items, databinding", function(assert) {
@@ -1657,19 +1676,27 @@ QUnit.module("lists");
 
 		var button = document.createElement("button");
 		editor.actions["simply-list-add"](button);
-		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
-		assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
-		assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
+		const done = assert.async();
+		setTimeout(function() {
+			assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
+			assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
+			assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);
+			done();
 
-		editor.actions["simply-list-add"](button);
-		assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 2);
-		assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
-		assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
+			editor.actions["simply-list-add"](button);
+			const done2 = assert.async();
+			setTimeout(function() {
+				assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 2);
+				assert.equal(editor.pageData.testList[0].item, testList.querySelector("[data-simply-field=item]").innerHTML);
+				assert.equal(editor.pageData.testList[0]._bindings_.item, testList.querySelector("[data-simply-field=item]").dataBinding);		
 
-		assert.equal(editor.pageData.testList[1].item, testList.querySelectorAll("[data-simply-field=item]")[1].innerHTML);
-		assert.equal(editor.pageData.testList[1]._bindings_.item, testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding);		
-		assert.equal(testList.querySelectorAll("[data-simply-field=item]")[0].dataBinding.parentKey, "/testList/0/");
-		assert.equal(testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding.parentKey, "/testList/1/");
+				assert.equal(editor.pageData.testList[1].item, testList.querySelectorAll("[data-simply-field=item]")[1].innerHTML);
+				assert.equal(editor.pageData.testList[1]._bindings_.item, testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding);		
+				assert.equal(testList.querySelectorAll("[data-simply-field=item]")[0].dataBinding.parentKey, "/testList/0/");
+				assert.equal(testList.querySelectorAll("[data-simply-field=item]")[1].dataBinding.parentKey, "/testList/1/");
+				done2();
+			});
+		});
 	});
 
 
@@ -1696,6 +1723,41 @@ QUnit.module("lists");
 		editor.data.apply(data, document);
 		assert.equal(editor.currentData['/'].menu[0].items[0]._bindings_.item, list.querySelector("[data-simply-field=item]").dataBinding);
 	});
+
+	QUnit.test("click on list item marker, then list item delete", function(assert) {
+		var testList = document.querySelector("#testList");
+		currentList = testList;
+		testList.innerHTML = '';
+
+		var button = document.createElement("button");
+		editor.actions["simply-list-add"](button);
+		editor.actions["simply-list-add"](button);
+
+		var done1 = assert.async();
+		setTimeout(function() {
+			assert.equal(editor.pageData.testList.length, 2);
+			assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 2);
+			assert.equal(editor.pageData.testList[0].item, "Hello world");
+			assert.equal(editor.pageData.testList[1].item, "Hello world");
+			var target = testList.querySelectorAll("[data-simply-list-item]")[1];
+			editor.context.toolbar.hide = true;
+			editor.context.update();
+			editor.context.toolbar.hide = false;
+			simulateClick(target, -5, 50); // click on the list-item toolbar thingy to activate the list-item toolbar
+			setTimeout(function() {
+				document.querySelector(".simply-section.active [data-simply-action=simply-list-item-delete]").click();
+				setTimeout(function() {
+					assert.equal(editor.pageData.testList.length, 1);
+					assert.equal(testList.querySelectorAll("[data-simply-list-item]").length, 1);
+					assert.equal(editor.pageData.testList[0].item, "Hello world");
+					done1();
+				}, 100);
+			}, 100);
+		}, 100);
+	});
+
+
+
 /* FIXME: Decide how this should work and make it so */
 /*QUnit.module("static link with editable content");
 	QUnit.test("click on link", function(assert) {

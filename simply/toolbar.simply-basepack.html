@@ -545,41 +545,43 @@
 				var annotation = hopeEditor.fragment.has(range, tag);
 
 				if (range.start === range.end) {
-					var addTag = function(event) {
-						hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag); // remove it now, setting textContent can trigger it again and mess up;
-						var newValue = event.newValue.replace(/ $/, "\xa0"); // replace ending space with nbsp;
-						var rangeLength = newValue.length - event.prevValue.length;
-						event.preventDefault();
-						event.target.textContent = newValue; // Note: this will trigger another DOMCharacterDataModified if the change wasn't applied yet;
-						// ... and messes up the cursor position;
+					var addTag = function(mutations) {
+						mutations.forEach(function(mutation) {
+							hopeEditor.field.observer.disconnect(); // remove it now, setting textContent can trigger it again and mess up;
+							var newValue = mutation.newValue.replace(/ $/, "\xa0"); // replace ending space with nbsp;
+							var rangeLength = newValue.length - event.prevValue.length;
+							// FIXME: There used to be an event.preventDefault here;
+							mutation.target.textContent = newValue; // Note: this will trigger another CharacterDataModified if the change wasn't applied yet;
+							// ... and messes up the cursor position;
 
-						hopeEditor.parseHTML();
-						hopeEditor.selection.move(rangeLength);
-						var newRange = hope.range.create(range.start, range.start + rangeLength);
+							hopeEditor.parseHTML();
+							hopeEditor.selection.move(rangeLength);
+							var newRange = hope.range.create(range.start, range.start + rangeLength);
 
-						for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
-							if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
-								hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
-							} else {
-								hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+							for (var i=0; i<editor.plugins.hope.annotation.tagToggle.length; i++) {
+								if (!hopeEditor.fragment.has(newRange, editor.plugins.hope.annotation.tagToggle[i])) {
+									hopeEditor.fragment = hopeEditor.fragment.apply(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+								} else {
+									hopeEditor.fragment = hopeEditor.fragment.remove(newRange, editor.plugins.hope.annotation.tagToggle[i]);
+								}
 							}
-						}
-						hopeEditor.update();
+							hopeEditor.update();
 
-						window.setTimeout(function() {
-							// this resets the cursor position to where it was; Chrome 54 is still busy doing stuff when the update is running, so give it a cycle to get its stuff together;
-							hopeEditor.selection.updateRange(newRange.end, newRange.end);
-							hopeEditor.showCursor();
-						}, 0);
+							window.setTimeout(function() {
+								// this resets the cursor position to where it was; Chrome 54 is still busy doing stuff when the update is running, so give it a cycle to get its stuff together;
+								hopeEditor.selection.updateRange(newRange.end, newRange.end);
+								hopeEditor.showCursor();
+							}, 0);
 
-						editor.plugins.hope.annotation.tagToggle = [];
+							editor.plugins.hope.annotation.tagToggle = [];
+						});
 					};
 
 					if (editor.plugins.hope.annotation.tagToggle.length === 0) {
-						hopeEditor.field.addEventListener("DOMCharacterDataModified", addTag);
-						var removeAddTagListener = function() {
-							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
-						};
+						hopeEditor.field.observer = new MutationObserver(addTag);
+						hopeEditor.field.observer.observe(hopeEditor.field, {
+							"characterData" : true
+						});
 					}
 				}
 
@@ -594,7 +596,7 @@
 							editor.plugins.hope.annotation.tagToggle.push(tag);
 						}
 						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
-							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+							hopeEditor.field.observer.disconnect();
 						}
 						// hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					} else {
@@ -613,7 +615,7 @@
 							editor.plugins.hope.annotation.tagToggle.push(tag);
 						}
 						if (editor.plugins.hope.annotation.tagToggle.length === 0) {
-							hopeEditor.field.removeEventListener("DOMCharacterDataModified", addTag);
+							hopeEditor.field.observer.disconnect();
 						}
 					} else {
 						hopeEditor.fragment = hopeEditor.fragment.apply(range, tag);
@@ -1514,6 +1516,7 @@
 					editor.responsiveImages.initImage(hopeEditor.field);
 					editor.plugins.image.reselect();
 					editor.context.update();
+					editor.fireEvent("databinding:valuechanged", hopeEditor.field);
 				}
 			},
 			"simply-insert-image" : function() {
@@ -2236,8 +2239,11 @@
 				deleteButton.parentNode.parentNode.removeChild(deleteButton.parentNode);
 			}
 
-			editor.toolbarsContainer.querySelector("#simply-browse").addEventListener("DOMNodeInserted", editor.plugins.browse.dialog.updateToolbar);
-			editor.toolbarsContainer.querySelector("#simply-browse").addEventListener("DOMNodeRemoved",editor.plugins.browse.dialog.updateToolbar);
+			browseTreeObserver = new MutationObserver(editor.plugins.browse.dialog.updateToolbar);
+			browseTreeObserver.observe(editor.toolbarsContainer.querySelector("#simply-browse"), {
+				"childList": true,
+				"subtree": true
+			});
 
 			var targetList = editor.toolbarsContainer.querySelector("#simply-browse .simply-dialog-body");
 			new Slip(targetList); // slip is used for the tap-hold timing;
@@ -3089,6 +3095,7 @@
 				}
 				editor.data.apply(newData, newListItem);
 				var dataPath = editor.data.getDataPath(newListItem);
+				newListItem.simplyListIndex = listIndex;
 				newListItem.simplyData = newData[dataPath]; // optimize: this allows the databinding to cleanly insert the new item;
 
 				if ( targetNode ) {
@@ -3510,10 +3517,11 @@ document.addEventListener('simply-toolbars-loaded', function() {
 			},
 			update : function() {
 				var pageTemplate = "index.html";
+				var path = editor.data.getDataPath();
 				if (document.head.querySelector("meta[name=page-template]")) {
 					pageTemplate = document.head.querySelector("meta[name=page-template]").getAttribute("content");
-				} else if (editor.currentData[editor.data.getDataPath()]['data-simply-page-template']) {
-					pageTemplate = editor.currentData[editor.data.getDataPath()]['data-simply-page-template'];
+				} else if (typeof editor.currentData[path] != 'undefined' && editor.currentData[path]['data-simply-page-template']) {
+					pageTemplate = editor.currentData[path]['data-simply-page-template'];
 				}
 				editor.toolbarsContainer.getElementById("simply-page-template-list").value = pageTemplate;
 			}
@@ -3536,7 +3544,11 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		},
 		setMeta : function(name, value) {
 			// just set the data, databinding will take care of the rest if needed.
-			editor.currentData[editor.data.getDataPath()]['data-simply-' + name] = value;
+			var path = editor.data.getDataPath();
+			if (typeof editor.currentData[path] == 'undefined') {
+				editor.currentData[path] = {};
+			}
+			editor.currentData[path]['data-simply-' + name] = value;
 		},
 		init : function(config) {
 			if (
@@ -4122,150 +4134,161 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		inserts[i].appendChild(symbolLi);
 	}
 </script><script type="text/javascript">
-	var spanListener = function(event) {
-		if (!editor.node.getSimplyField(event.target)) {
-			return;
-		}
+	var spanListener = function(mutations) {
+		mutations.forEach(function(mutation) {
+			mutation.addedNodes.forEach(function(addedNode) {
+				if (!editor.node.getSimplyField(addedNode)) {
+					return;
+				}
 
-		if (event.target.tagName && event.target.tagName.toLowerCase()=='span') {
-			editor.node.unwrap(event.target);
-			var sel = window.getSelection();
-			var range = sel.getRangeAt(0);
-			sel.removeAllRanges();
-			sel.addRange(range);
-		}
+				if (addedNode.tagName && addedNode.tagName.toLowerCase()=='span') {
+					editor.node.unwrap(addedNode);
+					var sel = window.getSelection();
+					var range = sel.getRangeAt(0);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
+			});
+		});
 	};
 
-	var fontListener = function(event) {
-		if (!editor.node.getSimplyField(event.target)) {
-			return;
-		}
+	var fontListener = function(mutations) {
+		mutations.forEach(function(mutation) {
+			mutation.addedNodes.forEach(function(addedNode) {
+				if (!editor.node.getSimplyField(addedNode)) {
+					return;
+				}
 
-		if (event.target.tagName && event.target.tagName.toLowerCase()=='font') {
-			editor.node.unwrap(event.target);
-			var sel = window.getSelection();
-			var range = sel.getRangeAt(0);
-			sel.removeAllRanges();
-			sel.addRange(range);
+				if (addedNode.tagName && addedNode.tagName.toLowerCase()=='font') {
+					editor.node.unwrap(addedNode);
+					var sel = window.getSelection();
+					var range = sel.getRangeAt(0);
+					sel.removeAllRanges();
+					sel.addRange(range);
 
-			// If a browser is bold enough to ask us to insert a font tag, that must mean they are up to no good. No more tags allowed!
-			event.target.ownerDocument.addEventListener("DOMNodeInserted", noTagsAllowedListener);
-			window.setTimeout(function() {
-				document.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
-			}, 200);
-		}
+					// If a browser is bold enough to ask us to insert a font tag, that must mean they are up to no good. No more tags allowed!
+					addedNode.ownerDocument.noTagsObserver = new MutationObserver(noTagsAllowedListener);
+					window.setTimeout(function() {
+						document.noTagsObserver.disconnect();
+					}, 200);
+				}
 
-		// Chrome remembers that a text was bold or italic, this will remove those tags when they are inserted.
-		if (event.target.tagName && (event.target.tagName.toLowerCase()=='b' || event.target.tagName.toLowerCase()=='i')) {
-			if (event.target.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
-				// replace 'b' tags with 'strong; 'i' tags with 'em'; doing this on the childNodes so that the selection doesn't break for safari;
-				for (var i=event.target.childNodes.length-1; i > -1; i--) {
-					if (event.target.tagName.toLowerCase()=='b') {
-						editor.node.wrap(event.target.childNodes[i], "strong");
-					} else if (event.target.tagName.toLowerCase()=='i') {
-						editor.node.wrap(event.target.childNodes[i], "em");
+				// Chrome remembers that a text was bold or italic, this will remove those tags when they are inserted.
+				if (addedNode.tagName && (addedNode.tagName.toLowerCase()=='b' || addedNode.tagName.toLowerCase()=='i')) {
+					if (addedNode.attributes.length === 0) { // check for attributes (including class), we do want to allow <i class="fa"> and other things.
+						// replace 'b' tags with 'strong; 'i' tags with 'em'; doing this on the childNodes so that the selection doesn't break for safari;
+						for (var i=addedNode.childNodes.length-1; i > -1; i--) {
+							if (addedNode.tagName.toLowerCase()=='b') {
+								editor.node.wrap(addedNode.childNodes[i], "strong");
+							} else if (addedNode.tagName.toLowerCase()=='i') {
+								editor.node.wrap(addedNode.childNodes[i], "em");
+							}
+						}
+
+						editor.node.unwrap(addedNode);
+						var sel = window.getSelection();
+						var range = sel.getRangeAt(0);
+						sel.removeAllRanges();
+						sel.addRange(range);
 					}
 				}
-
-				editor.node.unwrap(event.target);
-				var sel = window.getSelection();
-				var range = sel.getRangeAt(0);
-				sel.removeAllRanges();
-				sel.addRange(range);
-			}
-		}
+			});
+		});
 	};
 
-	var noTagsAllowedListener = function(event) {
-		if (!editor.node.getSimplyField(event.target)) {
-			return;
-		}
-
-		if (event.target.tagName) {
-			editor.node.unwrap(event.target);
-			var sel = window.getSelection();
-			var range = sel.getRangeAt(0);
-			sel.removeAllRanges();
-			sel.addRange(range);
-		}
-	};
-
-	var divListener = function(event) {
-		if (!editor.node.getSimplyField(event.target)) {
-			return;
-		}
-
-		if (
-			event.target.tagName && (event.target.tagName.toLowerCase()=='div')
-		) {
-			window.setTimeout(function() {
-				// allow a bit of time before unwrapping - chrome is still moving elements around at this point
-				if (event.target.innerHTML == '') {
-					event.target.innerHTML = "<br>";
-				}
-
-				// var siblings = newP.parentNode.childNodes;
-				var parent = event.target.parentNode;
-				if (!parent) {
+	var noTagsAllowedListener = function(mutations) {
+		mutations.forEach(function(mutation) {
+			mutation.addedNodes.forEach(function(addedNode) {
+				if (!editor.node.getSimplyField(addedNode)) {
 					return;
 				}
 
-				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
-				var sel = window.getSelection();
-				if (sel.rangeCount) {
+				if (addedNode.tagName) {
+					editor.node.unwrap(addedNode);
+					var sel = window.getSelection();
 					var range = sel.getRangeAt(0);
-					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
-				}
-
-				var nestingRules = hope.render.html.rules.nesting[parent.tagName.toLowerCase()];
-				if (nestingRules && nestingRules.indexOf("p") === -1) {
-					// replace the div with a 'br' element when we are in an element that does not allow paragraphs
-					var breakEl = document.createElement("BR");
-					event.target.parentNode.insertBefore(breakEl, event.target);
-				}
-
-				editor.node.unwrap(event.target);
-				var siblings = parent.childNodes;
-				editor.node.unwrap(event.target);
-				addParagraphs(siblings);
-				if (caretNode) {
-					range = document.createRange();
-					range.setStart(caretNode, 0);
 					sel.removeAllRanges();
 					sel.addRange(range);
 				}
-			}, 10);
-		} else if (event.target.tagName && (event.target.tagName.toLowerCase() == 'h1')) {
-			window.setTimeout(function() {
-				// special case for H1 - we don't want it inserted as a result of an enter key. The first one should be a H1, the others should be a paragraph.
-				// Firefox inserts the new element in front of the original; Chrome inserts the new H1 behind the original.
+			});
+		});
+	};
 
-				var parent = event.target.parentNode;
-				if (!parent) {
+	var divListener = function(mutations) {
+		mutations.forEach(function(mutation) {
+			mutation.addedNodes.forEach(function(addedNode) {
+				if (!editor.node.getSimplyField(addedNode)) {
 					return;
 				}
 
-				// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
-				var sel = window.getSelection();
-				if (sel.rangeCount) {
-					var range = sel.getRangeAt(0);
-					var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
-				}
+				if (
+					addedNode.tagName && (addedNode.tagName.toLowerCase()=='div')
+				) {
+					if (addedNode.innerHTML == '') {
+						addedNode.innerHTML = "<br>";
+					}
 
-				var nodes = parent.querySelectorAll("h1");
-				for (var i=1; i<nodes.length; i++) {
-					editor.node.unwrap(nodes[i]); // Unwrap the other nodes, leave the first H1;
+					// var siblings = newP.parentNode.childNodes;
+					var parent = addedNode.parentNode;
+					if (!parent) {
+						return;
+					}
+
+					// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
+					var sel = window.getSelection();
+					if (sel.rangeCount) {
+						var range = sel.getRangeAt(0);
+						var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+					}
+
+					var nestingRules = hope.render.html.rules.nesting[parent.tagName.toLowerCase()];
+					if (nestingRules && nestingRules.indexOf("p") === -1) {
+						// replace the div with a 'br' element when we are in an element that does not allow paragraphs
+						var breakEl = document.createElement("BR");
+						addedNode.parentNode.insertBefore(breakEl, addedNode);
+					}
+
+					editor.node.unwrap(addedNode);
+					var siblings = parent.childNodes;
+					editor.node.unwrap(addedNode);
+					addParagraphs(siblings);
+					if (caretNode) {
+						range = document.createRange();
+						range.setStart(caretNode, 0);
+						sel.removeAllRanges();
+						sel.addRange(range);
+					}
+				} else if (addedNode.tagName && (addedNode.tagName.toLowerCase() == 'h1')) {
+					// special case for H1 - we don't want it inserted as a result of an enter key. The first one should be a H1, the others should be a paragraph.
+					// Firefox inserts the new element in front of the original; Chrome inserts the new H1 behind the original.
+
+					var parent = addedNode.parentNode;
+					if (!parent) {
+						return;
+					}
+
+					// remember the textnode where the caret is in, so we can place it back after we are done unwrapping and re-wrapping;
+					var sel = window.getSelection();
+					if (sel.rangeCount) {
+						var range = sel.getRangeAt(0);
+						var caretNode = range.startContainer.firstChild ? range.startContainer.firstChild : range.startContainer;
+					}
+
+					var nodes = parent.querySelectorAll("h1");
+					for (var i=1; i<nodes.length; i++) {
+						editor.node.unwrap(nodes[i]); // Unwrap the other nodes, leave the first H1;
+					}
+					var siblings = parent.childNodes;
+					addParagraphs(siblings);
+					if (caretNode) {
+						range = document.createRange();
+						range.setStart(caretNode, 0);
+						sel.removeAllRanges();
+						sel.addRange(range);
+					}
 				}
-				var siblings = parent.childNodes;
-				addParagraphs(siblings);
-				if (caretNode) {
-					range = document.createRange();
-					range.setStart(caretNode, 0);
-					sel.removeAllRanges();
-					sel.addRange(range);
-				}
-			}, 10);
-		}
+			});
+		});
 	};
 
 	var cleanPastedHtml = function(pastedHtml, target) {
@@ -4362,7 +4385,11 @@ document.addEventListener('simply-toolbars-loaded', function() {
 		init : function() {
 			// Chrome will remember the styling from an element that was removed and helpfully insert it back into the HTML.
 			// We never want that.
-			document.addEventListener("DOMNodeInserted", fontListener);
+			document.fontObserver = new MutationObserver(fontListener);
+			document.fontObserver.observe(document, {
+				"childList": true,
+				"subtree" : true
+			});
 
 			document.addEventListener("keydown", function(event) {
 				if (!editor.node.getSimplyField(event.target)) {
@@ -4371,7 +4398,11 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				switch (event.keyCode) {
 					case 8:		// backspace
 					case 46: 	// delete
-						event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
+						event.target.ownerDocument.spanObserver = new MutationObserver(spanListener);
+						event.target.ownerDocument.spanObserver.observe(event.target.ownerDocument, {
+							"childList": true,
+							"subtree" : true
+						});
 
 						// empty the field if only a newline remains;
 						if (
@@ -4389,7 +4420,11 @@ document.addEventListener('simply-toolbars-loaded', function() {
 						}
 						var simplyParent = editor.node.getSimplyParent(event.target);
 						if (simplyParent) {
-							event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
+							event.target.ownerDocument.divObserver = new MutationObserver(divListener);
+							event.target.ownerDocument.divObserver.observe(event.target.ownerDocument, {
+								"childList": true,
+								"subtree" : true
+							});
 							if (simplyParent.hopeEditor) {
 								simplyParent.hopeEditor.needsUpdate = true;
 							}
@@ -4402,9 +4437,12 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				if (!editor.node.getSimplyField(event.target)) {
 					return;
 				}
-				event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
-				event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
-				event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
+				var targetDocument = event.target.ownerDocument;
+				window.setTimeout(function() {
+					if (targetDocument.divObserver) {targetDocument.divObserver.disconnect();}
+					if (targetDocument.spanObserver) {targetDocument.spanObserver.disconnect();}
+					if (targetDocument.noTagsObserver) {targetDocument.noTagsObserver.disconnect();}
+				}, 1);
 			});
 
 			document.addEventListener("paste", function(event) {
@@ -4421,32 +4459,38 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				}
 
 				var targetField = editor.node.getSimplyParent(event.target);
+				var targetDocument = event.target.ownerDocument;
 
 				pastedHtml = cleanPastedHtml(pastedHtml, event.target);
 				while (pastedHtml && (!pasteAllowed(pastedHtml, targetField))) {
 					pastedHtml = unwrapPastedHtml(pastedHtml);
 				}
 
-				event.target.ownerDocument.addEventListener("DOMNodeInserted", spanListener);
-				event.target.ownerDocument.addEventListener("DOMNodeInserted", fontListener);
+				targetDocument.spanObserver = new MutationObserver(spanListener);
+				targetDocument.spanObserver.observe(targetDocument, {
+					"childList": true,
+					"subtree" : true
+				});
 
 				if (pastedHtml) {
 					event.preventDefault();
-					event.target.ownerDocument.execCommand("insertHtml", false, pastedHtml);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", fontListener);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
-					return;
+					targetDocument.execCommand("insertHtml", false, pastedHtml);
 				}
 				if (pastedText) {
 					event.preventDefault();
-					event.target.ownerDocument.addEventListener("DOMNodeInserted", divListener);
-					event.target.ownerDocument.execCommand("insertText", false, pastedText);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", spanListener);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", fontListener);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", divListener);
-					event.target.ownerDocument.removeEventListener("DOMNodeInserted", noTagsAllowedListener);
+					targetDocument.divObserver = new MutationObserver(divListener);
+					targetDocument.divObserver.observe(targetDocument, {
+						"childList": true,
+						"subtree" : true
+					});
+					targetDocument.execCommand("insertText", false, pastedText);
+					var targetDocument = targetDocument;
 				}
+				window.setTimeout(function() {
+					if (targetDocument.divObserver) {targetDocument.divObserver.disconnect();}
+					if (targetDocument.spanObserver) {targetDocument.spanObserver.disconnect();}
+					if (targetDocument.noTagsObserver) {targetDocument.noTagsObserver.disconnect();}
+				}, 1);
 			});
 		}
 	});
@@ -5167,7 +5211,8 @@ document.addEventListener('simply-toolbars-loaded', function() {
 				<button id="simply-buy-button" data-simply-action="simply-about-buy" style="display: none">Buy now</button>
 			</div>
 			<div id="simply-about-footer">
-				<p>SimplyEdit is a product by <button class="simply-about-muze" data-simply-action="simply-about-muze">Muze</button><br>&copy; 2015-2019, <button class="simply-about-muze" data-simply-action="simply-about-license">all rights reserved.</button></p>
+				<p>SimplyEdit is a product by <button class="simply-about-muze" data-simply-action="simply-about-muze">Muze</button><br>&copy;
+				2015-2021, <button class="simply-about-muze" data-simply-action="simply-about-license">all rights reserved.</button></p>
 			</div>
 		</div>
 	</div>
