@@ -1762,8 +1762,7 @@ QUnit.module("simply components");
 		field.innerHTML = `
 		  <div data-simply-list="things" data-simply-entry="entry">
     <template>
-      <div data-simply-field="entry" data-simply-content="template" data-simply-transformer="thingType" data-simply-default-value="de
-fault">
+      <div data-simply-field="entry" data-simply-content="template" data-simply-transformer="thingType" data-simply-default-value="default">
         <template data-simply-template="default"></template>
         <template data-simply-template="thing">
           <div class="ds-form-group ds-grid">
