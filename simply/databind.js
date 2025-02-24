@@ -178,11 +178,9 @@ elementBinding = function(element, config, dataBinding) {
 							}
 							elementBinding.dataBinding.set(elementBinding.getter());
 						break;
-						case "childList":
-						break;
 						default:
-							// there are needed to keep the focus in an element while typing;
-							dataBinding.set(elementBinding.getter());
+							// these are needed to keep the focus in an element while typing;
+							elementBinding.dataBinding.set(elementBinding.getter());
 						break;
 					}
 				}
@@ -233,8 +231,8 @@ elementBinding = function(element, config, dataBinding) {
 							});
 						break;
 						default:
-							// there are needed to keep the focus in an element while typing;
-							dataBinding.set(elementBinding.getter());
+							// these are needed to keep the focus in an element while typing;
+							elementBinding.dataBinding.set(elementBinding.getter());
 						break;
 					}
 				}
@@ -272,7 +270,7 @@ elementBinding = function(element, config, dataBinding) {
 			case "databinding:valuechanged":
 				// Allow the browser to fix what it thinks needs to be fixed (node to be removed, cleaned etc) before setting the new data;
 
-				// there are needed to keep the focus in an element while typing;
+				// these are needed to keep the focus in an element while typing;
 				elementBinding.pauseListeners();
 				dataBinding.set(elementBinding.getter());
 				elementBinding.resumeListeners();
