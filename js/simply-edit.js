@@ -1553,8 +1553,8 @@
 					field.innerHTML = "";
 				}
 
-				field.hopeContent = document.createElement("textarea");
-				field.hopeMarkup = document.createElement("textarea");
+				field.hopeContent = {"value" : ""}; // this was a textarea, but having a textarea makes \r characters disappear which causes off-by-one errors in hope
+				field.hopeMarkup = {"value" : ""}; // this was a textarea, but having a textarea makes \r characters disappear which causes off-by-one errors in hope
 				field.hopeRenderedSource = document.createElement("DIV");
 				field.hopeEditor = hope.editor.create( field.hopeContent, field.hopeMarkup, field, field.hopeRenderedSource );
 				field.hopeEditor.field = field;
