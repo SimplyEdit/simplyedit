@@ -530,6 +530,90 @@ QUnit.module("hope editor behaviour");
 		assert.notOk(annotation);
 	});
 
+	QUnit.test("add and remove strong markup", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = "line1<br>line2";
+		testContent.hopeEditor.parseHTML();
+
+		// setCaretPosition only works in the first node, we need the second. FIXME: update setCaretPosition to understand this;
+		// setCaretPosition(testContent, 6, 5);
+		
+		var mySetCaretStart = function(range, targetNode, rangeStart) {
+			if (targetNode.nodeType === document.ELEMENT_NODE) {
+				for (var node=0; node<targetNode.childNodes.length; node++) {
+					if (targetNode.childNodes[node].nodeType === document.ELEMENT_NODE) {
+						var childStart = mySetCaretStart(range, targetNode.childNodes[node], rangeStart);
+						if (typeof childStart === "number") {
+							rangeStart = childStart;
+							continue;
+						} else {
+							return;
+						}
+					}
+					if (rangeStart < targetNode.childNodes[node].length) {
+						range.setStart(targetNode.childNodes[node], rangeStart);
+						return;
+					} else {
+						rangeStart -= targetNode.childNodes[node].length;
+					}
+				}
+			} else if (targetNode.nodeType === document.TEXT_NODE) {
+				range.setStart(targetNode, rangeStart);
+				return;
+			}
+			return rangeStart;
+		}
+		var mySetCaretEnd = function(range, targetNode, rangeEnd) {
+			if (targetNode.nodeType === document.ELEMENT_NODE) {
+				for (var node=0; node<targetNode.childNodes.length; node++) {
+					if (targetNode.childNodes[node].nodeType === document.ELEMENT_NODE) {
+						var childEnd = mySetCaretEnd(range, targetNode.childNodes[node], rangeEnd);
+						if (typeof childEnd === "number") {
+							rangeEnd = childEnd;
+							continue;
+						} else {
+							return;
+						}
+					}
+					if (rangeEnd <= targetNode.childNodes[node].length) {
+						range.setEnd(targetNode.childNodes[node], rangeEnd);
+						return;
+					} else {
+						rangeEnd -= targetNode.childNodes[node].length;
+					}
+				}
+			} else if (targetNode.nodeType === document.TEXT_NODE) {
+				range.setEnd(targetNode, rangeEnd);
+				return;
+			}
+			return rangeEnd;
+		}
+		
+		var mySetCaretPosition = function(targetNode, start, length) {
+			var range = document.createRange();
+			mySetCaretStart(range, targetNode, start);
+			mySetCaretEnd(range, targetNode, start + length);
+			var sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+			if (focus in targetNode) {
+				targetNode.focus();
+			}
+			var newRange = sel.getRangeAt(0);
+			editor.context.skipUpdate = false;
+			editor.context.update();
+			// End setCaretPosition
+		}
+
+		// setCaretPosition(testContent, 6, 5);
+		mySetCaretPosition(testContent, 5, 5);
+		editor.actions['simply-text-bold']();
+		assert.equal(testContent.innerHTML, 'line1<br><strong>line2</strong>', "STRONG tag is applied on the second line");
+		mySetCaretPosition(testContent, 0, 10);
+		editor.actions['simply-text-bold']();
+		assert.equal(testContent.innerHTML, 'line1<br>line2', "STRONG tag is removed");
+	});
+
 	
 QUnit.module("editor context");
 	QUnit.test("text context", function(assert) {
