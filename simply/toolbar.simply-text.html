@@ -564,10 +564,6 @@
 						// hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
 					} else {
 						hopeEditor.fragment = hopeEditor.fragment.remove(annotation.range, annotation.tag);
-						var newRange = hope.range.create(annotation.range.start, range.start);
-						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, tag);
-						newRange = hope.range.create(range.end, annotation.range.end);
-						hopeEditor.fragment = hopeEditor.fragment.apply(newRange, tag);
 					}
 				} else {
 					if (range.start === range.end) {
