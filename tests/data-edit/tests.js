@@ -1511,7 +1511,7 @@ QUnit.module("text hyperlinks");
 
 	QUnit.test("hyperlink fixed with text content shows no toolbar", function(assert) {
 		var testContent = document.querySelector("#testContent");
-		testContent.innerHTML = "<a href='#' data-simply-field='link' data-simply-content='fixed'><h4 data-simply-field='title' data-simply-content='text'>Title</h4></a>";
+		testContent.innerHTML = '<a href="#" data-simply-field="caption-link" data-simply-content="fixed">    <div class="caption">        <h4 data-simply-field="title-program" data-simply-content="text">Titel Programma</h4>      </div></a>';
 		testContent.hopeEditor.parseHTML();
 
 		setCaretPosition(testContent.querySelector("h4"), 3);
