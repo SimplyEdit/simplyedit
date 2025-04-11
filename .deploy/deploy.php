@@ -73,14 +73,14 @@ set('rsync',[
 ]);
 
 // Configure servers
-server('canary', 'mz-webserver-01.muze.nl')
+server('canary', 'mz-webserver-01.muze.nl', 2223)
 	->port(2223)
 	->user('canary.simplyedit.io')
 	->stage('canary')
 	->env('deploy_path', '/var/www/vhosts/canary.simplyedit.io/site/res/');
 
 // Configure servers
-server('cdn1', 'mz-webserver-01.muze.nl')
+server('cdn1', 'mz-webserver-01.muze.nl', 2223)
 	->port(2223)
 	->user('cdn.simplyedit.io')
 	->stage('cdn')
