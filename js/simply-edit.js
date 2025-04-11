@@ -2335,6 +2335,7 @@
 				};
 				var slipReorderHandler = function(e) {
 					e.target.parentNode.insertBefore(e.target, e.detail.insertBefore);
+					e.stopPropagation(); // prevent the reorder event from reaching any parent lists
 					window.setTimeout(removeSelection, 1);
 					return false;
 				};
