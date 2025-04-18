@@ -340,8 +340,7 @@
 				if (pastedHtml) {
 					event.preventDefault();
 					targetDocument.execCommand("insertHtml", false, pastedHtml);
-				}
-				if (pastedText) {
+				} else if (pastedText) {
 					event.preventDefault();
 					targetDocument.divObserver = new MutationObserver(divListener);
 					targetDocument.divObserver.observe(targetDocument, {
