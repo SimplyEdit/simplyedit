@@ -998,7 +998,7 @@
 
 					editor.bindingParents.push(j + listIndex.length);
 					var currentBinding = list.dataBinding;
-					if (typeof currentBinding !== "undefined") {
+					if (typeof currentBinding !== "undefined" && !listDataSource) {
 						if (currentBinding.mode == "list") {
 							if (currentBinding.get() != listData) {
 								if (currentBinding.get().push) {
