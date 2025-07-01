@@ -2,7 +2,7 @@
 	Simply edit the Web
 
 	Written by Yvo Brevoort
-	Copyright Muze 2015-2020, all rights reserved.
+	Copyright Muze 2015-2025, all rights reserved.
 */
 (function() {
 	if (window.editor) {
