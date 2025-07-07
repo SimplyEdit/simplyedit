@@ -820,12 +820,12 @@ QUnit.module("databinding");
 		editor.data.apply(editor.currentData, document);
 
 		field.innerHTML = "Hi world!";
-		stop();
+		const done = assert.async();
 		window.setTimeout(function() {
 			field.dataBinding.resolve(true);
 			assert.equal(field.innerHTML, "Hi world!", "new content remains in div");
 			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
-			start();
+			done();
 		}, 150);
 	});
 
@@ -928,12 +928,12 @@ QUnit.module("databinding");
 		assert.equal(field.querySelector("div").innerHTML, "Hi world!", "added item is found in DOM");
 
 		field.querySelector("DIV").innerHTML = "Way out there";
-		stop();
+		const done = assert.async();
 		window.setTimeout(function() {
 			field.querySelector("DIV").dataBinding.resolve(true);
 			assert.equal(editor.pageData.hello[0].item, "Way out there", "setting innerHTML does it");
 			assert.equal(field.querySelector("div").innerHTML, "Way out there", "modified item is modified in DOM");
-			start();
+			done();
 		}, 150);
 	});
 
@@ -957,10 +957,10 @@ QUnit.module("databinding");
 		var extraNode = field.querySelector("li").cloneNode(true);
 		field.appendChild(extraNode);
 
-		stop();
+		const done = assert.async();
 		window.setTimeout(function() {
 			assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world!"},{item:"Hi world!"}]), "cloned item is found in data");
-			start();
+			done();
 		}, 300);
 	});
 
@@ -978,13 +978,13 @@ QUnit.module("databinding");
 		editor.currentData = {};
 		editor.data.apply(editor.currentData, document);
 
-		stop();
+		const done = assert.async();
 		window.setTimeout(function() { 
 			field.dataBinding.resolve(true);
 			assert.equal(field.innerHTML, "Hi world!", "new content is set in div");
 			assert.equal(field2.innerHTML, "Hi world!", "new content is set in second div");
 			assert.equal(editor.pageData.hello, "Hi world!", "new content is found in pagedata");
-			start();
+			done();
 		}, 150);
 
 		field.innerHTML = "Hi world!";
@@ -1025,12 +1025,12 @@ QUnit.module("databinding");
 		editor.pageData.hello.push({item : "Hi world 2!"});
 		field.dataBinding.resolve(true);
 		field.appendChild(field.querySelector("li"));
-		stop();
+		const done = assert.async();
 		window.setTimeout(function() {
 			assert.equal(JSON.stringify(editor.pageData.hello), JSON.stringify([{item:"Hi world 2!"}, {item:"Hi world!"}]), "added item is found in data");
 			assert.equal(field.querySelector("div").innerHTML, "Hi world 2!", "added item is found in DOM");
 			assert.equal(field.querySelector("li + li div").innerHTML, "Hi world!", "added item is found in DOM");
-			start();
+			done();
 		}, 5);
 	});
 
@@ -1379,11 +1379,11 @@ QUnit.module("databinding");
 			q : "Que"
 		};
 		document.querySelector("#testContent div").innerHTML = "Hello again";
-		stop();
+		const done = assert.async();
 		window.setTimeout(function() { // give Edge a second to catch up;
-			start();
 			document.querySelector("#testContent div").dataBinding.resolve(true);
 			assert.equal(editor.currentData['/'].item.a.b.c, "Hello again");
+			done();
 		}, 0);
 	});
 
@@ -1412,11 +1412,11 @@ QUnit.module("databinding");
 			x : "Ex"
 		};
 		document.querySelector("#testContent div").innerHTML = "Hello again";
-		stop();
+		const done = assert.async();
 		window.setTimeout(function() { // let it redraw
-			start();
 			document.querySelector("#testContent div").dataBinding.resolve(true);
 			assert.equal(editor.currentData['/'].item.a.b.c.d, "Hello again");
+			done();
 		}, 0);
 	});
 
