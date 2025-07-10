@@ -2,7 +2,7 @@
 	Simply edit the Web
 
 	Written by Yvo Brevoort
-	Copyright Muze 2015-2020, all rights reserved.
+	Copyright Muze 2015-2025, all rights reserved.
 */
 (function() {
 	if (window.editor) {
@@ -3436,40 +3436,6 @@
 	editor.addAction = function(name, action) {
 		editor.actions[name] = action;
 	};
-
-	var preventDOMContentLoaded = function(event) {
-		event.preventDefault();
-		return false;
-	};
-
-	if ("addEventListener" in document) {
-		document.addEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-		window.addEventListener("load", preventDOMContentLoaded, true);
-	}
-
-	if (typeof jQuery !== "undefined") {
-		if (typeof jQuery.holdReady === "function") {
-			jQuery.holdReady(true);
-		}
-	}
-
-	document.addEventListener("simply-content-loaded", function(evt) {
-		if ("removeEventListener" in document) {
-			document.removeEventListener("DOMContentLoaded", preventDOMContentLoaded, true);
-			window.removeEventListener("load", preventDOMContentLoaded, true);
-		}
-			
-		editor.fireEvent("DOMContentLoaded", document);
-		window.setTimeout(function() {
-			editor.fireEvent("load", window);
-		}, 100);
-
-		if (typeof jQuery !== "undefined") {
-			if (typeof jQuery.holdReady === "function") {
-				jQuery.holdReady(false);
-			}
-		}
-	});
 
 	// Add fake window.console for IE8/9
 	if (!window.console) console = {log: function() {}};
