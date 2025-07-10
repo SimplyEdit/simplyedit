@@ -1509,6 +1509,16 @@ QUnit.module("text hyperlinks");
 		assert.equal(targetInput.value, "", "title is emptied");
 	});
 
+	QUnit.test("hyperlink fixed with text content shows no toolbar", function(assert) {
+		var testContent = document.querySelector("#testContent");
+		testContent.innerHTML = '<a href="#" data-simply-field="caption-link" data-simply-content="fixed">    <div class="caption">        <h4 data-simply-field="title-program" data-simply-content="text">Titel Programma</h4>      </div></a>';
+		testContent.hopeEditor.parseHTML();
+
+		setCaretPosition(testContent.querySelector("h4"), 3);
+
+		assert.ok(editor.context.get(), "simply-no-context", "hyperlink context");
+	});
+
 
 QUnit.module("images");
 	QUnit.test("insert image at end of paragraph stays at caret location", function(assert) {
